@@ -313,14 +313,12 @@ function deptGridHTML() {
 function selectDept(id) {
   staffState.dept = DEPTS.find(d=>d.id===id);
   staffState.step = "form";
-  document.querySelector(".app > div:last-child").outerHTML = formHTML();
-  // re-render form inside app after header
   const app = document.getElementById("app");
   const header = app.querySelector(".header");
   app.innerHTML = "";
   app.appendChild(header);
-  app.insertAdjacentHTML("beforeend", `<div class="form-scroll"><div id="form-inner">${formBodyHTML()}</div></div>`);
-  bindForm();
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll"><div id="form-inner"></div></div>`);
+  document.getElementById("form-inner").innerHTML = formBodyHTML();
 }
 
 function formBodyHTML() {
