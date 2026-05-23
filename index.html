@@ -215,13 +215,23 @@ function compressImg(dataUrl) {
 // ── STATE ─────────────────────────────────────────────────
 let state = { mode:null, pin:null };
 function render() {
+  // Stop any admin polling
+  if (adminInterval) { clearInterval(adminInterval); adminInterval = null; }
   const app = document.getElementById("app");
+  app.innerHTML = "";
   if (state.pin==="admin") { app.innerHTML = pinHTML("🔐 ລະຫັດຜູ້ອານຸມັດ","admin"); return; }
   if (state.pin==="owner") { app.innerHTML = pinHTML("🔐 ລະຫັດຫົວໜ້າ","owner"); return; }
-  if (state.mode==="staff") { app.innerHTML = headerHTML("ສົ່ງຍອດ & ຖ່າຍຮູບບິນ") + staffHTML(); bindStaff(); return; }
-  if (state.mode==="admin"||state.mode==="owner") { app.innerHTML = headerHTML(state.mode==="owner"?"👑 ຫົວໜ້າ — ເບິ່ງຍອດເງິນ":"🔍 ກຳລັງກວດສອບ") + adminLoadingHTML(); bindHeader(); loadAdmin(); return; }
+  if (state.mode==="staff") {
+    app.innerHTML = headerHTML("ສົ່ງຍອດ & ຖ່າຍຮູບບິນ");
+    app.insertAdjacentHTML("beforeend", deptGridHTML());
+    return;
+  }
+  if (state.mode==="admin"||state.mode==="owner") {
+    app.innerHTML = headerHTML(state.mode==="owner"?"👑 ຫົວໜ້າ — ເບິ່ງຍອດເງິນ":"🔍 ກຳລັງກວດສອບ") + adminLoadingHTML();
+    loadAdmin();
+    return;
+  }
   app.innerHTML = homeHTML();
-  bindHome();
 }
 
 function headerHTML(title) {
