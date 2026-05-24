@@ -7,10 +7,49 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Phetsarath OT','Noto Sans Lao','Sarabun',sans-serif; background:#1a1a2e; min-height:100vh; color:#e0e0e0; }
+  body { font-family: 'Phetsarath OT','Noto Sans Lao','Sarabun',sans-serif; background:#1a1a2e; min-height:100vh; color:#e0e0e0; transition:background 0.3s; }
+  body.light { background:#f4f1eb !important; color:#1a1a1a !important; }
+  body.light .app { background:#f4f1eb !important; }
+  body.light .home { background:#f4f1eb !important; }
+  body.light .app-title { color:#1a1a1a !important; }
+  body.light .app-sub { color:#777 !important; }
+  body.light .pin-wrap { background:#f4f1eb !important; }
+  body.light .pin-title { color:#1a1a1a !important; }
+  body.light .pin-key { background:#fff !important; color:#1a1a1a !important; border-color:#ddd !important; }
+  body.light .dept-grid { background:#f4f1eb !important; }
+  body.light .dept-grid h2 { color:#1a1a1a !important; }
+  body.light .dept-card { background:#fff !important; }
+  body.light .form-scroll { background:#f4f1eb !important; }
+  body.light .lbl { color:#444 !important; }
+  body.light .inp { background:#fff !important; color:#1a1a1a !important; border-color:#ddd !important; }
+  body.light .photo-btn { background:#fafafa !important; color:#555 !important; border-color:#bbb !important; }
+  body.light .admin-wrap { background:#f4f1eb !important; }
+  body.light .record-card { background:#fff !important; }
+  body.light .dept-summary { background:#fff !important; }
+  body.light .tab { background:#fff !important; color:#777 !important; border-color:#ddd !important; }
+  body.light .section-title { color:#999 !important; }
+  body.light .record-dept { color:#1a1a1a !important; }
+  body.light .record-time { color:#aaa !important; }
+  body.light .record-name { color:#555 !important; }
+  body.light .dept-sum-row { color:#1a1a1a !important; border-color:#f0f0f0 !important; }
+  body.light .done-box { background:#fff !important; }
+  body.light .done-title { color:#1a1a1a !important; }
+  body.light .modal { background:#fff !important; color:#1a1a1a !important; }
+  body.light .backup-modal { background:#fff !important; color:#1a1a1a !important; }
+  body.light .modal-info { color:#444 !important; }
+  body.light .btn-cancel { background:#fff !important; color:#555 !important; border-color:#ddd !important; }
+  body.light .view-btn { background:#fff !important; color:#555 !important; border-color:#ddd !important; }
+  body.light .cur-btn { background:#fff !important; color:#555 !important; border-color:#ddd !important; }
+  body.light .cur-active { background:#e8f5e9 !important; color:#2d6a4f !important; border-color:#2d6a4f !important; }
+  body.light .restore-btn { background:#fff !important; }
+  body.light .clear-btn { background:#fff !important; }
+  body.light .backup-textarea { background:#f9fef9 !important; color:#1a1a1a !important; }
+  body.light .admin-scroll { background:#f4f1eb !important; }
   .app { max-width:480px; margin:0 auto; min-height:100vh; background:#1a1a2e; }
   button { font-family:inherit; cursor:pointer; }
   input { font-family:inherit; font-size:16px; } /* 16px prevents iOS zoom */
+  * { touch-action: manipulation; } /* prevent double-tap zoom everywhere */
+  button { touch-action: manipulation; }
 
   /* HOME */
   .home { display:flex; flex-direction:column; align-items:center; padding:40px 20px; background:#1a1a2e; }
@@ -24,6 +63,9 @@
   .card-title { font-size:20px; font-weight:700; }
   .card-sub { font-size:13px; opacity:0.8; margin-top:2px; }
   .sync-note { margin-top:16px; font-size:11px; color:#bbb; text-align:center; }
+  .theme-btn { position:fixed; bottom:20px; right:20px; width:48px; height:48px; border-radius:50%; border:none; font-size:22px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); z-index:999; display:flex; align-items:center; justify-content:center; }
+  .theme-btn.dark { background:#16213e; color:#ffd700; }
+  .theme-btn.light { background:#fff; color:#1a1a2e; }
 
   /* HEADER */
   .header { background:#1a1a1a; color:#fff; display:flex; align-items:center; padding:14px 16px; gap:12px; position:sticky; top:0; z-index:10; }
@@ -776,6 +818,29 @@ function doRestore(el) {
 }
 
 // ── INIT ─────────────────────────────────────────────────
+// Theme toggle
+let isDark = localStorage.getItem("dv_theme") !== "light";
+function applyTheme() {
+  document.body.classList.toggle("light", !isDark);
+  const btn = document.getElementById("theme-btn");
+  if (btn) {
+    btn.textContent = isDark ? "☀️" : "🌙";
+    btn.className = "theme-btn " + (isDark ? "dark" : "light");
+  }
+}
+function toggleTheme() {
+  isDark = !isDark;
+  localStorage.setItem("dv_theme", isDark ? "dark" : "light");
+  applyTheme();
+}
+
+// Add floating theme button
+const themeBtn = document.createElement("button");
+themeBtn.id = "theme-btn";
+themeBtn.onclick = toggleTheme;
+document.body.appendChild(themeBtn);
+
+applyTheme();
 render();
 </script>
 </body>
