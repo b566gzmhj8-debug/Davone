@@ -160,16 +160,32 @@ function getSupa() {
 
 async function dbGet() {
   try {
-    const { data, error } = await getSupa().from("records").select("*").order("timestamp", {ascending:true});
-    if (error || !data) return [];
-    return data.map(r => ({
+    const { data, error } = await Promise.race([
+      getSupa().from("records").select("*").order("timestamp", {ascending:true}),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
+    ]);
+    if (error || !data) return getCached();
+    const records = data.map(r => ({
       id: r.id, timestamp: r.timestamp,
       department: r.department, departmentName: r.department_name,
       amount: Number(r.amount), currency: r.currency||"LAK",
       note: r.note||"", image: r.image||null,
       verified: r.verified||false, approved: r.approved||false,
     }));
-  } catch(e) { console.error(e); return []; }
+    // Cache to localStorage
+    try { localStorage.setItem("dv_cache", JSON.stringify(records)); } catch {}
+    return records;
+  } catch(e) { 
+    console.error(e); 
+    return getCached();
+  }
+}
+
+function getCached() {
+  try { 
+    const c = localStorage.getItem("dv_cache");
+    return c ? JSON.parse(c) : [];
+  } catch { return []; }
 }
 
 async function dbSave(rec) {
@@ -458,8 +474,15 @@ function adminLoadingHTML() {
 }
 async function loadAdmin() {
   if(adminInterval) clearInterval(adminInterval);
+  // Show cached data immediately
+  const cached = getCached();
+  if (cached.length > 0) {
+    adminRecords = cached;
+    renderAdmin();
+  }
+  // Then fetch fresh data
   await refreshAdmin();
-  adminInterval=setInterval(refreshAdmin,10000);
+  adminInterval=setInterval(refreshAdmin,15000);
 }
 async function refreshAdmin() {
   const newRecords = await dbGet();
