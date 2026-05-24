@@ -503,12 +503,9 @@ async function refreshAdmin() {
     if (el && scrollTop > 0) el.scrollTop = scrollTop;
   });
 }
-function renderAdmin() {
-  const app=document.getElementById("app");
-  const header=app.querySelector(".header");
-  if(!header) return;
-  const isOwner=state.mode==="owner";
-  const filtered=adminRecords.filter(r=>{
+function getFiltered() {
+  const isOwner = state.mode==="owner";
+  return adminRecords.filter(r=>{
     if(isOwner&&!r.verified) return false;
     const d=new Date(r.timestamp);
     const rk=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
@@ -517,6 +514,37 @@ function renderAdmin() {
     if(adminTab==="month") return rm===monthKey();
     return true;
   });
+}
+
+function recordsHTML(filtered, isOwner) {
+  if(filtered.length===0) return `<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການ ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
+  return [...filtered].reverse().map(r=>{
+    const dept=DEPTS.find(d=>d.id===r.department)||{icon:"📦",name:r.departmentName,color:"#999"};
+    return `<div class="record-card" style="border-left-color:${dept.color}">
+      <div class="record-top">
+        <span class="record-dept">${dept.icon} ${r.departmentName}</span>
+        <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
+      </div>
+      <div class="record-meta">
+        <span class="record-time">${fmtDate(r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
+        <span class="status-badge ${r.verified?"status-done":"status-wait"}" data-badge="${r.id}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
+      </div>
+      ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
+      <div class="record-actions">
+        ${r.image?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
+        ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" data-verify="${r.id}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+        ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderAdmin() {
+  const app=document.getElementById("app");
+  const header=app.querySelector(".header");
+  if(!header) return;
+  const isOwner=state.mode==="owner";
+  const filtered=getFiltered();
   const pending=adminRecords.filter(r=>!r.verified).length;
   const totalLAK=filtered.filter(r=>!r.currency||r.currency==="LAK").reduce((s,r)=>s+r.amount,0);
   const totalTHB=filtered.filter(r=>r.currency==="THB").reduce((s,r)=>s+r.amount,0);
@@ -525,61 +553,57 @@ function renderAdmin() {
     return {...d,total:rows.reduce((s,r)=>s+r.amount,0),count:rows.length};
   }).filter(d=>d.total>0);
 
-  let html=`<div class="admin-wrap">
+  // If admin shell already exists, only update content inside - NO scroll reset
+  const existingScroll = app.querySelector(".admin-scroll");
+  if (existingScroll) {
+    // Update totals
+    const lak = existingScroll.querySelector(".total-lak");
+    const thb = existingScroll.querySelector(".total-thb");
+    const cnt = existingScroll.querySelector(".total-count");
+    const lbl = existingScroll.querySelector(".total-label");
+    if(lak) lak.textContent = totalLAK>0?fmtKIP(totalLAK):"";
+    if(thb) thb.textContent = totalTHB>0?fmtTHB(totalTHB):"";
+    if(cnt) cnt.textContent = filtered.length+" ລາຍການ";
+    if(lbl) lbl.textContent = adminTab==="today"?"ຍອດລວມມື້ນີ້":adminTab==="month"?"ຍອດລວມເດືອນນີ້":"ຍອດລວມທັງໝົດ";
+    // Update records list only
+    const recList = existingScroll.querySelector("#rec-list");
+    if(recList) recList.innerHTML = recordsHTML(filtered, isOwner);
+    // Update tabs
+    existingScroll.querySelectorAll(".tab").forEach(b=>{
+      b.classList.toggle("active", b.dataset.tab===adminTab);
+    });
+    return; // NO scroll jump!
+  }
+
+  // First time: build full shell
+  let deptHTML = "";
+  if(byDept.length>0) {
+    deptHTML = `<div class="dept-summary"><div class="section-title">ສະຫຼຸບຕາມພະແນກ</div>${byDept.map(d=>`<div class="dept-sum-row"><span>${d.icon} ${d.name}</span><div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:#aaa">${d.count} ລາຍການ</span><span style="font-weight:700;font-size:14px;color:${d.color}">${fmtKIP(d.total)}</span></div></div>`).join("")}</div>`;
+  }
+
+  const html=`<div class="admin-wrap">
     <div class="total-card">
       <div class="total-label">${adminTab==="today"?"ຍອດລວມມື້ນີ້":adminTab==="month"?"ຍອດລວມເດືອນນີ້":"ຍອດລວມທັງໝົດ"}</div>
-      ${totalLAK>0?`<div class="total-amount total-lak">${fmtKIP(totalLAK)}</div>`:'<div class="total-amount total-lak"></div>'}
-      ${totalTHB>0?`<div class="total-amount2 total-thb">${fmtTHB(totalTHB)}</div>`:'<div class="total-amount2 total-thb"></div>'}
+      <div class="total-amount total-lak">${totalLAK>0?fmtKIP(totalLAK):""}</div>
+      <div class="total-amount2 total-thb">${totalTHB>0?fmtTHB(totalTHB):""}</div>
       ${totalLAK===0&&totalTHB===0?`<div class="total-amount">${fmtKIP(0)}</div>`:""}
       <div class="total-count">${filtered.length} ລາຍການ</div>
       ${!isOwner&&pending>0?`<span class="pending-badge">⏳ ລໍ້ຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
     </div>
     <div class="tabs">
-      <button class="tab ${adminTab==="today"?"active":""}" onclick="setTab('today')">ມື້ນີ້</button>
-      <button class="tab ${adminTab==="month"?"active":""}" onclick="setTab('month')">ເດືອນນີ້</button>
-      <button class="tab ${adminTab==="all"?"active":""}" onclick="setTab('all')">ທັງໝົດ</button>
+      <button class="tab ${adminTab==="today"?"active":""}" data-tab="today" onclick="setTab('today')">ມື້ນີ້</button>
+      <button class="tab ${adminTab==="month"?"active":""}" data-tab="month" onclick="setTab('month')">ເດືອນນີ້</button>
+      <button class="tab ${adminTab==="all"?"active":""}" data-tab="all" onclick="setTab('all')">ທັງໝົດ</button>
     </div>
     ${!isOwner?`<div class="backup-row">
       <button class="backup-btn" onclick="doBackup()">📥 Backup</button>
       <button class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore</button>
       <input type="file" id="restore-file" accept=".json" class="hidden" onchange="doRestore(this)">
-    </div>`:""}`; 
+    </div>`:""}
+    <div class="section-title">ລາຍການທັງໝົດ</div>
+    <div id="rec-list">${recordsHTML(filtered, isOwner)}</div>
+  </div>`;
 
-  if(byDept.length>0) {
-    html+=`<div class="dept-summary"><div class="section-title">ສະຫຼຸບຕາມພະແນກ</div>`;
-    byDept.forEach(d=>{
-      html+=`<div class="dept-sum-row"><span>${d.icon} ${d.name}</span><div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:#aaa">${d.count} ລາຍການ</span><span style="font-weight:700;font-size:14px;color:${d.color}">${fmtKIP(d.total)}</span></div></div>`;
-    });
-    html+=`</div>`;
-  }
-
-  html+=`<div class="section-title">ລາຍການທັງໝົດ</div>`;
-  if(filtered.length===0) {
-    html+=`<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການ ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
-  } else {
-    [...filtered].reverse().forEach(r=>{
-      const dept=DEPTS.find(d=>d.id===r.department)||{icon:"📦",name:r.departmentName,color:"#999"};
-      html+=`<div class="record-card" style="border-left-color:${dept.color}">
-        <div class="record-top">
-          <span class="record-dept">${dept.icon} ${r.departmentName}</span>
-          <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
-        </div>
-        <div class="record-meta">
-          <span class="record-time">${fmtDate(r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
-          <span class="status-badge ${r.verified?"status-done":"status-wait"}" data-badge="${r.id}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
-        </div>
-        ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
-        <div class="record-actions">
-          ${r.image?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" data-verify="${r.id}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
-          ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
-        </div>
-      </div>`;
-    });
-  }
-  html+=`</div>`;
-
-  // Replace content after header
   const oldContent=app.querySelector(".admin-wrap,.loading");
   if(oldContent) oldContent.remove();
   const scrollDiv=document.createElement("div");
@@ -589,7 +613,32 @@ function renderAdmin() {
   app.appendChild(scrollDiv);
 }
 
-function setTab(t) { adminTab=t; renderAdmin(); }
+function setTab(t) {
+  adminTab = t;
+  const isOwner = state.mode==="owner";
+  const filtered = getFiltered();
+  const totalLAK=filtered.filter(r=>!r.currency||r.currency==="LAK").reduce((s,r)=>s+r.amount,0);
+  const totalTHB=filtered.filter(r=>r.currency==="THB").reduce((s,r)=>s+r.amount,0);
+  const scroll = document.querySelector(".admin-scroll");
+  if (!scroll) return;
+  // Update tabs
+  scroll.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab===t));
+  // Update label
+  const lbl = scroll.querySelector(".total-label");
+  if(lbl) lbl.textContent = t==="today"?"ຍອດລວມມື້ນີ້":t==="month"?"ຍອດລວມເດືອນນີ້":"ຍອດລວມທັງໝົດ";
+  // Update totals
+  const lak = scroll.querySelector(".total-lak");
+  const thb = scroll.querySelector(".total-thb");
+  const cnt = scroll.querySelector(".total-count");
+  if(lak) lak.textContent = totalLAK>0?fmtKIP(totalLAK):"";
+  if(thb) thb.textContent = totalTHB>0?fmtTHB(totalTHB):"";
+  if(cnt) cnt.textContent = filtered.length+" ລາຍການ";
+  // Update records
+  const recList = scroll.querySelector("#rec-list");
+  if(recList) recList.innerHTML = recordsHTML(filtered, isOwner);
+  // Scroll to top of list smoothly
+  scroll.scrollTo({top:0, behavior:"smooth"});
+}
 
 async function tapVerify(id) {
   const r=adminRecords.find(x=>x.id===id); if(!r) return;
@@ -598,6 +647,8 @@ async function tapVerify(id) {
 }
 
 async function confirmDelete(id) {
+  event.preventDefault();
+  event.stopPropagation();
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`<div class="modal">
