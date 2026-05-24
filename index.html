@@ -486,19 +486,22 @@ async function loadAdmin() {
 }
 async function refreshAdmin() {
   const newRecords = await dbGet();
-  // Only re-render if data actually changed
-  if (JSON.stringify(newRecords) !== JSON.stringify(adminRecords)) {
-    adminRecords = newRecords;
-    // Save scroll position
-    const scrollEl = document.querySelector(".admin-scroll");
-    const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
-    renderAdmin();
-    // Restore scroll position
-    setTimeout(() => {
-      const el = document.querySelector(".admin-scroll");
-      if (el) el.scrollTop = scrollTop;
-    }, 0);
-  }
+  const changed = JSON.stringify(newRecords) !== JSON.stringify(adminRecords);
+  if (!changed) return;
+  adminRecords = newRecords;
+  
+  // Check if user is scrolled down - if yes, don't re-render
+  const scrollEl = document.querySelector(".admin-scroll");
+  const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
+  
+  // Re-render silently
+  renderAdmin();
+  
+  // Restore exact scroll position
+  requestAnimationFrame(() => {
+    const el = document.querySelector(".admin-scroll");
+    if (el && scrollTop > 0) el.scrollTop = scrollTop;
+  });
 }
 function renderAdmin() {
   const app=document.getElementById("app");
@@ -525,8 +528,8 @@ function renderAdmin() {
   let html=`<div class="admin-wrap">
     <div class="total-card">
       <div class="total-label">${adminTab==="today"?"ຍອດລວມມື້ນີ້":adminTab==="month"?"ຍອດລວມເດືອນນີ້":"ຍອດລວມທັງໝົດ"}</div>
-      ${totalLAK>0?`<div class="total-amount">${fmtKIP(totalLAK)}</div>`:""}
-      ${totalTHB>0?`<div class="total-amount2">${fmtTHB(totalTHB)}</div>`:""}
+      ${totalLAK>0?`<div class="total-amount total-lak">${fmtKIP(totalLAK)}</div>`:'<div class="total-amount total-lak"></div>'}
+      ${totalTHB>0?`<div class="total-amount2 total-thb">${fmtTHB(totalTHB)}</div>`:'<div class="total-amount2 total-thb"></div>'}
       ${totalLAK===0&&totalTHB===0?`<div class="total-amount">${fmtKIP(0)}</div>`:""}
       <div class="total-count">${filtered.length} ລາຍການ</div>
       ${!isOwner&&pending>0?`<span class="pending-badge">⏳ ລໍ້ຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
