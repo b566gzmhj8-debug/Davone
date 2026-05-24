@@ -462,8 +462,20 @@ async function loadAdmin() {
   adminInterval=setInterval(refreshAdmin,5000);
 }
 async function refreshAdmin() {
-  adminRecords=await dbGet();
-  renderAdmin();
+  const newRecords = await dbGet();
+  // Only re-render if data actually changed
+  if (JSON.stringify(newRecords) !== JSON.stringify(adminRecords)) {
+    adminRecords = newRecords;
+    // Save scroll position
+    const scrollEl = document.querySelector(".admin-scroll");
+    const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
+    renderAdmin();
+    // Restore scroll position
+    setTimeout(() => {
+      const el = document.querySelector(".admin-scroll");
+      if (el) el.scrollTop = scrollTop;
+    }, 0);
+  }
 }
 function renderAdmin() {
   const app=document.getElementById("app");
@@ -545,6 +557,7 @@ function renderAdmin() {
   const oldContent=app.querySelector(".admin-wrap,.loading");
   if(oldContent) oldContent.remove();
   const scrollDiv=document.createElement("div");
+  scrollDiv.className="admin-scroll";
   scrollDiv.style="overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - 52px)";
   scrollDiv.innerHTML=html;
   app.appendChild(scrollDiv);
