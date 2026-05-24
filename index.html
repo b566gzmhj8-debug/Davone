@@ -459,7 +459,7 @@ function adminLoadingHTML() {
 async function loadAdmin() {
   if(adminInterval) clearInterval(adminInterval);
   await refreshAdmin();
-  adminInterval=setInterval(refreshAdmin,5000);
+  adminInterval=setInterval(refreshAdmin,10000);
 }
 async function refreshAdmin() {
   const newRecords = await dbGet();
@@ -540,12 +540,12 @@ function renderAdmin() {
         </div>
         <div class="record-meta">
           <span class="record-time">${fmtDate(r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
-          <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
+          <span class="status-badge ${r.verified?"status-done":"status-wait"}" data-badge="${r.id}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
         ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
         <div class="record-actions">
           ${r.image?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" data-verify="${r.id}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
           ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
         </div>
       </div>`;
