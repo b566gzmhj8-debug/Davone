@@ -93,6 +93,7 @@
   .backup-row { display:flex; gap:10px; margin-bottom:14px; }
   .backup-btn { flex:1; padding:12px; border-radius:10px; border:none; background:#1a3a5c; color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
   .restore-btn { flex:1; padding:12px; border-radius:10px; border:1.5px solid #1a3a5c; background:#fff; color:#1a3a5c; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .clear-btn { width:100%; padding:12px; border-radius:10px; border:1.5px solid #e74c3c; background:#fff; color:#e74c3c; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; margin-bottom:14px; }
   .restore-msg { background:#f0f9f0; border:1px solid #b2dfdb; border-radius:10px; padding:10px 14px; font-size:13px; color:#2d6a4f; text-align:center; margin-bottom:12px; }
   .dept-summary { background:#fff; border-radius:14px; padding:14px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
   .section-title { font-size:12px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
@@ -599,7 +600,8 @@ function renderAdmin() {
       <button class="backup-btn" onclick="doBackup()">📥 Backup</button>
       <button class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore</button>
       <input type="file" id="restore-file" accept=".json" class="hidden" onchange="doRestore(this)">
-    </div>`:""}
+    </div>
+    <button class="clear-btn" onclick="confirmClearAll()">🗑 ລ້າງຂໍ້ມູນທັງໝົດ (ເລີ່ມເດືອນໃໝ່)</button>`:""}
     <div class="section-title">ລາຍການທັງໝົດ</div>
     <div id="rec-list">${recordsHTML(filtered, isOwner)}</div>
   </div>`;
@@ -680,6 +682,41 @@ function viewBill(id) {
   </div>`;
   overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
   document.body.appendChild(overlay);
+}
+
+async function confirmClearAll() {
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `<div class="modal">
+    <div style="font-size:44px">🗑️</div>
+    <div style="font-size:20px;font-weight:800;color:#e74c3c">ລ້າງຂໍ້ມູນທັງໝົດ?</div>
+    <div style="font-size:13px;color:#555;text-align:center;line-height:1.6">ລາຍການທັງໝົດຈະຖືກລຶບ<br>ແນະນຳໃຫ້ກົດ Backup ກ່ອນ</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="this.closest('.overlay').remove()">ຍົກເລີກ</button>
+      <button class="btn-delete" onclick="doClearAll(this)">ລ້າງທັງໝົດ</button>
+    </div>
+  </div>`;
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+
+async function doClearAll(btn) {
+  btn.textContent = "⏳ ກຳລັງລ້າງ...";
+  btn.disabled = true;
+  try {
+    // Delete all records from Supabase
+    await getSupa().from("records").delete().neq("id", 0);
+    adminRecords = [];
+    // Clear cache
+    try { localStorage.removeItem("dv_cache"); } catch {}
+    btn.closest(".overlay").remove();
+    renderAdmin();
+    alert("ລ້າງຂໍ້ມູນສຳເລັດ! ພ້ອມເລີ່ມເດືອນໃໝ່ແລ້ວ ✅");
+  } catch(e) {
+    btn.textContent = "ລ້າງທັງໝົດ";
+    btn.disabled = false;
+    alert("ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່");
+  }
 }
 
 async function doBackup() {
