@@ -617,28 +617,131 @@ function deptIconHTMLAdmin(dept) {
 
 function recordsHTML(filtered, isOwner) {
   if(filtered.length===0) return `<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການ ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
-  return [...filtered].reverse().map(r=>{
-    const dept=DEPTS.find(d=>d.id===r.department)||{icon:"📦",name:r.departmentName,color:"#999"};
+
+  // Group records: pair LAK+THB that share same department & close timestamp (within 5 sec)
+  const used = new Set();
+  const groups = [];
+  const sorted = [...filtered].sort((a,b)=>b.timestamp-a.timestamp);
+  for(const r of sorted) {
+    if(used.has(r.id)) continue;
+    used.add(r.id);
+    // Try to find a pair: same dept, different currency, timestamp within 5000ms
+    const pair = sorted.find(p =>
+      !used.has(p.id) &&
+      p.department === r.department &&
+      p.currency !== (r.currency||"LAK") &&
+      Math.abs(p.timestamp - r.timestamp) <= 5000
+    );
+    if(pair) {
+      used.add(pair.id);
+      const lak = (r.currency||"LAK")==="LAK" ? r : pair;
+      const thb = (r.currency||"LAK")==="THB" ? r : pair;
+      groups.push({ type:"pair", lak, thb, dept:r.department, departmentName:r.departmentName, timestamp:r.timestamp });
+    } else {
+      groups.push({ type:"single", r, dept:r.department, departmentName:r.departmentName, timestamp:r.timestamp });
+    }
+  }
+
+  return groups.map(g => {
+    const dept=DEPTS.find(d=>d.id===g.dept)||{icon:"📦",name:g.departmentName,color:"#999"};
     const iconHtml = DEPT_IMGS[dept.id]
       ? `<img src="${DEPT_IMGS[dept.id]}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px;" alt="">`
       : (dept.icon + " ");
-    return `<div class="record-card" style="border-left-color:${dept.color}">
-      <div class="record-top">
-        <span class="record-dept">${iconHtml}${r.departmentName}</span>
-        <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
-      </div>
-      <div class="record-meta">
-        <span class="record-time">${fmtDate(r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
-        <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
-      </div>
-      ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
-      <div class="record-actions">
-        ${r.image?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
-        ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
-        ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
-      </div>
-    </div>`;
+
+    if(g.type==="pair") {
+      const { lak, thb } = g;
+      const verified = lak.verified && thb.verified;
+      const note = lak.note || thb.note;
+      const image = lak.image || thb.image;
+      const imageId = lak.image ? lak.id : thb.id;
+      return `<div class="record-card" style="border-left-color:${dept.color}">
+        <div class="record-top">
+          <span class="record-dept">${iconHtml}${g.departmentName}</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span class="record-amt" style="color:${dept.color}">${fmtKIP(lak.amount)}</span>
+            <span class="record-amt" style="color:#2980b9;font-size:13px">${fmtTHB(thb.amount)}</span>
+          </div>
+        </div>
+        <div class="record-meta">
+          <span class="record-time">${fmtDate(g.timestamp)} 🇱🇦🇹🇭</span>
+          <span class="status-badge ${verified?"status-done":"status-wait"}">${verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
+        </div>
+        ${note?`<div class="record-name">👤 ${note}</div>`:""}
+        <div class="record-actions">
+          ${image?`<button class="view-btn" onclick="viewBill(${imageId})">🖼 ເບິ່ງບິນ</button>`:""}
+          ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyPair(${lak.id},${thb.id})">${verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+          ${!isOwner?`<button class="delete-btn" onclick="confirmDeletePair(${lak.id},${thb.id})">🗑</button>`:""}
+        </div>
+      </div>`;
+    } else {
+      const r = g.r;
+      return `<div class="record-card" style="border-left-color:${dept.color}">
+        <div class="record-top">
+          <span class="record-dept">${iconHtml}${r.departmentName}</span>
+          <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
+        </div>
+        <div class="record-meta">
+          <span class="record-time">${fmtDate(r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
+          <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
+        </div>
+        ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
+        <div class="record-actions">
+          ${r.image?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
+          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+          ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
+        </div>
+      </div>`;
+    }
   }).join("");
+}
+
+async function tapVerifyPair(id1, id2) {
+  const r1=adminRecords.find(x=>x.id===id1);
+  const r2=adminRecords.find(x=>x.id===id2);
+  if(!r1||!r2) return;
+  const newVal = !(r1.verified && r2.verified);
+  await dbUpdate(id1,{approved:newVal, verified:newVal});
+  await dbUpdate(id2,{approved:newVal, verified:newVal});
+  await refreshAdmin();
+}
+
+function confirmDeletePair(id1, id2) {
+  const r1=adminRecords.find(x=>x.id===id1); if(!r1) return;
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `<div class="modal">
+    <div style="font-size:44px">🗑️</div>
+    <div style="font-size:18px;font-weight:800">ລຶບລາຍການນີ້?</div>
+    <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r1.departmentName} (ກີບ + ບາດ)</div>
+    <div style="font-size:12px;color:#f39c12;margin-bottom:8px">ໃສ່ PIN ຫົວໜ້າເພື່ອຢືນຢັນ</div>
+    <input type="password" inputmode="numeric" maxlength="4" placeholder="PIN" id="del-pin" class="pin-input-confirm">
+    <div id="del-err" style="color:#e74c3c;font-size:12px;min-height:18px;margin-top:4px"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="this.closest('.overlay').remove()">ຍົກເລີກ</button>
+      <button class="btn-delete" onclick="checkAndDeletePair(${id1},${id2},this)">ລຶບ</button>
+    </div>
+  </div>`;
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+  setTimeout(()=>{ const p=document.getElementById("del-pin"); if(p) p.focus(); },100);
+}
+
+async function checkAndDeletePair(id1, id2, btn) {
+  const pin = document.getElementById("del-pin").value;
+  if (pin !== CLEAR_CONFIRM_PIN) {
+    document.getElementById("del-err").textContent = "PIN ບໍ່ຖືກຕ້ອງ";
+    return;
+  }
+  btn.textContent = "⏳"; btn.disabled = true;
+  try {
+    await dbDelete(id1);
+    await dbDelete(id2);
+    btn.closest(".overlay").remove();
+    await refreshAdmin();
+  } catch(e) {
+    document.getElementById("del-err").textContent = "ລຶບບໍ່ສຳເລັດ: " + e.message;
+    btn.textContent = "ລຶບ"; btn.disabled = false;
+  }
 }
 
 function renderAdmin() {
