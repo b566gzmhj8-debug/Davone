@@ -769,33 +769,35 @@ function storageHTML(records) {
   const { totalBytes, pct } = calcStorage(records);
   const mb = (totalBytes / (1024*1024)).toFixed(2);
   const maxMb = 500;
+  // Minimum bar width 3% so it's always visible
+  const barWidth = Math.max(pct, 3);
   let barColor = "#27ae60";
-  let warn = "";
+  let warnHTML = "";
   if(pct >= 90) {
     barColor = "#e74c3c";
-    warn = `<div class="storage-warn" style="background:#fdecea;color:#e74c3c">🚨 ໃກ້ຈະເຕັມແລ້ວ! ກະລຸນາ Export ຂໍ້ມູນດ່ວນ</div>`;
+    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fdecea;color:#e74c3c;font-size:12px;font-weight:700;text-align:center">🚨 ໃກ້ຈະເຕັມແລ້ວ! Export ຂໍ້ມູນດ່ວນ!</div>';
   } else if(pct >= 70) {
     barColor = "#f39c12";
-    warn = `<div class="storage-warn" style="background:#fff8e1;color:#f39c12">⚠️ Storage ໃຊ້ໄປ ${pct}% ແລ້ວ ຄວນ Backup ຂໍ້ມູນ</div>`;
+    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fff8e1;color:#f39c12;font-size:12px;font-weight:700;text-align:center">⚠️ Storage ໃຊ້ໄປ ' + pct + '% ຄວນ Backup ຂໍ້ມູນ</div>';
   } else if(pct >= 50) {
     barColor = "#f39c12";
   }
   const displayPct = pct < 0.01 ? "< 0.01" : pct;
-  return `<div class="storage-card">
-    <div class="storage-title">💾 ການໃຊ້ Storage</div>
-    <div class="storage-bar-wrap">
-      <div class="storage-bar" style="width:${pct}%;background:${barColor}"></div>
-    </div>
-    <div class="storage-info">
-      <span>ໃຊ້ໄປ: ~${mb} MB</span>
-      <span>${displayPct}% / 500 MB</span>
-    </div>
-    <div class="storage-info" style="margin-top:4px">
-      <span style="color:#888">ຈຳນວນ Record: ${records.length} ລາຍການ</span>
-      <span style="color:#888">ເຫຼືອ: ~${(maxMb - parseFloat(mb)).toFixed(1)} MB</span>
-    </div>
-    ${warn}
-  </div>`;
+  return '<div style="background:#1e2d40;border:1.5px solid #2d4a6a;border-radius:14px;padding:14px 16px;margin-bottom:12px;">'
+    + '<div style="font-size:12px;font-weight:700;color:#7fb3d3;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">💾 ການໃຊ້ Storage (Supabase Free 500MB)</div>'
+    + '<div style="background:#0d1117;border-radius:20px;height:14px;overflow:hidden;margin-bottom:8px;">'
+    + '<div style="height:100%;border-radius:20px;width:' + barWidth + '%;background:' + barColor + ';transition:width 0.5s;"></div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:#ccc;margin-bottom:4px;">'
+    + '<span>ໃຊ້ໄປ: <b>~' + mb + ' MB</b></span>'
+    + '<span><b>' + displayPct + '%</b> / 500 MB</span>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:12px;color:#888;">'
+    + '<span>Records: ' + records.length + ' ລາຍການ</span>'
+    + '<span>ເຫຼືອ: ~' + (maxMb - parseFloat(mb)).toFixed(1) + ' MB</span>'
+    + '</div>'
+    + warnHTML
+    + '</div>';
 }
 
 function renderAdmin() {
@@ -868,6 +870,7 @@ function renderAdmin() {
     <button class="clear-btn" onclick="confirmClearAll()">⚠️ ລ້າງຂໍ້ມູນທັງໝົດ (ຕ້ອງ PIN)</button>
   ` : "";
 
+  // Build storage section
   const storageCard = storageHTML(adminRecords);
   const html = `<div class="admin-wrap">
     <div class="total-card">
