@@ -868,7 +868,7 @@ function renderAdmin() {
     <button class="clear-btn" onclick="confirmClearAll()">⚠️ ລ້າງຂໍ້ມູນທັງໝົດ (ຕ້ອງ PIN)</button>
   ` : "";
 
-  const storageCard = !isOwner ? storageHTML(adminRecords) : "";
+  const storageCard = storageHTML(adminRecords);
   const html = `<div class="admin-wrap">
     <div class="total-card">
       <div class="total-label">${tabLabel}</div>
@@ -878,6 +878,7 @@ function renderAdmin() {
       <div class="total-count">${filtered.length} ລາຍການ | ທັງໝົດໃນລະບົບ ${adminRecords.length} ລາຍການ</div>
       ${!isOwner&&pending>0?`<span class="pending-badge">⏳ ລໍ້ຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
     </div>
+    ${storageCard}
     <div class="tabs">
       <button class="tab ${adminTab==="today"?"active":""}" data-tab="today" onclick="setTab('today')">ມື້ນີ້</button>
       <button class="tab ${adminTab==="month"?"active":""}" data-tab="month" onclick="setTab('month')">ເດືອນ</button>
@@ -886,7 +887,6 @@ function renderAdmin() {
     ${monthPickerHTML}
     ${deptHTML}
     ${clearHTML}
-    ${storageCard}
     <div class="section-title">ລາຍການ</div>
     <div id="rec-list">${recordsHTML(filtered, isOwner)}</div>
   </div>`;
