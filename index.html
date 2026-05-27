@@ -364,6 +364,7 @@ async function dbGet() {
       amount: Number(r.amount), currency: r.currency||"LAK",
       note: r.note||"", image: r.image||null,
       verified: r.verified||false, approved: r.approved||false,
+      approvedAt: r.approved_at||null,
     }));
     try { localStorage.setItem("dv_cache", JSON.stringify(records)); } catch {}
     return records;
@@ -820,7 +821,12 @@ function recordsHTML(filtered, isOwner) {
   // Group records: pair LAK+THB that share same department & close timestamp (within 5 sec)
   const used = new Set();
   const groups = [];
-  const sorted = [...filtered].sort((a,b)=>b.timestamp-a.timestamp);
+  // For owner: sort verified by approvedAt desc, then unverified by timestamp desc
+  const sorted = [...filtered].sort((a,b) => {
+    const aSort = (a.verified && a.approvedAt) ? a.approvedAt : a.timestamp;
+    const bSort = (b.verified && b.approvedAt) ? b.approvedAt : b.timestamp;
+    return bSort - aSort;
+  });
   for(const r of sorted) {
     if(used.has(r.id)) continue;
     used.add(r.id);
@@ -862,7 +868,7 @@ function recordsHTML(filtered, isOwner) {
           </div>
         </div>
         <div class="record-meta">
-          <span class="record-time">${fmtDate(g.timestamp)} 🇱🇦🇹🇭</span>
+          <span class="record-time">${fmtDate(isOwner && verified && lak.approvedAt ? lak.approvedAt : g.timestamp)} 🇱🇦🇹🇭</span>
           <span class="status-badge ${verified?"status-done":"status-wait"}">${verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
         ${note?`<div class="record-name">👤 ${note}</div>`:""}
@@ -880,7 +886,7 @@ function recordsHTML(filtered, isOwner) {
           <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
         </div>
         <div class="record-meta">
-          <span class="record-time">${fmtDate(r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
+          <span class="record-time">${fmtDate(isOwner && r.verified && r.approvedAt ? r.approvedAt : r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
           <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
         ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
@@ -899,8 +905,11 @@ async function tapVerifyPair(id1, id2) {
   const r2=adminRecords.find(x=>x.id===id2);
   if(!r1||!r2) return;
   const newVal = !(r1.verified && r2.verified);
-  await dbUpdate(id1,{approved:newVal, verified:newVal});
-  await dbUpdate(id2,{approved:newVal, verified:newVal});
+  const patch = {approved:newVal, verified:newVal};
+  if (newVal) patch.approved_at = Date.now();
+  else patch.approved_at = null;
+  await dbUpdate(id1, patch);
+  await dbUpdate(id2, patch);
   await refreshAdmin();
 }
 
@@ -1118,7 +1127,11 @@ function setFilterMonth(val) {
 
 async function tapVerify(id) {
   const r=adminRecords.find(x=>x.id===id); if(!r) return;
-  await dbUpdate(id,{approved:true, verified:!r.verified});
+  const newVerified = !r.verified;
+  const patch = {approved: newVerified, verified: newVerified};
+  if (newVerified) patch.approved_at = Date.now();
+  else patch.approved_at = null;
+  await dbUpdate(id, patch);
   await refreshAdmin();
 }
 
