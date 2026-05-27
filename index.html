@@ -7,12 +7,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Phetsarath OT','Noto Sans Lao','Sarabun',sans-serif; background:#1a1a2e; min-height:100vh; color:#e0e0e0; transition:background 0.3s; }
+  body { font-family: 'Phetsarath OT','Noto Sans Lao','Sarabun',sans-serif; background:radial-gradient(ellipse at 30% 0%, #1e0b35 0%, #0c0c1a 45%, #0a1510 100%); min-height:100vh; color:#e0e0e0; transition:background 0.3s; }
   body.light { background:#f4f1eb !important; color:#1a1a1a !important; }
   body.light .app { background:#f4f1eb !important; }
-  body.light .home { background:#f4f1eb !important; }
-  body.light .app-title { color:#1a1a1a !important; }
-  body.light .app-sub { color:#777 !important; }
+  body.light .home { background:linear-gradient(160deg,#f5f0e8 0%,#ede8de 100%) !important; }
+  body.light .home-bg-glow1 { background:radial-gradient(circle,rgba(180,140,30,0.12) 0%,transparent 70%) !important; }
+  body.light .home-bg-glow2 { background:radial-gradient(circle,rgba(30,100,60,0.08) 0%,transparent 70%) !important; }
+  body.light .app-title { background:linear-gradient(135deg,#8a6010,#b8891a,#6a4800) !important; -webkit-background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  body.light .app-sub { color:#999 !important; -webkit-text-fill-color:#999 !important; }
+  body.light .sync-note { color:rgba(0,0,0,0.3) !important; }
+  body.light .home-card { background:rgba(255,255,255,0.7) !important; border-color:rgba(0,0,0,0.08) !important; box-shadow:0 2px 16px rgba(0,0,0,0.08) !important; }
+  body.light .home-card .card-title { color:#1a1a1a !important; }
+  body.light .home-card .card-sub { color:#888 !important; }
+  body.light .home-card.hc-gold .hc-icon-box { background:rgba(180,140,30,0.12) !important; border-color:rgba(180,140,30,0.25) !important; }
+  body.light .home-card.hc-blue .hc-icon-box { background:rgba(60,100,200,0.08) !important; border-color:rgba(60,100,200,0.2) !important; }
+  body.light .home-card.hc-ruby .hc-icon-box { background:rgba(180,40,40,0.08) !important; border-color:rgba(180,40,40,0.2) !important; }
+  body.light .home-card.hc-gold .hc-arrow { background:rgba(180,140,30,0.12) !important; }
+  body.light .home-card.hc-blue .hc-arrow { background:rgba(60,100,200,0.1) !important; }
+  body.light .home-card.hc-ruby .hc-arrow { background:rgba(180,40,40,0.1) !important; }
   body.light .pin-wrap { background:#f4f1eb !important; }
   body.light .pin-title { color:#1a1a1a !important; }
   body.light .pin-key { background:#fff !important; color:#1a1a1a !important; border-color:#ddd !important; }
@@ -54,16 +66,39 @@
 
   /* HOME */
   .home { display:flex; flex-direction:column; align-items:center; padding:40px 20px; background:#1a1a2e; }
-  .logo { width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:8px; }
-  .app-title { font-size:22px; font-weight:800; color:#ffffff; text-align:center; margin-bottom:4px; }
-  .app-sub { font-size:13px; color:#aaa; margin-bottom:32px; text-align:center; }
-  .home-cards { display:flex; flex-direction:column; gap:14px; width:100%; }
-  .home-card { display:flex; flex-direction:column; align-items:flex-start; padding:20px 24px; border-radius:16px; border:none; color:#fff; text-align:left; box-shadow:0 4px 20px rgba(0,0,0,0.15); transition:opacity 0.1s; }
-  .home-card:active { opacity:0.85; }
-  .card-icon { font-size:32px; margin-bottom:6px; }
+  /* ── HOME NEW UI ── */
+  .home { display:flex; flex-direction:column; align-items:center; padding:48px 20px 60px; min-height:100vh; position:relative; }
+  .home-bg-glow1 { position:fixed;top:-120px;right:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(212,175,55,0.18) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0; }
+  .home-bg-glow2 { position:fixed;bottom:-100px;left:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(30,100,60,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0; }
+  .logo-ring { width:108px;height:108px;border-radius:50%;background:linear-gradient(145deg,rgba(212,175,55,0.3),rgba(212,175,55,0.05));padding:3px;margin-bottom:20px;box-shadow:0 0 48px rgba(212,175,55,0.18),0 0 90px rgba(212,175,55,0.06);position:relative;z-index:1; }
+  .logo { width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid rgba(0,0,0,0.4); display:block; }
+  .app-title { font-size:23px;font-weight:700;line-height:1.35;text-align:center;background:linear-gradient(135deg,#d4af37 0%,#f5e06e 50%,#b8891a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.3px;margin-bottom:6px;position:relative;z-index:1; }
+  .app-sub { font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:44px;text-align:center;position:relative;z-index:1; }
+  .home-cards { display:flex;flex-direction:column;gap:14px;width:100%;max-width:400px;position:relative;z-index:1; }
+  .home-card { display:flex;align-items:center;gap:18px;padding:22px 22px;border-radius:22px;border:1px solid rgba(255,255,255,0.07);color:#fff;text-align:left;background:rgba(255,255,255,0.045);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);cursor:pointer;position:relative;overflow:hidden;transition:transform 0.18s ease;-webkit-tap-highlight-color:transparent; }
+  .home-card:active { transform:scale(0.975); }
+  .home-card::before { content:'';position:absolute;left:0;top:16px;bottom:16px;width:3.5px;border-radius:0 4px 4px 0; }
+  .home-card::after { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 55%);border-radius:22px;pointer-events:none; }
+  .home-card.hc-gold::before { background:linear-gradient(180deg,#d4af37,#8a6010); }
+  .home-card.hc-blue::before { background:linear-gradient(180deg,#5090e0,#1a408a); }
+  .home-card.hc-ruby::before { background:linear-gradient(180deg,#c0392b,#6b0e1e); }
+  .hc-icon-box { width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+  .home-card.hc-gold .hc-icon-box { background:linear-gradient(145deg,rgba(212,175,55,0.18),rgba(212,175,55,0.06));border:1px solid rgba(212,175,55,0.2); }
+  .home-card.hc-blue .hc-icon-box { background:linear-gradient(145deg,rgba(80,144,224,0.18),rgba(80,144,224,0.06));border:1px solid rgba(80,144,224,0.2); }
+  .home-card.hc-ruby .hc-icon-box { background:linear-gradient(145deg,rgba(192,57,43,0.18),rgba(192,57,43,0.06));border:1px solid rgba(192,57,43,0.2); }
+  .hc-icon-box svg { width:30px;height:30px; }
+  .hc-text { flex:1; }
+  .card-title { font-size:18px;font-weight:700;color:#fff;letter-spacing:0.2px; }
+  .card-sub { font-size:12.5px;color:rgba(255,255,255,0.38);margin-top:4px; }
+  .hc-arrow { width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+  .home-card.hc-gold .hc-arrow { background:rgba(212,175,55,0.12); }
+  .home-card.hc-blue .hc-arrow { background:rgba(80,144,224,0.12); }
+  .home-card.hc-ruby .hc-arrow { background:rgba(192,57,43,0.12); }
+  .sync-note { margin-top:32px;font-size:11px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-align:center;text-transform:uppercase;display:flex;align-items:center;gap:8px;justify-content:center;position:relative;z-index:1; }
+  .card-icon { display:none; }
   .card-title { font-size:20px; font-weight:700; }
   .card-sub { font-size:13px; opacity:0.8; margin-top:2px; }
-  .sync-note { margin-top:16px; font-size:11px; color:#bbb; text-align:center; }
+  .sync-note { margin-top:32px;font-size:11px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-align:center;text-transform:uppercase;display:flex;align-items:center;gap:8px;justify-content:center;position:relative;z-index:1; }
   .theme-btn { position:fixed; bottom:20px; right:20px; width:48px; height:48px; border-radius:50%; border:none; font-size:22px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); z-index:999; display:flex; align-items:center; justify-content:center; }
   .theme-btn.dark { background:#16213e; color:#ffd700; }
   .theme-btn.light { background:#fff; color:#1a1a2e; }
@@ -346,22 +381,36 @@ function goBack() { state.mode=null; state.pin=null; render(); }
 
 // ── HOME ─────────────────────────────────────────────────
 function homeHTML() {
+  const iconStaff = ['<svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">','<rect x="2" y="5" width="20" height="14" rx="3"/>','<circle cx="9" cy="11" r="2.5"/>','<path d="M5 18c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5"/>','<line x1="15" y1="9" x2="19" y2="9"/>','<line x1="15" y1="13" x2="18" y2="13"/>','</svg>'].join('');
+  const iconAdmin = ['<svg viewBox="0 0 24 24" fill="none" stroke="#5090e0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">','<path d="M12 2L4 6v6c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V6L12 2z"/>','<polyline points="9 12 11 14 15 10"/>','</svg>'].join('');
+  const iconOwner = ['<svg viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">','<path d="M2 19h20M3 19l2-9 4.5 5L12 5l2.5 10L19 10l2 9"/>','<circle cx="12" cy="5" r="1.2" fill="#c0392b"/>','<circle cx="5" cy="10" r="1" fill="#c0392b"/>','<circle cx="19" cy="10" r="1" fill="#c0392b"/>','</svg>'].join('');
+  const arrowGold = '<span style="font-size:20px;color:#d4af37;line-height:1">›</span>';
+  const arrowBlue = '<span style="font-size:20px;color:#5090e0;line-height:1">›</span>';
+  const arrowRuby = '<span style="font-size:20px;color:#c0392b;line-height:1">›</span>';
   return `<div class="home">
-    <img src="${LOGO_IMG}" class="logo" alt="logo">
-    <div class="app-title">ລະບົບການເງິນຮ້ານດາວອນ</div>
-    <p class="app-sub">ອາໄຫລ່ / ເງິນຂາຍລົດ / ອຸປະກອນເສີມ</p>
+    <div class="home-bg-glow1"></div>
+    <div class="home-bg-glow2"></div>
+    <div class="logo-ring"><img src="${LOGO_IMG}" class="logo" alt="logo"></div>
+    <div class="app-title">ລະບົບການເງິນ<br>ຮ້ານດາວອນ</div>
+    <p class="app-sub">DAOVONE FINANCIAL SYSTEM</p>
     <div class="home-cards">
-      <button class="home-card" style="background:#2d6a4f" onclick="state.mode='staff';render()">
-        <span class="card-icon">👤</span><span class="card-title">ພະນັກງານ</span><span class="card-sub">ສົ່ງຍອດ & ຖ່າຍຮູບບິນ</span>
+      <button class="home-card hc-gold" onclick="state.mode='staff';render()">
+        <div class="hc-icon-box">${iconStaff}</div>
+        <div class="hc-text"><div class="card-title">ພະນັກງານ</div><div class="card-sub">ສົ່ງຍອດ & ຖ່າຍຮູບບິນ</div></div>
+        <div class="hc-arrow">${arrowGold}</div>
       </button>
-      <button class="home-card" style="background:#1a3a5c" onclick="state.pin='admin';render()">
-        <span class="card-icon">📊</span><span class="card-title">ຜູ້ອານຸມັດ</span><span class="card-sub">🔐 ຕ້ອງໃສ່ລະຫັດ</span>
+      <button class="home-card hc-blue" onclick="state.pin='admin';render()">
+        <div class="hc-icon-box">${iconAdmin}</div>
+        <div class="hc-text"><div class="card-title">ຜູ້ອານຸມັດ</div><div class="card-sub">🔐 ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
+        <div class="hc-arrow">${arrowBlue}</div>
       </button>
-      <button class="home-card" style="background:#6d3b47" onclick="state.pin='owner';render()">
-        <span class="card-icon">👑</span><span class="card-title">ຫົວໜ້າ</span><span class="card-sub">🔐 ຕ້ອງໃສ່ລະຫັດ</span>
+      <button class="home-card hc-ruby" onclick="state.pin='owner';render()">
+        <div class="hc-icon-box">${iconOwner}</div>
+        <div class="hc-text"><div class="card-title">ຫົວໜ້າ</div><div class="card-sub">🔐 ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
+        <div class="hc-arrow">${arrowRuby}</div>
       </button>
     </div>
-    <div class="sync-note">☁️ ຂໍ້ມູນ sync ທຸກເຄື່ອງ real-time • ເກັບທຸກເດືອນ ບໍ່ຫາຍ</div>
+    <div class="sync-note"><span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.15);display:inline-block;margin-right:8px"></span>ຂໍ້ມູນ sync ທຸກເຄື່ອງ real-time<span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.15);display:inline-block;margin-left:8px"></span></div>
   </div>`;
 }
 
