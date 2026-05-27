@@ -462,6 +462,8 @@ function render() {
     return;
   }
   if (state.mode==="admin"||state.mode==="owner") {
+    // Owner always defaults to "all" tab to see all verified records
+    if (state.mode==="owner" && adminTab==="today") adminTab="all";
     app.innerHTML = headerHTML(state.mode==="owner"?"👑 ຫົວໜ້າ — ເບິ່ງຍອດເງິນ":"🔍 ກຳລັງກວດສອບ") + adminLoadingHTML();
     loadAdmin();
     return;
@@ -472,7 +474,11 @@ function render() {
 function headerHTML(title) {
   return `<div class="header"><button class="header-back" onclick="goBack()">←</button><span class="header-title">${title}</span></div>`;
 }
-function goBack() { state.mode=null; state.pin=null; render(); }
+function goBack() { 
+  adminTab = "today"; 
+  filterMonth = null;
+  state.mode=null; state.pin=null; render(); 
+}
 
 // ── HOME ─────────────────────────────────────────────────
 function homeHTML() {
@@ -797,6 +803,8 @@ function getFiltered() {
   const isOwner = state.mode==="owner";
   return adminRecords.filter(r => {
     if(isOwner && !r.verified) return false;
+    // Owner with no tab filter = show ALL verified records
+    if(isOwner && adminTab==="all" && !filterMonth) return true;
     // Owner uses approvedAt for date filtering; admin uses original timestamp
     const ts = (isOwner && r.approvedAt) ? r.approvedAt : r.timestamp;
     const d = new Date(ts);
