@@ -797,7 +797,9 @@ function getFiltered() {
   const isOwner = state.mode==="owner";
   return adminRecords.filter(r => {
     if(isOwner && !r.verified) return false;
-    const d = new Date(r.timestamp);
+    // Owner uses approvedAt for date filtering; admin uses original timestamp
+    const ts = (isOwner && r.approvedAt) ? r.approvedAt : r.timestamp;
+    const d = new Date(ts);
     const rk = d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
     const rm = d.getFullYear()+"-"+(d.getMonth()+1);
     const rmOld = d.getFullYear()+"-"+d.getMonth();
@@ -812,9 +814,12 @@ function getFiltered() {
 }
 
 function getAvailableMonths() {
+  const isOwner = state.mode==="owner";
   const months = new Set();
   adminRecords.forEach(r => {
-    const d = new Date(r.timestamp);
+    if(isOwner && !r.verified) return;
+    const ts = (isOwner && r.approvedAt) ? r.approvedAt : r.timestamp;
+    const d = new Date(ts);
     months.add(d.getFullYear()+"-"+(d.getMonth()+1));
   });
   return [...months].sort().reverse();
