@@ -358,13 +358,14 @@ async function dbGet() {
       new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
     ]);
     if (error || !data) return getCached();
+    const approvedMap = getApprovedMap();
     const records = data.map(r => ({
       id: r.id, timestamp: r.timestamp,
       department: r.department, departmentName: r.department_name,
       amount: Number(r.amount), currency: r.currency||"LAK",
       note: r.note||"", image: r.image||null,
       verified: r.verified||false, approved: r.approved||false,
-      approvedAt: r.approved_at||null,
+      approvedAt: approvedMap[r.id] || null,
     }));
     try { localStorage.setItem("dv_cache", JSON.stringify(records)); } catch {}
     return records;
@@ -379,6 +380,17 @@ function getCached() {
     const c = localStorage.getItem("dv_cache");
     return c ? JSON.parse(c) : [];
   } catch { return []; }
+}
+
+function getApprovedMap() {
+  try {
+    const m = localStorage.getItem("dv_approved");
+    return m ? JSON.parse(m) : {};
+  } catch { return {}; }
+}
+
+function saveApprovedMap(map) {
+  try { localStorage.setItem("dv_approved", JSON.stringify(map)); } catch {}
 }
 
 async function dbSave(rec) {
@@ -906,10 +918,19 @@ async function tapVerifyPair(id1, id2) {
   if(!r1||!r2) return;
   const newVal = !(r1.verified && r2.verified);
   const patch = {approved:newVal, verified:newVal};
-  if (newVal) patch.approved_at = Date.now();
-  else patch.approved_at = null;
   await dbUpdate(id1, patch);
   await dbUpdate(id2, patch);
+  // Store approvedAt in localStorage (no new DB column needed)
+  const approvedMap = getApprovedMap();
+  if (newVal) {
+    const ts = Date.now();
+    approvedMap[id1] = ts;
+    approvedMap[id2] = ts;
+  } else {
+    delete approvedMap[id1];
+    delete approvedMap[id2];
+  }
+  saveApprovedMap(approvedMap);
   await refreshAdmin();
 }
 
@@ -1129,9 +1150,12 @@ async function tapVerify(id) {
   const r=adminRecords.find(x=>x.id===id); if(!r) return;
   const newVerified = !r.verified;
   const patch = {approved: newVerified, verified: newVerified};
-  if (newVerified) patch.approved_at = Date.now();
-  else patch.approved_at = null;
   await dbUpdate(id, patch);
+  // Store approvedAt in localStorage (no new DB column needed)
+  const approvedMap = getApprovedMap();
+  if (newVerified) approvedMap[id] = Date.now();
+  else delete approvedMap[id];
+  saveApprovedMap(approvedMap);
   await refreshAdmin();
 }
 
