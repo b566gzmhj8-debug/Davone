@@ -58,6 +58,41 @@
   body.light .backup-textarea { background:#f9fef9 !important; color:#1a1a1a !important; }
   body.light .admin-scroll { background:#f4f1eb !important; }
   body.light .month-picker { background:#fff !important; color:#1a1a1a !important; border-color:#ddd !important; }
+  /* ── DEPT LIST PRO — light mode ── */
+  body.light .dept-grid { background:#f5f0e8 !important; }
+  body.light .dept-header-pro { background:linear-gradient(180deg,#f5f0e8 80%,transparent) !important; }
+  body.light .dh-title { color:#1a1a1a !important; }
+  body.light .dh-sub { color:rgba(0,0,0,0.35) !important; }
+  body.light .dept-search { background:rgba(0,0,0,0.04) !important; border-color:rgba(0,0,0,0.08) !important; }
+  body.light .dept-search svg { stroke:rgba(0,0,0,0.25) !important; }
+  body.light .dept-search span { color:rgba(0,0,0,0.25) !important; }
+  body.light .dept-section-label { color:rgba(0,0,0,0.3) !important; }
+  body.light .dept-card { background:#fff !important; border-color:rgba(0,0,0,0.06) !important; box-shadow:0 2px 12px rgba(0,0,0,0.06) !important; }
+  body.light .dept-name { color:#1a1a1a !important; }
+  body.light .dept-card-img { background:rgba(0,0,0,0.03) !important; border-color:rgba(0,0,0,0.06) !important; }
+  body.light .dept-card-arrow { opacity:0.85; }
+  body.light .dept-list-wrap { background:transparent !important; }
+  /* ── FORM PRO — light mode ── */
+  body.light .form-scroll { background:#f5f0e8 !important; }
+  body.light .form-pro { background:transparent !important; }
+  body.light .dept-chip { background:rgba(0,0,0,0.04) !important; }
+  body.light .dept-chip-tag { color:rgba(0,0,0,0.35) !important; }
+  body.light .field-label-pro { color:rgba(0,0,0,0.45) !important; }
+  body.light .input-wrap-pro { background:#fff !important; border-color:rgba(0,0,0,0.1) !important; box-shadow:0 2px 8px rgba(0,0,0,0.05) !important; }
+  body.light .input-wrap-pro input,
+  body.light .input-wrap-pro textarea { color:#1a1a1a !important; }
+  body.light .input-wrap-pro input::placeholder,
+  body.light .input-wrap-pro textarea::placeholder { color:rgba(0,0,0,0.2) !important; }
+  body.light .input-wrap-pro.lak:focus-within { border-color:rgba(230,126,34,0.5) !important; box-shadow:0 0 0 3px rgba(230,126,34,0.1) !important; }
+  body.light .input-wrap-pro.thb:focus-within { border-color:rgba(41,128,185,0.5) !important; box-shadow:0 0 0 3px rgba(41,128,185,0.1) !important; }
+  body.light .photo-zone-pro { background:rgba(0,0,0,0.03) !important; border-color:rgba(0,0,0,0.15) !important; }
+  body.light .photo-text-pro { color:rgba(0,0,0,0.4) !important; }
+  body.light .photo-sub-pro { color:rgba(0,0,0,0.25) !important; }
+  body.light .photo-icon-pro { background:rgba(0,0,0,0.06) !important; }
+  body.light .photo-icon-pro svg { stroke:rgba(0,0,0,0.3) !important; }
+  body.light .form-divider { background:linear-gradient(90deg,transparent,rgba(0,0,0,0.08),transparent) !important; }
+  body.light .submit-wrap-pro { background:linear-gradient(0deg,#f5f0e8 70%,transparent) !important; }
+  body.light .amount-preview { color:#1a1a1a !important; }
   .app { max-width:480px; margin:0 auto; min-height:100vh; background:#1a1a2e; }
   button { font-family:inherit; cursor:pointer; }
   input { font-family:inherit; font-size:16px; }
@@ -122,7 +157,7 @@
   .pin-key.empty { background:transparent; border:none; box-shadow:none; cursor:default; }
 
   /* FORM */
-  .form-scroll { overflow-y:auto; -webkit-overflow-scrolling:touch; height:calc(100vh - 52px); background:#1a1a2e; }
+  .form-scroll { overflow-y:auto; -webkit-overflow-scrolling:touch; height:calc(100vh - 52px); background:#08080f; }
   .form-container { padding:20px 16px; display:flex; flex-direction:column; gap:16px; }
   .back-btn { background:none; border:none; font-size:15px; color:#2d6a4f; cursor:pointer; text-align:left; padding:0; font-family:inherit; }
   .dept-badge { border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:12px; color:#fff; }
@@ -149,11 +184,11 @@
   .done-amount.thb { color:#2980b9; }
 
   /* DEPT GRID */
-  .dept-grid { padding:20px 16px; background:#1a1a2e; min-height:100vh; }
-  .dept-grid h2 { font-size:18px; font-weight:700; color:#ffffff; margin-bottom:16px; }
+  .dept-grid { padding:0; background:#08080f; min-height:100vh; }
+  .dept-grid h2 { display:none; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .dept-card { background:#16213e; border:2px solid; border-radius:14px; padding:16px 12px; min-height:130px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.3); transition:opacity 0.1s; }
-  .dept-card:active { opacity:0.8; }
+  .dept-card { background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.18s ease,background 0.18s ease;-webkit-tap-highlight-color:transparent;width:100%; }
+  .dept-card:active { transform:scale(0.975);background:rgba(255,255,255,0.06); }
   .dept-icon { font-size:40px; }
   .dept-icon-img { width:120px; height:120px; object-fit:contain; }
   .dept-name { font-size:16px; font-weight:800; text-align:center; }
@@ -226,6 +261,51 @@
   .backup-textarea { width:100%; height:220px; font-size:12px; padding:10px; border-radius:10px; border:1.5px solid #2d6a4f; font-family:monospace; line-height:1.6; resize:none; background:#f9fef9; }
   .hidden { display:none; }
   .pin-input-confirm { margin-top:12px; padding:12px; border-radius:10px; border:1.5px solid #555; background:#1a1a2e; color:#fff; font-size:18px; font-family:inherit; text-align:center; width:140px; letter-spacing:8px; outline:none; }
+
+  /* ── DEPT LIST PRO ── */
+  .dept-search { margin:0 18px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px; }
+  .dept-search svg { width:16px;height:16px;stroke:rgba(255,255,255,0.25);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0; }
+  .dept-search span { font-size:13px;color:rgba(255,255,255,0.2);letter-spacing:0.5px; }
+  .dept-section-label { font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:8px 2px 6px; }
+  .dept-card-img { width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden; }
+  .dept-card-img img { width:46px;height:46px;object-fit:contain; }
+  .dept-card-text { flex:1; }
+  .dept-card-arrow { width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+  .dept-card-arrow svg { width:16px;height:16px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round; }
+  .dept-tag { display:inline-block;margin-top:4px;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:6px; }
+  /* ── FORM PRO ── */
+  .form-pro { padding:0 18px 120px;display:flex;flex-direction:column;gap:20px; }
+  .dept-chip { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:4px; }
+  .dept-chip img { width:40px;height:40px;object-fit:contain;border-radius:10px; }
+  .dept-chip-name { font-size:15px;font-weight:700; }
+  .dept-chip-tag { font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.5;margin-top:2px; }
+  .chip-dot { margin-left:auto;width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor; }
+  .field-group-pro { display:flex;flex-direction:column;gap:8px; }
+  .field-label-pro { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px; }
+  .input-wrap-pro { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;display:flex;align-items:center;gap:10px;transition:border-color 0.2s,box-shadow 0.2s; }
+  .input-wrap-pro:focus-within { border-color:rgba(212,175,55,0.4);box-shadow:0 0 0 3px rgba(212,175,55,0.08); }
+  .input-wrap-pro.lak:focus-within { border-color:rgba(230,126,34,0.4);box-shadow:0 0 0 3px rgba(230,126,34,0.08); }
+  .input-wrap-pro.thb:focus-within { border-color:rgba(41,128,185,0.4);box-shadow:0 0 0 3px rgba(41,128,185,0.08); }
+  .input-wrap-pro input,.input-wrap-pro textarea { flex:1;background:transparent;border:none;outline:none;font-size:22px;font-weight:700;color:#fff;font-family:inherit;width:100%; }
+  .input-wrap-pro textarea { font-size:15px;font-weight:500;resize:none;height:52px;line-height:1.5; }
+  .input-wrap-pro input::placeholder,.input-wrap-pro textarea::placeholder { color:rgba(255,255,255,0.15);font-weight:400; }
+  .input-currency-badge { font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:8px;flex-shrink:0; }
+  .photo-zone-pro { background:rgba(255,255,255,0.03);border:1.5px dashed rgba(255,255,255,0.1);border-radius:18px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent; }
+  .photo-zone-pro:active { background:rgba(255,255,255,0.06);transform:scale(0.98); }
+  .photo-icon-pro { width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center; }
+  .photo-icon-pro svg { width:24px;height:24px;stroke:rgba(255,255,255,0.4);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+  .photo-text-pro { font-size:14px;font-weight:600;color:rgba(255,255,255,0.5); }
+  .photo-sub-pro { font-size:11px;color:rgba(255,255,255,0.2); }
+  .submit-wrap-pro { position:fixed;bottom:0;left:0;right:0;padding:16px 18px 32px;background:linear-gradient(0deg,#08080f 70%,transparent);z-index:20; }
+  .btn-pro-submit { width:100%;padding:18px;border-radius:18px;border:none;background:linear-gradient(135deg,#27ae60,#1e8449);color:#fff;font-size:16px;font-weight:700;font-family:inherit;letter-spacing:0.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 24px rgba(39,174,96,0.3);transition:all 0.2s;-webkit-tap-highlight-color:transparent; }
+  .btn-pro-submit:active { transform:scale(0.97); }
+  .btn-pro-submit:disabled { background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);box-shadow:none;cursor:not-allowed; }
+  .btn-pro-submit svg { width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round; }
+  .form-divider { height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent); }
+  .dept-header-pro { display:flex;align-items:center;gap:14px;padding:20px 18px 14px;position:sticky;top:52px;z-index:9;background:linear-gradient(180deg,#08080f 80%,transparent); }
+  .dept-header-pro .dh-title { font-size:18px;font-weight:700;color:#fff; }
+  .dept-header-pro .dh-sub { font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;letter-spacing:1px;text-transform:uppercase; }
+  .dept-list-wrap { padding:0 18px 40px;display:flex;flex-direction:column;gap:10px; }
 </style>
 </head>
 <body>
@@ -462,16 +542,43 @@ function deptIconHTML(d) {
   return `<span class="dept-icon">${d.icon}</span>`;
 }
 
+function deptTagMap(id) {
+  if (id==="spare_tractor"||id==="spare_truck") return "SPARE PARTS";
+  if (id==="debt") return "DEBT";
+  if (id==="accessories") return "ACCESSORIES";
+  return "SALES";
+}
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return r+","+g+","+b;
+}
 function deptGridHTML() {
-  return `<div class="dept-grid">
-    <h2>ເລືອກພະແນກຂອງທ່ານ</h2>
-    <div class="grid">
-      ${DEPTS.map(d=>`<button class="dept-card" style="border-color:${d.color}" onclick="selectDept('${d.id}')">
-        ${deptIconHTML(d)}
-        <span class="dept-name" style="color:${d.color}">${d.name}</span>
-      </button>`).join("")}
-    </div>
-  </div>`;
+  const arrowSVG = (c) => '<svg viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+  let lastTag = ""; let rows = "";
+  DEPTS.forEach(d => {
+    const tag = deptTagMap(d.id);
+    const rgb = hexToRgb(d.color);
+    if (tag !== lastTag) {
+      rows += '<div class="dept-section-label">'+tag+'</div>';
+      lastTag = tag;
+    }
+    const imgHTML = DEPT_IMGS[d.id]
+      ? '<img src="'+DEPT_IMGS[d.id]+'" alt="">'
+      : '<span style="font-size:28px">'+(d.icon||"📦")+'</span>';
+    rows += '<button class="dept-card" style="border-left:3px solid '+d.color+';box-shadow:inset 40px 0 40px -30px rgba('+rgb+',0.08)" onclick="selectDept(\''+d.id+'\')">'
+      + '<div class="dept-card-img">'+imgHTML+'</div>'
+      + '<div class="dept-card-text">'
+        + '<div class="dept-name" style="color:#fff;font-size:15px;font-weight:700">'+d.name+'</div>'
+        + '<div class="dept-tag" style="background:rgba('+rgb+',0.12);color:'+d.color+'">'+tag+'</div>'
+      + '</div>'
+      + '<div class="dept-card-arrow" style="background:rgba('+rgb+',0.1)">'+arrowSVG(d.color)+'</div>'
+      + '</button>';
+  });
+  return '<div class="dept-grid">'
+    + '<div class="dept-header-pro"><div><div class="dh-title">ເລືອກພະແນກ</div><div class="dh-sub">ເລືອກປະເພດລາຍການ</div></div></div>'
+    + '<div class="dept-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>ຄົ້ນຫາພະແນກ...</span></div>'
+    + '<div class="dept-list-wrap">'+rows+'</div>'
+    + '</div>';
 }
 
 function selectDept(id) {
@@ -480,7 +587,7 @@ function selectDept(id) {
   const header = app.querySelector(".header");
   app.innerHTML = "";
   app.appendChild(header);
-  app.insertAdjacentHTML("beforeend", `<div class="form-scroll"><div id="form-inner">${formBodyHTML()}</div></div>`);
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="background:#08080f"><div id="form-inner" style="padding-top:0">${formBodyHTML()}</div></div>`);
 }
 
 function formBodyHTML() {
@@ -488,46 +595,64 @@ function formBodyHTML() {
   const numLAK = staffState.rawLAK ? parseInt(staffState.rawLAK,10) : 0;
   const numTHB = staffState.rawTHB ? parseInt(staffState.rawTHB,10) : 0;
   const canSubmit = (numLAK>0||numTHB>0) && !staffState.saving;
-  const iconHTML = DEPT_IMGS[d.id]
-    ? `<img src="${DEPT_IMGS[d.id]}" style="width:32px;height:32px;object-fit:contain;" alt="">`
-    : `<span style="font-size:28px">${d.icon}</span>`;
-  return `
-    <div class="form-container">
-      <button class="back-btn" onclick="backToDept()">← ກັບ</button>
-      <div class="dept-badge" style="background:${d.color}">
-        ${iconHTML}
-        <span style="font-size:17px;font-weight:700">${d.name}</span>
-      </div>
-      <div class="field">
-        <label class="lbl">🇱🇦 ຈຳນວນເງິນກີບ</label>
-        <input class="inp" type="text" inputmode="numeric" placeholder="0" id="inp-lak"
-          value="${fmtNum(staffState.rawLAK)}" oninput="onAmtInput(this,'LAK')">
-        <div id="preview-lak" class="amount-preview" style="display:${staffState.rawLAK?'block':'none'}">${fmtKIP(numLAK)}</div>
-      </div>
-      <div class="field">
-        <label class="lbl">🇹🇭 ຈຳນວນເງິນບາດ</label>
-        <input class="inp" type="text" inputmode="numeric" placeholder="0" id="inp-thb"
-          value="${fmtNum(staffState.rawTHB)}" oninput="onAmtInput(this,'THB')">
-        <div id="preview-thb" class="amount-preview thb" style="display:${staffState.rawTHB?'block':'none'}">${fmtTHB(numTHB)}</div>
-      </div>
-      <div class="field">
-        <label class="lbl">ຊື່ພະນັກງານມອບເງິນ</label>
-        <input class="inp" type="text" placeholder="ໃສ່ຊື່ພະນັກງານ..." id="inp-name"
-          value="${staffState.name}" oninput="staffState.name=this.value">
-      </div>
-      <div class="field">
-        <label class="lbl">ຖ່າຍຮູບບິນ</label>
-        <input type="file" id="file-input" accept="image/*" capture="environment" class="hidden" onchange="onFileChange(this)">
-        ${staffState.img
-          ? `<div class="img-preview-wrap"><img src="${staffState.img}" class="img-preview"><button class="rephoto-btn" onclick="document.getElementById('file-input').click()">📷 ຖ່າຍໃໝ່</button></div>`
-          : `<button class="photo-btn" onclick="document.getElementById('file-input').click()">📷 ຖ່າຍຮູບບິນ / ເລືອກຮູບ</button>`
-        }
-      </div>
-      ${!canSubmit&&!staffState.saving?'<div class="warn-box">⚠️ ກະລຸນາໃສ່ຈຳນວນເງິນກ່ອນກົດສົ່ງ</div>':""}
-      <button class="btn-green" id="submit-btn" ${canSubmit?"":"disabled"} onclick="submitRecord()">
-        ${staffState.saving?"⏳ ກຳລັງສົ່ງ...":"✓ ສົ່ງຂໍ້ມູນ"}
-      </button>
-    </div>`;
+  const rgb = hexToRgb(d.color);
+  const tag = deptTagMap(d.id);
+  const chipImg = DEPT_IMGS[d.id]
+    ? '<img src="'+DEPT_IMGS[d.id]+'" alt="">'
+    : '<span style="font-size:28px">'+(d.icon||'📦')+'</span>';
+  const photoSection = staffState.img
+    ? '<div class="img-preview-wrap"><img src="'+staffState.img+'" class="img-preview"><button class="rephoto-btn" onclick="document.getElementById(\'file-input\').click()">📷 ຖ່າຍໃໝ່</button></div>'
+    : '<div class="photo-zone-pro" onclick="document.getElementById(\'file-input\').click()">'
+        + '<div class="photo-icon-pro"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'
+        + '<div class="photo-text-pro">ຖ່າຍຮູບບິນ / ເລືອກຮູບ</div>'
+        + '<div class="photo-sub-pro">JPG, PNG · ຂະໜາດສູງສຸດ 5MB</div>'
+      + '</div>';
+  const submitIcon = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+  const warnHTML = (!canSubmit&&!staffState.saving)
+    ? '<div class="warn-box" style="background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">'
+      + '<span style="font-size:14px">⚠️</span>'
+      + '<span style="font-size:12px;color:#f39c12;font-weight:600">ກະລຸນາໃສ່ຈຳນວນເງິນກ່ອນກົດສົ່ງ</span>'
+      + '</div>'
+    : '';
+  return '<div class="form-pro">'
+    + '<div class="dept-chip" style="border-color:rgba('+rgb+',0.25);background:rgba('+rgb+',0.06)">'
+      + '<div style="width:44px;height:44px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06)">'+chipImg+'</div>'
+      + '<div><div class="dept-chip-name" style="color:'+d.color+'">'+d.name+'</div><div class="dept-chip-tag">'+tag+'</div></div>'
+      + '<div class="chip-dot" style="background:'+d.color+';color:'+d.color+'"></div>'
+    + '</div>'
+    + '<div class="field-group-pro">'
+      + '<div class="field-label-pro"><span>🇱🇦</span> ຈຳນວນເງິນກີບ</div>'
+      + '<div class="input-wrap-pro lak">'
+        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-lak" value="'+fmtNum(staffState.rawLAK)+'" oninput="onAmtInput(this,\'LAK\')">'
+        + '<span class="input-currency-badge" style="background:rgba(230,126,34,0.12);color:#e67e22">ກີບ</span>'
+      + '</div>'
+      + '<div id="preview-lak" class="amount-preview" style="display:'+( staffState.rawLAK?'block':'none')+'">'+fmtKIP(numLAK)+'</div>'
+    + '</div>'
+    + '<div class="field-group-pro">'
+      + '<div class="field-label-pro"><span>🇹🇭</span> ຈຳນວນເງິນບາດ</div>'
+      + '<div class="input-wrap-pro thb">'
+        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-thb" value="'+fmtNum(staffState.rawTHB)+'" oninput="onAmtInput(this,\'THB\')">'
+        + '<span class="input-currency-badge" style="background:rgba(41,128,185,0.12);color:#2980b9">ບາດ</span>'
+      + '</div>'
+      + '<div id="preview-thb" class="amount-preview thb" style="display:'+(staffState.rawTHB?'block':'none')+'">'+fmtTHB(numTHB)+'</div>'
+    + '</div>'
+    + '<div class="form-divider"></div>'
+    + '<div class="field-group-pro">'
+      + '<div class="field-label-pro">👤 ຊື່ພະນັກງານ</div>'
+      + '<div class="input-wrap-pro"><textarea placeholder="ໃສ່ຊື່ພະນັກງານ..." id="inp-name" oninput="staffState.name=this.value">'+staffState.name+'</textarea></div>'
+    + '</div>'
+    + '<div class="field-group-pro">'
+      + '<div class="field-label-pro">📎 ຖ່າຍຮູບບິນ</div>'
+      + '<input type="file" id="file-input" accept="image/*" capture="environment" class="hidden" onchange="onFileChange(this)">'
+      + photoSection
+    + '</div>'
+    + warnHTML
+    + '</div>'
+    + '<div class="submit-wrap-pro">'
+      + '<button class="btn-pro-submit" id="submit-btn" '+(canSubmit?'':'disabled')+' onclick="submitRecord()">'
+        + (staffState.saving ? '⏳ ກຳລັງສົ່ງ...' : submitIcon+'ສົ່ງຂໍ້ມູນ')
+      + '</button>'
+    + '</div>';
 }
 
 function backToDept() {
