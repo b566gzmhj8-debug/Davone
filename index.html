@@ -474,10 +474,21 @@ function render() {
 function headerHTML(title) {
   return `<div class="header"><button class="header-back" onclick="goBack()">←</button><span class="header-title">${title}</span></div>`;
 }
-function goBack() { 
-  adminTab = "today"; 
+function goBack() {
+  // If staff is on form page → go back to dept list
+  if (state.mode==="staff" && staffState.step==="form") {
+    staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", name:"", img:null, saving:false };
+    const app = document.getElementById("app");
+    const header = app.querySelector(".header");
+    app.innerHTML = "";
+    app.appendChild(header);
+    app.insertAdjacentHTML("beforeend", deptGridHTML());
+    return;
+  }
+  // Otherwise go back to Home
+  adminTab = "today";
   filterMonth = null;
-  state.mode=null; state.pin=null; render(); 
+  state.mode=null; state.pin=null; render();
 }
 
 // ── HOME ─────────────────────────────────────────────────
