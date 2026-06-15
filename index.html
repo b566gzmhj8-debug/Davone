@@ -842,9 +842,10 @@ async function loadAdmin() {
 }
 
 async function refreshAdmin() {
-  const newRecords = await dbGet();
-  const changed = JSON.stringify(newRecords) !== JSON.stringify(adminRecords);
-  if (!changed) return;
+  const [newRecords] = await Promise.all([
+    dbGet(),
+    fetchBankDeposits()
+  ]);
   adminRecords = newRecords;
   const scrollEl = document.querySelector(".admin-scroll");
   const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
@@ -1450,17 +1451,39 @@ function doRestore(el) {
   r.readAsText(file); el.value="";
 }
 
-// ── BANK DEPOSITS ──────────────────────────────────────────
+// ── BANK DEPOSITS (Supabase) ──────────────────────────────────────────
 
-function getBankDeposits() {
+// Cache deposits in memory to avoid extra fetches
+let _bankDepositsCache = null;
+
+async function fetchBankDeposits() {
   try {
-    const d = localStorage.getItem("dv_bank_deposits");
-    return d ? JSON.parse(d) : [];
-  } catch { return []; }
+    const { data, error } = await getSupa().from("bank_deposits").select("*").order("ts", { ascending: false });
+    if (error) throw error;
+    _bankDepositsCache = data || [];
+    return _bankDepositsCache;
+  } catch { _bankDepositsCache = _bankDepositsCache || []; return _bankDepositsCache; }
 }
 
-function saveBankDeposits(arr) {
-  try { localStorage.setItem("dv_bank_deposits", JSON.stringify(arr)); } catch {}
+function getBankDeposits() {
+  // Return cache (loaded during loadAdmin). Falls back to empty array.
+  return _bankDepositsCache || [];
+}
+
+async function addBankDeposit(dep) {
+  try {
+    const { error } = await getSupa().from("bank_deposits").insert([dep]);
+    if (error) throw error;
+    _bankDepositsCache = null; // invalidate cache
+  } catch(e) { alert("ບັນທຶກບໍ່ສຳເລັດ: " + e.message); throw e; }
+}
+
+async function removeBankDeposit(id) {
+  try {
+    const { error } = await getSupa().from("bank_deposits").delete().eq("id", id);
+    if (error) throw error;
+    _bankDepositsCache = null; // invalidate cache
+  } catch(e) { alert("ລຶບບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
 
 function calcCashBalance(records, currency) {
@@ -1631,23 +1654,29 @@ function onBankAmtInput(el) {
   }
 }
 
-function confirmBankDeposit(btn) {
+async function confirmBankDeposit(btn) {
   const cur = window._bankCur || "LAK";
   const digits = (document.getElementById("bank-amt-input").value||"").replace(/\D/g,"");
   const num = digits ? parseInt(digits,10) : 0;
   if(num <= 0) return;
   const note = (document.getElementById("bank-note-input").value||"").trim();
-  const deposits = getBankDeposits();
-  deposits.push({ id: Date.now().toString(), ts: Date.now(), amount: num, currency: cur, note });
-  saveBankDeposits(deposits);
-  btn.closest(".overlay").remove();
-  renderAdmin();
+  btn.disabled = true;
+  btn.textContent = "⏳ ກຳລັງບັນທຶກ...";
+  try {
+    await addBankDeposit({ id: Date.now().toString(), ts: Date.now(), amount: num, currency: cur, note });
+    btn.closest(".overlay").remove();
+    await refreshAdmin();
+  } catch {
+    btn.disabled = false;
+    btn.textContent = "✅ ຢືນຢັນ";
+  }
 }
 
-function deleteBankDeposit(id) {
-  const deps = getBankDeposits().filter(d => d.id !== id);
-  saveBankDeposits(deps);
-  renderAdmin();
+async function deleteBankDeposit(id) {
+  try {
+    await removeBankDeposit(id);
+    await refreshAdmin();
+  } catch {}
 }
 
 let isDark = localStorage.getItem("dv_theme") !== "light";
