@@ -144,6 +144,7 @@
   .card-title { font-size:20px; font-weight:700; }
   .card-sub { font-size:13px; opacity:0.8; margin-top:2px; }
   .sync-note { margin-top:32px;font-size:11px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-align:center;text-transform:uppercase;display:flex;align-items:center;gap:8px;justify-content:center;position:relative;z-index:1; }
+  @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(-10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
   .theme-btn { position:fixed; bottom:20px; right:20px; width:48px; height:48px; border-radius:50%; border:none; font-size:22px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); z-index:999; display:flex; align-items:center; justify-content:center; }
   .theme-btn.dark { background:#16213e; color:#ffd700; }
   .theme-btn.light { background:#fff; color:#1a1a2e; }
@@ -520,6 +521,7 @@ function headerHTML(title) {
   return `<div class="header"><button class="header-back" onclick="goBack()">←</button><span class="header-title">${title}</span></div>`;
 }
 function goBack() {
+  if (realtimeChannel) { getSupa().removeChannel(realtimeChannel); realtimeChannel = null; }
   // If staff is on form page → go back to dept list
   if (state.mode==="staff" && staffState.step==="form") {
     staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", name:"", img:null, saving:false };
@@ -828,9 +830,66 @@ function showDone(numLAK,numTHB) {
 // ── ADMIN ─────────────────────────────────────────────────
 let adminRecords=[], adminTab="today", adminInterval=null;
 let filterMonth = null;
+let realtimeChannel = null;
+let _lastRecordCount = 0;
+let _lastPendingCount = 0;
 
 function adminLoadingHTML() {
   return `<div class="loading"><div class="loading-icon">☁️</div><div>ກຳລັງໂຫຼດຂໍ້ມູນ...</div></div>`;
+}
+
+// ── NOTIFICATION ──────────────────────────────────────────
+function notifyNew(msg) {
+  // Vibrate
+  if (navigator.vibrate) navigator.vibrate([120, 60, 120, 60, 200]);
+  // Sound (short beep via Web Audio API)
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = "sine"; osc.frequency.setValueAtTime(880, ctx.currentTime);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+    setTimeout(() => ctx.close(), 600);
+  } catch {}
+  // In-app toast
+  const existing = document.getElementById("notify-toast");
+  if (existing) existing.remove();
+  const toast = document.createElement("div");
+  toast.id = "notify-toast";
+  toast.style.cssText = "position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#1a6a3f,#27ae60);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:700;box-shadow:0 4px 24px rgba(0,0,0,0.4);max-width:320px;text-align:center;animation:toastIn 0.3s ease;pointer-events:none;";
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => { if(toast.parentNode) toast.remove(); }, 4000);
+}
+
+function setupRealtime() {
+  if (realtimeChannel) getSupa().removeChannel(realtimeChannel);
+  realtimeChannel = getSupa()
+    .channel("records-changes")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "records" }, async (payload) => {
+      if (state.mode !== "admin" && state.mode !== "owner") return;
+      await refreshAdmin();
+      const deptName = payload.new.department_name || "ລາຍການໃໝ່";
+      const amt = payload.new.currency === "THB"
+        ? fmtTHB(Number(payload.new.amount))
+        : fmtKIP(Number(payload.new.amount));
+      notifyNew("📥 ພະນັກງານສົ່ງຍອດ\n" + deptName + " " + amt);
+    })
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "records" }, async (payload) => {
+      if (state.mode !== "admin" && state.mode !== "owner") return;
+      const wasVerified = !payload.old.verified && payload.new.verified;
+      if (!wasVerified) return;
+      await refreshAdmin();
+      const deptName = payload.new.department_name || "ລາຍການ";
+      const amt = payload.new.currency === "THB"
+        ? fmtTHB(Number(payload.new.amount))
+        : fmtKIP(Number(payload.new.amount));
+      notifyNew("✅ Approve ສຳເລັດ\n" + deptName + " " + amt);
+    })
+    .subscribe();
 }
 
 async function loadAdmin() {
@@ -838,7 +897,9 @@ async function loadAdmin() {
   const cached = getCached();
   if (cached.length > 0) { adminRecords = cached; renderAdmin(); }
   await refreshAdmin();
-  adminInterval = setInterval(refreshAdmin, 15000);
+  setupRealtime();
+  // Keep polling as fallback every 30s
+  adminInterval = setInterval(refreshAdmin, 30000);
 }
 
 async function refreshAdmin() {
