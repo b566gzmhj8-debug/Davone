@@ -1662,21 +1662,36 @@ async function confirmBankDeposit(btn) {
   const note = (document.getElementById("bank-note-input").value||"").trim();
   btn.disabled = true;
   btn.textContent = "⏳ ກຳລັງບັນທຶກ...";
+  const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: cur, note };
+  // Optimistic update: add to cache immediately and re-render
+  if (!_bankDepositsCache) _bankDepositsCache = [];
+  _bankDepositsCache.unshift(dep);
+  btn.closest(".overlay").remove();
+  renderAdmin();
+  // Then save to Supabase in background
   try {
-    await addBankDeposit({ id: Date.now().toString(), ts: Date.now(), amount: num, currency: cur, note });
-    btn.closest(".overlay").remove();
-    await refreshAdmin();
+    await addBankDeposit(dep);
   } catch {
-    btn.disabled = false;
-    btn.textContent = "✅ ຢືນຢັນ";
+    // Rollback cache on failure
+    _bankDepositsCache = _bankDepositsCache.filter(d => d.id !== dep.id);
+    renderAdmin();
+    alert("ບັນທຶກບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່");
   }
 }
 
 async function deleteBankDeposit(id) {
+  // Optimistic update: remove from cache immediately
+  if (_bankDepositsCache) {
+    _bankDepositsCache = _bankDepositsCache.filter(d => d.id !== id);
+  }
+  renderAdmin();
   try {
     await removeBankDeposit(id);
-    await refreshAdmin();
-  } catch {}
+  } catch {
+    // Refresh from server on failure
+    await fetchBankDeposits();
+    renderAdmin();
+  }
 }
 
 let isDark = localStorage.getItem("dv_theme") !== "light";
