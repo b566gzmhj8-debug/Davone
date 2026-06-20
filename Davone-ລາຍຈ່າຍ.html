@@ -356,6 +356,10 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
       </svg>
       <span>ສະຫຼຸບ</span>
     </button>
+    <button class="btn-summary" onclick="exportCSV()" style="background:rgba(61,170,128,0.1);border-color:rgba(61,170,128,0.3);color:#3daa80" title="ສຳຮອງຂໍ້ມູນ CSV">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M5 7l3 3 3-3"/><path d="M2 12h12"/></svg>
+      <span>ສຳຮອງ</span>
+    </button>
     <button class="btn-summary" onclick="openCfg()" style="padding:7px 10px;opacity:.6" title="ຕັ້ງຄ່າ">⚙️</button>
     <div class="topbar-time" id="liveDate"></div>
   </div>
@@ -537,19 +541,17 @@ const state = {adminTag:'', goodsTag:'', selMode:false, selected:new Set()};
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
+// ── Supabase ຝັງໄວ້ແລ້ວ ບໍ່ຕ້ອງຕັ້ງຄ່າ ──
+const SUPABASE_URL = 'https://snyyhmeprngskneaaubb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XPKO1h3cIxNt8yPJfO7gpg_dg40mwJs';
+
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('expenseDate').value = new Date().toISOString().slice(0,10);
   tick(); setInterval(tick, 30000);
 
-  const cfg = loadConfig();
-  if (cfg) {
-    document.getElementById('cfgOverlay').style.display = 'none';
-    initSupabase(cfg.url, cfg.key);
-  } else {
-    // ສະແດງ config modal
-    document.getElementById('cfgUrl').value = '';
-    document.getElementById('cfgKey').value = '';
-  }
+  // ເຊື່ອມ Supabase ອັດຕະໂນມັດ
+  document.getElementById('cfgOverlay').style.display = 'none';
+  initSupabase(SUPABASE_URL, SUPABASE_KEY);
 
   document.addEventListener('keydown', e => {
     if (e.key==='Enter' && !e.isComposing) {
@@ -589,7 +591,7 @@ function openCfg() {
 
 function initSupabase(url, key) {
   try {
-    sb = supabase.createClient(url, key);
+    sb = supabase.createClient(url || SUPABASE_URL, key || SUPABASE_KEY);
     setSyncBadge('loading', '⏳ ກຳລັງເຊື່ອມ…');
     reloadHistory();
   } catch(e) {
