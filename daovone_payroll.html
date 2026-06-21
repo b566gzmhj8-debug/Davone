@@ -391,7 +391,6 @@
     <div style="display:flex;gap:8px;">
       <button class="btn btn-sm btn-primary" onclick="cloudSave()" id="cloud-save-btn">☁️ ບັນທຶກ Cloud</button>
       <button class="btn btn-sm" style="background:#e8f5ec;color:var(--green-dark);" onclick="cloudLoad()">🔄 ໂຫລດ Cloud</button>
-      <button class="btn btn-sm" style="background:#f5e9c0;color:#b8901f;border:1.5px solid #c9a227;" onclick="loadBackupData()">📦 ໂຫລດ Backup (19 ຄົນ)</button>
     </div>
   </div>
 
@@ -685,12 +684,30 @@ function setSaveStatus(msg, color) {
   if (el) { el.textContent = msg; el.style.color = color || '#666'; }
 }
 
-async function cloudSave() {
-  try {
-    const empForCloud = employees.map(({ qrImage, ...rest }) => rest);
-    const qrMap = {};
-    employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
+// ກັນ cloudSave ຖືກເອີ້ນຊ້ອນກັນ (ຄ້າງຫຼາຍ request ພ້ອມກັນ)
+let _cloudSaveInFlight = false;
 
+async function cloudSave() {
+  if (_cloudSaveInFlight) return; // ມີ request ກຳລັງເຮັດຢູ່ແລ້ວ, ບໍ່ຍິງຊ້ອນ
+  _cloudSaveInFlight = true;
+
+  // ບັນທຶກ local ກ່ອນທັນທີ ບໍ່ວ່າ cloud ຈະສຳເລັດຫຼືບໍ່
+  const empForCloud = employees.map(({ qrImage, ...rest }) => rest);
+  const qrMap = {};
+  employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
+  try {
+    localStorage.setItem('daovone_payroll', JSON.stringify({
+      employees: empForCloud,
+      month: document.getElementById('month-picker').value,
+      saved: new Date().toISOString()
+    }));
+    localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap));
+  } catch(e) {}
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000); // ບໍ່ໃຫ້ຄ້າງຕະຫຼອດໄປ
+
+  try {
     const payload = {
       id: RECORD_ID,
       data: JSON.stringify({ employees: empForCloud }),
@@ -703,47 +720,32 @@ async function cloudSave() {
       {
         method: 'POST',
         headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       }
     );
     if (!res.ok) throw new Error(await res.text());
 
-    try {
-      localStorage.setItem('daovone_payroll', JSON.stringify({
-        employees: empForCloud,
-        month: document.getElementById('month-picker').value,
-        saved: new Date().toISOString()
-      }));
-      localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap));
-    } catch(e) {}
-
     const t = new Date().toLocaleTimeString('lo-LA');
     setSaveStatus(`✅ ບັນທຶກ Cloud ສຳເລັດ — ${t}`, '#1a5c2e');
   } catch(e) {
-    setSaveStatus('❌ Cloud save error: ' + e.message, '#c0392b');
+    const msg = e.name === 'AbortError' ? 'ໝົດເວລາລໍ Cloud (8s)' : e.message;
+    setSaveStatus('⚠️ ບັນທຶກ Local ແລ້ວ, Cloud error: ' + msg, '#c9a227');
+  } finally {
+    clearTimeout(timer);
+    _cloudSaveInFlight = false;
   }
 }
 
-// ── BACKUP DATA (ຈາກ daovone_payroll_backup.json) ──
-const BACKUP_DATA = {"employees":[{"bonusItems":[{"label":"ເງິນນ້ຳມັນ","amount":100000},{"label":"ເງິນຄອມລົດໃຫຍ່","amount":500000}],"baseSalary":4000000,"workDays":30,"paid":false,"bankAccount":"061120001354087001","bankName":"Bcel one","id":1782021860300,"name":"ທ້າວ.ເຈີນ ສຸວົງ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຕຳແໜ່ງ","amount":500000},{"label":"ເງິນນ້ຳມັນລົດທ້ຽວການ","amount":100000},{"label":"ເງິນຂະຍັນ","amount":300000},{"label":"ເງິນບໍລິຫານຈັດການ ທາງຄູໂບຕ້າ","amount":5000000},{"label":"ເງິນຄອມຂາຍອາໄຫລ່","amount":0},{"label":"ເບ້ຍລ້ຽງຕອນສວຍ(ບໍລວມວັນອາທິດ)","amount":130000}],"baseSalary":10000000,"workDays":30,"paid":false,"bankAccount":"095120001159324001","bankName":"Bcel One","id":1782021860301,"name":"ທ້າວ.ກົງວ່າງ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນນ້ຳມັນລົດ","amount":100000},{"label":"ເງິນຕິດຕາມໜີ້","amount":0},{"label":"ເງິນຄອມລົດໃຫຍ່","amount":0}],"baseSalary":7000000,"workDays":30,"paid":false,"bankAccount":"060120001525514001","bankName":"Bcel One","id":1782023172936,"name":"ນາງ.ມາລີ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນບໍ່ຂາດວຽກ","amount":100000},{"label":"ເງິນນ້ຳມັນລົດແລ່ນວຽກ","amount":200000},{"label":"ເບ້ຍລ້ຽງຕອນສວຍ(ບໍລວມວັນອາທິດ)","amount":130000},{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0},{"label":"ເງິນຂາຍອາໄຫລ່","amount":0}],"baseSalary":6000000,"workDays":30,"paid":false,"bankAccount":"060120001525537001","bankName":"Bcel One","id":1782028929485,"name":"ນາງ.ພີມທອງ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນນ້ຳມັນລົດ","amount":100000},{"label":"ເງິນຜັນຜົນກຳໄລ່ລາຍເດືອນ,ສ້ອມແປງ","amount":0},{"label":"ເບ້ຍລ້ຽງຕອນສວຍ(ບໍ່ລວມວັນອາທິດ)","amount":130000},{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0}],"baseSalary":4000000,"workDays":30,"paid":false,"bankAccount":"063120001561759001","bankName":"Bcel One","id":1782029043819,"name":"ທ້າວ.ໂຕນ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນນ້ຳມັນລົດ","amount":100000},{"label":"ເງິນຄອມຂາຍອາໄຫລ່","amount":0}],"baseSalary":4000000,"workDays":30,"paid":false,"bankAccount":"060120001387496001","bankName":"Bcel One","id":1782029322073,"name":"ທ້າວ.ຄຳເສົາ ໄຊຊິງລີ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດໃຫຍ່","amount":0},{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0},{"label":"ເງິນຂາຍອາໄຫລ່","amount":0}],"baseSalary":5000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"Bcel One","id":1782029396746,"name":"ນາງ.ນິດ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0},{"label":"ເຮັດວຽກລວງເວລາ","amount":0}],"baseSalary":3500000,"workDays":30,"paid":false,"bankAccount":"","bankName":"ACD","id":1782029435034,"name":"ທ້າວ.ໂພ","advance":2000000,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0},{"label":"ເງິນນ້ຳມັນລົດທ້ຽວການ","amount":100000},{"label":"ເງິນລວງເວລາ","amount":0}],"baseSalary":7000000,"workDays":30,"paid":false,"bankAccount":"0601211039472","bankName":"Bcel One","id":1782029475929,"name":"ທ້າວ.ສີທົນ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0},{"label":"ເງິນຄອມຂາຍອາໄຫລ່","amount":0},{"label":"ເງິນຄອມລົດໃຫຍ່","amount":0}],"baseSalary":3000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"LDB","id":1782029646679,"name":"ນາງ.ເພືອຍ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດໃຫຍ່","amount":0}],"baseSalary":3000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"APR","id":1782029702511,"name":"ທ້າວ.ວົງເພັດ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດໃຫຍ່","amount":0},{"label":"ເງິນນ້ຳມັນທ້ຽວການ","amount":100000}],"baseSalary":4000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"Bcel One","id":1782029786398,"name":"ນາງ.ສຸກັນຍາ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0}],"baseSalary":3000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"Bcel One","id":1782029856702,"name":"ນາງ.ຍຸພິນ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0}],"baseSalary":3000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"LBD","id":1782029890415,"name":"ທ້າວ.ສິງຄຳ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0}],"baseSalary":1700000,"workDays":30,"paid":false,"bankAccount":"cash","bankName":"","id":1782029917054,"name":"ທ້າວ.ມິກ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[{"label":"ເງິນຄອມລົດຄູໂບຕ້າ","amount":0},{"label":"ເງິນລວງເວລາວຽກ","amount":0}],"baseSalary":7500000,"workDays":30,"paid":false,"bankAccount":"","bankName":"Bcel One","id":1782029943145,"name":"ທ້າວ.ບຸນຕຸ້ຍ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[],"baseSalary":3500000,"workDays":30,"paid":false,"bankAccount":"","bankName":"Bcel One","id":1782029986288,"name":"ນາງ.ຄຳ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[],"baseSalary":4000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"","id":1782030000148,"name":"ນາງ.ແວ້ງ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""},{"bonusItems":[],"baseSalary":5000000,"workDays":30,"paid":false,"bankAccount":"","bankName":"","id":1782030023329,"name":"ທ້າວ.ວຽງຄົງ","advance":0,"debt":0,"otherDeduct":0,"qrImage":""}],"month":"2026-06"};
-
-function loadBackupData() {
-  employees = BACKUP_DATA.employees.map(e => ({
-    bonusItems: [], baseSalary: 3000000, workDays: 30,
-    paid: false, bankAccount: '', bankName: '', qrImage: '',
-    ...e
-  }));
-  const mp = document.getElementById('month-picker');
-  if (mp && BACKUP_DATA.month) mp.value = BACKUP_DATA.month;
-  renderTable();
-  setSaveStatus('✅ ໂຫລດຂໍ້ມູນ Backup ສຳເລັດ (19 ຄົນ) — ກົດ "ໂຫລດ Cloud" ຖ້າ Supabase ໃຊ້ໄດ້', '#c9a227');
-}
+let _cloudLoadInFlight = false;
 
 async function cloudLoad() {
-  setSaveStatus('🔄 ກຳລັງໂຫລດ Cloud... (5ວິ)', '#666');
+  if (_cloudLoadInFlight) return; // ກັນກົດຊ້ອນລະຫວ່າງລໍຢູ່
+  _cloudLoadInFlight = true;
+  setSaveStatus('🔄 ກຳລັງໂຫລດ...', '#666');
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000); // ลด timeout เหลือ 5 วิ
+    const timer = setTimeout(() => controller.abort(), 10000);
 
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/payroll_data?id=eq.${RECORD_ID}&select=data,qr_data&limit=1`,
@@ -752,7 +754,7 @@ async function cloudLoad() {
     clearTimeout(timer);
     if (!res.ok) throw new Error(await res.text());
     const rows = await res.json();
-    if (!rows || rows.length === 0) throw new Error('ບໍ່ພົບຂໍ້ມູນໃນ Cloud');
+    if (!rows || rows.length === 0) throw new Error('ບໍ່ພົບຂໍ້ມູນ');
 
     const parsed = JSON.parse(rows[0].data);
     let qrMap = {};
@@ -774,7 +776,6 @@ async function cloudLoad() {
     const t = new Date().toLocaleTimeString('lo-LA');
     setSaveStatus(`✅ ໂຫລດ Cloud ສຳເລັດ — ${t}`, '#1a5c2e');
   } catch(e) {
-    // Cloud failed — try localStorage first, then backup
     try {
       const raw = localStorage.getItem('daovone_payroll');
       if (raw) {
@@ -786,19 +787,20 @@ async function cloudLoad() {
           paid: false, bankAccount: '', bankName: '', qrImage: '',
           ...e, qrImage: qrMap[e.id] || e.qrImage || ''
         }));
-        if (data.month) {
-          const mp = document.getElementById('month-picker');
-          if (mp) mp.value = data.month;
-        }
         renderTable();
-        setSaveStatus('⚠️ Cloud ໃຊ້ບໍ່ໄດ້ — ໃຊ້ຂໍ້ມູນ Local ແທນ (ກົດ "ໂຫລດ Backup" ຖ້າຕ້ອງການ)', '#c9a227');
+        setSaveStatus('⚠️ ໃຊ້ຂໍ້ມູນ Local — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c9a227');
       } else {
-        // No localStorage either — load backup
-        loadBackupData();
+        employees = defaultEmployees();
+        renderTable();
+        setSaveStatus('⚠️ Cloud ເຊື່ອມຕໍ່ບໍ່ໄດ້ — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c0392b');
       }
     } catch(e2) {
-      loadBackupData();
+      employees = defaultEmployees();
+      renderTable();
+      setSaveStatus('⚠️ ໂຫລດ Cloud ບໍ່ໄດ້ — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c0392b');
     }
+  } finally {
+    _cloudLoadInFlight = false;
   }
 }
 
@@ -1282,7 +1284,6 @@ function handleQRImageUpload(input) {
   reader.readAsDataURL(file);
   input.value = '';
 }
-}
 
 function clearQRImage() {
   const preview = document.getElementById('qr-img-preview');
@@ -1520,11 +1521,30 @@ async function exportSelectedPDFs() {
   document.getElementById('month-picker').value =
     now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
 
-  // ⚡ ໂຫລດ Backup ທັນທີ (ບໍ່ລໍຖ້າ Cloud)
-  loadBackupData();
+  // ໂຫລດ localStorage ກ່ອນທັນທີ (ໄວ — ໃຊ້ໄດ້ທັນທີ)
+  try {
+    const raw = localStorage.getItem('daovone_payroll');
+    if (raw) {
+      const data = JSON.parse(raw);
+      let qrMap = {};
+      try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e) {}
+      employees = data.employees.map(e => ({
+        bonusItems: [], baseSalary: 3000000, workDays: 30,
+        paid: false, bankAccount: '', bankName: '', qrImage: '',
+        ...e, qrImage: qrMap[e.id] || e.qrImage || ''
+      }));
+      setSaveStatus('💾 ໂຫລດ Local — ກຳລັງ sync Cloud...', '#666');
+    } else {
+      employees = defaultEmployees();
+      setSaveStatus('📝 ຂໍ້ມູນໃໝ່', '#666');
+    }
+  } catch(e) {
+    employees = defaultEmployees();
+  }
+  renderTable(); // ສະແດງຂໍ້ມູນທັນທີ
 
-  // ພະຍາຍາມ sync Cloud ໃນ background ຫຼັງຈາກ 1 ວິ (ບໍ່ block UI)
-  setTimeout(() => cloudLoad(), 1000);
+  // ພະຍາຍາມ sync Cloud ໃນ background (ບໍ່ block UI)
+  setTimeout(() => cloudLoad(), 500);
 
   // ✅ Auto cloud save ທຸກ 60 ວິນາທີ
   setInterval(() => { cloudSave(); }, 60000);
