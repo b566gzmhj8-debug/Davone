@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payroll.html - ດາວອນ</title>
+<title>ລະບົບສະຫຼຸບເງິນເດືອນ - ດາວອນ</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -810,12 +810,24 @@ function computeNet(emp) {
   return gross + bonus - deduct;
 }
 
-// ── Format number input with commas while typing ──
+// ── Live format: ໃສ່ຈຸດທັນທີຂະນະພິມ ──
+function liveFormat(el) {
+  const raw = el.value.replace(/,/g, '');  // ລຶບ comma ເກົ່າ
+  if (raw === '' || raw === '-') return;    // ຍັງໃສ່ຄ່າຍ
+  const num = Number(raw);
+  if (isNaN(num)) return;                  // ບໍ່ໃຊ່ຕົວເລກ
+  const formatted = num.toLocaleString('en-US');
+  // ຄຳນວນ cursor position ຫຼັງ format
+  const cursorFromEnd = el.value.length - el.selectionEnd;
+  el.value = formatted;
+  // ຕັ້ງ cursor ໃຫ້ຖືກ
+  const newPos = formatted.length - cursorFromEnd;
+  el.setSelectionRange(Math.max(0, newPos), Math.max(0, newPos));
+}
+
+// ── Format number input (legacy, used elsewhere) ──
 function formatInput(el) {
-  const raw = parseNum(el.value);
-  if (!isNaN(raw) && el.value !== '') {
-    el.value = raw.toLocaleString('en-US');
-  }
+  liveFormat(el);
 }
 
 // ── Render main table ──
@@ -836,16 +848,20 @@ function renderTable() {
       <td>${i+1}</td>
       <td class="td-left"><input class="cell-input emp-name-input" value="${emp.name}" onblur="updateField(${i},'name',this.value)"></td>
       <td><input class="cell-input" value="${fmt(emp.baseSalary)}"
+          oninput="liveFormat(this)"
           onblur="updateField(${i},'baseSalary',parseNum(this.value));this.value=fmt(employees[${i}].baseSalary)"></td>
       <td><input class="cell-input" type="number" min="0" max="31" value="${emp.workDays}"
           onblur="updateField(${i},'workDays',this.value)"></td>
       <td style="font-weight:600;color:var(--green-dark);white-space:nowrap">${fmt(gross)}</td>
       <td>${bonusLabel}</td>
       <td><input class="cell-input" value="${fmt(emp.advance)}" style="color:#c0392b"
+          oninput="liveFormat(this)"
           onblur="updateField(${i},'advance',parseNum(this.value));this.value=fmt(employees[${i}].advance)"></td>
       <td><input class="cell-input" value="${fmt(emp.debt)}" style="color:#c0392b"
+          oninput="liveFormat(this)"
           onblur="updateField(${i},'debt',parseNum(this.value));this.value=fmt(employees[${i}].debt)"></td>
       <td><input class="cell-input" value="${fmt(emp.otherDeduct)}" style="color:#c0392b"
+          oninput="liveFormat(this)"
           onblur="updateField(${i},'otherDeduct',parseNum(this.value));this.value=fmt(employees[${i}].otherDeduct)"></td>
       <td class="net-cell ${net < 0 ? 'negative' : ''}">${fmt(net)}</td>
       <td style="text-align:center;">
@@ -990,7 +1006,7 @@ function renderBonusRows() {
       <input class="b-label" placeholder="ລາຍລະອຽດ ເຊັ່ນ: ຄ່ານ້ຳມັນ" value="${item.label}"
         oninput="tempBonusItems[${i}].label=this.value">
       <input class="b-amount" placeholder="ຈຳນວນ" value="${item.amount > 0 ? fmt(item.amount) : ''}"
-        oninput="formatInput(this);tempBonusItems[${i}].amount=parseNum(this.value);updateBonusPreview()">
+        oninput="liveFormat(this);tempBonusItems[${i}].amount=parseNum(this.value);updateBonusPreview()">
       <button class="btn btn-danger btn-xs" onclick="removeBonusRow(${i})">✕</button>
     `;
     container.appendChild(div);
