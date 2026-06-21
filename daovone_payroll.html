@@ -455,9 +455,11 @@
       <button class="btn btn-primary" onclick="addEmployee()">➕ ເພີ່ມພະນັກງານ</button>
       <button class="btn btn-danger" onclick="promptDeleteEmployee()">🗑️ ລົບພະນັກງານ</button>
       <button class="btn btn-gold" id="all-pdf-btn" onclick="openSelectPDF()">📦 ດາວໂຫລດ PDF</button>
-      <button class="btn btn-gray" onclick="exportJSON()" title="ສົ່ງອອກຂໍ້ມູນເປັນໄຟລ໌ JSON">💾 Export ຂໍ້ມູນ</button>
-      <button class="btn btn-gray" onclick="importJSON()" title="ນຳໄຟລ໌ JSON ກັບຄືນ">📂 Import ຂໍ້ມູນ</button>
-      <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(this)">
+      <button class="btn btn-gray" onclick="exportJSON()">💾 Export ຂໍ້ມູນ</button>
+      <label class="btn btn-gray" style="cursor:pointer;margin:0;">
+        📂 Import ຂໍ້ມູນ
+        <input type="file" accept=".json,application/json" style="display:none;" onchange="handleImport(this)">
+      </label>
     </div>
     <div id="delete-panel" style="display:none;margin-top:12px;background:#fde8e8;border:1.5px solid #e88;border-radius:10px;padding:14px 16px;">
       <div style="font-size:0.88rem;color:#c0392b;font-weight:600;margin-bottom:10px;">🗑️ ເລືອກພະນັກງານທີ່ຕ້ອງການລົບ:</div>
