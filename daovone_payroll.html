@@ -686,16 +686,15 @@ function setSaveStatus(msg, color) {
 
 async function cloudSave() {
   try {
+    // ແຍກ QR ອອກ — save ໃນ column qr_data ຂອງ Supabase
     const empForCloud = employees.map(({ qrImage, ...rest }) => rest);
-
-    // Save qrImages ໃນ localStorage ແຍກ
     const qrMap = {};
     employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
-    try { localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap)); } catch(e) {}
 
     const payload = {
       id: RECORD_ID,
       data: JSON.stringify({ employees: empForCloud }),
+      qr_data: JSON.stringify(qrMap),
       updated_at: new Date().toISOString()
     };
 
@@ -709,13 +708,14 @@ async function cloudSave() {
     );
     if (!res.ok) throw new Error(await res.text());
 
-    // Backup local
+    // Backup local ດ້ວຍ (ໂດຍບໍ່ມີ QR ຖ້າ storage ເຕັມ)
     try {
       localStorage.setItem('daovone_payroll', JSON.stringify({
-        employees,
+        employees: empForCloud,
         month: document.getElementById('month-picker').value,
         saved: new Date().toISOString()
       }));
+      localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap));
     } catch(e) {}
 
     const t = new Date().toLocaleTimeString('lo-LA');
@@ -728,8 +728,9 @@ async function cloudSave() {
 async function cloudLoad() {
   setSaveStatus('🔄 ກຳລັງໂຫລດ...', '#666');
   try {
+    // ໂຫລດທັງ data ແລະ qr_data ໃນ request ດຽວ
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/payroll_data?id=eq.${RECORD_ID}&select=data&limit=1`,
+      `${SUPABASE_URL}/rest/v1/payroll_data?id=eq.${RECORD_ID}&select=data,qr_data&limit=1`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
     );
     if (!res.ok) throw new Error(await res.text());
@@ -738,14 +739,21 @@ async function cloudLoad() {
 
     const parsed = JSON.parse(rows[0].data);
 
+    // ໂຫລດ QR ຈາກ Supabase ກ່ອນ ຖ້າບໍ່ມີ fallback localStorage
     let qrMap = {};
-    try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e) {}
+    try {
+      if (rows[0].qr_data) {
+        qrMap = JSON.parse(rows[0].qr_data);
+      } else {
+        qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}');
+      }
+    } catch(e) {}
 
     employees = parsed.employees.map(e => ({
       bonusItems: [], baseSalary: 3000000, workDays: 30,
       paid: false, bankAccount: '', bankName: '', qrImage: '',
       ...e,
-      qrImage: qrMap[e.id] || e.qrImage || ''
+      qrImage: qrMap[e.id] || ''  // ໂຫລດ QR ຈາກ cloud
     }));
 
     renderTable();
