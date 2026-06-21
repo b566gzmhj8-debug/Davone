@@ -667,9 +667,9 @@
 <script>
 const LAO_MONTHS = ['ມັງກອນ','ກຸມພາ','ມີນາ','ເມສາ','ພຶດສະພາ','ມີຖຸນາ','ກໍລະກົດ','ສິງຫາ','ກັນຍາ','ຕຸລາ','ພະຈິກ','ທັນວາ'];
 
-// ── Supabase REST API (ບໍ່ໃຊ້ library — ໃຊ້ fetch ໂດຍກົງ) ──
+// ── Supabase REST API ──
 const SUPABASE_URL = 'https://snyyhmeprngskneaaubb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_XPKO1h3cIxNt8yPJfO7gpg_dg40mwJs';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNueXlobWVwcm5nc2tuZWFhdWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIyMTgsImV4cCI6MjA5NTEzODIxOH0.3ltbo2EDzbHuMIC-TkoRew7asII0rIGNF0qoz2DkWHs';
 const RECORD_ID    = 'daovone_payroll_main';
 
 const SB_HEADERS = {
@@ -679,8 +679,6 @@ const SB_HEADERS = {
   'Prefer': 'return=minimal'
 };
 
-let sb = null; // ບໍ່ໃຊ້ library ແລ້ວ — sb = true ເພື່ອ check
-
 function setSaveStatus(msg, color) {
   const el = document.getElementById('save-status-text');
   if (el) { el.textContent = msg; el.style.color = color || '#666'; }
@@ -688,7 +686,6 @@ function setSaveStatus(msg, color) {
 
 async function cloudSave() {
   try {
-    // ແຍກ QR ອອກ — save ໃນ column qr_data ຂອງ Supabase
     const empForCloud = employees.map(({ qrImage, ...rest }) => rest);
     const qrMap = {};
     employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
@@ -710,7 +707,6 @@ async function cloudSave() {
     );
     if (!res.ok) throw new Error(await res.text());
 
-    // Backup local ດ້ວຍ (ໂດຍບໍ່ມີ QR ຖ້າ storage ເຕັມ)
     try {
       localStorage.setItem('daovone_payroll', JSON.stringify({
         employees: empForCloud,
@@ -721,7 +717,7 @@ async function cloudSave() {
     } catch(e) {}
 
     const t = new Date().toLocaleTimeString('lo-LA');
-    setSaveStatus(`✅ ບັນທຶກ Cloud ອັດຕະໂນມັດ — ${t}`, '#1a5c2e');
+    setSaveStatus(`✅ ບັນທຶກ Cloud ສຳເລັດ — ${t}`, '#1a5c2e');
   } catch(e) {
     setSaveStatus('❌ Cloud save error: ' + e.message, '#c0392b');
   }
@@ -754,11 +750,14 @@ async function cloudLoad() {
       paid: false, bankAccount: '', bankName: '', qrImage: '',
       ...e, qrImage: qrMap[e.id] || ''
     }));
+    if (parsed.month) {
+      const mp = document.getElementById('month-picker');
+      if (mp) mp.value = parsed.month;
+    }
     renderTable();
     const t = new Date().toLocaleTimeString('lo-LA');
     setSaveStatus(`✅ ໂຫລດ Cloud ສຳເລັດ — ${t}`, '#1a5c2e');
   } catch(e) {
-    // Fallback: ໂຫລດ localStorage ແທນ — ໃຊ້ງານໄດ້ທັນທີ
     try {
       const raw = localStorage.getItem('daovone_payroll');
       if (raw) {
@@ -782,6 +781,56 @@ async function cloudLoad() {
       renderTable();
       setSaveStatus('⚠️ ໂຫລດ Cloud ບໍ່ໄດ້ — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c0392b');
     }
+  }
+}
+
+function localSaveNow() {
+  try {
+    const empNoQR = employees.map(({ qrImage, ...rest }) => rest);
+    localStorage.setItem('daovone_payroll', JSON.stringify({
+      employees: empNoQR,
+      month: document.getElementById('month-picker').value,
+      saved: new Date().toISOString()
+    }));
+    const qrMap = {};
+    employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
+    try { localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap)); } catch(e2) {}
+    const t = new Date().toLocaleTimeString('lo-LA');
+    setSaveStatus(`✅ ບັນທຶກແລ້ວ — ${t}`, '#1a5c2e');
+  } catch(e) {
+    setSaveStatus('❌ ບັນທຶກບໍ່ໄດ້: ' + e.message, '#c0392b');
+  }
+}
+
+function localLoad() {
+  setSaveStatus('🔄 ກຳລັງໂຫລດ...', '#666');
+  try {
+    const raw = localStorage.getItem('daovone_payroll');
+    if (raw) {
+      const data = JSON.parse(raw);
+      let qrMap = {};
+      try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e2) {}
+      employees = data.employees.map(e => ({
+        bonusItems: [], baseSalary: 3000000, workDays: 30,
+        paid: false, bankAccount: '', bankName: '', qrImage: '',
+        ...e, qrImage: qrMap[e.id] || e.qrImage || ''
+      }));
+      if (data.month) {
+        const mp = document.getElementById('month-picker');
+        if (mp) mp.value = data.month;
+      }
+      renderTable();
+      const t = new Date().toLocaleTimeString('lo-LA');
+      setSaveStatus(`✅ ໂຫລດສຳເລັດ — ${t}`, '#1a5c2e');
+    } else {
+      employees = defaultEmployees();
+      renderTable();
+      setSaveStatus('📋 ເລີ່ມໃໝ່ — ບໍ່ມີຂໍ້ມູນເກົ່າ', '#c9a227');
+    }
+  } catch(e) {
+    employees = defaultEmployees();
+    renderTable();
+    setSaveStatus('⚠️ ໂຫລດບໍ່ໄດ້ — ເລີ່ມໃໝ່', '#c0392b');
   }
 }
 
@@ -924,39 +973,16 @@ function renderTable() {
   updateSummary();
 }
 
-// ── Auto-save to localStorage ──
+// ── Auto-save (local immediate + cloud debounced 4s) ──
 let _cloudSaveTimer = null;
 
 function autoSave() {
-  // 1. Save local — ລອງ save ທັງໝົດກ່ອນ
-  try {
-    localStorage.setItem('daovone_payroll', JSON.stringify({
-      employees,
-      month: document.getElementById('month-picker').value,
-      saved: new Date().toISOString()
-    }));
-  } catch(e) {
-    // quota exceeded — save ໂດຍບໍ່ມີ QR images
-    try {
-      const empNoQR = employees.map(({ qrImage, ...rest }) => rest);
-      localStorage.setItem('daovone_payroll', JSON.stringify({
-        employees: empNoQR,
-        month: document.getElementById('month-picker').value,
-        saved: new Date().toISOString()
-      }));
-      // Save QR images ແຍກ
-      const qrMap = {};
-      employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
-      try { localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap)); } catch(e2) {}
-    } catch(e2) { /* silent */ }
-  }
-
-  // 2. Debounce cloud save — 4 ວິຫຼັງຈາກແກ້ຄັ້ງສຸດທ້າຍ
+  // Local save ທັນທີ
+  localSaveNow();
+  // Cloud save debounce 4 ວິ
   clearTimeout(_cloudSaveTimer);
   setSaveStatus('⏳ ກຳລັງຈັດການ...', '#999');
-  _cloudSaveTimer = setTimeout(() => {
-    cloudSave();
-  }, 4000);
+  _cloudSaveTimer = setTimeout(() => { cloudSave(); }, 4000);
 }
 
 function updateField(i, field, val) {
