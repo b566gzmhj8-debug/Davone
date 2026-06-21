@@ -728,39 +728,58 @@ async function cloudSave() {
 async function cloudLoad() {
   setSaveStatus('🔄 ກຳລັງໂຫລດ...', '#666');
   try {
-    // ໂຫລດທັງ data ແລະ qr_data ໃນ request ດຽວ
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/payroll_data?id=eq.${RECORD_ID}&select=data,qr_data&limit=1`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }, signal: controller.signal }
     );
+    clearTimeout(timer);
     if (!res.ok) throw new Error(await res.text());
     const rows = await res.json();
     if (!rows || rows.length === 0) throw new Error('ບໍ່ພົບຂໍ້ມູນ');
 
     const parsed = JSON.parse(rows[0].data);
-
-    // ໂຫລດ QR ຈາກ Supabase ກ່ອນ ຖ້າບໍ່ມີ fallback localStorage
     let qrMap = {};
     try {
-      if (rows[0].qr_data) {
-        qrMap = JSON.parse(rows[0].qr_data);
-      } else {
-        qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}');
-      }
+      if (rows[0].qr_data) qrMap = JSON.parse(rows[0].qr_data);
+      else qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}');
     } catch(e) {}
 
     employees = parsed.employees.map(e => ({
       bonusItems: [], baseSalary: 3000000, workDays: 30,
       paid: false, bankAccount: '', bankName: '', qrImage: '',
-      ...e,
-      qrImage: qrMap[e.id] || ''  // ໂຫລດ QR ຈາກ cloud
+      ...e, qrImage: qrMap[e.id] || ''
     }));
-
     renderTable();
     const t = new Date().toLocaleTimeString('lo-LA');
     setSaveStatus(`✅ ໂຫລດ Cloud ສຳເລັດ — ${t}`, '#1a5c2e');
   } catch(e) {
-    setSaveStatus('❌ Cloud load error: ' + e.message, '#c0392b');
+    // Fallback: ໂຫລດ localStorage ແທນ — ໃຊ້ງານໄດ້ທັນທີ
+    try {
+      const raw = localStorage.getItem('daovone_payroll');
+      if (raw) {
+        const data = JSON.parse(raw);
+        let qrMap = {};
+        try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e2) {}
+        employees = data.employees.map(e => ({
+          bonusItems: [], baseSalary: 3000000, workDays: 30,
+          paid: false, bankAccount: '', bankName: '', qrImage: '',
+          ...e, qrImage: qrMap[e.id] || e.qrImage || ''
+        }));
+        renderTable();
+        setSaveStatus('⚠️ ໃຊ້ຂໍ້ມູນ Local — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c9a227');
+      } else {
+        employees = defaultEmployees();
+        renderTable();
+        setSaveStatus('⚠️ Cloud ເຊື່ອມຕໍ່ບໍ່ໄດ້ — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c0392b');
+      }
+    } catch(e2) {
+      employees = defaultEmployees();
+      renderTable();
+      setSaveStatus('⚠️ ໂຫລດ Cloud ບໍ່ໄດ້ — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#c0392b');
+    }
   }
 }
 
@@ -1455,13 +1474,19 @@ async function exportSelectedPDFs() {
   document.getElementById('month-picker').value =
     now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
 
-  // ໂຫລດ localStorage ກ່ອນ (fast)
+  // ໂຫລດ localStorage ກ່ອນທັນທີ (ໄວ — ໃຊ້ໄດ້ທັນທີ)
   try {
     const raw = localStorage.getItem('daovone_payroll');
     if (raw) {
       const data = JSON.parse(raw);
-      employees = data.employees.map(e => ({ bonusItems: [], baseSalary: 3000000, workDays: 30, paid: false, bankAccount: '', bankName: '', qrImage: '', ...e }));
-      setSaveStatus('💾 ໂຫລດຈາກ local browser ແລ້ວ', '#666');
+      let qrMap = {};
+      try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e) {}
+      employees = data.employees.map(e => ({
+        bonusItems: [], baseSalary: 3000000, workDays: 30,
+        paid: false, bankAccount: '', bankName: '', qrImage: '',
+        ...e, qrImage: qrMap[e.id] || e.qrImage || ''
+      }));
+      setSaveStatus('💾 ໂຫລດ Local — ກຳລັງ sync Cloud...', '#666');
     } else {
       employees = defaultEmployees();
       setSaveStatus('📝 ຂໍ້ມູນໃໝ່', '#666');
@@ -1469,11 +1494,12 @@ async function exportSelectedPDFs() {
   } catch(e) {
     employees = defaultEmployees();
   }
-  renderTable();
+  renderTable(); // ສະແດງຂໍ້ມູນທັນທີ
 
-  // ພະຍາຍາມໂຫລດ Cloud ຫຼັງ (async)
-  cloudLoad();
-  // ✅ Auto cloud save ທຸກ 60 ວິນາທີ (backup)
+  // ພະຍາຍາມ sync Cloud ໃນ background (ບໍ່ block UI)
+  setTimeout(() => cloudLoad(), 500);
+
+  // ✅ Auto cloud save ທຸກ 60 ວິນາທີ
   setInterval(() => { cloudSave(); }, 60000);
 })();
 
