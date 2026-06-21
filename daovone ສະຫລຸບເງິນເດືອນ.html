@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ລະບົບສະຫຼຸບເງິນເດືອນ - ດາວອນ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root {
+    --green-dark: #1a5c2e;
+    --green-mid: #2d7a45;
+    --green-light: #e8f5ec;
+    --gold: #c9a227;
+    --gold-light: #f5e9c0;
+    --cream: #fdf8f0;
+    --text: #1a1a1a;
+    --muted: #666;
+    --red-light: #fde8e8;
+    --red: #c0392b;
+    --border: #d0d0d0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lao MN', 'Noto Sans Lao', 'Phetsarath OT', Arial, sans-serif;
+    background: #f0f0f0;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== ADMIN PANEL ===== */
+  #admin-panel { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+  .admin-header {
+    background: var(--green-dark);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .admin-header h1 { font-size: 1.3rem; }
+  .admin-header span { font-size: 0.85rem; opacity: 0.8; }
+  .logo-circle {
+    width: 44px; height: 44px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .header-left { display: flex; align-items: center; }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .card h2 {
+    font-size: 1rem;
+    color: var(--green-dark);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--green-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Employee table */
+  .emp-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead th {
+    background: var(--green-dark);
+    color: white;
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+  tbody tr:nth-child(even) { background: var(--green-light); }
+  tbody tr:hover { background: var(--gold-light); }
+  tbody td { padding: 7px 6px; text-align: center; border-bottom: 1px solid #eee; }
+  tbody td.td-left { text-align: left; }
+
+  input.cell-input {
+    width: 100%;
+    min-width: 75px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 5px 6px;
+    font-size: 0.82rem;
+    text-align: right;
+    font-family: inherit;
+    background: white;
+  }
+  input.cell-input:focus { outline: none; border-color: var(--green-mid); background: #f0fff4; }
+  .emp-name-input { text-align: left !important; min-width: 110px; }
+
+  .net-cell { font-weight: 700; color: var(--green-dark); white-space: nowrap; }
+  .net-cell.negative { color: var(--red); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border: none; border-radius: 8px;
+    font-size: 0.9rem; font-family: inherit; cursor: pointer;
+    font-weight: 600; transition: all 0.15s;
+  }
+  .btn-primary { background: var(--green-dark); color: white; }
+  .btn-primary:hover { background: var(--green-mid); }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #b8901f; }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-danger:hover { background: #a93226; }
+  .btn-gray { background: #e0e0e0; color: #333; }
+  .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+  .btn-xs { padding: 3px 8px; font-size: 0.74rem; }
+  .btn-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+
+  /* Bonus badge */
+  .bonus-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--green-light); color: var(--green-dark);
+    border: 1px solid var(--green-mid);
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    white-space: nowrap;
+  }
+  .bonus-badge:hover { background: #d0eeda; }
+
+  /* Summary bar */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .sum-box {
+    background: white; border-radius: 10px; padding: 14px 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07); text-align: center;
+  }
+  .sum-box .label { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+  .sum-box .value { font-size: 1.1rem; font-weight: 700; color: var(--green-dark); }
+  .sum-box.red .value { color: var(--red); }
+  .sum-box.gold .value { color: var(--gold); }
+
+  /* ===== BONUS MODAL ===== */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 900;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal-box {
+    background: white; border-radius: 14px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  .modal-head {
+    background: var(--green-dark); color: white;
+    padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-head h3 { font-size: 1rem; }
+  .modal-body { padding: 16px 20px; }
+  .modal-foot { padding: 12px 20px; background: #f5f5f5; display: flex; gap: 8px; justify-content: flex-end; }
+
+  .bonus-row {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+  }
+  .bonus-row input {
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; font-size: 0.88rem; font-family: inherit;
+  }
+  .bonus-row input.b-label { flex: 2; }
+  .bonus-row input.b-amount { flex: 1; text-align: right; }
+  .bonus-row input:focus { outline: none; border-color: var(--green-mid); }
+
+  .add-bonus-row {
+    display: flex; gap: 8px; margin-top: 10px;
+  }
+
+  /* ===== SLIP ===== */
+  #slip-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 999;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  #slip-modal.open { display: flex; }
+
+  .slip-container {
+    background: var(--cream); width: 100%; max-width: 600px;
+    max-height: 90vh; overflow-y: auto;
+    border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .slip-header {
+    background: white; padding: 24px 28px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid var(--gold);
+  }
+  .slip-logo {
+    width: 72px; height: 72px; background: var(--gold);
+    border-radius: 50%; border: 3px solid var(--green-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  }
+  .slip-title-block { text-align: center; flex: 1; padding: 0 12px; }
+  .slip-title-block h1 { font-size: 2rem; color: var(--green-dark); font-weight: 900; letter-spacing: 1px; }
+  .slip-title-block p { font-size: 0.85rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .slip-doc-no {
+    background: var(--gold-light); border: 1.5px solid var(--gold);
+    border-radius: 8px; padding: 10px 16px; text-align: center; min-width: 120px;
+  }
+  .slip-doc-no .label { font-size: 0.75rem; color: var(--muted); }
+  .slip-doc-no .value { font-size: 1rem; font-weight: 700; color: var(--green-dark); }
+
+  .slip-info {
+    background: white; padding: 16px 28px;
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .slip-info-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+  .slip-info-item .icon {
+    width: 32px; height: 32px; background: var(--green-light);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .slip-info-item .lbl { font-size: 0.75rem; color: var(--muted); }
+  .slip-info-item .val { font-weight: 600; }
+
+  .slip-table-wrap { padding: 16px 28px; }
+  .slip-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .slip-table thead th {
+    background: var(--green-dark); color: white; padding: 10px;
+    text-align: center;
+  }
+  .slip-table thead th:first-child { border-radius: 8px 0 0 0; text-align: left; }
+  .slip-table thead th:last-child { border-radius: 0 8px 0 0; }
+  .slip-table tbody td { padding: 9px 10px; border-bottom: 1px solid #eee; text-align: center; }
+  .slip-table tbody td:first-child { text-align: left; }
+  .slip-table tbody tr:nth-child(even) { background: #f9f9f9; }
+  .slip-table tbody tr.row-deduct { background: var(--red-light); }
+  .slip-table tbody tr.row-deduct td { color: var(--red); }
+  .slip-table tbody tr.row-bonus { background: #f0fff4; }
+  .slip-table tbody tr.row-bonus td { color: var(--green-dark); }
+
+  .slip-total {
+    background: var(--green-dark); color: white;
+    padding: 14px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .slip-total .lbl { font-size: 1rem; font-weight: 700; }
+  .slip-total .amt { font-size: 1.4rem; font-weight: 900; }
+
+  .slip-sign {
+    padding: 20px 28px 24px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    background: white;
+  }
+  .sign-box { text-align: center; }
+  .sign-box .sign-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 40px; }
+  .sign-box .sign-line { border-top: 1.5px solid #333; padding-top: 6px; font-size: 0.85rem; }
+
+  .slip-footer { background: var(--green-dark); height: 10px; border-radius: 0 0 12px 12px; }
+
+  .slip-close-row {
+    display: flex; justify-content: flex-end; gap: 10px;
+    padding: 12px 20px; background: #f5f5f5; border-radius: 12px 12px 0 0;
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    body { background: white; }
+    #admin-panel { display: none !important; }
+    #bonus-modal { display: none !important; }
+    #slip-modal { display: block !important; position: static; padding: 0; background: none; }
+    .slip-container { box-shadow: none; max-height: none !important; overflow: visible !important; border-radius: 0; }
+    .slip-close-row { display: none !important; }
+    .owner-only-section { display: none !important; }
+    .slip-table thead th { background: #1a5c2e !important; color: white !important; }
+    .slip-total { background: #1a5c2e !important; color: white !important; }
+    .slip-footer { background: #1a5c2e !important; }
+    .slip-info-item .icon { background: #e8f5ec !important; }
+    .slip-doc-no { background: #f5e9c0 !important; border: 1.5px solid #c9a227 !important; }
+    .row-deduct { background: #fde8e8 !important; }
+    .row-deduct td { color: #c0392b !important; }
+    .row-bonus { background: #f0fff4 !important; }
+    .row-bonus td { color: #1a5c2e !important; }
+  }
+
+  @media (max-width: 768px) {
+    /* Admin panel */
+    #admin-panel { padding: 12px; }
+
+    /* Header */
+    .admin-header { padding: 12px 16px; gap: 8px; }
+    .admin-header h1 { font-size: 1.05rem; }
+    .logo-circle { width: 36px; height: 36px; font-size: 1rem; margin-right: 8px; }
+
+    /* Summary boxes — 2 per row on mobile */
+    .summary-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    .sum-box { padding: 10px 10px; }
+    .sum-box .label { font-size: 0.7rem; }
+    .sum-box .value { font-size: 0.95rem; }
+
+    /* Card */
+    .card { padding: 14px 12px; }
+    .card h2 { font-size: 0.9rem; }
+
+    /* Table — horizontal scroll on mobile */
+    .emp-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { font-size: 0.78rem; }
+    thead th { padding: 8px 5px; font-size: 0.73rem; }
+    tbody td { padding: 6px 5px; }
+    input.cell-input { min-width: 65px; font-size: 0.75rem; padding: 4px 5px; }
+    .emp-name-input { min-width: 90px; }
+
+    /* Buttons */
+    .btn { padding: 8px 12px; font-size: 0.82rem; }
+    .btn-actions { gap: 7px; }
+    .btn-sm { padding: 5px 8px; font-size: 0.72rem; }
+
+    /* Slip modal */
+    .slip-container { max-width: 100%; border-radius: 0; max-height: 100vh; }
+    #slip-modal { padding: 0; align-items: flex-end; }
+    .slip-header { padding: 16px 16px 12px; }
+    .slip-logo { width: 50px; height: 50px; font-size: 1.3rem; }
+    .slip-title-block h1 { font-size: 1.4rem; }
+    .slip-info { padding: 12px 16px; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .slip-table-wrap { padding: 10px 12px; }
+    .slip-total { padding: 12px 16px; }
+    .slip-total .amt { font-size: 1.1rem; }
+    .slip-sign { padding: 14px 16px 18px; }
+    .slip-close-row { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+
+    /* Modals */
+    .modal-box { max-height: 85vh; overflow-y: auto; }
+    .modal-body { padding: 12px 14px; }
+
+    /* Delete panel */
+    #delete-panel { padding: 10px 12px; }
+  }
+
+  @media (max-width: 400px) {
+    .summary-bar { grid-template-columns: 1fr 1fr; }
+    .slip-title-block h1 { font-size: 1.2rem; }
+    .slip-info { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== ADMIN PANEL ========== -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <div class="header-left">
+      <div class="logo-circle">🐴</div>
+      <div>
+        <h1>ລະບົບສະຫຼຸບເງິນເດືອນ</h1>
+        <span>ຮ້ານດາວອນ — Daovone Shop</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <label style="color:rgba(255,255,255,0.8);font-size:0.85rem;">ເດືອນ:</label>
+      <input type="month" id="month-picker"
+        onchange="autoSave()"
+        style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 10px;font-size:0.9rem;color-scheme:dark;">
+    </div>
+  </div>
+
+  <!-- Cloud save status bar -->
+  <div id="save-status-bar" style="
+    background:white;border-radius:10px;padding:8px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.07);
+    font-size:0.8rem;flex-wrap:wrap;gap:6px;
+  ">
+    <div id="save-status-text" style="color:var(--muted);">⏳ ກຳລັງໂຫລດ...</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-primary" onclick="cloudSave()" id="cloud-save-btn">☁️ ບັນທຶກ Cloud</button>
+      <button class="btn btn-sm" style="background:#e8f5ec;color:var(--green-dark);" onclick="cloudLoad()">🔄 ໂຫລດ Cloud</button>
+    </div>
+  </div>
+
+  <!-- Summary boxes -->
+  <div class="summary-bar">
+    <div class="sum-box">
+      <div class="label">👥 ພະນັກງານທັງໝົດ</div>
+      <div class="value" id="sum-total">0 ຄົນ</div>
+    </div>
+    <div class="sum-box">
+      <div class="label">💵 ເງິນເດືອນລວມ</div>
+      <div class="value" id="sum-salary">0 ກີບ</div>
+    </div>
+    <div class="sum-box">
+      <div class="label">🎁 ໂບນັດ/ພິເສດ</div>
+      <div class="value" id="sum-bonus">0 ກີບ</div>
+    </div>
+    <div class="sum-box red">
+      <div class="label">➖ ຫັກທັງໝົດ</div>
+      <div class="value" id="sum-deduct">0 ກີບ</div>
+    </div>
+    <div class="sum-box gold">
+      <div class="label">✅ ຈ່າຍທັງໝົດ</div>
+      <div class="value" id="sum-net">0 ກີບ</div>
+    </div>
+    <div class="sum-box">
+      <div class="label">✅ ໂອນແລ້ວ</div>
+      <div class="value" style="color:#2d7a45" id="sum-paid">0 ຄົນ</div>
+    </div>
+    <div class="sum-box red">
+      <div class="label">⏳ ຍັງບໍ່ໂອນ</div>
+      <div class="value" id="sum-unpaid">0 ຄົນ</div>
+    </div>
+  </div>
+
+  <!-- Employee Table -->
+  <div class="card">
+    <h2>📋 ລາຍການພະນັກງານ</h2>
+    <div class="emp-table-wrap">
+      <table id="emp-table">
+        <thead>
+          <tr>
+            <th style="width:36px">#</th>
+            <th>ຊື່ພະນັກງານ</th>
+            <th style="width:120px">ເງິນເດືອນ<br>ຕໍ່ 30 ວັນ</th>
+            <th style="width:60px">ວັນ<br>ວຽກ</th>
+            <th style="width:110px">ລວມ<br>ຕາມວັນ</th>
+            <th style="width:120px">ລາຍຮັບ<br>ພິເສດ</th>
+            <th style="width:110px">ເບີກ<br>ລ່ວງໜ້າ</th>
+            <th style="width:110px">ໜີ້ຄ້າງ</th>
+            <th style="width:110px">ຫັກ<br>ອື່ນໆ</th>
+            <th style="width:115px">ສຸດທິ<br>(ກີບ)</th>
+            <th style="width:54px">ໂອນ<br>ແລ້ວ?</th>
+            <th style="width:46px">ບັນຊີ</th>
+            <th style="width:50px">ໃບ</th>
+          </tr>
+        </thead>
+        <tbody id="emp-tbody"></tbody>
+      </table>
+    </div>
+    <div class="btn-actions">
+      <button class="btn btn-primary" onclick="addEmployee()">➕ ເພີ່ມພະນັກງານ</button>
+      <button class="btn btn-danger" onclick="promptDeleteEmployee()">🗑️ ລົບພະນັກງານ</button>
+      <button class="btn btn-gold" id="all-pdf-btn" onclick="openSelectPDF()">📦 ດາວໂຫລດ PDF</button>
+      <button class="btn btn-gray" onclick="exportJSON()" title="ສົ່ງອອກຂໍ້ມູນເປັນໄຟລ໌ JSON">💾 Export ຂໍ້ມູນ</button>
+      <button class="btn btn-gray" onclick="importJSON()" title="ນຳໄຟລ໌ JSON ກັບຄືນ">📂 Import ຂໍ້ມູນ</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(this)">
+    </div>
+    <div id="delete-panel" style="display:none;margin-top:12px;background:#fde8e8;border:1.5px solid #e88;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:0.88rem;color:#c0392b;font-weight:600;margin-bottom:10px;">🗑️ ເລືອກພະນັກງານທີ່ຕ້ອງການລົບ:</div>
+      <div id="delete-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
+      <button class="btn btn-gray btn-sm" onclick="closeDeletePanel()">ຍົກເລີກ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== BONUS MODAL ========== -->
+<div id="bonus-modal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>🎁 ລາຍຮັບພິເສດ — <span id="bonus-emp-name"></span></h3>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeBonus()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">ໃສ່ລາຍຮັບພິເສດໄດ້ຫຼາຍລາຍການ ເຊັ່ນ: ຄ່ານ້ຳມັນ, ໂບນັດ, ຄ່າລ່ວງເວລາ...</p>
+      <div id="bonus-rows"></div>
+      <button class="btn btn-primary btn-sm" onclick="addBonusRow()" style="margin-top:8px;">➕ ເພີ່ມລາຍການ</button>
+    </div>
+    <div class="modal-foot">
+      <div style="flex:1;font-size:0.88rem;color:var(--green-dark);font-weight:700;">
+        ລວມ: <span id="bonus-total-preview">0</span> ກີບ
+      </div>
+      <button class="btn btn-primary" onclick="saveBonus()">✅ ບັນທຶກ</button>
+      <button class="btn btn-gray" onclick="closeBonus()">ຍົກເລີກ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SELECT PDF MODAL ========== -->
+<div id="select-pdf-modal" class="modal-backdrop">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-head">
+      <h3>📦 ເລືອກພະນັກງານທີ່ຕ້ອງການ PDF</h3>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeSelectPDF()">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:55vh;overflow-y:auto;">
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-sm btn-primary" onclick="selectAllPDF(true)">✅ ເລືອກທັງໝົດ</button>
+        <button class="btn btn-sm btn-gray" onclick="selectAllPDF(false)">☐ ຍົກເລີກທັງໝົດ</button>
+      </div>
+      <div id="select-pdf-list"></div>
+    </div>
+    <div class="modal-foot">
+      <div style="flex:1;font-size:0.85rem;color:var(--muted);">ເລືອກແລ້ວ: <span id="select-pdf-count" style="color:var(--green-dark);font-weight:700;">0</span> ຄົນ</div>
+      <button class="btn btn-gold" id="select-pdf-btn" onclick="exportSelectedPDFs()">📥 ດາວໂຫລດ ZIP</button>
+      <button class="btn btn-gray" onclick="closeSelectPDF()">ຍົກເລີກ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== BANK / QR MODAL ========== -->
+<div id="bank-modal" class="modal-backdrop">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-head">
+      <h3>🏦 ບັນຊີ & QR Code — <span id="bank-emp-name"></span></h3>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeBankModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:4px;">ຊື່ທະນາຄານ</label>
+        <input id="bank-name-input" class="cell-input" style="width:100%;min-width:unset;text-align:left;padding:8px 10px;font-size:0.9rem;"
+          placeholder="ເຊັ່ນ: BCEL, LDB, JDB...">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:4px;">ເລກບັນຊີ</label>
+        <input id="bank-acc-input" class="cell-input" style="width:100%;min-width:unset;text-align:left;padding:8px 10px;font-size:0.9rem;"
+          placeholder="ເຊັ່ນ: 060-12-00012345-00">
+      </div>
+      <div style="margin-bottom:8px;">
+        <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px;">📷 ຮູບ QR Code (screenshot ຈາກ BCEL/LDB)</label>
+        <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+          <div id="qr-img-preview"
+            style="width:130px;height:130px;border:2px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#f9f9f9;overflow:hidden;flex-shrink:0;cursor:pointer;position:relative;"
+            onclick="expandQR()" title="ກົດເພື່ອຂະຫຍາຍ / Scan">
+            <span style="color:#aaa;font-size:0.78rem;text-align:center;">ຍັງບໍ່ມີ<br>QR</span>
+          </div>
+          <div style="flex:1;min-width:120px;">
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:8px;" onclick="document.getElementById('qr-file-input').click()">📷 ເລືອກຮູບ QR</button>
+            <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="handleQRImageUpload(this)">
+            <button class="btn btn-sm" style="width:100%;margin-bottom:8px;background:#e8f5ec;color:var(--green-dark);border:1.5px solid var(--green-mid);" onclick="expandQR()">🔍 ຂະຫຍາຍ / Scan</button>
+            <button class="btn btn-sm" style="width:100%;margin-bottom:8px;background:#f5e9c0;color:#b8901f;border:1.5px solid var(--gold);" onclick="downloadQR()">💾 ດາວໂຫລດຮູບ QR</button>
+            <button class="btn btn-sm btn-gray" style="width:100%;" onclick="clearQRImage()">🗑️ ລຶບຮູບ</button>
+            <p style="font-size:0.72rem;color:var(--muted);margin-top:6px;">ກົດຮູບ QR ເພື່ອຂະຫຍາຍ ແລ້ວ scan ດ້ວຍ app ໄດ້ເລີຍ</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" onclick="saveBankModal()">✅ ບັນທຶກ</button>
+      <button class="btn btn-gray" onclick="closeBankModal()">ຍົກເລີກ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== QR FULLSCREEN ========== -->
+<div id="qr-fullscreen" onclick="closeQRFullscreen()" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.92);
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  cursor:pointer;
+">
+  <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:4px;">ກົດໃສ່ໜ້ານີ້ເພື່ອປິດ</div>
+  <img id="qr-fullscreen-img" src="" style="
+    max-width:90vw;max-height:75vh;
+    border-radius:16px;box-shadow:0 0 60px rgba(255,255,255,0.2);
+    object-fit:contain;
+  ">
+  <div style="display:flex;gap:12px;margin-top:8px;" onclick="event.stopPropagation()">
+    <button onclick="downloadQR()" style="
+      background:#c9a227;color:white;border:none;border-radius:10px;
+      padding:12px 24px;font-size:1rem;font-family:inherit;cursor:pointer;font-weight:700;
+    ">💾 ດາວໂຫລດ / Save</button>
+    <button onclick="closeQRFullscreen()" style="
+      background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.3);
+      border-radius:10px;padding:12px 20px;font-size:1rem;font-family:inherit;cursor:pointer;
+    ">✕ ປິດ</button>
+  </div>
+  <div style="color:rgba(255,255,255,0.45);font-size:0.78rem;text-align:center;max-width:280px;">
+    ສ້ອງ QR ດ້ວຍ Camera ໄດ້ເລີຍ<br>ຫຼື ດາວໂຫລດໄວ້ໃນ Photos ແລ້ວ scan
+  </div>
+</div>
+
+<!-- ========== SLIP MODAL ========== -->
+<div id="slip-modal">
+  <div class="slip-container">
+    <div class="slip-close-row">
+      <button class="btn btn-gold btn-sm" id="pdf-btn" onclick="exportPDF()">📤 ສ້າງ PDF / ແຊຣ໌</button>
+      <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ ພິມ</button>
+      <button class="btn btn-danger btn-sm" onclick="closeSlip()">✕ ປິດ</button>
+    </div>
+
+    <div class="slip-header">
+      <div class="slip-logo">🐴</div>
+      <div class="slip-title-block">
+        <h1>ໃບຮັບເງິນ</h1>
+        <p>PAYSLIP / RECEIPT</p>
+        <div style="width:60px;height:3px;background:var(--gold);margin:6px auto 0;border-radius:2px;"></div>
+      </div>
+      <div class="slip-doc-no">
+        <div class="label">ເລກທີ່ເອກະສານ:</div>
+        <div class="value" id="slip-doc-id">DVP-001</div>
+      </div>
+    </div>
+
+    <div class="slip-info">
+      <div class="slip-info-item">
+        <div class="icon">👤</div>
+        <div><div class="lbl">ຊື່ພະນັກງານ</div><div class="val" id="slip-name">—</div></div>
+      </div>
+      <div class="slip-info-item">
+        <div class="icon">📅</div>
+        <div><div class="lbl">ວັນທີອອກໃບ</div><div class="val" id="slip-date">—</div></div>
+      </div>
+      <div class="slip-info-item">
+        <div class="icon">🗓️</div>
+        <div><div class="lbl">ປະຈຳເດືອນ</div><div class="val" id="slip-month">—</div></div>
+      </div>
+      <div class="slip-info-item">
+        <div class="icon">✅</div>
+        <div><div class="lbl">ວັນເຮັດວຽກ</div><div class="val" id="slip-days">— ວັນ</div></div>
+      </div>
+    </div>
+
+    <div class="slip-table-wrap">
+      <table class="slip-table">
+        <thead>
+          <tr>
+            <th>ລຳດັບ</th>
+            <th>ລາຍລະອຽດ</th>
+            <th>ຈຳນວນອົງວຽກ</th>
+            <th>ຈຳນວນ<br>ອົງຍາມ</th>
+            <th>ລວມເງິນ</th>
+          </tr>
+        </thead>
+        <tbody id="slip-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="slip-total">
+      <div class="lbl">🪙 ລວມເປັນເງິນທັງໝົດ</div>
+      <div class="amt" id="slip-total-amount">0 ກີບ</div>
+    </div>
+
+    <div class="slip-sign">
+      <div class="sign-box">
+        <div class="sign-label">ຜູ້ຈ່າຍເງິນ</div>
+        <div class="sign-line">Hainam PHONEMANY</div>
+      </div>
+      <div class="sign-box">
+        <div class="sign-label">ຜູ້ຮັບເງິນ</div>
+        <div class="sign-line" id="slip-sign-name">————————</div>
+      </div>
+    </div>
+
+    <!-- Bank QR — ສຳລັບ Hainam ດຽວ (ບໍ່ພິມ) -->
+    <div id="slip-bank-qr" class="owner-only-section" style="display:none;background:#f5e9c0;border:2px dashed #c9a227;border-radius:10px;margin:12px 16px;padding:14px 18px;"></div>
+
+    <div class="slip-footer"></div>
+  </div>
+</div>
+
+<script>
+const LAO_MONTHS = ['ມັງກອນ','ກຸມພາ','ມີນາ','ເມສາ','ພຶດສະພາ','ມີຖຸນາ','ກໍລະກົດ','ສິງຫາ','ກັນຍາ','ຕຸລາ','ພະຈິກ','ທັນວາ'];
+
+// ── Supabase config ──
+// ⚠️ ໃສ່ anon key ຂອງ project snyyhmeprngskneaaubb ຢູ່ນີ້
+const SUPABASE_URL  = 'https://snyyhmeprngskneaaubb.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_XPKO1h3cIxNt8yPJfO7gpg_dg40mwJs';
+const RECORD_ID     = 'daovone_payroll_main';
+
+let sb = null;
+try {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) {}
+
+function setSaveStatus(msg, color) {
+  const el = document.getElementById('save-status-text');
+  if (el) { el.textContent = msg; el.style.color = color || '#666'; }
+}
+
+async function cloudSave() {
+  if (!sb || SUPABASE_KEY === 'YOUR_ANON_KEY_HERE') {
+    setSaveStatus('⚠️ ຍັງບໍ່ໄດ້ຕັ້ງ Supabase key', '#c9a227');
+    return;
+  }
+  try {
+    // Strip qrImage ອອກກ່ອນ upload (ຮູບໃຫຍ່ເກີນ — ເກັບ local ແທນ)
+    const empForCloud = employees.map(e => {
+      const { qrImage, ...rest } = e;
+      return rest;
+    });
+
+    // Save qrImages ໃນ localStorage ແຍກ (keyed by employee id)
+    const qrMap = {};
+    employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
+    localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap));
+
+    // Save ຂໍ້ມູນຫຼັກ (ບໍ່ມີຮູບ) ຂຶ້ນ Cloud
+    const payload = {
+      id: RECORD_ID,
+      data: JSON.stringify({ employees: empForCloud }),
+      updated_at: new Date().toISOString()
+    };
+    const { error } = await sb.from('payroll_data').upsert(payload, { onConflict: 'id' });
+    if (error) throw error;
+
+    // Backup ທັງໝົດ (ລວມ QR) ໃສ່ localStorage
+    localStorage.setItem('daovone_payroll', JSON.stringify({
+      employees,
+      month: document.getElementById('month-picker').value,
+      saved: new Date().toISOString()
+    }));
+
+    const t = new Date().toLocaleTimeString('lo-LA');
+    setSaveStatus(`✅ ບັນທຶກ Cloud ອັດຕະໂນມັດ — ${t}`, '#1a5c2e');
+  } catch(e) {
+    setSaveStatus('❌ Cloud save error: ' + e.message, '#c0392b');
+  }
+}
+
+async function cloudLoad() {
+  if (!sb || SUPABASE_KEY === 'YOUR_ANON_KEY_HERE') {
+    setSaveStatus('⚠️ ຍັງບໍ່ໄດ້ຕັ້ງ Supabase key', '#c9a227');
+    return;
+  }
+  setSaveStatus('🔄 ກຳລັງໂຫລດ...', '#666');
+  try {
+    const { data, error } = await sb.from('payroll_data').select('data').eq('id', RECORD_ID).single();
+    if (error) throw error;
+
+    const parsed = JSON.parse(data.data);
+
+    // ໂຫລດ qrImages ຈາກ localStorage ກັບຄືນ
+    let qrMap = {};
+    try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e) {}
+
+    employees = parsed.employees.map(e => ({
+      bonusItems: [], baseSalary: 3000000, workDays: 30,
+      paid: false, bankAccount: '', bankName: '', qrImage: '',
+      ...e,
+      qrImage: qrMap[e.id] || e.qrImage || ''  // ຕໍ່ QR ກັບຄືນ
+    }));
+
+    renderTable();
+    const t = new Date().toLocaleTimeString('lo-LA');
+    setSaveStatus(`✅ ໂຫລດ Cloud ສຳເລັດ — ${t}`, '#1a5c2e');
+  } catch(e) {
+    setSaveStatus('❌ Cloud load error: ' + e.message, '#c0392b');
+  }
+}
+
+let employees = [];
+let slipCounter = 1;
+let editingBonusIdx = -1; // which employee is being edited
+let tempBonusItems = [];  // [{label, amount}]
+
+// ── Format number with commas ──
+function fmt(n) {
+  const num = Number(n) || 0;
+  return num.toLocaleString('en-US');
+}
+
+// ── Parse formatted input (remove commas) ──
+function parseNum(s) {
+  return Number(String(s).replace(/,/g, '')) || 0;
+}
+
+// ── Default employee structure ──
+function newEmp(i) {
+  return {
+    id: Date.now() + i,
+    name: `ພະນັກງານ ${i+1}`,
+    baseSalary: 3000000,  // ເງິນເດືອນຕໍ່ 30 ວັນ
+    workDays: 30,         // ວັນທີ່ເຮັດວຽກຈິງ
+    bonusItems: [],
+    advance: 0,
+    debt: 0,
+    otherDeduct: 0,
+    paid: false,
+    bankAccount: '',
+    bankName: '',
+    qrImage: '',
+  };
+}
+
+function defaultEmployees() {
+  return Array.from({length: 5}, (_, i) => newEmp(i));
+}
+
+// ── Compute totals ──
+function bonusTotal(emp) {
+  return (emp.bonusItems || []).reduce((s, b) => s + Number(b.amount), 0);
+}
+
+// ── ຄຳນວນເງິນເດືອນຈາກຕໍ່ 30 ວັນ × ວັນທີ່ເຮັດ ──
+function calcGross(emp) {
+  const base = Number(emp.baseSalary) || 0;
+  const days = Number(emp.workDays)   || 0;
+  return Math.round(base / 30 * days);
+}
+
+function computeNet(emp) {
+  const gross  = calcGross(emp);
+  const bonus  = bonusTotal(emp);
+  const deduct = Number(emp.advance) + Number(emp.debt) + Number(emp.otherDeduct);
+  return gross + bonus - deduct;
+}
+
+// ── Format number input with commas while typing ──
+function formatInput(el) {
+  const raw = parseNum(el.value);
+  if (!isNaN(raw) && el.value !== '') {
+    el.value = raw.toLocaleString('en-US');
+  }
+}
+
+// ── Render main table ──
+function renderTable() {
+  const tbody = document.getElementById('emp-tbody');
+  tbody.innerHTML = '';
+
+  employees.forEach((emp, i) => {
+    const gross = calcGross(emp);
+    const bonus = bonusTotal(emp);
+    const net = computeNet(emp);
+    const bonusLabel = emp.bonusItems && emp.bonusItems.length > 0
+      ? `<span class="bonus-badge" onclick="openBonus(${i})">🎁 ${emp.bonusItems.length} ລາຍການ<br>(${fmt(bonus)} ກີບ)</span>`
+      : `<button class="btn btn-sm" style="background:var(--green-light);color:var(--green-dark);border:1px dashed var(--green-mid);" onclick="openBonus(${i})">➕ ເພີ່ມ</button>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td class="td-left"><input class="cell-input emp-name-input" value="${emp.name}" onblur="updateField(${i},'name',this.value)"></td>
+      <td><input class="cell-input" value="${fmt(emp.baseSalary)}"
+          onblur="updateField(${i},'baseSalary',parseNum(this.value));this.value=fmt(employees[${i}].baseSalary)"></td>
+      <td><input class="cell-input" type="number" min="0" max="31" value="${emp.workDays}"
+          onblur="updateField(${i},'workDays',this.value)"></td>
+      <td style="font-weight:600;color:var(--green-dark);white-space:nowrap">${fmt(gross)}</td>
+      <td>${bonusLabel}</td>
+      <td><input class="cell-input" value="${fmt(emp.advance)}" style="color:#c0392b"
+          onblur="updateField(${i},'advance',parseNum(this.value));this.value=fmt(employees[${i}].advance)"></td>
+      <td><input class="cell-input" value="${fmt(emp.debt)}" style="color:#c0392b"
+          onblur="updateField(${i},'debt',parseNum(this.value));this.value=fmt(employees[${i}].debt)"></td>
+      <td><input class="cell-input" value="${fmt(emp.otherDeduct)}" style="color:#c0392b"
+          onblur="updateField(${i},'otherDeduct',parseNum(this.value));this.value=fmt(employees[${i}].otherDeduct)"></td>
+      <td class="net-cell ${net < 0 ? 'negative' : ''}">${fmt(net)}</td>
+      <td style="text-align:center;">
+        <button onclick="togglePaid(${i})" style="
+          font-size:1.2rem;background:none;border:none;cursor:pointer;
+          width:36px;height:36px;border-radius:50%;
+          background:${emp.paid ? '#e8f5ec' : '#f5f5f5'};
+          border:2px solid ${emp.paid ? '#2d7a45' : '#ccc'};
+        " title="${emp.paid ? 'ໂອນແລ້ວ — ກົດເພື່ອຍົກເລີກ' : 'ຍັງບໍ່ໂອນ — ກົດເພື່ອຕິກ'}">
+          ${emp.paid ? '✅' : '⬜'}
+        </button>
+      </td>
+      <td style="text-align:center;">
+        <button class="btn btn-sm" onclick="openBankModal(${i})" style="
+          background:${emp.bankAccount||emp.qrData ? '#f5e9c0' : '#f5f5f5'};
+          color:${emp.bankAccount||emp.qrData ? '#b8901f' : '#999'};
+          border:1.5px solid ${emp.bankAccount||emp.qrData ? '#c9a227' : '#ddd'};
+          font-size:0.75rem;padding:4px 6px;
+        " title="ໃສ່ເລກບັນຊີ / QR">
+          ${emp.bankAccount||emp.qrData ? '🏦' : '➕'}
+        </button>
+      </td>
+      <td><button class="btn btn-gold btn-sm" onclick="showSlip(${i})">📄</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  updateSummary();
+}
+
+// ── Auto-save to localStorage ──
+let _cloudSaveTimer = null;
+
+function autoSave() {
+  // 1. Save local immediately (fast, no network)
+  try {
+    localStorage.setItem('daovone_payroll', JSON.stringify({
+      employees,
+      month: document.getElementById('month-picker').value,
+      saved: new Date().toISOString()
+    }));
+  } catch(e) { /* silent fail */ }
+
+  // 2. Debounce cloud save — 4 ວິຫຼັງຈາກແກ້ຄັ້ງສຸດທ້າຍ
+  clearTimeout(_cloudSaveTimer);
+  setSaveStatus('⏳ ກຳລັງຈັດການ...', '#999');
+  _cloudSaveTimer = setTimeout(() => {
+    cloudSave();
+  }, 4000);
+}
+
+function updateField(i, field, val) {
+  if (field === 'name') {
+    employees[i][field] = val;
+  } else {
+    employees[i][field] = parseNum(String(val));
+  }
+  autoSave();
+  renderTable();
+}
+
+function addEmployee() {
+  employees.push(newEmp(employees.length));
+  autoSave();
+  renderTable();
+}
+
+// ── Delete panel ──
+function promptDeleteEmployee() {
+  const panel = document.getElementById('delete-panel');
+  const list  = document.getElementById('delete-list');
+  list.innerHTML = '';
+  employees.forEach((emp, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm';
+    btn.style.cssText = 'background:white;color:#c0392b;border:1.5px solid #e88;';
+    btn.textContent = `✕ ${emp.name}`;
+    btn.onclick = () => deleteEmployee(i);
+    list.appendChild(btn);
+  });
+  panel.style.display = employees.length ? 'block' : 'none';
+}
+
+function closeDeletePanel() {
+  document.getElementById('delete-panel').style.display = 'none';
+}
+
+function deleteEmployee(i) {
+  const name = employees[i].name;
+  if (!confirm(`ລົບ "${name}" ອອກ?`)) return;
+  employees.splice(i, 1);
+  autoSave();
+  renderTable();
+  // refresh delete panel
+  if (document.getElementById('delete-panel').style.display !== 'none') {
+    promptDeleteEmployee();
+  }
+}
+
+// ── Summary ──
+function updateSummary() {
+  const total  = employees.length;
+  const salary = employees.reduce((s,e) => s + calcGross(e), 0);
+  const bonus  = employees.reduce((s,e) => s + bonusTotal(e), 0);
+  const deduct = employees.reduce((s,e) => s + Number(e.advance)+Number(e.debt)+Number(e.otherDeduct), 0);
+  const net    = employees.reduce((s,e) => s + computeNet(e), 0);
+  const paid   = employees.filter(e => e.paid).length;
+
+  document.getElementById('sum-total').textContent  = total + ' ຄົນ';
+  document.getElementById('sum-salary').textContent = fmt(salary) + ' ກີບ';
+  document.getElementById('sum-bonus').textContent  = fmt(bonus)  + ' ກີບ';
+  document.getElementById('sum-deduct').textContent = fmt(deduct) + ' ກີບ';
+  document.getElementById('sum-net').textContent    = fmt(net)    + ' ກີບ';
+  document.getElementById('sum-paid').textContent   = paid + ' ຄົນ';
+  document.getElementById('sum-unpaid').textContent = (total - paid) + ' ຄົນ';
+}
+
+// ── BONUS MODAL ──
+function openBonus(idx) {
+  editingBonusIdx = idx;
+  const emp = employees[idx];
+  document.getElementById('bonus-emp-name').textContent = emp.name;
+  // Copy existing items
+  tempBonusItems = (emp.bonusItems || []).map(b => ({...b}));
+  if (tempBonusItems.length === 0) tempBonusItems.push({label:'', amount:0});
+  renderBonusRows();
+  document.getElementById('bonus-modal').classList.add('open');
+}
+
+function closeBonus() {
+  document.getElementById('bonus-modal').classList.remove('open');
+  editingBonusIdx = -1;
+}
+
+function renderBonusRows() {
+  const container = document.getElementById('bonus-rows');
+  container.innerHTML = '';
+  tempBonusItems.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'bonus-row';
+    div.innerHTML = `
+      <input class="b-label" placeholder="ລາຍລະອຽດ ເຊັ່ນ: ຄ່ານ້ຳມັນ" value="${item.label}"
+        oninput="tempBonusItems[${i}].label=this.value">
+      <input class="b-amount" placeholder="ຈຳນວນ" value="${item.amount > 0 ? fmt(item.amount) : ''}"
+        oninput="formatInput(this);tempBonusItems[${i}].amount=parseNum(this.value);updateBonusPreview()">
+      <button class="btn btn-danger btn-xs" onclick="removeBonusRow(${i})">✕</button>
+    `;
+    container.appendChild(div);
+  });
+  updateBonusPreview();
+}
+
+function addBonusRow() {
+  tempBonusItems.push({label:'', amount:0});
+  renderBonusRows();
+  // Focus last label input
+  const inputs = document.querySelectorAll('#bonus-rows .b-label');
+  if (inputs.length) inputs[inputs.length-1].focus();
+}
+
+function removeBonusRow(i) {
+  tempBonusItems.splice(i, 1);
+  if (tempBonusItems.length === 0) tempBonusItems.push({label:'', amount:0});
+  renderBonusRows();
+}
+
+function updateBonusPreview() {
+  const total = tempBonusItems.reduce((s,b) => s + Number(b.amount), 0);
+  document.getElementById('bonus-total-preview').textContent = fmt(total);
+}
+
+function saveBonus() {
+  if (editingBonusIdx < 0) return;
+  employees[editingBonusIdx].bonusItems = tempBonusItems.filter(b => b.amount > 0 || b.label.trim());
+  autoSave();
+  closeBonus();
+  renderTable();
+}
+
+// ── SLIP ──
+function getMonthLabel() {
+  const mp = document.getElementById('month-picker').value;
+  if (!mp) return '— / —';
+  const [y, m] = mp.split('-');
+  return LAO_MONTHS[parseInt(m)-1] + ' ' + y;
+}
+
+function showSlip(i) {
+  const emp = employees[i];
+  const gross = calcGross(emp);
+  const net = computeNet(emp);
+  const today = new Date();
+  const dateStr = today.getDate() + '/' + (today.getMonth()+1) + '/' + today.getFullYear();
+
+  document.getElementById('slip-doc-id').textContent = 'DVP-' + String(slipCounter++).padStart(3,'0');
+  document.getElementById('slip-name').textContent   = emp.name;
+  document.getElementById('slip-date').textContent   = dateStr;
+  document.getElementById('slip-month').textContent  = getMonthLabel();
+  document.getElementById('slip-days').textContent   = emp.workDays + ' ວັນ';
+  document.getElementById('slip-sign-name').textContent = emp.name;
+
+  const tbody = document.getElementById('slip-tbody');
+  tbody.innerHTML = '';
+  let idx = 1;
+
+  function addRow(label, rate, qty, amount, cls) {
+    if (Number(amount) === 0 && cls !== '') return;
+    const tr = document.createElement('tr');
+    if (cls) tr.className = cls;
+    tr.innerHTML = `
+      <td style="text-align:center">${String(idx++).padStart(2,'0')}</td>
+      <td>${label}</td>
+      <td style="text-align:right">${fmt(rate)}</td>
+      <td style="text-align:center">${qty}</td>
+      <td style="text-align:right;font-weight:700">${fmt(amount)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  addRow('ເງິນເດືອນ', emp.baseSalary, emp.workDays, gross, '');
+  (emp.bonusItems || []).forEach(b => {
+    if (Number(b.amount) > 0 || b.label.trim())
+      addRow(b.label || 'ລາຍຮັບພິເສດ', b.amount, 1, b.amount, 'row-bonus');
+  });
+  if (Number(emp.advance) > 0)     addRow('ເງິນເບີກລ່ວງໜ້າ',     emp.advance,     1, emp.advance,     'row-deduct');
+  if (Number(emp.debt) > 0)        addRow('ໜີ້ຄ້າງຈາກເດືອນກ່ອນ', emp.debt,        1, emp.debt,        'row-deduct');
+  if (Number(emp.otherDeduct) > 0) addRow('ຫັກອື່ນໆ',              emp.otherDeduct, 1, emp.otherDeduct, 'row-deduct');
+
+  document.getElementById('slip-total-amount').textContent = fmt(net) + ' ກີບ';
+  document.getElementById('slip-modal').classList.add('open');
+
+  // Show QR image in modal — ສຳລັບ Hainam ດຽວ (ບໍ່ໄປໃນ PDF/ພິມ)
+  const qrArea = document.getElementById('slip-bank-qr');
+  if (qrArea) {
+    if (emp.qrImage || emp.bankAccount) {
+      qrArea.innerHTML = `
+        <div style="font-size:0.72rem;font-weight:700;color:#b8901f;margin-bottom:8px;display:flex;align-items:center;gap:5px;">
+          🔒 ສຳລັບຜູ້ຈ່າຍເງິນດຽວ — ບໍ່ສົ່ງໃຫ້ພະນັກງານ (ບໍ່ພິມ/ບໍ່ຢູ່ໃນ PDF)
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          ${emp.bankAccount ? `<div>
+            <div style="font-size:0.72rem;color:#666;">🏦 ${emp.bankName||'ທະນາຄານ'}</div>
+            <div style="font-weight:700;font-size:0.95rem;">${emp.bankAccount}</div>
+          </div>` : ''}
+          ${emp.qrImage ? `
+          <div style="text-align:center;">
+            <img src="${emp.qrImage}" id="slip-qr-img"
+              style="width:110px;height:110px;object-fit:contain;cursor:pointer;border-radius:8px;border:2px solid #c9a227;"
+              onclick="expandQRFromEl(this,'${(emp.name||'').replace(/'/g,'')}')"
+              title="ກົດຂະຫຍາຍ Scan">
+            <div style="font-size:0.7rem;color:#b8901f;font-weight:600;margin-top:3px;">👆 ກົດເພື່ອ Scan</div>
+          </div>` : ''}
+        </div>`;
+      qrArea.style.display = 'block';
+    } else {
+      qrArea.style.display = 'none';
+    }
+  }
+}
+
+function closeSlip() {
+  document.getElementById('slip-modal').classList.remove('open');
+}
+
+// ── Delete employee ──
+function deleteEmployee(i) {
+  const name = employees[i].name;
+  if (!confirm(`ລົບ "${name}" ອອກຈາກລາຍການ?`)) return;
+  employees.splice(i, 1);
+  renderTable();
+}
+
+// ── Toggle paid status ──
+function togglePaid(i) {
+  employees[i].paid = !employees[i].paid;
+  autoSave();
+  renderTable();
+}
+
+// ── Bank / QR modal ──
+let editingBankIdx = -1;
+let qrInstance = null;
+
+function openBankModal(i) {
+  editingBankIdx = i;
+  const emp = employees[i];
+  document.getElementById('bank-emp-name').textContent = emp.name;
+  document.getElementById('bank-name-input').value = emp.bankName || '';
+  document.getElementById('bank-acc-input').value  = emp.bankAccount || '';
+  // Show existing QR image if any
+  const preview = document.getElementById('qr-img-preview');
+  if (emp.qrImage) {
+    preview.innerHTML = `<img src="${emp.qrImage}" style="width:100%;height:100%;object-fit:contain;">`;
+  } else {
+    preview.innerHTML = '<span style="color:#aaa;font-size:0.78rem;text-align:center;">ຍັງບໍ່ມີ<br>QR</span>';
+  }
+  document.getElementById('bank-modal').classList.add('open');
+}
+
+function closeBankModal() {
+  document.getElementById('bank-modal').classList.remove('open');
+  editingBankIdx = -1;
+}
+
+function handleQRImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const b64 = e.target.result;
+    document.getElementById('qr-img-preview').innerHTML =
+      `<img src="${b64}" style="width:100%;height:100%;object-fit:contain;">`;
+    // Store temp in dataset
+    document.getElementById('qr-img-preview').dataset.b64 = b64;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function clearQRImage() {
+  const preview = document.getElementById('qr-img-preview');
+  preview.innerHTML = '<span style="color:#aaa;font-size:0.78rem;text-align:center;">ຍັງບໍ່ມີ<br>QR</span>';
+  preview.dataset.b64 = '';
+}
+
+// ── QR Fullscreen ──
+function expandQR() {
+  const preview = document.getElementById('qr-img-preview');
+  const img = preview.querySelector('img');
+  if (!img) { alert('ຍັງບໍ່ມີຮູບ QR — ກະລຸນາ upload ກ່ອນ'); return; }
+  document.getElementById('qr-fullscreen-img').src = img.src;
+  document.getElementById('qr-fullscreen').style.display = 'flex';
+}
+
+// Called from slip modal QR img click
+function expandQRFromEl(imgEl, name) {
+  document.getElementById('qr-fullscreen-img').src = imgEl.src;
+  // Override download to use this image
+  document._qrDownloadSrc = imgEl.src;
+  document._qrDownloadName = name;
+  document.getElementById('qr-fullscreen').style.display = 'flex';
+}
+
+function closeQRFullscreen() {
+  document.getElementById('qr-fullscreen').style.display = 'none';
+}
+
+function downloadQR() {
+  // Try slip modal source first (set by expandQRFromEl)
+  const src  = document._qrDownloadSrc || (document.getElementById('qr-img-preview').querySelector('img') || {}).src;
+  const name = document._qrDownloadName || document.getElementById('bank-emp-name').textContent || 'QR';
+  if (!src) { alert('ຍັງບໍ່ມີຮູບ QR'); return; }
+  const a = document.createElement('a');
+  a.href = src;
+  a.download = `QR_${name}.png`;
+  a.click();
+  document._qrDownloadSrc = null;
+  document._qrDownloadName = null;
+}
+
+function saveBankModal() {
+  if (editingBankIdx < 0) return;
+  employees[editingBankIdx].bankName    = document.getElementById('bank-name-input').value.trim();
+  employees[editingBankIdx].bankAccount = document.getElementById('bank-acc-input').value.trim();
+  const b64 = document.getElementById('qr-img-preview').dataset.b64;
+  // Keep existing image if no new upload (b64 empty = unchanged unless cleared)
+  if (b64 !== undefined) employees[editingBankIdx].qrImage = b64;
+  autoSave();
+  closeBankModal();
+  renderTable();
+}
+
+// ── Export data as JSON file (safe backup) ──
+function exportJSON() {
+  const data = {
+    employees,
+    month: document.getElementById('month-picker').value,
+    exported: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const month = document.getElementById('month-picker').value || 'data';
+  a.href = url;
+  a.download = `daovone_payroll_${month}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+// ── Import JSON file ──
+function importJSON() {
+  document.getElementById('import-file').click();
+}
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.employees) throw new Error('ໄຟລ໌ຜິດ format');
+      if (!confirm(`ນຳເຂົ້າຂໍ້ມູນ ${data.employees.length} ຄົນ?\n(ຂໍ້ມູນປັດຈຸບັນຈະຖືກແທນທີ່)`)) return;
+      employees = data.employees.map(e => ({ bonusItems: [], baseSalary: 3000000, workDays: 30, paid: false, bankAccount: '', bankName: '', qrImage: '', ...e }));
+      if (data.month) document.getElementById('month-picker').value = data.month;
+      renderTable();
+      alert('✅ ນຳເຂົ້າສຳເລັດ!');
+    } catch(err) {
+      alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── Select PDF modal ──
+let selectedPDFIndices = new Set();
+
+function openSelectPDF() {
+  if (employees.length === 0) { alert('ບໍ່ມີພະນັກງານ'); return; }
+  selectedPDFIndices = new Set(employees.map((_, i) => i)); // default: all selected
+  renderSelectList();
+  document.getElementById('select-pdf-modal').classList.add('open');
+}
+
+function closeSelectPDF() {
+  document.getElementById('select-pdf-modal').classList.remove('open');
+}
+
+function renderSelectList() {
+  const list = document.getElementById('select-pdf-list');
+  list.innerHTML = '';
+  employees.forEach((emp, i) => {
+    const checked = selectedPDFIndices.has(i);
+    const net = computeNet(emp);
+    const div = document.createElement('div');
+    div.style.cssText = `
+      display:flex;align-items:center;gap:10px;
+      padding:10px 12px;border-radius:8px;margin-bottom:6px;cursor:pointer;
+      background:${checked ? 'var(--green-light)' : '#f5f5f5'};
+      border:1.5px solid ${checked ? 'var(--green-mid)' : '#ddd'};
+      transition:all 0.1s;
+    `;
+    div.innerHTML = `
+      <input type="checkbox" ${checked ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;"
+        onchange="toggleSelectPDF(${i},this.checked)">
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:0.9rem;">${emp.name}</div>
+        <div style="font-size:0.78rem;color:var(--muted);">
+          ${emp.workDays} ວັນ • ສຸດທິ: <span style="color:var(--green-dark);font-weight:700;">${fmt(net)} ກີບ</span>
+        </div>
+      </div>
+    `;
+    div.onclick = (e) => {
+      if (e.target.type === 'checkbox') return;
+      const cb = div.querySelector('input');
+      cb.checked = !cb.checked;
+      toggleSelectPDF(i, cb.checked);
+    };
+    list.appendChild(div);
+  });
+  updateSelectCount();
+}
+
+function toggleSelectPDF(i, checked) {
+  if (checked) selectedPDFIndices.add(i);
+  else selectedPDFIndices.delete(i);
+  renderSelectList();
+}
+
+function selectAllPDF(val) {
+  if (val) selectedPDFIndices = new Set(employees.map((_, i) => i));
+  else selectedPDFIndices = new Set();
+  renderSelectList();
+}
+
+function updateSelectCount() {
+  document.getElementById('select-pdf-count').textContent = selectedPDFIndices.size;
+}
+
+async function exportSelectedPDFs() {
+  if (selectedPDFIndices.size === 0) { alert('ກະລຸນາເລືອກຢ່າງໜ້ອຍ 1 ຄົນ'); return; }
+
+  const btn = document.getElementById('select-pdf-btn');
+  const original = btn.textContent;
+  btn.disabled = true;
+
+  const indices = [...selectedPDFIndices].sort((a,b) => a-b);
+  const monthLabel = getMonthLabel();
+
+  try {
+    if (typeof JSZip === 'undefined') {
+      alert('JSZip ໂຫລດຍັງບໍ່ທັນ — ກະລຸນາລໍຖ້າ ແລ້ວລອງໃໝ່');
+      return;
+    }
+
+    // ຖ້າເລືອກຄົນດຽວ — share PDF ດ່ວນ
+    if (indices.length === 1) {
+      const emp = employees[indices[0]];
+      btn.textContent = `⏳ ສ້າງ PDF...`;
+      const docNum = 'DVP-' + String(indices[0] + 1).padStart(3,'0');
+      const canvas = await slipToCanvas(emp, docNum);
+      const pdf = canvasToPDF(canvas);
+      const filename = `ໃບເງິນເດືອນ_${emp.name}_${monthLabel}.pdf`.replace(/\s+/g,'_');
+      const blob = pdf.output('blob');
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      }
+      closeSelectPDF();
+      return;
+    }
+
+    // ຫຼາຍຄົນ — ZIP
+    const zip = new JSZip();
+    for (let n = 0; n < indices.length; n++) {
+      const i = indices[n];
+      const emp = employees[i];
+      btn.textContent = `⏳ ${n+1}/${indices.length} ${emp.name}`;
+      const docNum = 'DVP-' + String(i + 1).padStart(3,'0');
+      const canvas = await slipToCanvas(emp, docNum);
+      const pdf = canvasToPDF(canvas);
+      const filename = `${String(i+1).padStart(2,'0')}_${emp.name}_${monthLabel}.pdf`.replace(/\s+/g,'_');
+      zip.file(filename, pdf.output('arraybuffer'));
+    }
+
+    btn.textContent = '📦 ສ້າງ ZIP...';
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const zipName = `ເງິນເດືອນ_${monthLabel}_${indices.length}ຄົນ.zip`.replace(/\s+/g,'_');
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a'); a.href = url; a.download = zipName; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 8000);
+
+    closeSelectPDF();
+    alert(`✅ ດາວໂຫລດ ZIP ${indices.length} ໃບສຳເລັດ!`);
+  } catch(err) {
+    alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = original;
+    btn.disabled = false;
+  }
+}
+
+// ── INIT ──
+(function init() {
+  // ✅ auto ເດືອນປັດຈຸບັນທຸກຄັ້ງ
+  const now = new Date();
+  document.getElementById('month-picker').value =
+    now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+
+  // ໂຫລດ localStorage ກ່ອນ (fast)
+  try {
+    const raw = localStorage.getItem('daovone_payroll');
+    if (raw) {
+      const data = JSON.parse(raw);
+      employees = data.employees.map(e => ({ bonusItems: [], baseSalary: 3000000, workDays: 30, paid: false, bankAccount: '', bankName: '', qrImage: '', ...e }));
+      setSaveStatus('💾 ໂຫລດຈາກ local browser ແລ້ວ', '#666');
+    } else {
+      employees = defaultEmployees();
+      setSaveStatus('📝 ຂໍ້ມູນໃໝ່', '#666');
+    }
+  } catch(e) {
+    employees = defaultEmployees();
+  }
+  renderTable();
+
+  // ພະຍາຍາມໂຫລດ Cloud ຫຼັງ (async)
+  if (sb && SUPABASE_KEY !== 'YOUR_ANON_KEY_HERE') {
+    cloudLoad();
+  } else {
+    setSaveStatus('⚠️ ຂໍ້ມູນຢູ່ local browser — ໃສ່ Supabase key ເພື່ອ cloud sync', '#c9a227');
+  }
+  // ✅ Auto cloud save ທຸກ 60 ວິນາທີ (backup)
+  setInterval(() => {
+    if (sb && SUPABASE_KEY !== 'YOUR_ANON_KEY_HERE') {
+      cloudSave();
+    }
+  }, 60000);
+})();
+
+document.getElementById('slip-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('slip-modal')) closeSlip();
+});
+document.getElementById('bonus-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('bonus-modal')) closeBonus();
+});
+document.getElementById('select-pdf-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('select-pdf-modal')) closeSelectPDF();
+});
+document.getElementById('bank-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('bank-modal')) closeBankModal();
+});
+
+// ── Build standalone slip HTML for one employee (no modal needed) ──
+function buildSlipHTML(emp, docNum) {
+  const gross = calcGross(emp);
+  const net   = computeNet(emp);
+  const today = new Date();
+  const dateStr = today.getDate() + '/' + (today.getMonth()+1) + '/' + today.getFullYear();
+  const monthLabel = getMonthLabel();
+
+  let rowsHTML = '';
+  let idx = 1;
+
+  function row(label, rate, qty, amount, bg, color) {
+    if (Number(amount) === 0 && bg !== '') return '';
+    return `<tr style="background:${bg}">
+      <td style="text-align:center;padding:9px 8px;border-bottom:1px solid #eee;">${String(idx++).padStart(2,'0')}</td>
+      <td style="text-align:left;padding:9px 8px;border-bottom:1px solid #eee;color:${color}">${label}</td>
+      <td style="text-align:right;padding:9px 8px;border-bottom:1px solid #eee;color:${color}">${fmt(rate)}</td>
+      <td style="text-align:center;padding:9px 8px;border-bottom:1px solid #eee;color:${color}">${qty}</td>
+      <td style="text-align:right;padding:9px 8px;border-bottom:1px solid #eee;font-weight:700;color:${color}">${fmt(amount)}</td>
+    </tr>`;
+  }
+
+  rowsHTML += row('ເງິນເດືອນ', emp.baseSalary, emp.workDays, gross, '', '#1a1a1a');
+  (emp.bonusItems || []).forEach(b => {
+    if (Number(b.amount) > 0 || b.label.trim())
+      rowsHTML += row(b.label || 'ລາຍຮັບພິເສດ', b.amount, 1, b.amount, '#f0fff4', '#1a5c2e');
+  });
+  if (Number(emp.advance) > 0)     rowsHTML += row('ເງິນເບີກລ່ວງໜ້າ',     emp.advance,     1, emp.advance,     '#fde8e8', '#c0392b');
+  if (Number(emp.debt) > 0)        rowsHTML += row('ໜີ້ຄ້າງຈາກເດືອນກ່ອນ', emp.debt,        1, emp.debt,        '#fde8e8', '#c0392b');
+  if (Number(emp.otherDeduct) > 0) rowsHTML += row('ຫັກອື່ນໆ',              emp.otherDeduct, 1, emp.otherDeduct, '#fde8e8', '#c0392b');
+
+  return `
+  <div style="
+    font-family:'Lao MN','Noto Sans Lao',Arial,sans-serif;
+    background:#fdf8f0; width:560px; padding:0; margin:0;
+  ">
+    <!-- Header -->
+    <div style="background:white;padding:20px 24px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #c9a227;">
+      <div style="width:68px;height:68px;background:#c9a227;border-radius:50%;border:3px solid #1a5c2e;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🐴</div>
+      <div style="text-align:center;flex:1;padding:0 12px;">
+        <div style="font-size:1.8rem;color:#1a5c2e;font-weight:900;letter-spacing:1px;">ໃບຮັບເງິນ</div>
+        <div style="font-size:0.8rem;color:#666;letter-spacing:2px;text-transform:uppercase;">PAYSLIP / RECEIPT</div>
+        <div style="width:50px;height:3px;background:#c9a227;margin:5px auto 0;border-radius:2px;"></div>
+      </div>
+      <div style="background:#f5e9c0;border:1.5px solid #c9a227;border-radius:8px;padding:10px 14px;text-align:center;min-width:110px;">
+        <div style="font-size:0.72rem;color:#666;">ເລກທີ່ເອກະສານ:</div>
+        <div style="font-size:0.95rem;font-weight:700;color:#1a5c2e;">${docNum}</div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div style="background:white;padding:14px 24px;border-bottom:1px solid #d0d0d0;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:30px;height:30px;background:#e8f5ec;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">👤</div>
+        <div><div style="font-size:0.72rem;color:#666;">ຊື່ພະນັກງານ</div><div style="font-weight:700;">${emp.name}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:30px;height:30px;background:#e8f5ec;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">📅</div>
+        <div><div style="font-size:0.72rem;color:#666;">ວັນທີອອກໃບ</div><div style="font-weight:700;">${dateStr}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:30px;height:30px;background:#e8f5ec;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">🗓️</div>
+        <div><div style="font-size:0.72rem;color:#666;">ປະຈຳເດືອນ</div><div style="font-weight:700;">${monthLabel}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:30px;height:30px;background:#e8f5ec;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">✅</div>
+        <div><div style="font-size:0.72rem;color:#666;">ວັນເຮັດວຽກ</div><div style="font-weight:700;">${emp.workDays} ວັນ</div></div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="padding:14px 24px;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+        <thead>
+          <tr>
+            <th style="background:#1a5c2e;color:white;padding:9px 8px;text-align:left;border-radius:8px 0 0 0;">ລຳດັບ</th>
+            <th style="background:#1a5c2e;color:white;padding:9px 8px;text-align:left;">ລາຍລະອຽດ</th>
+            <th style="background:#1a5c2e;color:white;padding:9px 8px;text-align:right;">ຈຳນວນ</th>
+            <th style="background:#1a5c2e;color:white;padding:9px 8px;text-align:center;">ວັນ/ຄັ້ງ</th>
+            <th style="background:#1a5c2e;color:white;padding:9px 8px;text-align:right;border-radius:0 8px 0 0;">ລວມ</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHTML}</tbody>
+      </table>
+    </div>
+
+    <!-- Total -->
+    <div style="background:#1a5c2e;color:white;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:0.95rem;font-weight:700;">🪙 ລວມເປັນເງິນທັງໝົດ</div>
+      <div style="font-size:1.3rem;font-weight:900;">${fmt(net)} ກີບ</div>
+    </div>
+
+    <!-- Signature -->
+    <div style="background:white;padding:18px 24px 22px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div style="text-align:center;">
+        <div style="font-size:0.82rem;color:#666;margin-bottom:38px;">ຜູ້ຈ່າຍເງິນ</div>
+        <div style="border-top:1.5px solid #333;padding-top:5px;font-size:0.82rem;">Hainam PHONEMANY</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:0.82rem;color:#666;margin-bottom:38px;">ຜູ້ຮັບເງິນ</div>
+        <div style="border-top:1.5px solid #333;padding-top:5px;font-size:0.82rem;">${emp.name}</div>
+      </div>
+    </div>
+
+    <!-- Footer bar -->
+    <div style="background:#1a5c2e;height:10px;border-radius:0 0 8px 8px;"></div>
+  </div>`;
+}
+
+async function slipToCanvas(emp, docNum) {
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;top:0;left:-9999px;z-index:-999;';
+  container.innerHTML = buildSlipHTML(emp, docNum);
+  document.body.appendChild(container);
+
+  await new Promise(r => setTimeout(r, 300));
+
+  const inner = container.firstElementChild;
+  const h = inner ? inner.scrollHeight : 800;
+
+  const canvas = await html2canvas(container, {
+    scale: 2.5,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#fdf8f0',
+    scrollX: 0, scrollY: 0,
+    width: 560,
+    height: h || 800,
+    windowWidth: 560,
+    windowHeight: h || 800,
+    logging: false,
+  });
+
+  document.body.removeChild(container);
+  return canvas;
+}
+
+// ── Canvas → PDF ──
+function canvasToPDF(canvas) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const margin = 8;
+  const maxW = pageW - margin * 2;
+  const maxH = pageH - margin * 2;
+  const imgH = (canvas.height * maxW) / canvas.width;
+  if (imgH <= maxH) {
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, maxW, imgH);
+  } else {
+    const scale = maxH / imgH;
+    const fitW = maxW * scale;
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pageW - fitW) / 2, margin, fitW, maxH);
+  }
+  return pdf;
+}
+
+// ── Export single PDF & Share (from slip modal) ──
+async function exportPDF() {
+  const btn = document.getElementById('pdf-btn');
+  const original = btn.textContent;
+  btn.textContent = '⏳ ກຳລັງສ້າງ...';
+  btn.disabled = true;
+
+  try {
+    const slipName = document.getElementById('slip-name').textContent;
+    const emp = employees.find(e => e.name === slipName) || employees[0];
+    const docId = document.getElementById('slip-doc-id').textContent;
+    const monthLabel = getMonthLabel();
+
+    const canvas = await slipToCanvas(emp, docId);
+    const pdf = canvasToPDF(canvas);
+    const filename = `ໃບເງິນເດືອນ_${emp.name}_${monthLabel}.pdf`.replace(/\s+/g,'_');
+    const pdfBlob = pdf.output('blob');
+    const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+    }
+  } catch(err) {
+    alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = original;
+    btn.disabled = false;
+  }
+}
+
+// ── Export ALL as ZIP ──
+async function exportAllPDFs() {
+  const btn = document.getElementById('all-pdf-btn');
+  const original = btn.textContent;
+  btn.disabled = true;
+
+  if (employees.length === 0) {
+    alert('ບໍ່ມີພະນັກງານ');
+    btn.disabled = false;
+    return;
+  }
+
+  try {
+    // Check JSZip loaded
+    if (typeof JSZip === 'undefined') {
+      alert('JSZip ໂຫລດຍັງບໍ່ທັນ — ກະລຸນາລໍຖ້າ ແລ້ວລອງໃໝ່');
+      btn.disabled = false;
+      return;
+    }
+
+    const zip = new JSZip();
+    const monthLabel = getMonthLabel();
+
+    for (let i = 0; i < employees.length; i++) {
+      const emp = employees[i];
+      btn.textContent = `⏳ ${i+1}/${employees.length} ${emp.name}`;
+      const docNum = 'DVP-' + String(i + 1).padStart(3, '0');
+      const canvas = await slipToCanvas(emp, docNum);
+      const pdf = canvasToPDF(canvas);
+      const filename = `${String(i+1).padStart(2,'0')}_${emp.name}_${monthLabel}.pdf`.replace(/\s+/g,'_');
+      zip.file(filename, pdf.output('arraybuffer'));
+    }
+
+    btn.textContent = '📦 ກຳລັງສ້າງ ZIP...';
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const zipName = `ເງິນເດືອນ_ທຸກຄົນ_${monthLabel}.zip`.replace(/\s+/g,'_');
+
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = zipName; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 8000);
+
+    alert(`✅ ສຳເລັດ! ດາວໂຫລດ ZIP ${employees.length} ໃບແລ້ວ`);
+  } catch(err) {
+    alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = original;
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
