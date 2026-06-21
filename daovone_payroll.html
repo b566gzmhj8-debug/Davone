@@ -7,7 +7,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   :root {
     --green-dark: #1a5c2e;
@@ -666,16 +665,19 @@
 <script>
 const LAO_MONTHS = ['ມັງກອນ','ກຸມພາ','ມີນາ','ເມສາ','ພຶດສະພາ','ມີຖຸນາ','ກໍລະກົດ','ສິງຫາ','ກັນຍາ','ຕຸລາ','ພະຈິກ','ທັນວາ'];
 
-// ── Supabase config ──
-// ⚠️ ໃສ່ anon key ຂອງ project snyyhmeprngskneaaubb ຢູ່ນີ້
-const SUPABASE_URL  = 'https://snyyhmeprngskneaaubb.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_XPKO1h3cIxNt8yPJfO7gpg_dg40mwJs';
-const RECORD_ID     = 'daovone_payroll_main';
+// ── Supabase REST API (ບໍ່ໃຊ້ library — ໃຊ້ fetch ໂດຍກົງ) ──
+const SUPABASE_URL = 'https://snyyhmeprngskneaaubb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XPKO1h3cIxNt8yPJfO7gpg_dg40mwJs';
+const RECORD_ID    = 'daovone_payroll_main';
 
-let sb = null;
-try {
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-} catch(e) {}
+const SB_HEADERS = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Prefer': 'return=minimal'
+};
+
+let sb = null; // ບໍ່ໃຊ້ library ແລ້ວ — sb = true ເພື່ອ check
 
 function setSaveStatus(msg, color) {
   const el = document.getElementById('save-status-text');
@@ -683,37 +685,38 @@ function setSaveStatus(msg, color) {
 }
 
 async function cloudSave() {
-  if (!sb || SUPABASE_KEY === 'YOUR_ANON_KEY_HERE') {
-    setSaveStatus('⚠️ ຍັງບໍ່ໄດ້ຕັ້ງ Supabase key', '#c9a227');
-    return;
-  }
   try {
-    // Strip qrImage ອອກກ່ອນ upload (ຮູບໃຫຍ່ເກີນ — ເກັບ local ແທນ)
-    const empForCloud = employees.map(e => {
-      const { qrImage, ...rest } = e;
-      return rest;
-    });
+    const empForCloud = employees.map(({ qrImage, ...rest }) => rest);
 
-    // Save qrImages ໃນ localStorage ແຍກ (keyed by employee id)
+    // Save qrImages ໃນ localStorage ແຍກ
     const qrMap = {};
     employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
-    localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap));
+    try { localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap)); } catch(e) {}
 
-    // Save ຂໍ້ມູນຫຼັກ (ບໍ່ມີຮູບ) ຂຶ້ນ Cloud
     const payload = {
       id: RECORD_ID,
       data: JSON.stringify({ employees: empForCloud }),
       updated_at: new Date().toISOString()
     };
-    const { error } = await sb.from('payroll_data').upsert(payload, { onConflict: 'id' });
-    if (error) throw error;
 
-    // Backup ທັງໝົດ (ລວມ QR) ໃສ່ localStorage
-    localStorage.setItem('daovone_payroll', JSON.stringify({
-      employees,
-      month: document.getElementById('month-picker').value,
-      saved: new Date().toISOString()
-    }));
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/payroll_data?on_conflict=id`,
+      {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(payload)
+      }
+    );
+    if (!res.ok) throw new Error(await res.text());
+
+    // Backup local
+    try {
+      localStorage.setItem('daovone_payroll', JSON.stringify({
+        employees,
+        month: document.getElementById('month-picker').value,
+        saved: new Date().toISOString()
+      }));
+    } catch(e) {}
 
     const t = new Date().toLocaleTimeString('lo-LA');
     setSaveStatus(`✅ ບັນທຶກ Cloud ອັດຕະໂນມັດ — ${t}`, '#1a5c2e');
@@ -723,18 +726,18 @@ async function cloudSave() {
 }
 
 async function cloudLoad() {
-  if (!sb || SUPABASE_KEY === 'YOUR_ANON_KEY_HERE') {
-    setSaveStatus('⚠️ ຍັງບໍ່ໄດ້ຕັ້ງ Supabase key', '#c9a227');
-    return;
-  }
   setSaveStatus('🔄 ກຳລັງໂຫລດ...', '#666');
   try {
-    const { data, error } = await sb.from('payroll_data').select('data').eq('id', RECORD_ID).single();
-    if (error) throw error;
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/payroll_data?id=eq.${RECORD_ID}&select=data&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (!res.ok) throw new Error(await res.text());
+    const rows = await res.json();
+    if (!rows || rows.length === 0) throw new Error('ບໍ່ພົບຂໍ້ມູນ');
 
-    const parsed = JSON.parse(data.data);
+    const parsed = JSON.parse(rows[0].data);
 
-    // ໂຫລດ qrImages ຈາກ localStorage ກັບຄືນ
     let qrMap = {};
     try { qrMap = JSON.parse(localStorage.getItem('daovone_qr_images') || '{}'); } catch(e) {}
 
@@ -742,7 +745,7 @@ async function cloudLoad() {
       bonusItems: [], baseSalary: 3000000, workDays: 30,
       paid: false, bankAccount: '', bankName: '', qrImage: '',
       ...e,
-      qrImage: qrMap[e.id] || e.qrImage || ''  // ຕໍ່ QR ກັບຄືນ
+      qrImage: qrMap[e.id] || e.qrImage || ''
     }));
 
     renderTable();
@@ -896,14 +899,28 @@ function renderTable() {
 let _cloudSaveTimer = null;
 
 function autoSave() {
-  // 1. Save local immediately (fast, no network)
+  // 1. Save local — ລອງ save ທັງໝົດກ່ອນ
   try {
     localStorage.setItem('daovone_payroll', JSON.stringify({
       employees,
       month: document.getElementById('month-picker').value,
       saved: new Date().toISOString()
     }));
-  } catch(e) { /* silent fail */ }
+  } catch(e) {
+    // quota exceeded — save ໂດຍບໍ່ມີ QR images
+    try {
+      const empNoQR = employees.map(({ qrImage, ...rest }) => rest);
+      localStorage.setItem('daovone_payroll', JSON.stringify({
+        employees: empNoQR,
+        month: document.getElementById('month-picker').value,
+        saved: new Date().toISOString()
+      }));
+      // Save QR images ແຍກ
+      const qrMap = {};
+      employees.forEach(e => { if (e.qrImage) qrMap[e.id] = e.qrImage; });
+      try { localStorage.setItem('daovone_qr_images', JSON.stringify(qrMap)); } catch(e2) {}
+    } catch(e2) { /* silent */ }
+  }
 
   // 2. Debounce cloud save — 4 ວິຫຼັງຈາກແກ້ຄັ້ງສຸດທ້າຍ
   clearTimeout(_cloudSaveTimer);
@@ -1171,14 +1188,27 @@ function handleQRImageUpload(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
-    const b64 = e.target.result;
-    document.getElementById('qr-img-preview').innerHTML =
-      `<img src="${b64}" style="width:100%;height:100%;object-fit:contain;">`;
-    // Store temp in dataset
-    document.getElementById('qr-img-preview').dataset.b64 = b64;
+    // ບີບຮູບລົງເຫຼືອ 200×200 JPEG ກ່ອນ save (ຈາກ MB → ~20KB)
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX = 200; // px
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else       { w = Math.round(w * MAX / h); h = MAX; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.75); // quality 75%
+      document.getElementById('qr-img-preview').innerHTML =
+        `<img src="${compressed}" style="width:100%;height:100%;object-fit:contain;">`;
+      document.getElementById('qr-img-preview').dataset.b64 = compressed;
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
   input.value = '';
+}
 }
 
 function clearQRImage() {
@@ -1434,17 +1464,9 @@ async function exportSelectedPDFs() {
   renderTable();
 
   // ພະຍາຍາມໂຫລດ Cloud ຫຼັງ (async)
-  if (sb && SUPABASE_KEY !== 'YOUR_ANON_KEY_HERE') {
-    cloudLoad();
-  } else {
-    setSaveStatus('⚠️ ຂໍ້ມູນຢູ່ local browser — ໃສ່ Supabase key ເພື່ອ cloud sync', '#c9a227');
-  }
+  cloudLoad();
   // ✅ Auto cloud save ທຸກ 60 ວິນາທີ (backup)
-  setInterval(() => {
-    if (sb && SUPABASE_KEY !== 'YOUR_ANON_KEY_HERE') {
-      cloudSave();
-    }
-  }, 60000);
+  setInterval(() => { cloudSave(); }, 60000);
 })();
 
 document.getElementById('slip-modal').addEventListener('click', e => {
