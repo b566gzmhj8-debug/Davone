@@ -145,15 +145,24 @@
   /* Summary bar */
   .summary-bar {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px; margin-bottom: 20px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px; margin-bottom: 20px;
   }
   .sum-box {
-    background: white; border-radius: 10px; padding: 14px 16px;
+    background: white; border-radius: 10px; padding: 14px 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.07); text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; min-width: 0;
   }
-  .sum-box .label { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
-  .sum-box .value { font-size: 1.1rem; font-weight: 700; color: var(--green-dark); }
+  .sum-box .label {
+    font-size: 0.72rem; color: var(--muted); margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    white-space: nowrap; max-width: 100%; line-height: 1.25;
+  }
+  .sum-box .value {
+    font-size: 1.02rem; font-weight: 700; color: var(--green-dark);
+    white-space: nowrap; overflow: hidden;
+  }
   .sum-box.red .value { color: var(--red); }
   .sum-box.gold .value { color: var(--gold); }
 
@@ -314,7 +323,7 @@
     /* Summary boxes — 2 per row on mobile */
     .summary-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
     .sum-box { padding: 10px 10px; }
-    .sum-box .label { font-size: 0.7rem; }
+    .sum-box .label { font-size: 0.66rem; white-space: nowrap; }
     .sum-box .value { font-size: 0.95rem; }
 
     /* Card */
@@ -373,7 +382,7 @@
   .sum-box { border-radius:0; box-shadow:none; text-align:left; border-right:1px solid var(--border);
              border-bottom:1px solid var(--border); padding:14px 16px; }
   .sum-box .label { display:flex; align-items:center; gap:7px; font-size:.74rem; color:var(--muted); }
-  .sum-box .label .ico { color:var(--green-dark); font-size:.95rem; }
+  .sum-box .label .ico { color:var(--green-dark); font-size:.85rem; flex:none; }
   .sum-box .value { font-family:'Noto Serif Lao',serif; font-size:1.16rem; }
   .card { border-radius:6px; border:1px solid var(--border); box-shadow:0 1px 3px rgba(20,67,47,.05); }
   .card h2 { font-family:'Noto Serif Lao',serif; font-weight:600; border-bottom:1px solid var(--gold);
@@ -1089,6 +1098,24 @@ function autosizeAllNames() {
   document.querySelectorAll('input.emp-name-input, input.auto-w').forEach(autosizeName);
 }
 
+// ── ປັບຂະໜາດໂຕອັກສອນຂອງຕົວເລກ summary ໃຫ້ພໍດີແຖວດຽວ ບໍ່ວ່າເລກຈະຍາວແຄ່ໃດ ──
+function autoFitSummaryValues() {
+  document.querySelectorAll('.sum-box .value').forEach(el => {
+    const maxFont = 1.1; // rem, ຄ່າເລີ່ມຕົ້ນຈາກ CSS
+    const minFont = 0.62; // rem, ກັນບໍ່ໃຫ້ນ້ອຍເກີນໄປ
+    let fontSize = maxFont;
+    el.style.fontSize = fontSize + 'rem';
+    const box = el.parentElement;
+    const available = box.clientWidth - 16; // ເຜື່ອ padding ຊ້າຍຂວາ
+    let guard = 0;
+    while (el.scrollWidth > available && fontSize > minFont && guard < 30) {
+      fontSize -= 0.04;
+      el.style.fontSize = fontSize.toFixed(2) + 'rem';
+      guard++;
+    }
+  });
+}
+
 // ── Auto-save (local immediate + cloud debounced 4s) ──
 let _cloudSaveTimer = null;
 
@@ -1176,6 +1203,7 @@ function updateSummary() {
   document.getElementById('sum-net').textContent    = fmt(net)    + ' ກີບ';
   document.getElementById('sum-paid').textContent   = paid + ' ຄົນ';
   document.getElementById('sum-unpaid').textContent = (total - paid) + ' ຄົນ';
+  autoFitSummaryValues();
 }
 
 // ── BONUS MODAL ──
@@ -1660,6 +1688,13 @@ async function exportSelectedPDFs() {
 
   // Auto cloud save ທຸກ 60 ວິນາທີ
   setInterval(() => { cloudSave(); }, 60000);
+
+  // ປັບຂະໜາດໂຕອັກສອນ summary ໃໝ່ທຸກຄັ້ງທີ່ປ່ຽນຂະໜາດໜ້າຈໍ
+  let _resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(autoFitSummaryValues, 150);
+  });
 })();
 
 document.getElementById('slip-modal').addEventListener('click', e => {
