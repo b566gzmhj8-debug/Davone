@@ -800,11 +800,11 @@ async function cloudSave() {
   }
 }
 
-async function cloudLoad() {
-  setSaveStatus('ກຳລັງໂຫລດ...', '#6b7770');
+async function cloudLoad(silent = false) {
+  if (!silent) setSaveStatus('ກຳລັງໂຫລດ...', '#6b7770');
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000);
+    const timer = setTimeout(() => controller.abort(), 7000);
 
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/payroll_data?id=eq.${RECORD_ID}&select=data,qr_data&limit=1`,
@@ -835,6 +835,11 @@ async function cloudLoad() {
     const t = new Date().toLocaleTimeString('lo-LA');
     setSaveStatus(`ໂຫລດ Cloud ສຳເລັດ — ${t}`, '#14432f');
   } catch(e) {
+    if (silent) {
+      // sync ເບື້ອງຫຼັງລົ້ມເຫລວ — ໃຊ້ຂໍ້ມູນ Local ທີ່ສະແດງຢູ່ແລ້ວ, ບໍ່ຕ້ອງເຮັດຫຍັງເພີ່ມ
+      setSaveStatus('ໃຊ້ຂໍ້ມູນ Local (Cloud ຊ້າ/ຢຸດ) — ກົດ "ໂຫລດ Cloud" ລອງໃໝ່', '#b08d3e');
+      return;
+    }
     try {
       const raw = localStorage.getItem('daovone_payroll');
       if (raw) {
@@ -1341,7 +1346,6 @@ function handleQRImageUpload(input) {
   reader.readAsDataURL(file);
   input.value = '';
 }
-}
 
 function clearQRImage() {
   const preview = document.getElementById('qr-img-preview');
@@ -1601,8 +1605,8 @@ async function exportSelectedPDFs() {
   }
   renderTable(); // ສະແດງຂໍ້ມູນທັນທີ
 
-  // ພະຍາຍາມ sync Cloud ໃນ background (ບໍ່ block UI)
-  setTimeout(() => cloudLoad(), 500);
+  // ພະຍາຍາມ sync Cloud ໃນ background ແບບງຽບ (ບໍ່ block UI, ບໍ່ຂຶ້ນ "ກຳລັງໂຫລດ")
+  setTimeout(() => cloudLoad(true), 500);
 
   // Auto cloud save ທຸກ 60 ວິນາທີ
   setInterval(() => { cloudSave(); }, 60000);
