@@ -1563,14 +1563,7 @@ async function exportSelectedPDFs() {
       const pdf = canvasToPDF(canvas);
       const filename = `ໃບເງິນເດືອນ_${emp.name}_${monthLabel}.pdf`.replace(/\s+/g,'_');
       const blob = pdf.output('blob');
-      const file = new File([blob], filename, { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: filename });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 3000);
-      }
+      await shareOrDownload(blob, filename, 'application/pdf');
       closeSelectPDF();
       return;
     }
@@ -1591,15 +1584,15 @@ async function exportSelectedPDFs() {
     btn.textContent = 'ສ້າງ ZIP...';
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const zipName = `ເງິນເດືອນ_${monthLabel}_${indices.length}ຄົນ.zip`.replace(/\s+/g,'_');
-    const url = URL.createObjectURL(zipBlob);
-    const a = document.createElement('a'); a.href = url; a.download = zipName; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 8000);
+    await shareOrDownload(zipBlob, zipName, 'application/zip');
 
     closeSelectPDF();
     alert(`ດາວໂຫລດ ZIP ${indices.length} ໃບສຳເລັດ!`);
   } catch(err) {
-    alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
-    console.error(err);
+    if (err.name !== 'AbortError') {
+      alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+      console.error(err);
+    }
   } finally {
     btn.textContent = original;
     btn.disabled = false;
@@ -1812,6 +1805,33 @@ function canvasToPDF(canvas) {
   return pdf;
 }
 
+// ── ແຊຣ໌ ຫຼື ດາວໂຫລດ — ລອງ native share ກ່ອນ, ຖ້າລົ້ມເຫລວ (ບໍ່ວ່າຍ້ອນຫຍັງ) ໃຫ້ດາວໂຫລດແທນ ──
+async function shareOrDownload(blob, filename, mimeType) {
+  const file = new File([blob], filename, { type: mimeType });
+  let canTryShare = false;
+  try {
+    canTryShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+  } catch (e) {
+    canTryShare = false;
+  }
+
+  if (canTryShare) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return; // share ສຳເລັດ
+    } catch (err) {
+      if (err && err.name === 'AbortError') return; // ຜູ້ໃຊ້ກົດຍົກເລີກ share ເອງ — ບໍ່ຕ້ອງເຮັດຫຍັງຕໍ່
+      // share ລົ້ມເຫລວຍ້ອນເຫດຜົນອື່ນ (ເຊັ່ນ file:// ບໍ່ອະນຸຍາດ) — ໄປດາວໂຫລດແທນ
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.target = '_blank'; a.rel = 'noopener';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 8000);
+}
+
 // ── Export single PDF & Share (from slip modal) ──
 async function exportPDF() {
   const btn = document.getElementById('pdf-btn');
@@ -1829,19 +1849,12 @@ async function exportPDF() {
     const pdf = canvasToPDF(canvas);
     const filename = `ໃບເງິນເດືອນ_${emp.name}_${monthLabel}.pdf`.replace(/\s+/g,'_');
     const pdfBlob = pdf.output('blob');
-    const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename; a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 3000);
-    }
+    await shareOrDownload(pdfBlob, filename, 'application/pdf');
   } catch(err) {
-    alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
-    console.error(err);
+    if (err.name !== 'AbortError') {
+      alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+      console.error(err);
+    }
   } finally {
     btn.textContent = original;
     btn.disabled = false;
@@ -1884,16 +1897,14 @@ async function exportAllPDFs() {
     btn.textContent = 'ກຳລັງສ້າງ ZIP...';
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const zipName = `ເງິນເດືອນ_ທຸກຄົນ_${monthLabel}.zip`.replace(/\s+/g,'_');
-
-    const url = URL.createObjectURL(zipBlob);
-    const a = document.createElement('a');
-    a.href = url; a.download = zipName; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 8000);
+    await shareOrDownload(zipBlob, zipName, 'application/zip');
 
     alert(`ສຳເລັດ! ດາວໂຫລດ ZIP ${employees.length} ໃບແລ້ວ`);
   } catch(err) {
-    alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
-    console.error(err);
+    if (err.name !== 'AbortError') {
+      alert('ເກີດຂໍ້ຜິດພາດ: ' + err.message);
+      console.error(err);
+    }
   } finally {
     btn.textContent = original;
     btn.disabled = false;
