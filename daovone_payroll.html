@@ -107,7 +107,7 @@
     background: white;
   }
   input.cell-input:focus { outline: none; border-color: var(--green-mid); background: #f5faf6; }
-  .emp-name-input { text-align: left !important; min-width: 110px; }
+  .emp-name-input { text-align: left !important; min-width: 170px; }
 
   .net-cell { font-weight: 700; color: var(--green-dark); white-space: nowrap; }
   .net-cell.negative { color: var(--red); }
@@ -326,7 +326,7 @@
     thead th { padding: 8px 5px; font-size: 0.73rem; }
     tbody td { padding: 6px 5px; }
     input.cell-input { min-width: 65px; font-size: 0.75rem; padding: 4px 5px; }
-    .emp-name-input { min-width: 90px; }
+    .emp-name-input { min-width: 140px; }
 
     /* Buttons */
     .btn { padding: 8px 12px; font-size: 0.82rem; }
@@ -709,8 +709,8 @@
           <tr>
             <th>ລຳດັບ</th>
             <th>ລາຍລະອຽດ</th>
-            <th>ຈຳນວນອົງວຽກ</th>
-            <th>ຈຳນວນ<br>ອົງຍາມ</th>
+            <th>ຈຳນວນເງິນ</th>
+            <th>ຈຳນວນ<br>ວັນງານ</th>
             <th>ລວມເງິນ</th>
           </tr>
         </thead>
@@ -1325,18 +1325,20 @@ function handleQRImageUpload(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
-    // ບີບຮູບລົງເຫຼືອ 200×200 JPEG ກ່ອນ save (ຈາກ MB → ~20KB)
+    // ບີບຮູບໃຫ້ນ້ອຍລົງ ແຕ່ຍັງ scan QR ໄດ້ (720px, quality 82%)
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const MAX = 200; // px
+      const MAX = 720; // px — ໃຫຍ່ພໍໃຫ້ scan QR ໄດ້
       let w = img.width, h = img.height;
-      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-      else       { w = Math.round(w * MAX / h); h = MAX; }
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else       { w = Math.round(w * MAX / h); h = MAX; }
+      }
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.75); // quality 75%
+      const compressed = canvas.toDataURL('image/jpeg', 0.82); // quality 82%
       document.getElementById('qr-img-preview').innerHTML =
         `<img src="${compressed}" style="width:100%;height:100%;object-fit:contain;">`;
       document.getElementById('qr-img-preview').dataset.b64 = compressed;
@@ -1702,8 +1704,8 @@ function buildSlipHTML(emp, docNum) {
           <tr>
             <th style="background:#14432f;color:white;padding:9px 8px;text-align:left;border-radius:8px 0 0 0;">ລຳດັບ</th>
             <th style="background:#14432f;color:white;padding:9px 8px;text-align:left;">ລາຍລະອຽດ</th>
-            <th style="background:#14432f;color:white;padding:9px 8px;text-align:right;">ຈຳນວນ</th>
-            <th style="background:#14432f;color:white;padding:9px 8px;text-align:center;">ວັນ/ຄັ້ງ</th>
+            <th style="background:#14432f;color:white;padding:9px 8px;text-align:right;">ຈຳນວນເງິນ</th>
+            <th style="background:#14432f;color:white;padding:9px 8px;text-align:center;">ຈຳນວນວັນງານ</th>
             <th style="background:#14432f;color:white;padding:9px 8px;text-align:right;border-radius:0 8px 0 0;">ລວມ</th>
           </tr>
         </thead>
