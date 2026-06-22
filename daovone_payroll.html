@@ -518,9 +518,7 @@
             <th style="width:60px">ວັນ<br>ວຽກ</th>
             <th style="width:110px">ລວມ<br>ຕາມວັນ</th>
             <th style="width:120px">ລາຍຮັບ<br>ພິເສດ</th>
-            <th style="width:110px">ເບີກ<br>ລ່ວງໜ້າ</th>
-            <th style="width:110px">ໜີ້ຄ້າງ</th>
-            <th style="width:110px">ຫັກ<br>ອື່ນໆ</th>
+            <th style="width:140px">ເບີກລ່ວງໜ້າ<br>(ຄ້າງ / ຫັກເດືອນນີ້)</th>
             <th style="width:115px">ສຸດທິ<br>(ກີບ)</th>
             <th style="width:54px">ໂອນ<br>ແລ້ວ?</th>
             <th style="width:46px">ບັນຊີ</th>
@@ -943,8 +941,7 @@ function newEmp(i) {
     workDays: 30,         // ວັນທີ່ເຮັດວຽກຈິງ
     bonusItems: [],
     advance: 0,
-    debt: 0,
-    otherDeduct: 0,
+    advanceBalance: 0,   // ຍອດໜີ້ເບີກລ່ວງໜ້າຄ້າງທັງໝົດ (ບໍ່ຖືກລົບອອກຈາກສຸດທິ — ມີແຕ່ "advance" ທີ່ຖືກລົບ)
     paid: false,
     bankAccount: '',
     bankName: '',
@@ -971,7 +968,7 @@ function calcGross(emp) {
 function computeNet(emp) {
   const gross  = calcGross(emp);
   const bonus  = bonusTotal(emp);
-  const deduct = Number(emp.advance) + Number(emp.debt) + Number(emp.otherDeduct);
+  const deduct = Number(emp.advance);
   return gross + bonus - deduct;
 }
 
@@ -1020,15 +1017,24 @@ function renderTable() {
           onblur="updateField(${i},'workDays',this.value)"></td>
       <td style="font-weight:600;color:var(--green-dark);white-space:nowrap">${fmt(gross)}</td>
       <td>${bonusLabel}</td>
-      <td><input class="cell-input" value="${fmt(emp.advance)}" style="color:#9c2c20"
-          oninput="liveFormat(this)"
-          onblur="updateField(${i},'advance',parseNum(this.value));this.value=fmt(employees[${i}].advance)"></td>
-      <td><input class="cell-input" value="${fmt(emp.debt)}" style="color:#9c2c20"
-          oninput="liveFormat(this)"
-          onblur="updateField(${i},'debt',parseNum(this.value));this.value=fmt(employees[${i}].debt)"></td>
-      <td><input class="cell-input" value="${fmt(emp.otherDeduct)}" style="color:#9c2c20"
-          oninput="liveFormat(this)"
-          onblur="updateField(${i},'otherDeduct',parseNum(this.value));this.value=fmt(employees[${i}].otherDeduct)"></td>
+      <td>
+        <div style="display:flex;flex-direction:column;gap:3px;min-width:100px">
+          <div style="display:flex;align-items:center;gap:3px">
+            <span style="font-size:9px;color:#8a8a8a;white-space:nowrap;width:34px;flex-shrink:0">ຄ້າງ</span>
+            <input class="cell-input" value="${fmt(emp.advanceBalance)}" style="color:#6b4423;font-size:12px"
+                title="ຍອດໜີ້ເບີກລ່ວງໜ້າຄ້າງທັງໝົດ — ແກ້ໄດ້ໂດຍກົງ"
+                oninput="liveFormat(this)"
+                onblur="updateField(${i},'advanceBalance',parseNum(this.value));this.value=fmt(employees[${i}].advanceBalance)">
+          </div>
+          <div style="display:flex;align-items:center;gap:3px">
+            <span style="font-size:9px;color:#9c2c20;white-space:nowrap;width:34px;flex-shrink:0">ຫັກ</span>
+            <input class="cell-input" value="${fmt(emp.advance)}" style="color:#9c2c20"
+                title="ຫັກເດືອນນີ້ — ຈະຖືກລົບອອກຈາກຍອດຄ້າງເທິງນີ້ໂດຍອັດຕະໂນມັດ"
+                oninput="liveFormat(this)"
+                onblur="updateField(${i},'advance',parseNum(this.value));renderTable()">
+          </div>
+        </div>
+      </td>
       <td class="net-cell ${net < 0 ? 'negative' : ''}">${fmt(net)}</td>
       <td style="text-align:center;">
         <button onclick="togglePaid(${i})" style="
@@ -1098,6 +1104,17 @@ function autoSave() {
 function updateField(i, field, val) {
   if (field === 'name') {
     employees[i][field] = val;
+  } else if (field === 'advance') {
+    let amount = parseNum(String(val));
+    const balance = Number(employees[i].advanceBalance) || 0;
+    if (amount > balance) {
+      alert(`ຫັກໄດ້ສູງສຸດ ${fmt(balance)} ກີບ (ຍອດໜີ້ຄ້າງມີເທົ່ານີ້) — ລະບົບຈະຫັກໃຫ້ສູງສຸດ`);
+      amount = balance;
+    }
+    employees[i].advance = amount;
+    employees[i].advanceBalance = balance - amount;
+  } else if (field === 'advanceBalance') {
+    employees[i].advanceBalance = parseNum(String(val));
   } else {
     employees[i][field] = parseNum(String(val));
   }
@@ -1148,7 +1165,7 @@ function updateSummary() {
   const total  = employees.length;
   const salary = employees.reduce((s,e) => s + calcGross(e), 0);
   const bonus  = employees.reduce((s,e) => s + bonusTotal(e), 0);
-  const deduct = employees.reduce((s,e) => s + Number(e.advance)+Number(e.debt)+Number(e.otherDeduct), 0);
+  const deduct = employees.reduce((s,e) => s + Number(e.advance), 0);
   const net    = employees.reduce((s,e) => s + computeNet(e), 0);
   const paid   = employees.filter(e => e.paid).length;
 
@@ -1268,9 +1285,19 @@ function showSlip(i) {
     if (Number(b.amount) > 0 || b.label.trim())
       addRow(b.label || 'ລາຍຮັບພິເສດ', b.amount, 1, b.amount, 'row-bonus');
   });
-  if (Number(emp.advance) > 0)     addRow('ເງິນເບີກລ່ວງໜ້າ',     emp.advance,     1, emp.advance,     'row-deduct');
-  if (Number(emp.debt) > 0)        addRow('ໜີ້ຄ້າງຈາກເດືອນກ່ອນ', emp.debt,        1, emp.debt,        'row-deduct');
-  if (Number(emp.otherDeduct) > 0) addRow('ຫັກອື່ນໆ',              emp.otherDeduct, 1, emp.otherDeduct, 'row-deduct');
+  if (Number(emp.advance) > 0) {
+    addRow('ເງິນເບີກລ່ວງໜ້າ (ຫັກເດືອນນີ້)', emp.advance, 1, emp.advance, 'row-deduct');
+  }
+  if (Number(emp.advanceBalance) > 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td></td>
+      <td style="font-size:12px;color:#9c2c20;font-style:italic">ຍອດເບີກລ່ວງໜ້າຄ້າງເຫຼືອ</td>
+      <td></td><td></td>
+      <td style="text-align:right;font-size:12px;color:#9c2c20;font-style:italic">${fmt(emp.advanceBalance)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
 
   document.getElementById('slip-total-amount').textContent = fmt(net) + ' ກີບ';
   document.getElementById('slip-modal').classList.add('open');
@@ -1675,9 +1702,18 @@ function buildSlipHTML(emp, docNum) {
     if (Number(b.amount) > 0 || b.label.trim())
       rowsHTML += row(b.label || 'ລາຍຮັບພິເສດ', b.amount, 1, b.amount, '#f5faf6', '#14432f');
   });
-  if (Number(emp.advance) > 0)     rowsHTML += row('ເງິນເບີກລ່ວງໜ້າ',     emp.advance,     1, emp.advance,     '#faf1ec', '#9c2c20');
-  if (Number(emp.debt) > 0)        rowsHTML += row('ໜີ້ຄ້າງຈາກເດືອນກ່ອນ', emp.debt,        1, emp.debt,        '#faf1ec', '#9c2c20');
-  if (Number(emp.otherDeduct) > 0) rowsHTML += row('ຫັກອື່ນໆ',              emp.otherDeduct, 1, emp.otherDeduct, '#faf1ec', '#9c2c20');
+  if (Number(emp.advance) > 0) {
+    rowsHTML += row('ເງິນເບີກລ່ວງໜ້າ (ຫັກເດືອນນີ້)', emp.advance, 1, emp.advance, '#faf1ec', '#9c2c20');
+  }
+  if (Number(emp.advanceBalance) > 0) {
+    rowsHTML += `<tr>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;"></td>
+      <td style="text-align:left;padding:6px 8px;border-bottom:1px solid #eee;color:#9c2c20;font-size:12px;font-style:italic;">ຍອດເບີກລ່ວງໜ້າຄ້າງເຫຼືອ</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;"></td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;"></td>
+      <td style="text-align:right;padding:6px 8px;border-bottom:1px solid #eee;color:#9c2c20;font-size:12px;font-style:italic;">${fmt(emp.advanceBalance)}</td>
+    </tr>`;
+  }
 
   return `
   <div style="
