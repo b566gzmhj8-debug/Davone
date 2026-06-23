@@ -95,6 +95,7 @@
   body.light .input-wrap-pro textarea::placeholder { color:rgba(0,0,0,0.2) !important; }
   body.light .input-wrap-pro.lak:focus-within { border-color:rgba(230,126,34,0.5) !important; box-shadow:0 0 0 3px rgba(230,126,34,0.1) !important; }
   body.light .input-wrap-pro.thb:focus-within { border-color:rgba(41,128,185,0.5) !important; box-shadow:0 0 0 3px rgba(41,128,185,0.1) !important; }
+  body.light .input-wrap-pro.usd:focus-within { border-color:rgba(39,174,96,0.5) !important; box-shadow:0 0 0 3px rgba(39,174,96,0.1) !important; }
   body.light .photo-zone-pro { background:rgba(0,0,0,0.03) !important; border-color:rgba(0,0,0,0.15) !important; }
   body.light .photo-text-pro { color:rgba(0,0,0,0.4) !important; }
   body.light .photo-sub-pro { color:rgba(0,0,0,0.25) !important; }
@@ -177,6 +178,7 @@
   .inp { padding:12px 14px; border-radius:10px; border:1.5px solid #444; font-size:16px; font-family:inherit; outline:none; background:#16213e; color:#fff; width:100%; }
   .amount-preview { font-size:13px; color:#2d6a4f; font-weight:700; margin-top:2px; }
   .amount-preview.thb { color:#2980b9; }
+  .amount-preview.usd { color:#27ae60; }
   .photo-btn { padding:16px; border-radius:10px; border:2px dashed #555; background:#16213e; font-size:14px; cursor:pointer; font-family:inherit; color:#aaa; width:100%; }
   .img-preview-wrap { position:relative; border-radius:12px; overflow:hidden; }
   .img-preview { width:100%; display:block; }
@@ -193,6 +195,7 @@
   .done-sub { font-size:14px; color:#777; }
   .done-amount { font-size:26px; font-weight:800; color:#2d6a4f; }
   .done-amount.thb { color:#2980b9; }
+  .done-amount.usd { color:#27ae60; }
 
   /* DEPT GRID */
   .dept-grid { padding:0; background:#08080f; min-height:100vh; }
@@ -210,6 +213,7 @@
   .total-label { font-size:13px; opacity:0.8; margin-bottom:4px; }
   .total-amount { font-size:30px; font-weight:800; }
   .total-amount2 { font-size:22px; font-weight:800; margin-top:4px; }
+  .total-amount3 { font-size:22px; font-weight:800; margin-top:4px; color:#a4f5c0; }
   .total-count { font-size:12px; opacity:0.7; margin-top:4px; }
   .pending-badge { margin-top:8px; background:rgba(255,255,255,0.2); border-radius:20px; padding:6px 14px; font-size:13px; font-weight:600; display:inline-block; }
   .tabs { display:flex; gap:8px; margin-bottom:12px; }
@@ -258,7 +262,7 @@
   .storage-warn { margin-top:8px; font-size:12px; font-weight:700; text-align:center; padding:6px 10px; border-radius:8px; }
   .archive-banner { background:#2d4a1a; border-radius:10px; padding:10px 14px; font-size:12px; color:#7dc47d; margin-bottom:12px; text-align:center; }
 
-  .cur-btn { flex:1; padding:10px; border-radius:10px; border:1.5px solid #444; background:#16213e; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:#aaa; }
+  .cur-btn { flex:1; padding:10px 6px; border-radius:10px; border:1.5px solid #444; background:#16213e; cursor:pointer; font-family:inherit; font-size:12px; font-weight:600; color:#aaa; white-space:nowrap; }
   .cur-active { background:#1a3a5c !important; color:#fff !important; border-color:#2980b9 !important; }
   body.light .cur-btn { background:#fff !important; color:#555 !important; border-color:#ddd !important; }
   body.light .cur-active { background:#e8f5e9 !important; color:#2d6a4f !important; border-color:#2d6a4f !important; }
@@ -334,6 +338,7 @@
   .input-wrap-pro:focus-within { border-color:rgba(212,175,55,0.4);box-shadow:0 0 0 3px rgba(212,175,55,0.08); }
   .input-wrap-pro.lak:focus-within { border-color:rgba(230,126,34,0.4);box-shadow:0 0 0 3px rgba(230,126,34,0.08); }
   .input-wrap-pro.thb:focus-within { border-color:rgba(41,128,185,0.4);box-shadow:0 0 0 3px rgba(41,128,185,0.08); }
+  .input-wrap-pro.usd:focus-within { border-color:rgba(39,174,96,0.4);box-shadow:0 0 0 3px rgba(39,174,96,0.08); }
   .input-wrap-pro input,.input-wrap-pro textarea { flex:1;background:transparent;border:none;outline:none;font-size:22px;font-weight:700;color:#fff;font-family:inherit;width:100%; }
   .input-wrap-pro textarea { font-size:15px;font-weight:500;resize:none;height:52px;line-height:1.5; }
   .input-wrap-pro input::placeholder,.input-wrap-pro textarea::placeholder { color:rgba(255,255,255,0.15);font-weight:400; }
@@ -471,7 +476,8 @@ async function dbDeleteByMonth(year, month) {
 
 function fmtKIP(n) { return (n||0).toLocaleString("lo-LA") + " ກີບ"; }
 function fmtTHB(n) { return (n||0).toLocaleString("th-TH") + " ບາດ"; }
-function fmtAmt(n,c) { return c==="THB" ? fmtTHB(n) : fmtKIP(n); }
+function fmtUSD(n) { return "$" + (n||0).toLocaleString("en-US"); }
+function fmtAmt(n,c) { return c==="THB" ? fmtTHB(n) : c==="USD" ? fmtUSD(n) : fmtKIP(n); }
 function fmtDate(ts) { return new Date(ts).toLocaleDateString("lo-LA",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
 function fmtNum(d) { return d ? d.replace(/\B(?=(\d{3})+(?!\d))/g,".") : ""; }
 function todayKey() { const d=new Date(); return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
@@ -522,9 +528,15 @@ function headerHTML(title) {
 }
 function goBack() {
   if (realtimeChannel) { getSupa().removeChannel(realtimeChannel); realtimeChannel = null; }
-  // If staff is on form page → go back to dept list
-  if (state.mode==="staff" && staffState.step==="form") {
-    staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", name:"", img:null, saving:false };
+  // Staff: cash form or bank form → back to the method choice (keep selected dept)
+  if (state.mode==="staff" && (staffState.step==="form" || staffState.step==="bank")) {
+    staffState.step = "method";
+    renderMethodChoice();
+    return;
+  }
+  // Staff: method choice → back to dept list
+  if (state.mode==="staff" && staffState.step==="method") {
+    staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
     const app = document.getElementById("app");
     const header = app.querySelector(".header");
     app.innerHTML = "";
@@ -612,7 +624,7 @@ function updateDots(error) {
 }
 
 // ── STAFF ─────────────────────────────────────────────────
-let staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", name:"", img:null, saving:false };
+let staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
 
 function deptIconHTML(d) {
   if (DEPT_IMGS[d.id]) {
@@ -670,7 +682,7 @@ function filterDepts() {
 
 function deptGridHTML() {
   return '<div class="dept-grid">'
-    + '<div class="dept-header-pro"><div><div class="dh-title">ເລືອກພະແນກ</div><div class="dh-sub">ເລືອກປະເພດລາຍການ</div></div></div>'
+    + '<div class="dept-header-pro"><div><div class="dh-title">ເລືອກພະແນກ</div><div class="dh-sub">ເລືອກພະແນກກ່ອນ ແລ້ວເລືອกວິທີມອບ</div></div></div>'
     + '<div class="dept-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>'
     + '<input id="dept-search-input" type="text" placeholder="ຄົ້ນຫາພະແນກ..." oninput="filterDepts()" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:rgba(255,255,255,0.7);font-family:inherit" autocomplete="off" autocorrect="off"></div>'
     + '<div class="dept-list-wrap" id="dept-list-wrap">'+buildDeptRows('')+'</div>'
@@ -678,19 +690,60 @@ function deptGridHTML() {
 }
 
 function selectDept(id) {
-  staffState = { step:"form", dept:DEPTS.find(d=>d.id===id), rawLAK:"", rawTHB:"", name:"", img:null, saving:false };
+  staffState = { step:"method", dept:DEPTS.find(d=>d.id===id), rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
+  renderMethodChoice();
+}
+
+// Step "method": after picking a department, choose cash vs bank
+function renderMethodChoice() {
+  const d = staffState.dept; if (!d) return;
   const app = document.getElementById("app");
   const header = app.querySelector(".header");
   app.innerHTML = "";
-  app.appendChild(header);
+  if (header) app.appendChild(header);
+  const rgb = hexToRgb(d.color);
+  const chip = DEPT_IMGS[d.id]
+    ? '<img src="'+DEPT_IMGS[d.id]+'" alt="" style="width:52px;height:52px;border-radius:14px;object-fit:cover">'
+    : '<span style="font-size:34px">'+(d.icon||"📦")+'</span>';
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="background:#08080f;padding:24px 18px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px;padding:16px;background:rgba(${rgb},0.08);border:1px solid rgba(${rgb},0.25);border-radius:18px">
+      ${chip}
+      <div><div style="font-size:18px;font-weight:700;color:#fff">${d.name}</div><div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:3px">ເລືອກວິທີການມອບ</div></div>
+    </div>
+    <button onclick="staffChooseCash()" style="width:100%;padding:22px 20px;margin-bottom:16px;border-radius:20px;border:1px solid rgba(39,174,96,0.3);background:linear-gradient(135deg,rgba(39,174,96,0.16),rgba(39,174,96,0.04));color:#fff;display:flex;align-items:center;gap:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent">
+      <span style="font-size:34px">💵</span>
+      <div style="flex:1;text-align:left"><div style="font-size:17px;font-weight:700">ມອບເງິນສົດ</div><div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px">ມອບເງິນສົດໃຫ້ຜູ້ຮັບ · ລໍຖ້າອະນຸມັດ</div></div>
+      <span style="font-size:22px;color:#27ae60">›</span>
+    </button>
+    <button onclick="staffChooseBank()" style="width:100%;padding:22px 20px;border-radius:20px;border:1px solid rgba(41,128,185,0.3);background:linear-gradient(135deg,rgba(41,128,185,0.16),rgba(41,128,185,0.04));color:#fff;display:flex;align-items:center;gap:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent">
+      <span style="font-size:34px">🏦</span>
+      <div style="flex:1;text-align:left"><div style="font-size:17px;font-weight:700">ມອບເງິນເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px">ເງິນເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ</div></div>
+      <span style="font-size:22px;color:#2980b9">›</span>
+    </button>
+  </div>`);
+}
+
+function staffChooseCash() {
+  staffState.step = "form";
+  const app = document.getElementById("app");
+  const header = app.querySelector(".header");
+  app.innerHTML = "";
+  if (header) app.appendChild(header);
   app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="background:#08080f"><div id="form-inner" style="padding-top:0">${formBodyHTML()}</div></div>`);
+}
+
+function staffChooseBank() {
+  staffState.step = "bank";
+  _staffBankCur = "LAK";
+  renderStaffBankForm();
 }
 
 function formBodyHTML() {
   const d = staffState.dept;
   const numLAK = staffState.rawLAK ? parseInt(staffState.rawLAK,10) : 0;
   const numTHB = staffState.rawTHB ? parseInt(staffState.rawTHB,10) : 0;
-  const canSubmit = (numLAK>0||numTHB>0) && !staffState.saving;
+  const numUSD = staffState.rawUSD ? parseInt(staffState.rawUSD,10) : 0;
+  const canSubmit = (numLAK>0||numTHB>0||numUSD>0) && !staffState.saving;
   const rgb = hexToRgb(d.color);
   const tag = deptTagMap(d.id);
   const chipImg = DEPT_IMGS[d.id]
@@ -732,6 +785,14 @@ function formBodyHTML() {
       + '</div>'
       + '<div id="preview-thb" class="amount-preview thb" style="display:'+(staffState.rawTHB?'block':'none')+'">'+fmtTHB(numTHB)+'</div>'
     + '</div>'
+    + '<div class="field-group-pro">'
+      + '<div class="field-label-pro"><span>🇺🇸</span> ຈຳນວນເງິນໂດລາ</div>'
+      + '<div class="input-wrap-pro usd">'
+        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-usd" value="'+fmtNum(staffState.rawUSD)+'" oninput="onAmtInput(this,\'USD\')">'
+        + '<span class="input-currency-badge" style="background:rgba(39,174,96,0.12);color:#27ae60">USD</span>'
+      + '</div>'
+      + '<div id="preview-usd" class="amount-preview usd" style="display:'+(staffState.rawUSD?'block':'none')+'">'+fmtUSD(numUSD)+'</div>'
+    + '</div>'
     + '<div class="form-divider"></div>'
     + '<div class="field-group-pro">'
       + '<div class="field-label-pro">👤 ຊື່ພະນັກງານ</div>'
@@ -752,7 +813,7 @@ function formBodyHTML() {
 }
 
 function backToDept() {
-  staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", name:"", img:null, saving:false };
+  staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
   const app = document.getElementById("app");
   const header = app.querySelector(".header");
   app.innerHTML = "";
@@ -762,20 +823,26 @@ function backToDept() {
 
 function onAmtInput(el, cur) {
   const digits = el.value.replace(/\D/g,"");
-  if (cur==="LAK") staffState.rawLAK=digits; else staffState.rawTHB=digits;
+  if (cur==="LAK") staffState.rawLAK=digits;
+  else if (cur==="THB") staffState.rawTHB=digits;
+  else staffState.rawUSD=digits;
   el.value = fmtNum(digits);
   const num = digits ? parseInt(digits,10) : 0;
   if (cur==="LAK") {
     const p=document.getElementById("preview-lak");
     if(p){p.textContent=fmtKIP(num);p.style.display=digits?"block":"none";}
-  } else {
+  } else if (cur==="THB") {
     const p=document.getElementById("preview-thb");
     if(p){p.textContent=fmtTHB(num);p.style.display=digits?"block":"none";}
+  } else {
+    const p=document.getElementById("preview-usd");
+    if(p){p.textContent=fmtUSD(num);p.style.display=digits?"block":"none";}
   }
   const numLAK = staffState.rawLAK?parseInt(staffState.rawLAK,10):0;
   const numTHB = staffState.rawTHB?parseInt(staffState.rawTHB,10):0;
+  const numUSD = staffState.rawUSD?parseInt(staffState.rawUSD,10):0;
   const btn=document.getElementById("submit-btn");
-  if(btn){btn.disabled=!(numLAK>0||numTHB>0);}
+  if(btn){btn.disabled=!(numLAK>0||numTHB>0||numUSD>0);}
 }
 
 function onFileChange(el) {
@@ -793,15 +860,18 @@ function onFileChange(el) {
 async function submitRecord() {
   const numLAK=staffState.rawLAK?parseInt(staffState.rawLAK,10):0;
   const numTHB=staffState.rawTHB?parseInt(staffState.rawTHB,10):0;
-  if(numLAK<=0&&numTHB<=0) return;
+  const numUSD=staffState.rawUSD?parseInt(staffState.rawUSD,10):0;
+  if(numLAK<=0&&numTHB<=0&&numUSD<=0) return;
   staffState.saving=true;
   const btn=document.getElementById("submit-btn");
   if(btn){btn.disabled=true;btn.textContent="⏳ ກຳລັງສົ່ງ...";}
   try {
     const ts = Date.now();
-    if(numLAK>0) await dbSave({id:ts,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numLAK,currency:"LAK",note:staffState.name,image:staffState.img});
-    if(numTHB>0) await dbSave({id:ts+1,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numTHB,currency:"THB",note:staffState.name,image:numLAK>0?null:staffState.img});
-    showDone(numLAK,numTHB);
+    let imgUsed = false;
+    if(numLAK>0) { await dbSave({id:ts,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numLAK,currency:"LAK",note:staffState.name,image:staffState.img}); imgUsed = true; }
+    if(numTHB>0) { await dbSave({id:ts+1,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numTHB,currency:"THB",note:staffState.name,image:imgUsed?null:staffState.img}); imgUsed = true; }
+    if(numUSD>0) { await dbSave({id:ts+2,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numUSD,currency:"USD",note:staffState.name,image:imgUsed?null:staffState.img}); imgUsed = true; }
+    showDone(numLAK,numTHB,numUSD);
   } catch(e) {
     console.error(e);
     alert("ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່: "+e.message);
@@ -811,7 +881,7 @@ async function submitRecord() {
   }
 }
 
-function showDone(numLAK,numTHB) {
+function showDone(numLAK,numTHB,numUSD) {
   const d=staffState.dept;
   const app=document.getElementById("app");
   const header=app.querySelector(".header");
@@ -823,6 +893,7 @@ function showDone(numLAK,numTHB) {
     <div class="done-sub">ພະແນກ: ${d.name}</div>
     ${numLAK>0?`<div class="done-amount">${fmtKIP(numLAK)}</div>`:""}
     ${numTHB>0?`<div class="done-amount thb">${fmtTHB(numTHB)}</div>`:""}
+    ${numUSD>0?`<div class="done-amount usd">${fmtUSD(numUSD)}</div>`:""}
     <button class="btn-green" onclick="backToDept()" style="margin-bottom:0">ສົ່ງລາຍການໃໝ່</button>
   </div></div>`);
 }
@@ -873,9 +944,7 @@ function setupRealtime() {
       if (state.mode !== "admin" && state.mode !== "owner") return;
       await refreshAdmin();
       const deptName = payload.new.department_name || "ລາຍການໃໝ່";
-      const amt = payload.new.currency === "THB"
-        ? fmtTHB(Number(payload.new.amount))
-        : fmtKIP(Number(payload.new.amount));
+      const amt = fmtAmt(Number(payload.new.amount), payload.new.currency || "LAK");
       notifyNew("📥 ພະນັກງານສົ່ງຍອດ\n" + deptName + " " + amt);
     })
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "records" }, async (payload) => {
@@ -884,9 +953,7 @@ function setupRealtime() {
       if (!wasVerified) return;
       await refreshAdmin();
       const deptName = payload.new.department_name || "ລາຍການ";
-      const amt = payload.new.currency === "THB"
-        ? fmtTHB(Number(payload.new.amount))
-        : fmtKIP(Number(payload.new.amount));
+      const amt = fmtAmt(Number(payload.new.amount), payload.new.currency || "LAK");
       notifyNew("✅ Approve ສຳເລັດ\n" + deptName + " " + amt);
     })
     .subscribe();
@@ -958,10 +1025,19 @@ function deptIconHTMLAdmin(dept) {
   return dept.icon + " ";
 }
 
+// Currency display order + flag/badge for the grouped multi-currency record card
+const CUR_DISPLAY = {
+  LAK: { flag: "🇱🇦", color: null },          // null = use department color
+  THB: { flag: "🇹🇭", color: "#2980b9" },
+  USD: { flag: "🇺🇸", color: "#27ae60" }
+};
+const CUR_ORDER = ["LAK", "THB", "USD"];
+
 function recordsHTML(filtered, isOwner) {
   if(filtered.length===0) return `<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການ ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
 
-  // Group records: pair LAK+THB that share same department & close timestamp (within 5 sec)
+  // Group records: a single staff submission may create up to 3 rows (LAK/THB/USD)
+  // sharing the same department & a timestamp within 5 seconds of each other.
   const used = new Set();
   const groups = [];
   // For owner: sort verified by approvedAt desc, then unverified by timestamp desc
@@ -973,18 +1049,23 @@ function recordsHTML(filtered, isOwner) {
   for(const r of sorted) {
     if(used.has(r.id)) continue;
     used.add(r.id);
-    // Try to find a pair: same dept, different currency, timestamp within 5000ms
-    const pair = sorted.find(p =>
-      !used.has(p.id) &&
-      p.department === r.department &&
-      p.currency !== (r.currency||"LAK") &&
-      Math.abs(p.timestamp - r.timestamp) <= 5000
-    );
-    if(pair) {
-      used.add(pair.id);
-      const lak = (r.currency||"LAK")==="LAK" ? r : pair;
-      const thb = (r.currency||"LAK")==="THB" ? r : pair;
-      groups.push({ type:"pair", lak, thb, dept:r.department, departmentName:r.departmentName, timestamp:r.timestamp });
+    const members = [r];
+    // Find any other un-used records: same dept, different currency, within 5000ms
+    let found = true;
+    while(found) {
+      found = false;
+      const partner = sorted.find(p =>
+        !used.has(p.id) &&
+        p.department === r.department &&
+        !members.some(m => (m.currency||"LAK") === (p.currency||"LAK")) &&
+        Math.abs(p.timestamp - r.timestamp) <= 5000
+      );
+      if(partner) { used.add(partner.id); members.push(partner); found = true; }
+    }
+    if(members.length > 1) {
+      // Sort members by canonical currency order (LAK, THB, USD) for consistent display
+      members.sort((a,b) => CUR_ORDER.indexOf(a.currency||"LAK") - CUR_ORDER.indexOf(b.currency||"LAK"));
+      groups.push({ type:"group", members, dept:r.department, departmentName:r.departmentName, timestamp:r.timestamp });
     } else {
       groups.push({ type:"single", r, dept:r.department, departmentName:r.departmentName, timestamp:r.timestamp });
     }
@@ -996,29 +1077,37 @@ function recordsHTML(filtered, isOwner) {
       ? `<img src="${DEPT_IMGS[dept.id]}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px;" alt="">`
       : (dept.icon + " ");
 
-    if(g.type==="pair") {
-      const { lak, thb } = g;
-      const verified = lak.verified && thb.verified;
-      const note = lak.note || thb.note;
-      const image = lak.image || thb.image;
-      const imageId = lak.image ? lak.id : thb.id;
+    if(g.type==="group") {
+      const { members } = g;
+      const verified = members.every(m => m.verified);
+      const note = members.map(m => m.note).find(n => n) || "";
+      const imgMember = members.find(m => m.image);
+      const image = imgMember ? imgMember.image : null;
+      const imageId = imgMember ? imgMember.id : null;
+      const ids = members.map(m => m.id).join(",");
+      const flagsStr = members.map(m => CUR_DISPLAY[m.currency||"LAK"].flag).join("");
+      const lastApprovedAt = members.reduce((mx,m) => m.approvedAt && m.approvedAt>mx ? m.approvedAt : mx, 0);
       return `<div class="record-card" style="border-left-color:${dept.color}">
         <div class="record-top">
           <span class="record-dept">${iconHtml}${g.departmentName}</span>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-            <span class="record-amt" style="color:${dept.color}">${fmtKIP(lak.amount)}</span>
-            <span class="record-amt" style="color:#2980b9;font-size:13px">${fmtTHB(thb.amount)}</span>
+            ${members.map((m,i) => {
+              const cInfo = CUR_DISPLAY[m.currency||"LAK"];
+              const color = cInfo.color || dept.color;
+              const fontSize = i===0 ? "" : "font-size:13px;";
+              return `<span class="record-amt" style="color:${color};${fontSize}">${fmtAmt(m.amount, m.currency||"LAK")}</span>`;
+            }).join("")}
           </div>
         </div>
         <div class="record-meta">
-          <span class="record-time">${fmtDate(isOwner && verified && lak.approvedAt ? lak.approvedAt : g.timestamp)} 🇱🇦🇹🇭</span>
+          <span class="record-time">${fmtDate(isOwner && verified && lastApprovedAt ? lastApprovedAt : g.timestamp)} ${flagsStr}</span>
           <span class="status-badge ${verified?"status-done":"status-wait"}">${verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
         ${note?`<div class="record-name">👤 ${note}</div>`:""}
         <div class="record-actions">
           ${image?`<button class="view-btn" onclick="viewBill(${imageId})">🖼 ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyPair(${lak.id},${thb.id})">${verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
-          ${!isOwner?`<button class="delete-btn" onclick="confirmDeletePair(${lak.id},${thb.id})">🗑</button>`:""}
+          ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyGroup('${ids}')">${verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+          ${!isOwner?`<button class="delete-btn" onclick="confirmDeleteGroup('${ids}')">🗑</button>`:""}
         </div>
       </div>`;
     } else {
@@ -1029,7 +1118,7 @@ function recordsHTML(filtered, isOwner) {
           <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
         </div>
         <div class="record-meta">
-          <span class="record-time">${fmtDate(isOwner && r.verified && r.approvedAt ? r.approvedAt : r.timestamp)} ${r.currency==="THB"?"🇹🇭":"🇱🇦"}</span>
+          <span class="record-time">${fmtDate(isOwner && r.verified && r.approvedAt ? r.approvedAt : r.timestamp)} ${CUR_DISPLAY[r.currency||"LAK"].flag}</span>
           <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
         ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
@@ -1043,42 +1132,42 @@ function recordsHTML(filtered, isOwner) {
   }).join("");
 }
 
-async function tapVerifyPair(id1, id2) {
-  const r1=adminRecords.find(x=>x.id===id1);
-  const r2=adminRecords.find(x=>x.id===id2);
-  if(!r1||!r2) return;
-  const newVal = !(r1.verified && r2.verified);
+async function tapVerifyGroup(idsStr) {
+  const ids = idsStr.split(",");
+  const members = ids.map(id => adminRecords.find(x=>String(x.id)===String(id))).filter(Boolean);
+  if(!members.length) return;
+  const newVal = !members.every(m => m.verified);
   const patch = {approved:newVal, verified:newVal};
-  await dbUpdate(id1, patch);
-  await dbUpdate(id2, patch);
+  for(const m of members) { await dbUpdate(m.id, patch); }
   // Store approvedAt in localStorage (no new DB column needed)
   const approvedMap = getApprovedMap();
   if (newVal) {
     const ts = Date.now();
-    approvedMap[id1] = ts;
-    approvedMap[id2] = ts;
+    for(const m of members) approvedMap[m.id] = ts;
   } else {
-    delete approvedMap[id1];
-    delete approvedMap[id2];
+    for(const m of members) delete approvedMap[m.id];
   }
   saveApprovedMap(approvedMap);
   await refreshAdmin();
 }
 
-function confirmDeletePair(id1, id2) {
-  const r1=adminRecords.find(x=>x.id===id1); if(!r1) return;
+function confirmDeleteGroup(idsStr) {
+  const ids = idsStr.split(",");
+  const r1=adminRecords.find(x=>String(x.id)===String(ids[0])); if(!r1) return;
+  const members = ids.map(id => adminRecords.find(x=>String(x.id)===String(id))).filter(Boolean);
+  const curLabel = members.map(m => m.currency||"LAK").join(" + ");
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="modal">
     <div style="font-size:44px">🗑️</div>
     <div style="font-size:18px;font-weight:800">ລຶບລາຍການນີ້?</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r1.departmentName} (ກີບ + ບາດ)</div>
+    <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r1.departmentName} (${curLabel})</div>
     <div style="font-size:12px;color:#f39c12;margin-bottom:8px">ໃສ່ PIN ຫົວໜ້າເພື່ອຢືນຢັນ</div>
     <input type="password" inputmode="numeric" maxlength="4" placeholder="PIN" id="del-pin" class="pin-input-confirm">
     <div id="del-err" style="color:#e74c3c;font-size:12px;min-height:18px;margin-top:4px"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="this.closest('.overlay').remove()">ຍົກເລີກ</button>
-      <button class="btn-delete" onclick="checkAndDeletePair(${id1},${id2},this)">ລຶບ</button>
+      <button class="btn-delete" onclick="checkAndDeleteGroup('${idsStr}',this)">ລຶບ</button>
     </div>
   </div>`;
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
@@ -1086,7 +1175,7 @@ function confirmDeletePair(id1, id2) {
   setTimeout(()=>{ const p=document.getElementById("del-pin"); if(p) p.focus(); },100);
 }
 
-async function checkAndDeletePair(id1, id2, btn) {
+async function checkAndDeleteGroup(idsStr, btn) {
   const pin = document.getElementById("del-pin").value;
   if (pin !== CLEAR_CONFIRM_PIN) {
     document.getElementById("del-err").textContent = "PIN ບໍ່ຖືກຕ້ອງ";
@@ -1094,8 +1183,8 @@ async function checkAndDeletePair(id1, id2, btn) {
   }
   btn.textContent = "⏳"; btn.disabled = true;
   try {
-    await dbDelete(id1);
-    await dbDelete(id2);
+    const ids = idsStr.split(",");
+    for(const id of ids) { await dbDelete(id); }
     btn.closest(".overlay").remove();
     await refreshAdmin();
   } catch(e) {
@@ -1103,6 +1192,7 @@ async function checkAndDeletePair(id1, id2, btn) {
     btn.textContent = "ລຶບ"; btn.disabled = false;
   }
 }
+
 
 function calcStorage(records) {
   // Estimate DB size: each record ~500 bytes base + image size
@@ -1163,13 +1253,15 @@ function renderAdmin() {
   const pending=adminRecords.filter(r=>!r.verified).length;
   const totalLAK=filtered.filter(r=>!r.currency||r.currency==="LAK").reduce((s,r)=>s+r.amount,0);
   const totalTHB=filtered.filter(r=>r.currency==="THB").reduce((s,r)=>s+r.amount,0);
+  const totalUSD=filtered.filter(r=>r.currency==="USD").reduce((s,r)=>s+r.amount,0);
 
   const byDept=DEPTS.map(d=>{
     const rows=filtered.filter(r=>r.department===d.id);
     const lak=rows.filter(r=>!r.currency||r.currency==="LAK").reduce((s,r)=>s+r.amount,0);
     const thb=rows.filter(r=>r.currency==="THB").reduce((s,r)=>s+r.amount,0);
-    return {...d,lak,thb,count:rows.length};
-  }).filter(d=>d.lak>0||d.thb>0);
+    const usd=rows.filter(r=>r.currency==="USD").reduce((s,r)=>s+r.amount,0);
+    return {...d,lak,thb,usd,count:rows.length};
+  }).filter(d=>d.lak>0||d.thb>0||d.usd>0);
 
   const months = getAvailableMonths();
   const {y:ny, m:nm} = nowYearMonth();
@@ -1198,6 +1290,7 @@ function renderAdmin() {
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
             ${d.lak>0?`<span style="font-weight:700;font-size:13px;color:${d.color}">${fmtKIP(d.lak)}</span>`:""}
             ${d.thb>0?`<span style="font-weight:700;font-size:13px;color:#2980b9">${fmtTHB(d.thb)}</span>`:""}
+            ${d.usd>0?`<span style="font-weight:700;font-size:13px;color:#27ae60">${fmtUSD(d.usd)}</span>`:""}
             <span style="font-size:11px;color:#aaa">${d.count} ລາຍການ</span>
           </div>
         </div>`;
@@ -1229,7 +1322,8 @@ function renderAdmin() {
       <div class="total-label">${tabLabel}</div>
       <div class="total-amount">${totalLAK>0?fmtKIP(totalLAK):""}</div>
       <div class="total-amount2">${totalTHB>0?fmtTHB(totalTHB):""}</div>
-      ${totalLAK===0&&totalTHB===0?`<div class="total-amount">${fmtKIP(0)}</div>`:""}
+      <div class="total-amount3">${totalUSD>0?fmtUSD(totalUSD):""}</div>
+      ${totalLAK===0&&totalTHB===0&&totalUSD===0?`<div class="total-amount">${fmtKIP(0)}</div>`:""}
       <div class="total-count">${filtered.length} ລາຍການ | ທັງໝົດໃນລະບົບ ${adminRecords.length} ລາຍການ</div>
       ${!isOwner&&pending>0?`<span class="pending-badge">⏳ ລໍ້ຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
     </div>
@@ -1444,7 +1538,7 @@ async function doBackup() {
   const d = new Date();
   const dateStr = d.toLocaleDateString("lo-LA",{day:"2-digit",month:"long",year:"numeric"});
   let lines = ["═══════════════════════","  ງານເງິນຮ້ານດາວອນ",`  ວັນທີ: ${dateStr}`,"═══════════════════════",""];
-  let tLAK=0, tTHB=0;
+  let tLAK=0, tTHB=0, tUSD=0;
   filtered.forEach((r,i)=>{
     const dt = new Date(r.timestamp);
     const time = dt.toLocaleTimeString("lo-LA",{hour:"2-digit",minute:"2-digit"});
@@ -1453,11 +1547,12 @@ async function doBackup() {
     if(r.note) lines.push(`   👤 ${r.note}`);
     lines.push(`   💰 ${fmtAmt(r.amount,r.currency||"LAK")}`);
     lines.push(`   🕐 ${dateR} ${time}`,"");
-    if(r.currency==="THB") tTHB+=r.amount; else tLAK+=r.amount;
+    if(r.currency==="THB") tTHB+=r.amount; else if(r.currency==="USD") tUSD+=r.amount; else tLAK+=r.amount;
   });
   lines.push("───────────────────────","  ສະຫຼຸບຍອດລວມ");
   if(tLAK>0) lines.push(`  💵 ${fmtKIP(tLAK)}`);
   if(tTHB>0) lines.push(`  💵 ${fmtTHB(tTHB)}`);
+  if(tUSD>0) lines.push(`  💵 ${fmtUSD(tUSD)}`);
   lines.push(`  📋 ທັງໝົດ ${filtered.length} ລາຍການ`,"═══════════════════════");
   const text = lines.join("\n");
   const overlay = document.createElement("div");
@@ -1547,85 +1642,122 @@ async function removeBankDeposit(id) {
   } catch(e) { alert("ລຶບບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
 
+// Staff bank deposits are tagged by a "S|" prefix in the note (so we know the money
+// went straight to the boss). Admin deposits have a plain note.
+function isStaffDeposit(d) { return !!(d && d.note && d.note.indexOf("S|") === 0); }
+function depDisplayNote(d) { return isStaffDeposit(d) ? d.note.slice(2) : (d.note || ""); }
+
 function calcCashBalance(records, currency) {
-  // Total received (verified records only for owner, all for admin)
-  const isOwner = state.mode === "owner";
-  const src = isOwner ? records.filter(r => r.verified) : records;
-  const totalIn = src.filter(r => (r.currency||"LAK") === currency).reduce((s,r) => s+r.amount, 0);
+  // ALL cash records count as "with the receiver" — even pending ones, because the
+  // money is physically with the receiver while awaiting approval.
+  const cashRecords = records.filter(r => (r.currency||"LAK") === currency).reduce((s,r) => s+r.amount, 0);
   const deposits = getBankDeposits().filter(d => d.currency === currency);
-  const totalOut = deposits.reduce((s,d) => s+d.amount, 0);
-  return { totalIn, totalOut, balance: totalIn - totalOut };
+  const staffDep = deposits.filter(isStaffDeposit).reduce((s,d) => s+d.amount, 0);   // went straight to boss
+  const adminDep = deposits.filter(d => !isStaffDeposit(d)).reduce((s,d) => s+d.amount, 0); // receiver banked it
+  const withAdmin = cashRecords - adminDep;   // cash on hand with receiver, not yet banked
+  const toBoss = adminDep + staffDep;          // everything that reached the boss's bank account
+  const grand = cashRecords + staffDep;        // = withAdmin + toBoss
+  return {
+    cashRecords, staffDep, adminDep, withAdmin, toBoss, grand,
+    balance: withAdmin,                       // admin deposit ceiling = cash on hand
+    totalIn: cashRecords, totalBank: toBoss   // legacy aliases
+  };
 }
 
 function bankCashSummaryHTML(records) {
   const lakBal = calcCashBalance(records, "LAK");
   const thbBal = calcCashBalance(records, "THB");
+  const usdBal = calcCashBalance(records, "USD");
   const deposits = getBankDeposits();
 
   let rowsHTML = "";
-  if (lakBal.totalIn > 0 || lakBal.totalOut > 0) {
+  if (lakBal.cashRecords > 0 || lakBal.toBoss > 0) {
     rowsHTML += `
       <div class="cash-row">
-        <span class="cash-row-label">🇱🇦 ຮັບເງິນສົດກີບ</span>
-        <span class="cash-row-value green">${fmtKIP(lakBal.totalIn)}</span>
+        <span class="cash-row-label">💰 ເງິນສົດຄ້າງ (ກີບ) <span style="font-size:10px;color:rgba(255,255,255,0.35)">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
+        <span class="cash-row-value gold">${fmtKIP(lakBal.withAdmin)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label">🏦 ມອບທະນາຄານ (ກີບ)</span>
-        <span class="cash-row-value red">- ${fmtKIP(lakBal.totalOut)}</span>
+        <span class="cash-row-label">🏦 ເຂົ້າບັນຊີຫົວໜ້າ (ກີບ)</span>
+        <span class="cash-row-value blue">${fmtKIP(lakBal.toBoss)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#fff">💵 ເງິນສົດກີບເຫຼືອ</span>
-        <span class="cash-row-value gold">${fmtKIP(lakBal.balance)}</span>
+        <span class="cash-row-label" style="font-weight:700;color:#fff">📊 ຍອດລວມທັງໝົด (ກີບ)</span>
+        <span class="cash-row-value green">${fmtKIP(lakBal.grand)}</span>
       </div>`;
   }
-  if (thbBal.totalIn > 0 || thbBal.totalOut > 0) {
+  if (thbBal.cashRecords > 0 || thbBal.toBoss > 0) {
     rowsHTML += `
-      <div class="cash-row" style="margin-top:8px">
-        <span class="cash-row-label">🇹🇭 ຮັບເງິນສົດບາດ</span>
-        <span class="cash-row-value blue">${fmtTHB(thbBal.totalIn)}</span>
+      <div class="cash-row" style="margin-top:14px">
+        <span class="cash-row-label">💰 ເງິນສົດຄ້າງ (ບາດ) <span style="font-size:10px;color:rgba(255,255,255,0.35)">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
+        <span class="cash-row-value gold">${fmtTHB(thbBal.withAdmin)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label">🏦 ມອບທະນາຄານ (ບາດ)</span>
-        <span class="cash-row-value red">- ${fmtTHB(thbBal.totalOut)}</span>
+        <span class="cash-row-label">🏦 ເຂົ້າບັນຊີຫົວໜ້າ (ບາດ)</span>
+        <span class="cash-row-value blue">${fmtTHB(thbBal.toBoss)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#fff">💵 ເງິນສົດບາດເຫຼືອ</span>
-        <span class="cash-row-value gold">${fmtTHB(thbBal.balance)}</span>
+        <span class="cash-row-label" style="font-weight:700;color:#fff">📊 ຍອດລວມທັງໝົด (ບາດ)</span>
+        <span class="cash-row-value green">${fmtTHB(thbBal.grand)}</span>
+      </div>`;
+  }
+  if (usdBal.cashRecords > 0 || usdBal.toBoss > 0) {
+    rowsHTML += `
+      <div class="cash-row" style="margin-top:14px">
+        <span class="cash-row-label">💰 ເງິນສົດຄ້າງ (USD) <span style="font-size:10px;color:rgba(255,255,255,0.35)">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
+        <span class="cash-row-value gold">${fmtUSD(usdBal.withAdmin)}</span>
+      </div>
+      <div class="cash-row">
+        <span class="cash-row-label">🏦 ເຂົ້າບັນຊີຫົວໜ້າ (USD)</span>
+        <span class="cash-row-value blue">${fmtUSD(usdBal.toBoss)}</span>
+      </div>
+      <div class="cash-row">
+        <span class="cash-row-label" style="font-weight:700;color:#fff">📊 ຍອດລວມທັງໝົด (USD)</span>
+        <span class="cash-row-value green">${fmtUSD(usdBal.grand)}</span>
       </div>`;
   }
   if (!rowsHTML) {
     rowsHTML = `<div style="text-align:center;color:#888;padding:10px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`;
   }
 
-  // Recent deposit history (last 5)
+  // Recent deposit history (last 5) — show who deposited + clean note
   const recent = [...deposits].reverse().slice(0, 5);
   let histHTML = "";
   if (recent.length > 0) {
     histHTML = `<div style="margin-top:14px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:8px">ປະຫວັດການມອບ</div>
-      ${recent.map(dep => `
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:8px">ປະຫວັດການມອບເຂົ້າທະນາຄານ</div>
+      ${recent.map(dep => {
+        const note = depDisplayNote(dep);
+        const srcTag = isStaffDeposit(dep)
+          ? '<span style="font-size:10px;color:#2980b9;font-weight:700">👷 ພະນັກງານ → ບັນຊີຫົວໜ້າ</span>'
+          : '<span style="font-size:10px;color:#c9a84a;font-weight:700">👤 ຜູ້ຮັບ → ບັນຊີຫົວໜ້າ</span>';
+        return `
         <div class="bank-history-item">
           <div class="bank-history-left">
-            <span class="bank-history-amt" style="color:${dep.currency==="THB"?"#2980b9":"#27ae60"}">${dep.currency==="THB"?fmtTHB(dep.amount):fmtKIP(dep.amount)}</span>
-            ${dep.note ? `<span class="bank-history-note">📝 ${dep.note}</span>` : ""}
+            <span class="bank-history-amt" style="color:${dep.currency==="THB"?"#2980b9":dep.currency==="USD"?"#27ae60":"#27ae60"}">${fmtAmt(dep.amount, dep.currency||"LAK")}</span>
+            ${srcTag}
+            ${note ? `<span class="bank-history-note">📝 ${note}</span>` : ""}
+            ${dep.image ? `<div style="margin-top:6px"><img src="${dep.image}" style="max-width:100%;border-radius:8px;max-height:120px;object-fit:cover;cursor:pointer" onclick="showImgFull('${dep.image}')"></div>` : ""}
             <span class="bank-history-time">🕐 ${fmtDate(dep.ts)}</span>
           </div>
           <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}')">🗑</button>
-        </div>`).join("")}
+        </div>`;
+      }).join("")}
     </div>`;
   }
 
   return `<div class="cash-summary-card">
-    <div class="cash-summary-title">🏦 ສະຫຼຸບເງິນສົດ & ທະນາຄານ</div>
+    <div class="cash-summary-title">💰 ສະຫຼຸບເງິນ (ຄ້າງ / ເຂົ້າທະນາຄານ)</div>
     ${rowsHTML}
     ${histHTML}
-    <button class="btn-bank" style="margin-top:16px" onclick="openBankModal()">🏦 ບັນທຶກມອບທະນາຄານ</button>
+    <button class="btn-bank" style="margin-top:16px" onclick="openBankModal()">🏦 ບັນທຶກມອບທະນາຄານ (ຂອງຜູ້ຮັບ)</button>
   </div>`;
 }
 
 function openBankModal() {
   const lakBal = calcCashBalance(adminRecords, "LAK");
   const thbBal = calcCashBalance(adminRecords, "THB");
+  const usdBal = calcCashBalance(adminRecords, "USD");
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="bank-modal">
@@ -1633,6 +1765,7 @@ function openBankModal() {
     <div style="display:flex;gap:8px;margin-bottom:4px">
       <button id="cur-lak" class="cur-btn cur-active" onclick="setBankCur('LAK')">🇱🇦 ກີບ</button>
       <button id="cur-thb" class="cur-btn" onclick="setBankCur('THB')">🇹🇭 ບາດ</button>
+      <button id="cur-usd" class="cur-btn" onclick="setBankCur('USD')">🇺🇸 USD</button>
     </div>
     <div class="bank-modal-avail" id="bank-avail-box">
       <span>ເງິນສົດທີ່ມີ</span>
@@ -1664,17 +1797,26 @@ function openBankModal() {
   window._bankCur = "LAK";
   window._bankBalLAK = lakBal.balance;
   window._bankBalTHB = thbBal.balance;
+  window._bankBalUSD = usdBal.balance;
   setTimeout(() => { const i = document.getElementById("bank-amt-input"); if(i) i.focus(); }, 150);
+}
+
+function bankCurBadgeLabel(cur) { return cur==="THB" ? "ບາດ" : cur==="USD" ? "USD" : "ກີບ"; }
+function bankCurBalance(cur) {
+  if (cur==="THB") return window._bankBalTHB;
+  if (cur==="USD") return window._bankBalUSD;
+  return window._bankBalLAK;
 }
 
 function setBankCur(cur) {
   window._bankCur = cur;
   document.getElementById("cur-lak").className = "cur-btn" + (cur==="LAK"?" cur-active":"");
   document.getElementById("cur-thb").className = "cur-btn" + (cur==="THB"?" cur-active":"");
-  document.getElementById("bank-cur-badge").textContent = cur==="THB" ? "ບາດ" : "ກີບ";
-  const bal = cur==="THB" ? window._bankBalTHB : window._bankBalLAK;
+  document.getElementById("cur-usd").className = "cur-btn" + (cur==="USD"?" cur-active":"");
+  document.getElementById("bank-cur-badge").textContent = bankCurBadgeLabel(cur);
+  const bal = bankCurBalance(cur);
   const avail = document.getElementById("bank-avail-amt");
-  if(avail) avail.textContent = cur==="THB" ? fmtTHB(bal) : fmtKIP(bal);
+  if(avail) avail.textContent = fmtAmt(bal, cur);
   // Reset input
   const inp = document.getElementById("bank-amt-input");
   if(inp){ inp.value=""; }
@@ -1689,16 +1831,16 @@ function onBankAmtInput(el) {
   const digits = el.value.replace(/\D/g,"");
   el.value = fmtNum(digits);
   const num = digits ? parseInt(digits,10) : 0;
-  const bal = cur==="THB" ? window._bankBalTHB : window._bankBalLAK;
+  const bal = bankCurBalance(cur);
   const remain = bal - num;
   const preview = document.getElementById("bank-preview");
   const remainEl = document.getElementById("bank-remain");
   const errEl = document.getElementById("bank-err");
   const btn = document.getElementById("bank-confirm-btn");
   if(num > 0) {
-    preview.textContent = cur==="THB" ? fmtTHB(num) : fmtKIP(num);
+    preview.textContent = fmtAmt(num, cur);
     if(remain >= 0) {
-      remainEl.textContent = "ເງິນສົດເຫຼືອ: " + (cur==="THB" ? fmtTHB(remain) : fmtKIP(remain));
+      remainEl.textContent = "ເງິນສົດເຫຼືອ: " + fmtAmt(remain, cur);
       remainEl.style.color = remain > 0 ? "#aaa" : "#f39c12";
       errEl.textContent = "";
       btn.disabled = false;
@@ -1740,6 +1882,7 @@ async function confirmBankDeposit(btn) {
   }
 }
 
+
 async function deleteBankDeposit(id) {
   // Optimistic update: remove from cache immediately
   if (_bankDepositsCache) {
@@ -1753,6 +1896,134 @@ async function deleteBankDeposit(id) {
     await fetchBankDeposits();
     renderAdmin();
   }
+}
+
+let _staffBankCur = "LAK";
+let _staffBankImg = null;
+function renderStaffBankForm() {
+  const d = staffState.dept;
+  const app = document.getElementById("app");
+  const header = app.querySelector(".header");
+  app.innerHTML = "";
+  if (header) app.appendChild(header);
+  const chip = d && DEPT_IMGS[d.id]
+    ? '<img src="'+DEPT_IMGS[d.id]+'" alt="" style="width:42px;height:42px;border-radius:12px;object-fit:cover">'
+    : '<span style="font-size:30px">'+((d&&d.icon)||"📦")+'</span>';
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="background:#08080f;padding:22px 18px 100px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      ${chip}
+      <div><div style="font-size:16px;font-weight:700;color:#fff">🏦 ມອບເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:rgba(255,255,255,0.4)">${d?d.name:""}</div></div>
+    </div>
+    <div style="background:rgba(41,128,185,0.08);border:1px solid rgba(41,128,185,0.22);border-radius:12px;padding:11px 14px;font-size:12px;color:#7fb3e0;margin-bottom:20px;line-height:1.5">ℹ️ ເງິນກ້ອນນີ້ຈະເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ (ນັບເປັນຍອດ “ເຂົ້າບັນຊີຫົວໜ້າ”)</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="scur-lak" class="cur-btn cur-active" onclick="setStaffBankCur('LAK')">🇱🇦 ກີບ</button>
+      <button id="scur-thb" class="cur-btn" onclick="setStaffBankCur('THB')">🇹🇭 ບາດ</button>
+      <button id="scur-usd" class="cur-btn" onclick="setStaffBankCur('USD')">🇺🇸 USD</button>
+    </div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px">ຈຳນວນທີ່ມອບ</div>
+    <div class="bank-input-wrap">
+      <input type="text" inputmode="numeric" placeholder="0" id="sbank-amt" oninput="onStaffBankInput(this)" autofocus>
+      <span id="sbank-badge">ກີບ</span>
+    </div>
+    <div id="sbank-preview" style="font-size:15px;font-weight:700;color:#27ae60;margin-top:8px;min-height:22px"></div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 8px">ໝາຍເຫດ (ຊື່ທະນາຄານ / ຜູ້ມອບ)</div>
+    <div class="bank-note-wrap">
+      <input type="text" placeholder="ເຊັ່ນ: BCEL, ທ້າວ x ນຳໄປຝາກ..." id="sbank-note">
+    </div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 8px">📎 ຮູບໃບໂອນ / ສະລິບ (ຖ້ານ)</div>
+    <input type="file" id="sbank-file" accept="image/*" capture="environment" class="hidden" onchange="onStaffBankFileChange(this)">
+    <div id="sbank-photo-zone"></div>
+    <div id="sbank-err" style="color:#e74c3c;font-size:12px;min-height:16px;text-align:center;margin-top:10px"></div>
+    <button class="btn-bank-confirm" style="width:100%;margin-top:18px" id="sbank-confirm" onclick="confirmStaffBank(this)" disabled>✅ ຢືນຢັນມອບເຂົ້າທະນາຄານ</button>
+  </div>`);
+  setTimeout(() => {
+    const i = document.getElementById("sbank-amt"); if (i) i.focus();
+    renderSbankPhotoZone();
+  }, 150);
+}
+
+function renderSbankPhotoZone() {
+  const zone = document.getElementById("sbank-photo-zone");
+  if (!zone) return;
+  if (_staffBankImg) {
+    zone.innerHTML = '<div class="img-preview-wrap" style="border-radius:12px;overflow:hidden">'
+      + '<img src="'+_staffBankImg+'" style="width:100%;display:block;border-radius:12px">'
+      + '<button class="rephoto-btn" onclick="document.getElementById("sbank-file").click()">📷 ຖ່າຍໃໝ່</button>'
+      + '</div>';
+  } else {
+    zone.innerHTML = '<div class="photo-zone-pro" onclick="document.getElementById("sbank-file").click()">'
+      + '<div class="photo-icon-pro"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'
+      + '<div class="photo-text-pro">ຖ່າຍຮູບໃບໂອນ / ສະລິບ</div>'
+      + '<div class="photo-sub-pro">JPG, PNG · ຂະໜາດສູງສຸດ 5MB</div>'
+      + '</div>';
+  }
+}
+
+function onStaffBankFileChange(el) {
+  const file = el.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = async ev => {
+    _staffBankImg = await compressImg(ev.target.result);
+    renderSbankPhotoZone();
+  };
+  r.readAsDataURL(file);
+}
+
+function setStaffBankCur(cur) {
+  _staffBankCur = cur;
+  document.getElementById("scur-lak").className = "cur-btn" + (cur === "LAK" ? " cur-active" : "");
+  document.getElementById("scur-thb").className = "cur-btn" + (cur === "THB" ? " cur-active" : "");
+  document.getElementById("scur-usd").className = "cur-btn" + (cur === "USD" ? " cur-active" : "");
+  document.getElementById("sbank-badge").textContent = cur === "THB" ? "ບາດ" : cur === "USD" ? "USD" : "ກີບ";
+  onStaffBankInput(document.getElementById("sbank-amt"));
+}
+
+function onStaffBankInput(el) {
+  const digits = el.value.replace(/\D/g, "");
+  el.value = fmtNum(digits);
+  const num = digits ? parseInt(digits, 10) : 0;
+  const preview = document.getElementById("sbank-preview");
+  const btn = document.getElementById("sbank-confirm");
+  if (num > 0) {
+    preview.textContent = fmtAmt(num, _staffBankCur);
+    btn.disabled = false;
+  } else {
+    preview.textContent = "";
+    btn.disabled = true;
+  }
+}
+
+async function confirmStaffBank(btn) {
+  const digits = (document.getElementById("sbank-amt").value || "").replace(/\D/g, "");
+  const num = digits ? parseInt(digits, 10) : 0;
+  if (num <= 0) return;
+  const userNote = (document.getElementById("sbank-note").value || "").trim();
+  const deptName = staffState.dept ? staffState.dept.name : "";
+  // "S|" prefix marks a STAFF deposit (money went straight to the boss); dept name records the source
+  const note = "S|" + deptName + (userNote ? " · " + userNote : "");
+  btn.disabled = true; btn.textContent = "⏳ ກຳລັງບັນທຶກ...";
+  const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: _staffBankCur, note, image: _staffBankImg || null };
+  try {
+    await addBankDeposit(dep);
+    if (navigator.vibrate) navigator.vibrate(80);
+    _staffBankImg = null;
+    showStaffBankDone(num, _staffBankCur);
+  } catch {
+    btn.disabled = false; btn.textContent = "✅ ຢືນຢັນມອບເຂົ້າທະນາຄານ";
+  }
+}
+
+function showStaffBankDone(num, cur) {
+  const app = document.getElementById("app");
+  const header = app.querySelector(".header");
+  app.innerHTML = "";
+  if (header) app.appendChild(header);
+  app.insertAdjacentHTML("beforeend", `<div class="center"><div class="done-box">
+    <div class="done-check" style="background:#1a5276">🏦</div>
+    <div class="done-title">ມອບເຂົ້າທະນາຄານສຳເລັດ!</div>
+    <div class="done-amount ${cur === "THB" ? "thb" : cur === "USD" ? "usd" : ""}">${fmtAmt(num, cur)}</div>
+    <button class="btn-green" onclick="backToDept()" style="margin-bottom:0">ກັບໜ້າຫຼັກ</button>
+  </div></div>`);
 }
 
 let isDark = localStorage.getItem("dv_theme") !== "light";
@@ -1777,6 +2048,15 @@ document.body.appendChild(themeBtn);
 
 applyTheme();
 render();
+
+function showImgFull(src) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px";
+  overlay.innerHTML = '<img src="'+src+'" style="max-width:100%;max-height:90vh;border-radius:12px;object-fit:contain">'
+    + '<button onclick="this.parentNode.remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;width:44px;height:44px;border-radius:50%;cursor:pointer">✕</button>';
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
 </script>
 </body>
 </html>
