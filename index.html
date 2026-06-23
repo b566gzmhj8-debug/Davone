@@ -1629,7 +1629,17 @@ function getBankDeposits() {
 async function addBankDeposit(dep) {
   try {
     const { error } = await getSupa().from("bank_deposits").insert([dep]);
-    if (error) throw error;
+    if (error) {
+      // If 'image' column doesn't exist yet, retry without image
+      if (error.message && error.message.includes("image")) {
+        const { image, ...depNoImg } = dep;
+        const { error: e2 } = await getSupa().from("bank_deposits").insert([depNoImg]);
+        if (e2) throw e2;
+        if (image) alert("⚠️ ບັນທຶກສຳເລັດ ແຕ່ຮູບບໍ່ໄດ້ຖືກບັນທຶກ\nກະລຸນາເພີ່ມ column \'image text\' ໃນຕາຕະລາງ bank_deposits ໃນ Supabase");
+      } else {
+        throw error;
+      }
+    }
     _bankDepositsCache = null; // invalidate cache
   } catch(e) { alert("ບັນທຶກບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
