@@ -13,6 +13,7 @@
     --hair:rgba(28,36,48,.14);
   }
   *{box-sizing:border-box;}
+  html,body{touch-action:manipulation;}
   body{margin:0;font-family:'Inter',sans-serif;background:var(--ivory);color:var(--ink);}
   .serif{font-family:'Playfair Display',serif;}
 
@@ -21,7 +22,7 @@
     min-height:100vh;background:var(--navy);padding:32px 24px;position:relative;}
   #login-wrap::before, #login-wrap::after{content:"";position:absolute;left:50%;transform:translateX(-50%);
     width:min(360px,80%);height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-  #login-wrap::before{top:8%;} #login-wrap::after{bottom:8%;}
+  #login-wrap::before{top:20px;} #login-wrap::after{bottom:20px;}
   .crest{width:112px;height:112px;border:2px solid var(--gold);border-radius:50%;display:flex;
     align-items:center;justify-content:center;margin-bottom:18px;overflow:hidden;background:#0d1730;
     box-shadow:0 0 0 6px rgba(169,131,75,.12);}
@@ -29,8 +30,8 @@
   #login-wrap h1{color:#f3ead2;font-size:1.05rem;font-weight:600;margin:0 0 6px;text-align:center;
     letter-spacing:.02em;line-height:1.55;max-width:340px;}
   #login-wrap .sub{color:rgba(233,221,196,.55);font-size:.78rem;margin:0 0 30px;letter-spacing:.05em;}
-  .pin-dots{display:flex;gap:16px;margin-bottom:10px;}
-  .pin-dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);background:transparent;transition:.2s;}
+  .pin-dots{display:flex;gap:22px;margin-bottom:16px;}
+  .pin-dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--gold);background:transparent;transition:.2s;}
   .pin-dot.filled{background:var(--gold);}
   .pin-dot.err{background:#a8544a;border-color:#a8544a;}
   .pin-err{color:#d8a596;font-size:.8rem;min-height:1.2em;margin-bottom:14px;letter-spacing:.03em;}
@@ -77,6 +78,15 @@
     padding:8px 16px;font-weight:600;font-size:.78rem;font-family:'Inter',sans-serif;letter-spacing:.02em;}
   .module-bar .mtitle{color:#f3ead2;font-size:.85rem;opacity:.9;font-family:'Playfair Display',serif;}
   #module-frame{width:100%;height:calc(100% - 50px);border:none;background:#fff;}
+
+  /* ---------- DESKTOP / MacBook (mouse & trackpad) ---------- */
+  .pin-key,.logout-btn,.back-btn{cursor:pointer;}
+  @media (hover:hover) and (pointer:fine){
+    .pin-key:not(.empty):hover{background:rgba(233,221,196,.08);border-color:rgba(233,221,196,.5);}
+    .row:hover{background:rgba(169,131,75,.05);}
+    .logout-btn:hover{background:rgba(233,221,196,.08);}
+    .back-btn:hover{filter:brightness(1.08);}
+  }
 </style>
 </head>
 <body>
@@ -148,13 +158,13 @@ function renderPinGrid(){
 function renderDots(err){
   const dots = document.getElementById('pinDots');
   dots.innerHTML = "";
-  for(let i=0;i<6;i++){
+  for(let i=0;i<4;i++){
     const filled = i < pin.length;
     dots.innerHTML += `<div class="pin-dot ${filled?'filled':''} ${err?'err':''}"></div>`;
   }
 }
 function pinPress(d){
-  if(pin.length>=6) return;
+  if(pin.length>=4) return;
   pin += d;
   renderDots(false);
   document.getElementById('pinErr').innerHTML = "&nbsp;";
