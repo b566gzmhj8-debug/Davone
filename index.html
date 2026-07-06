@@ -1334,7 +1334,7 @@ function renderAdmin() {
     </div>
     ${storageHTML(adminRecords)}
     ${bankCashSummaryHTML(adminRecords)}
-    ${bankHistoryCardHTML()}
+    <button class="btn-bank" style="margin-top:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15)" onclick="openBankHistoryModal()">📜 ປະຫວັດການມອບເຂົ້າບັນຊີ (${getBankDeposits().length})</button>
     <div class="tabs">
       <button class="tab ${adminTab==="today"?"active":""}" data-tab="today" onclick="setTab('today')">ມື້ນີ້</button>
       <button class="tab ${adminTab==="month"?"active":""}" data-tab="month" onclick="setTab('month')">ເດືອນ</button>
@@ -1770,6 +1770,21 @@ function bankHistoryCardHTML() {
     </div>`;
   }
   return html;
+}
+
+function openBankHistoryModal() {
+  const inner = bankHistoryCardHTML();
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `<div class="bank-modal" style="max-height:85vh;overflow-y:auto">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center">
+      <span class="bank-modal-title" style="margin:0">📜 ປະຫວັດການມອບເຂົ້າບັນຊີ</span>
+      <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
+    </div>
+    ${inner || `<div style="text-align:center;color:#888;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
+  </div>`;
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
 }
 
 function openBankModal() {
