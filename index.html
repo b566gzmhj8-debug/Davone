@@ -50,6 +50,7 @@
   body.light .backup-modal { background:#fff !important; color:#1a1a1a !important; }
   body.light .modal-info { color:#444 !important; }
   body.light .cash-summary-card { background:rgba(39,174,96,0.06) !important; border-color:rgba(39,174,96,0.2) !important; }
+  body.light .bank-history-card { background:#fff !important; border-color:rgba(0,0,0,0.08) !important; }
   body.light .bank-history-item { background:#fff !important; border-color:rgba(0,0,0,0.06) !important; }
   body.light .bank-modal { background:#fff !important; color:#1a1a1a !important; border-color:rgba(41,128,185,0.2) !important; }
   body.light .bank-input-wrap { background:#f5f5f5 !important; border-color:rgba(41,128,185,0.3) !important; }
@@ -269,6 +270,10 @@
 
   /* BANK DEPOSIT */
   .cash-summary-card { background:linear-gradient(135deg,#0d3320,#0a2a1a); border:1.5px solid rgba(39,174,96,0.3); border-radius:18px; padding:18px 20px; margin-bottom:14px; }
+  .bank-history-card { background:#12121e; border:1.5px solid rgba(255,255,255,0.08); border-radius:18px; padding:18px 20px; margin-bottom:14px; }
+  .bank-history-scroll { max-height:440px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:4px; margin-top:4px; }
+  .bank-history-scroll::-webkit-scrollbar { width:5px; }
+  .bank-history-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:3px; }
   .cash-summary-title { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(39,174,96,0.7); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
   .cash-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
   .cash-row:last-child { border-bottom:none; }
@@ -491,11 +496,11 @@ function compressImg(dataUrl) {
   return new Promise(res => {
     const i = new Image();
     i.onload = () => {
-      const MAX=500; let w=i.width,h=i.height;
+      const MAX=1280; let w=i.width,h=i.height;
       if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
       const c=document.createElement("canvas");c.width=w;c.height=h;
       c.getContext("2d").drawImage(i,0,0,w,h);
-      res(c.toDataURL("image/jpeg",0.4));
+      res(c.toDataURL("image/jpeg",0.72));
     };
     i.onerror=()=>res(null); i.src=dataUrl;
   });
@@ -1329,6 +1334,7 @@ function renderAdmin() {
     </div>
     ${storageHTML(adminRecords)}
     ${bankCashSummaryHTML(adminRecords)}
+    ${bankHistoryCardHTML()}
     <div class="tabs">
       <button class="tab ${adminTab==="today"?"active":""}" data-tab="today" onclick="setTab('today')">ມື້ນີ້</button>
       <button class="tab ${adminTab==="month"?"active":""}" data-tab="month" onclick="setTab('month')">ເດືອນ</button>
@@ -1720,38 +1726,50 @@ function bankCashSummaryHTML(records) {
     rowsHTML = `<div style="text-align:center;color:#888;padding:10px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`;
   }
 
-  // Recent deposit history (last 5) — show who deposited + clean note
-  const recent = deposits.slice(0, 5); // deposits already newest-first
-  let histHTML = "";
-  if (recent.length > 0) {
-    histHTML = `<div style="margin-top:14px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:8px">ປະຫວັດການມອບເຂົ້າທະນາຄານ</div>
-      ${recent.map(dep => {
-        const note = depDisplayNote(dep);
-        const srcTag = isStaffDeposit(dep)
-          ? '<span style="font-size:10px;color:#2980b9;font-weight:700">👷 ພະນັກງານ → ບັນຊີຫົວໜ້າ</span>'
-          : '<span style="font-size:10px;color:#c9a84a;font-weight:700">👤 ຜູ້ຮັບ → ບັນຊີຫົວໜ້າ</span>';
-        return `
-        <div class="bank-history-item">
-          <div class="bank-history-left">
-            <span class="bank-history-amt" style="color:${dep.currency==="THB"?"#2980b9":dep.currency==="USD"?"#27ae60":"#27ae60"}">${fmtAmt(dep.amount, dep.currency||"LAK")}</span>
-            ${srcTag}
-            ${note ? `<span class="bank-history-note">📝 ${note}</span>` : ""}
-            ${dep.image ? `<div style="margin-top:6px"><img src="${dep.image}" style="max-width:100%;border-radius:8px;max-height:120px;object-fit:cover;cursor:pointer" onclick="showImgFull('${dep.image}')"></div>` : ""}
-            <span class="bank-history-time">🕐 ${fmtDate(dep.ts)}</span>
-          </div>
-          <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}')">🗑</button>
-        </div>`;
-      }).join("")}
-    </div>`;
-  }
-
   return `<div class="cash-summary-card">
     <div class="cash-summary-title">💰 ສະຫຼຸບເງິນ (ຄ້າງ / ເຂົ້າທະນາຄານ)</div>
     ${rowsHTML}
-    ${histHTML}
     <button class="btn-bank" style="margin-top:16px" onclick="openBankModal()">🏦 ບັນທຶກມອບທະນາຄານ (ຂອງຜູ້ຮັບ)</button>
   </div>`;
+}
+
+// Two separate, independently-scrollable cards — one for money staff handed straight
+// to the boss's account, one for money the receiver banked themself. Kept apart so
+// the two sources never blur together.
+function bankHistoryItemHTML(dep) {
+  const note = depDisplayNote(dep);
+  return `
+    <div class="bank-history-item">
+      <div class="bank-history-left">
+        <span class="bank-history-amt" style="color:${dep.currency==="THB"?"#2980b9":dep.currency==="USD"?"#27ae60":"#27ae60"}">${fmtAmt(dep.amount, dep.currency||"LAK")}</span>
+        ${note ? `<span class="bank-history-note">📝 ${note}</span>` : ""}
+        ${dep.image ? `<div style="margin-top:6px"><img src="${dep.image}" style="max-width:100%;border-radius:8px;max-height:170px;object-fit:cover;cursor:zoom-in" onclick="showImgFull('${dep.image}')"></div>` : ""}
+        <span class="bank-history-time">🕐 ${fmtDate(dep.ts)}</span>
+      </div>
+      <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}')">🗑</button>
+    </div>`;
+}
+
+function bankHistoryCardHTML() {
+  const deposits = getBankDeposits(); // already newest-first
+  if (!deposits.length) return "";
+  const staffDeps = deposits.filter(isStaffDeposit);
+  const adminDeps = deposits.filter(d => !isStaffDeposit(d));
+
+  let html = "";
+  if (staffDeps.length) {
+    html += `<div class="bank-history-card">
+      <div class="cash-summary-title">👷 ປະຫວັດພະນັກງານມອບ → ບັນຊີຫົວໜ້າ (${staffDeps.length})</div>
+      <div class="bank-history-scroll">${staffDeps.map(bankHistoryItemHTML).join("")}</div>
+    </div>`;
+  }
+  if (adminDeps.length) {
+    html += `<div class="bank-history-card">
+      <div class="cash-summary-title">👤 ປະຫວັດຜູ້ຮັບມອບເຂົ້າທະນາຄານ (${adminDeps.length})</div>
+      <div class="bank-history-scroll">${adminDeps.map(bankHistoryItemHTML).join("")}</div>
+    </div>`;
+  }
+  return html;
 }
 
 function openBankModal() {
@@ -2051,9 +2069,20 @@ render();
 
 function showImgFull(src) {
   const overlay = document.createElement("div");
-  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px";
-  overlay.innerHTML = '<img src="'+src+'" style="max-width:100%;max-height:90vh;border-radius:12px;object-fit:contain">'
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow:hidden";
+  overlay.innerHTML = '<div class="zoom-wrap" style="width:100%;height:85vh;overflow:auto;display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch">'
+    + '<img src="'+src+'" class="zoom-img" style="max-width:100%;border-radius:12px;transition:transform .15s;transform-origin:top center;cursor:zoom-in">'
+    + '</div>'
+    + '<div style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:8px">👆 ແຕະຮູບເພື່ອຂະຫຍາຍ · ລູບເພື່ອເລື່ອນ</div>'
     + '<button onclick="this.parentNode.remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;width:44px;height:44px;border-radius:50%;cursor:pointer">✕</button>';
+  const img = overlay.querySelector(".zoom-img");
+  let zoomed = false;
+  img.onclick = e => {
+    e.stopPropagation();
+    zoomed = !zoomed;
+    img.style.transform = zoomed ? "scale(2.4)" : "scale(1)";
+    img.style.cursor = zoomed ? "zoom-out" : "zoom-in";
+  };
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
   document.body.appendChild(overlay);
 }
