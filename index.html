@@ -1629,17 +1629,7 @@ function getBankDeposits() {
 async function addBankDeposit(dep) {
   try {
     const { error } = await getSupa().from("bank_deposits").insert([dep]);
-    if (error) {
-      // If 'image' column doesn't exist yet, retry without image
-      if (error.message && error.message.includes("image")) {
-        const { image, ...depNoImg } = dep;
-        const { error: e2 } = await getSupa().from("bank_deposits").insert([depNoImg]);
-        if (e2) throw e2;
-        if (image) alert("⚠️ ບັນທຶກສຳເລັດ ແຕ່ຮູບບໍ່ໄດ້ຖືກບັນທຶກ\nກະລຸນາເພີ່ມ column \'image text\' ໃນຕາຕະລາງ bank_deposits ໃນ Supabase");
-      } else {
-        throw error;
-      }
-    }
+    if (error) throw error;
     _bankDepositsCache = null; // invalidate cache
   } catch(e) { alert("ບັນທຶກບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
@@ -1731,7 +1721,7 @@ function bankCashSummaryHTML(records) {
   }
 
   // Recent deposit history (last 5) — show who deposited + clean note
-  const recent = [...deposits].reverse().slice(0, 5);
+  const recent = deposits.slice(0, 5); // deposits already newest-first
   let histHTML = "";
   if (recent.length > 0) {
     histHTML = `<div style="margin-top:14px">
