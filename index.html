@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ລະບົບການເງິນຮ້ານດາວອນ</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Lao:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -344,7 +342,7 @@
   .dept-chip-tag { font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.5;margin-top:2px; }
   .chip-dot { margin-left:auto;width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor; }
   .field-group-pro { display:flex;flex-direction:column;gap:8px; }
-  .field-label-pro { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a89f88;display:flex;align-items:center;gap:6px; }
+  .field-label-pro { font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px; }
   .input-wrap-pro { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;display:flex;align-items:center;gap:10px;transition:border-color 0.2s,box-shadow 0.2s; }
   .input-wrap-pro:focus-within { border-color:rgba(212,175,55,0.4);box-shadow:0 0 0 3px rgba(212,175,55,0.08); }
   .input-wrap-pro.lak:focus-within { border-color:rgba(230,126,34,0.4);box-shadow:0 0 0 3px rgba(230,126,34,0.08); }
@@ -370,81 +368,6 @@
   .dept-header-pro .dh-title { font-size:18px;font-weight:700;color:#fff; }
   .dept-header-pro .dh-sub { font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;letter-spacing:1px;text-transform:uppercase; }
   .dept-list-wrap { padding:0 18px 40px;display:flex;flex-direction:column;gap:10px; }
-
-  /* ══════════════════════════════════════════════════════════
-     BANK LEDGER THEME — refinements on top of body.light
-     (cream / gold / navy, professional-document look)
-     ══════════════════════════════════════════════════════════ */
-  body.light { background:#FBF9F3 !important; }
-  body.light .app-title,
-  body.light .card-title,
-  body.light .pin-title,
-  body.light .dh-title,
-  body.light .header-title,
-  body.light .done-title,
-  body.light .total-label,
-  body.light .bank-modal-title { font-family:'Noto Serif Lao','Noto Sans Lao',serif !important; }
-
-  /* logo seal ring */
-  body.light .logo-ring { background:linear-gradient(145deg,rgba(138,96,16,0.22),rgba(138,96,16,0.04)) !important; box-shadow:0 0 0 1px rgba(138,96,16,0.35),0 8px 28px rgba(30,25,10,0.10) !important; }
-  body.light .app-sub { color:rgba(0,0,0,0.28) !important; letter-spacing:2.5px !important; }
-  body.light .home-bg-glow1 { background:radial-gradient(circle,rgba(201,162,39,0.14) 0%,transparent 70%) !important; }
-  body.light .home-bg-glow2 { background:radial-gradient(circle,rgba(27,42,74,0.06) 0%,transparent 70%) !important; }
-
-  /* role cards: flat bank-document card instead of glassy gradient */
-  body.light .home-card { border-radius:10px !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:0 2px 10px rgba(30,25,10,0.05) !important; }
-  body.light .home-card::after { display:none !important; }
-  body.light .home-card.hc-gold::before { background:#C9A227 !important; width:3px !important; }
-  body.light .home-card.hc-blue::before { background:#1B2A4A !important; width:3px !important; }
-  body.light .home-card.hc-ruby::before { background:#7c3030 !important; width:3px !important; }
-  body.light .hc-icon-box { border-radius:9px !important; }
-  body.light .home-card.hc-blue .hc-icon-box svg { stroke:#1B2A4A !important; }
-  body.light .home-card.hc-ruby .hc-icon-box svg { stroke:#7c3030 !important; }
-  body.light .card-sub { color:#a89f88 !important; }
-
-  /* header: cream with a thin gold hairline instead of solid black bar */
-  body.light .header { background:#FBF9F3 !important; border-bottom:1px solid #E4DBC0 !important; position:relative; box-shadow:none !important; }
-  body.light .header::before { content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8a6010,#c9a227 40%,#e8d38a 55%,#c9a227 70%,#8a6010); }
-  body.light .header-title { color:#232323 !important; }
-  body.light .header-back { color:#232323 !important; width:30px;height:30px;border-radius:50%;border:1px solid #E4DBC0;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px; }
-
-  /* PIN: circular keys, quiet numerals */
-  body.light .pin-title { color:#232323 !important; letter-spacing:0.3px; }
-  body.light .pin-dot { background:#E4DBC0 !important; }
-  body.light .pin-dot.filled { background:#8a6010 !important; }
-  body.light .pin-dot.error { background:#b0402f !important; }
-  body.light .pin-key { border-radius:50% !important; background:#fff !important; color:#232323 !important; border:1px solid #E4DBC0 !important; box-shadow:0 1px 4px rgba(30,25,10,0.05) !important; }
-  body.light .pin-key.del { background:#fdf6f4 !important; color:#b0402f !important; }
-
-  /* dept search + cards: crisper flat corners */
-  body.light .dept-search { border-radius:9px !important; }
-  body.light .dept-card { border-radius:9px !important; }
-  body.light .dept-card-img { border-radius:9px !important; }
-
-  /* form inputs: bank-slip flat fields */
-  body.light .input-wrap-pro { border-radius:9px !important; }
-  body.light .dept-chip { border-radius:9px !important; }
-  body.light .photo-zone-pro { border-radius:9px !important; }
-
-  /* done screens: ledger card with gold hairline + seal check */
-  body.light .done-box { border-radius:6px !important; border:1px solid #E4DBC0 !important; box-shadow:0 8px 28px rgba(30,25,10,0.10) !important; position:relative; }
-  body.light .done-box::before { content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#8a6010,#c9a227 40%,#e8d38a 55%,#c9a227 70%,#8a6010); }
-  body.light .done-check { background:#2d6a4f !important; border-radius:50% !important; box-shadow:0 0 0 4px rgba(45,106,79,0.12) !important; }
-  body.light .done-amount { color:#232323 !important; }
-
-  /* admin: dept summary + record cards as ledger rows */
-  body.light .dept-summary { border-radius:8px !important; border:1px solid #E4DBC0 !important; }
-  body.light .record-card { border-radius:8px !important; border:1px solid #E4DBC0 !important; box-shadow:0 2px 8px rgba(30,25,10,0.04) !important; }
-  body.light .storage-card { border-radius:8px !important; border:1px solid #E4DBC0 !important; }
-  body.light .tab { border-radius:8px !important; }
-  body.light .tab.active { background:#1B2A4A !important; border-color:#1B2A4A !important; }
-  body.light .verify-btn.done { background:#2d6a4f !important; }
-  body.light .status-done { background:#eaf3ee !important; color:#2d6a4f !important; }
-  body.light .status-wait { background:#faf1e0 !important; color:#8a6010 !important; }
-  body.light .pending-badge { background:rgba(138,96,16,0.14) !important; color:#8a6010 !important; }
-
-  /* theme toggle button: quiet ledger version */
-  .theme-btn.light { background:#fff !important; color:#8a6010 !important; border:1px solid #E4DBC0; box-shadow:0 2px 10px rgba(30,25,10,0.08); }
 </style>
 </head>
 <body>
@@ -471,18 +394,15 @@ const DEPT_IMGS = {
 };
 
 
-const CHECK_ICON = '<svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>';
-const WAIT_ICON = '<svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
-const BOX_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>';
 const DEPTS = [
-  { id:"spare_tractor", name:"ອາໄຫຼ່ ລົດແທັກເຕີ້", icon:null,  color:"#e67e22" },
-  { id:"spare_truck",   name:"ອາໄຫຼ່ ລົດໃຫຍ່",    icon:null,  color:"#8e44ad" },
+  { id:"spare_tractor", name:"ອາໄຫລ່ລົດແທັກເຕີ້", icon:null,  color:"#e67e22" },
+  { id:"spare_truck",   name:"ອາໄຫລ່ລົດໃຫຍ່",    icon:null,  color:"#8e44ad" },
   { id:"debt",          name:"ເງິນນຳໜີ້",         icon:null,  color:"#c0392b" },
   { id:"sell_sing",     name:"ເງິນຂາຍລົດຊິ້ງ",   icon:null,  color:"#2980b9" },
   { id:"sell_tractor",  name:"ເງິນຂາຍລົດແທັກເຕີ້",icon:null,  color:"#27ae60" },
   { id:"sell_plow",     name:"ເງິນຂາຍລົດໄຖນາ",   icon:null,  color:"#16a085" },
   { id:"sell_truck",    name:"ເງິນຂາຍລົດໃຫຍ່",    icon:null,  color:"#8e44ad" },
-  { id:"accessories",   name:"ຂາຍອຸປະກອນເສີມ",   icon:BOX_ICON,  color:"#d35400" },
+  { id:"accessories",   name:"ຂາຍອຸປະກອນເສີມ",   icon:"📦",  color:"#d35400" },
 ];
 
 let supa = null;
@@ -616,8 +536,8 @@ function render() {
   if (adminInterval) { clearInterval(adminInterval); adminInterval = null; }
   const app = document.getElementById("app");
   app.innerHTML = "";
-  if (state.pin==="admin") { app.innerHTML = pinHTML("ລະຫັດຜູ້ອານຸມັດ","admin"); return; }
-  if (state.pin==="owner") { app.innerHTML = pinHTML("ລະຫັດຫົວໜ້າ","owner"); return; }
+  if (state.pin==="admin") { app.innerHTML = pinHTML("🔐 ລະຫັດຜູ້ອານຸມັດ","admin"); return; }
+  if (state.pin==="owner") { app.innerHTML = pinHTML("🔐 ລະຫັດຫົວໜ້າ","owner"); return; }
   if (state.mode==="staff") {
     app.innerHTML = headerHTML("ສົ່ງຍອດ & ຖ່າຍຮູບບິນ");
     app.insertAdjacentHTML("beforeend", deptGridHTML());
@@ -626,7 +546,7 @@ function render() {
   if (state.mode==="admin"||state.mode==="owner") {
     // Owner always defaults to "all" tab to see all verified records
     if (state.mode==="owner" && adminTab==="today") adminTab="all";
-    app.innerHTML = headerHTML(state.mode==="owner"?"ຫົວໜ້າ — ເບິ່ງຍອດເງິນ":"ກຳລັງກວດສອບ") + adminLoadingHTML();
+    app.innerHTML = headerHTML(state.mode==="owner"?"👑 ຫົວໜ້າ — ເບິ່ງຍອດເງິນ":"🔍 ກຳລັງກວດສອບ") + adminLoadingHTML();
     loadAdmin();
     return;
   }
@@ -682,12 +602,12 @@ function homeHTML() {
       </button>
       <button class="home-card hc-blue" onclick="state.pin='admin';render()">
         <div class="hc-icon-box">${iconAdmin}</div>
-        <div class="hc-text"><div class="card-title">ຜູ້ອານຸມັດ</div><div class="card-sub">ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
+        <div class="hc-text"><div class="card-title">ຜູ້ອານຸມັດ</div><div class="card-sub">🔐 ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
         <div class="hc-arrow">${arrowBlue}</div>
       </button>
       <button class="home-card hc-ruby" onclick="state.pin='owner';render()">
         <div class="hc-icon-box">${iconOwner}</div>
-        <div class="hc-text"><div class="card-title">ຫົວໜ້າ</div><div class="card-sub">ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
+        <div class="hc-text"><div class="card-title">ຫົວໜ້າ</div><div class="card-sub">🔐 ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
         <div class="hc-arrow">${arrowRuby}</div>
       </button>
     </div>
@@ -771,7 +691,7 @@ function buildDeptRows(filter) {
       }
       const imgHTML = DEPT_IMGS[d.id]
         ? '<img src="'+DEPT_IMGS[d.id]+'" alt="">'
-        : '<span style="font-size:28px">'+(d.icon||BOX_ICON)+'</span>';
+        : '<span style="font-size:28px">'+(d.icon||"📦")+'</span>';
       rows += '<button class="dept-card" style="border-left:3px solid '+d.color+';box-shadow:inset 40px 0 40px -30px rgba('+rgb+',0.08)" onclick="selectDept(\''+d.id+'\')">'
         + '<div class="dept-card-img">'+imgHTML+'</div>'
         + '<div class="dept-card-text">'
@@ -792,7 +712,7 @@ function filterDepts() {
 
 function deptGridHTML() {
   return '<div class="dept-grid">'
-    + '<div class="dept-header-pro"><div><div class="dh-title">ເລືອກພະແນກ</div><div class="dh-sub">ເລືອກພະແນກກ່ອນ ແລ້ວເລືອກວິທີມອບ</div></div></div>'
+    + '<div class="dept-header-pro"><div><div class="dh-title">ເລືອກພະແນກ</div><div class="dh-sub">ເລືອກພະແນກກ່ອນ ແລ້ວເລືອกວິທີມອບ</div></div></div>'
     + '<div class="dept-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>'
     + '<input id="dept-search-input" type="text" placeholder="ຄົ້ນຫາພະແນກ..." oninput="filterDepts()" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:rgba(255,255,255,0.7);font-family:inherit" autocomplete="off" autocorrect="off"></div>'
     + '<div class="dept-list-wrap" id="dept-list-wrap">'+buildDeptRows('')+'</div>'
@@ -814,21 +734,21 @@ function renderMethodChoice() {
   const rgb = hexToRgb(d.color);
   const chip = DEPT_IMGS[d.id]
     ? '<img src="'+DEPT_IMGS[d.id]+'" alt="" style="width:52px;height:52px;border-radius:14px;object-fit:cover">'
-    : '<span style="font-size:34px">'+(d.icon||BOX_ICON)+'</span>';
-  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="padding:24px 18px">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px;padding:16px;background:rgba(${rgb},0.08);border:1px solid rgba(${rgb},0.25);border-radius:9px">
+    : '<span style="font-size:34px">'+(d.icon||"📦")+'</span>';
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="background:#08080f;padding:24px 18px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px;padding:16px;background:rgba(${rgb},0.08);border:1px solid rgba(${rgb},0.25);border-radius:18px">
       ${chip}
-      <div><div style="font-size:18px;font-weight:700;color:#232323">${d.name}</div><div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#a89f88;margin-top:3px">ເລືອກວິທີການມອບ</div></div>
+      <div><div style="font-size:18px;font-weight:700;color:#fff">${d.name}</div><div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:3px">ເລືອກວິທີການມອບ</div></div>
     </div>
-    <button onclick="staffChooseCash()" style="width:100%;padding:22px 20px;margin-bottom:16px;border-radius:9px;border:1px solid rgba(39,174,96,0.35);background:#fff;color:#232323;display:flex;align-items:center;gap:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(30,25,10,0.05)">
-      <span style="width:44px;height:44px;border-radius:9px;background:rgba(39,174,96,0.12);color:#1e8449;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg></span>
-      <div style="flex:1;text-align:left"><div style="font-size:17px;font-weight:700">ມອບເງິນສົດ</div><div style="font-size:12px;color:#a89f88;margin-top:3px">ມອບເງິນສົດໃຫ້ຜູ້ຮັບ · ລໍຖ້າອະນຸມັດ</div></div>
+    <button onclick="staffChooseCash()" style="width:100%;padding:22px 20px;margin-bottom:16px;border-radius:20px;border:1px solid rgba(39,174,96,0.3);background:linear-gradient(135deg,rgba(39,174,96,0.16),rgba(39,174,96,0.04));color:#fff;display:flex;align-items:center;gap:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent">
+      <span style="font-size:34px">💵</span>
+      <div style="flex:1;text-align:left"><div style="font-size:17px;font-weight:700">ມອບເງິນສົດ</div><div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px">ມອບເງິນສົດໃຫ້ຜູ້ຮັບ · ລໍຖ້າອະນຸມັດ</div></div>
       <span style="font-size:22px;color:#27ae60">›</span>
     </button>
-    <button onclick="staffChooseBank()" style="width:100%;padding:22px 20px;border-radius:9px;border:1px solid rgba(27,42,74,0.25);background:#fff;color:#232323;display:flex;align-items:center;gap:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(30,25,10,0.05)">
-      <span style="width:44px;height:44px;border-radius:9px;background:rgba(27,42,74,0.08);color:#1B2A4A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg></span>
-      <div style="flex:1;text-align:left"><div style="font-size:17px;font-weight:700">ມອບເງິນເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:#a89f88;margin-top:3px">ເງິນເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ</div></div>
-      <span style="font-size:22px;color:#1B2A4A">›</span>
+    <button onclick="staffChooseBank()" style="width:100%;padding:22px 20px;border-radius:20px;border:1px solid rgba(41,128,185,0.3);background:linear-gradient(135deg,rgba(41,128,185,0.16),rgba(41,128,185,0.04));color:#fff;display:flex;align-items:center;gap:16px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent">
+      <span style="font-size:34px">🏦</span>
+      <div style="flex:1;text-align:left"><div style="font-size:17px;font-weight:700">ມອບເງິນເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px">ເງິນເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ</div></div>
+      <span style="font-size:22px;color:#2980b9">›</span>
     </button>
   </div>`);
 }
@@ -858,9 +778,9 @@ function formBodyHTML() {
   const tag = deptTagMap(d.id);
   const chipImg = DEPT_IMGS[d.id]
     ? '<img src="'+DEPT_IMGS[d.id]+'" alt="">'
-    : '<span style="font-size:28px">'+(d.icon||BOX_ICON)+'</span>';
+    : '<span style="font-size:28px">'+(d.icon||'📦')+'</span>';
   const photoSection = staffState.img
-    ? '<div class="img-preview-wrap"><img src="'+staffState.img+'" class="img-preview"><button class="rephoto-btn" onclick="document.getElementById(\'file-input\').click()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> ຖ່າຍໃໝ່</button></div>'
+    ? '<div class="img-preview-wrap"><img src="'+staffState.img+'" class="img-preview"><button class="rephoto-btn" onclick="document.getElementById(\'file-input\').click()">📷 ຖ່າຍໃໝ່</button></div>'
     : '<div class="photo-zone-pro" onclick="document.getElementById(\'file-input\').click()">'
         + '<div class="photo-icon-pro"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'
         + '<div class="photo-text-pro">ຖ່າຍຮູບບິນ / ເລືອກຮູບ</div>'
@@ -869,7 +789,7 @@ function formBodyHTML() {
   const submitIcon = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
   const warnHTML = (!canSubmit&&!staffState.saving)
     ? '<div class="warn-box" style="background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">'
-      + '<span style="font-size:14px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg></span>'
+      + '<span style="font-size:14px">⚠️</span>'
       + '<span style="font-size:12px;color:#f39c12;font-weight:600">ກະລຸນາໃສ່ຈຳນວນເງິນກ່ອນກົດສົ່ງ</span>'
       + '</div>'
     : '';
@@ -905,11 +825,11 @@ function formBodyHTML() {
     + '</div>'
     + '<div class="form-divider"></div>'
     + '<div class="field-group-pro">'
-      + '<div class="field-label-pro"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ຊື່ພະນັກງານ</div>'
+      + '<div class="field-label-pro">👤 ຊື່ພະນັກງານ</div>'
       + '<div class="input-wrap-pro"><textarea placeholder="ໃສ່ຊື່ພະນັກງານ..." id="inp-name" oninput="staffState.name=this.value">'+staffState.name+'</textarea></div>'
     + '</div>'
     + '<div class="field-group-pro">'
-      + '<div class="field-label-pro"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-9 9a5 5 0 01-7-7l9-9a3 3 0 014 4l-9 9a1 1 0 01-2-2l8-8"/></svg> ຖ່າຍຮູບບິນ</div>'
+      + '<div class="field-label-pro">📎 ຖ່າຍຮູບບິນ</div>'
       + '<input type="file" id="file-input" accept="image/*" capture="environment" class="hidden" onchange="onFileChange(this)">'
       + photoSection
     + '</div>'
@@ -917,7 +837,7 @@ function formBodyHTML() {
     + '</div>'
     + '<div class="submit-wrap-pro">'
       + '<button class="btn-pro-submit" id="submit-btn" '+(canSubmit?'':'disabled')+' onclick="submitRecord()">'
-        + (staffState.saving ? WAIT_ICON+' ກຳລັງສົ່ງ...' : submitIcon+'ສົ່ງຂໍ້ມູນ')
+        + (staffState.saving ? '⏳ ກຳລັງສົ່ງ...' : submitIcon+'ສົ່ງຂໍ້ມູນ')
       + '</button>'
     + '</div>';
 }
@@ -974,7 +894,7 @@ async function submitRecord() {
   if(numLAK<=0&&numTHB<=0&&numUSD<=0) return;
   staffState.saving=true;
   const btn=document.getElementById("submit-btn");
-  if(btn){btn.disabled=true;btn.textContent="ກຳລັງສົ່ງ...";}
+  if(btn){btn.disabled=true;btn.textContent="⏳ ກຳລັງສົ່ງ...";}
   try {
     const ts = Date.now();
     let imgUsed = false;
@@ -1016,7 +936,7 @@ let _lastRecordCount = 0;
 let _lastPendingCount = 0;
 
 function adminLoadingHTML() {
-  return `<div class="loading"><div class="loading-icon"><svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 108.53 20H18a5 5 0 000-10z"/></svg></div><div>ກຳລັງໂຫຼດຂໍ້ມູນ...</div></div>`;
+  return `<div class="loading"><div class="loading-icon">☁️</div><div>ກຳລັງໂຫຼດຂໍ້ມູນ...</div></div>`;
 }
 
 // ── NOTIFICATION ──────────────────────────────────────────
@@ -1055,7 +975,7 @@ function setupRealtime() {
       await refreshAdmin();
       const deptName = payload.new.department_name || "ລາຍການໃໝ່";
       const amt = fmtAmt(Number(payload.new.amount), payload.new.currency || "LAK");
-      notifyNew("ພະນັກງານສົ່ງຍອດ\n" + deptName + " " + amt);
+      notifyNew("📥 ພະນັກງານສົ່ງຍອດ\n" + deptName + " " + amt);
     })
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "records" }, async (payload) => {
       if (state.mode !== "admin" && state.mode !== "owner") return;
@@ -1064,7 +984,7 @@ function setupRealtime() {
       await refreshAdmin();
       const deptName = payload.new.department_name || "ລາຍການ";
       const amt = fmtAmt(Number(payload.new.amount), payload.new.currency || "LAK");
-      notifyNew("Approve ສຳເລັດ\n" + deptName + " " + amt);
+      notifyNew("✅ Approve ສຳເລັດ\n" + deptName + " " + amt);
     })
     .subscribe();
 }
@@ -1144,7 +1064,7 @@ const CUR_DISPLAY = {
 const CUR_ORDER = ["LAK", "THB", "USD"];
 
 function recordsHTML(filtered, isOwner) {
-  if(filtered.length===0) return `<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການທີ່ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
+  if(filtered.length===0) return `<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການ ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
 
   // Group records: a single staff submission may create up to 3 rows (LAK/THB/USD)
   // sharing the same department & a timestamp within 5 seconds of each other.
@@ -1182,7 +1102,7 @@ function recordsHTML(filtered, isOwner) {
   }
 
   return groups.map(g => {
-    const dept=DEPTS.find(d=>d.id===g.dept)||{icon:BOX_ICON,name:g.departmentName,color:"#999"};
+    const dept=DEPTS.find(d=>d.id===g.dept)||{icon:"📦",name:g.departmentName,color:"#999"};
     const iconHtml = DEPT_IMGS[dept.id]
       ? `<img src="${DEPT_IMGS[dept.id]}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px;" alt="">`
       : (dept.icon + " ");
@@ -1211,13 +1131,13 @@ function recordsHTML(filtered, isOwner) {
         </div>
         <div class="record-meta">
           <span class="record-time">${fmtDate(isOwner && verified && lastApprovedAt ? lastApprovedAt : g.timestamp)} ${flagsStr}</span>
-          <span class="status-badge ${verified?"status-done":"status-wait"}">${verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ລໍຖ້າ'}</span>
+          <span class="status-badge ${verified?"status-done":"status-wait"}">${verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
-        ${note?`<div class="record-name"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ${note}</div>`:""}
+        ${note?`<div class="record-name">👤 ${note}</div>`:""}
         <div class="record-actions">
-          ${hasImage?`<button class="view-btn" onclick="viewBill(${imageId})"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyGroup('${ids}')">${verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ກົດຢືນຢັນ'}</button>`:""}
-          ${!isOwner?`<button class="delete-btn" onclick="confirmDeleteGroup('${ids}')"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>`:""}
+          ${hasImage?`<button class="view-btn" onclick="viewBill(${imageId})">🖼 ເບິ່ງບິນ</button>`:""}
+          ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyGroup('${ids}')">${verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+          ${!isOwner?`<button class="delete-btn" onclick="confirmDeleteGroup('${ids}')">🗑</button>`:""}
         </div>
       </div>`;
     } else {
@@ -1229,13 +1149,13 @@ function recordsHTML(filtered, isOwner) {
         </div>
         <div class="record-meta">
           <span class="record-time">${fmtDate(isOwner && r.verified && r.approvedAt ? r.approvedAt : r.timestamp)} ${CUR_DISPLAY[r.currency||"LAK"].flag}</span>
-          <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ລໍຖ້າ'}</span>
+          <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?"✅ ສຳເລັດ":"⏳ ລໍ້ຖ້າ"}</span>
         </div>
-        ${r.note?`<div class="record-name"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ${r.note}</div>`:""}
+        ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
         <div class="record-actions">
-          ${r.hasImage?`<button class="view-btn" onclick="viewBill(${r.id})"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ກົດຢືນຢັນ'}</button>`:""}
-          ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>`:""}
+          ${r.hasImage?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
+          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
+          ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
         </div>
       </div>`;
     }
@@ -1275,7 +1195,7 @@ function confirmDeleteGroup(idsStr) {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="modal">
-    <div style="font-size:44px"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></div>
+    <div style="font-size:44px">🗑️</div>
     <div style="font-size:18px;font-weight:800">ລຶບລາຍການນີ້?</div>
     <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r1.departmentName} (${curLabel})</div>
     <div style="font-size:12px;color:#f39c12;margin-bottom:8px">ໃສ່ PIN ຫົວໜ້າເພື່ອຢືນຢັນ</div>
@@ -1297,7 +1217,7 @@ async function checkAndDeleteGroup(idsStr, btn) {
     document.getElementById("del-err").textContent = "PIN ບໍ່ຖືກຕ້ອງ";
     return;
   }
-  btn.textContent = "..."; btn.disabled = true;
+  btn.textContent = "⏳"; btn.disabled = true;
   try {
     const ids = idsStr.split(",");
     for(const id of ids) { await dbDelete(id); }
@@ -1336,16 +1256,16 @@ function storageHTML(records) {
   let warnHTML = "";
   if(pct >= 90) {
     barColor = "#e74c3c";
-    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fdecea;color:#e74c3c;font-size:12px;font-weight:700;text-align:center"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> ໃກ້ຈະເຕັມແລ້ວ! Export ຂໍ້ມູນດ່ວນ!</div>';
+    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fdecea;color:#e74c3c;font-size:12px;font-weight:700;text-align:center">🚨 ໃກ້ຈະເຕັມແລ້ວ! Export ຂໍ້ມູນດ່ວນ!</div>';
   } else if(pct >= 70) {
     barColor = "#f39c12";
-    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fff8e1;color:#f39c12;font-size:12px;font-weight:700;text-align:center"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> Storage ໃຊ້ໄປ ' + pct + '% ຄວນ Backup ຂໍ້ມູນ</div>';
+    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fff8e1;color:#f39c12;font-size:12px;font-weight:700;text-align:center">⚠️ Storage ໃຊ້ໄປ ' + pct + '% ຄວນ Backup ຂໍ້ມູນ</div>';
   } else if(pct >= 50) {
     barColor = "#f39c12";
   }
   const displayPct = pct < 0.01 ? "< 0.01" : pct;
   return '<div style="background:#1e2d40;border:1.5px solid #2d4a6a;border-radius:14px;padding:14px 16px;margin-bottom:12px;">'
-    + '<div style="font-size:12px;font-weight:700;color:#7fb3d3;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> ການໃຊ້ Storage (Supabase Free 500MB)</div>'
+    + '<div style="font-size:12px;font-weight:700;color:#7fb3d3;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">💾 ການໃຊ້ Storage (Supabase Free 500MB)</div>'
     + '<div style="background:#0d1117;border-radius:20px;height:14px;overflow:hidden;margin-bottom:8px;">'
     + '<div style="height:100%;border-radius:20px;width:' + barWidth + '%;background:' + barColor + ';transition:width 0.5s;"></div>'
     + '</div>'
@@ -1385,7 +1305,7 @@ function renderAdmin() {
   const thisMonthKey = ny+"-"+nm;
   const monthPickerHTML = (adminTab==="month"||adminTab==="all") ? `
     <div class="month-row">
-      <span class="month-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg> ເດືອນ:</span>
+      <span class="month-label">📅 ເດືອນ:</span>
       <select class="month-picker" onchange="setFilterMonth(this.value)">
         <option value="">ທຸກເດືອນ</option>
         ${months.map(mk => {
@@ -1421,17 +1341,17 @@ function renderAdmin() {
 
   const clearHTML = !isOwner ? `
     <div class="safety-note">
-      <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6l7-3z"/></svg> <b>ຂໍ້ມູນທຸກເດືອນຈະຖືກເກັບໄວ້ຕະຫຼອດ</b><br>
+      🛡️ <b>ຂໍ້ມູນທຸກເດືອນຈະຖືກເກັບໄວ້ຕະຫຼອດ</b><br>
       ຖ້າຢາກລ້າງຂໍ້ມູນ ຕ້ອງໃສ່ PIN ຢືນຢັນທຸກຄັ້ງ
     </div>
     <div class="backup-row">
-      <button class="backup-btn" onclick="doBackup()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Backup ຂໍ້ຄວາມ</button>
-      <button class="restore-btn" onclick="document.getElementById('restore-file').click()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0l-4 4m4-4l4 4M4 21h16"/></svg> Restore JSON</button>
+      <button class="backup-btn" onclick="doBackup()">📥 Backup ຂໍ້ຄວາມ</button>
+      <button class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore JSON</button>
       <input type="file" id="restore-file" accept=".json" class="hidden" onchange="doRestore(this)">
     </div>
-    <button class="backup-btn" style="width:100%;margin-bottom:10px;background:#1a6a4f" onclick="doBackupJSON()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Export JSON (ສຳຮອງຂໍ້ມູນ)</button>
-    <button class="clear-btn-safe" onclick="confirmClearMonth()"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg> ລ້າງຂໍ້ມູນເດືອນທີ່ເລືອກ (ຕ້ອງ PIN)</button>
-    <button class="clear-btn" onclick="confirmClearAll()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> ລ້າງຂໍ້ມູນທັງໝົດ (ຕ້ອງ PIN)</button>
+    <button class="backup-btn" style="width:100%;margin-bottom:10px;background:#1a6a4f" onclick="doBackupJSON()">💾 Export JSON (ສຳຮອງຂໍ້ມູນ)</button>
+    <button class="clear-btn-safe" onclick="confirmClearMonth()">🗑 ລ້າງຂໍ້ມູນເດືອນທີ່ເລືອກ (ຕ້ອງ PIN)</button>
+    <button class="clear-btn" onclick="confirmClearAll()">⚠️ ລ້າງຂໍ້ມູນທັງໝົດ (ຕ້ອງ PIN)</button>
   ` : "";
 
   const html = `<div class="admin-wrap">
@@ -1442,11 +1362,11 @@ function renderAdmin() {
       <div class="total-amount3">${totalUSD>0?fmtUSD(totalUSD):""}</div>
       ${totalLAK===0&&totalTHB===0&&totalUSD===0?`<div class="total-amount">${fmtKIP(0)}</div>`:""}
       <div class="total-count">${filtered.length} ລາຍການ | ທັງໝົດໃນລະບົບ ${adminRecords.length} ລາຍການ</div>
-      ${!isOwner&&pending>0?`<span class="pending-badge">${WAIT_ICON} ລໍຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
+      ${!isOwner&&pending>0?`<span class="pending-badge">⏳ ລໍ້ຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
     </div>
     ${storageHTML(adminRecords)}
     ${bankCashSummaryHTML(adminRecords)}
-    <button class="btn-bank" style="margin-top:10px;background:#1B2A4A;border:1px solid #1B2A4A" onclick="openBankHistoryModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດການມອບເຂົ້າບັນຊີ (${getBankDeposits().length})</button>
+    <button class="btn-bank" style="margin-top:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15)" onclick="openBankHistoryModal()">📜 ປະຫວັດການມອບເຂົ້າບັນຊີ (${getBankDeposits().length})</button>
     <div class="tabs">
       <button class="tab ${adminTab==="today"?"active":""}" data-tab="today" onclick="setTab('today')">ມື້ນີ້</button>
       <button class="tab ${adminTab==="month"?"active":""}" data-tab="month" onclick="setTab('month')">ເດືອນ</button>
@@ -1516,7 +1436,7 @@ function confirmDelete(id) {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="modal">
-    <div style="font-size:44px"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></div>
+    <div style="font-size:44px">🗑️</div>
     <div style="font-size:18px;font-weight:800">ລຶບລາຍການນີ້?</div>
     <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r.departmentName} — ${fmtAmt(r.amount,r.currency||"LAK")}</div>
     <div style="font-size:12px;color:#f39c12;margin-bottom:8px">ໃສ່ PIN ຫົວໜ້າເພື່ອຢືນຢັນ</div>
@@ -1538,7 +1458,7 @@ async function checkAndDelete(id, btn) {
     document.getElementById("del-err").textContent = "PIN ບໍ່ຖືກຕ້ອງ";
     return;
   }
-  btn.textContent = "..."; btn.disabled = true;
+  btn.textContent = "⏳"; btn.disabled = true;
   try {
     await dbDelete(id);
     btn.closest(".overlay").remove();
@@ -1554,7 +1474,7 @@ function confirmClearMonth() {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="modal" style="width:88%;max-width:340px">
-    <div style="font-size:40px"><svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></div>
+    <div style="font-size:40px">🗓️</div>
     <div style="font-size:17px;font-weight:800;color:#f39c12">ລ້າງຂໍ້ມູນເດືອນ</div>
     <div style="font-size:12px;color:#aaa;margin-bottom:10px;text-align:center">ເລືອກເດືອນທີ່ຢາກລ້າງ ແລ້ວໃສ່ PIN ຫົວໜ້າ</div>
     <select id="del-month-sel" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #444;background:#1a1a2e;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px">
@@ -1584,7 +1504,7 @@ async function doDeleteMonth(btn) {
   const sel = document.getElementById("del-month-sel").value;
   if (!sel) return;
   const [y,m] = sel.split("-").map(Number);
-  btn.textContent = "ກຳລັງລ້າງ..."; btn.disabled = true;
+  btn.textContent = "⏳ ກຳລັງລ້າງ..."; btn.disabled = true;
   try {
     await dbDeleteByMonth(y, m);
     adminRecords = adminRecords.filter(r => {
@@ -1594,7 +1514,7 @@ async function doDeleteMonth(btn) {
     try { localStorage.setItem("dv_cache", JSON.stringify(adminRecords)); } catch {}
     btn.closest(".overlay").remove();
     renderAdmin();
-    alert(`ລ້າງຂໍ້ມູນ ${monthName(y,m)} ສຳເລັດ`);
+    alert(`ລ້າງຂໍ້ມູນ ${monthName(y,m)} ສຳເລັດ ✅`);
   } catch(e) {
     document.getElementById("delm-err").textContent = "ລ້າງບໍ່ສຳເລັດ: " + e.message;
     btn.textContent = "ລ້າງເດືອນ"; btn.disabled = false;
@@ -1605,7 +1525,7 @@ function confirmClearAll() {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="modal">
-    <div style="font-size:44px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg></div>
+    <div style="font-size:44px">⚠️</div>
     <div style="font-size:18px;font-weight:800;color:#e74c3c">ລ້າງຂໍ້ມູນທັງໝົດ?</div>
     <div style="font-size:12px;color:#aaa;text-align:center;line-height:1.7;margin-bottom:8px">
       ລາຍການທຸກເດືອນຈະຖືກລຶບຖາວອນ<br>
@@ -1630,14 +1550,14 @@ async function doClearAll(btn) {
     document.getElementById("clearall-err").textContent = "PIN ບໍ່ຖືກຕ້ອງ";
     return;
   }
-  btn.textContent = "ກຳລັງລ້າງ..."; btn.disabled = true;
+  btn.textContent = "⏳ ກຳລັງລ້າງ..."; btn.disabled = true;
   try {
     await getSupa().from("records").delete().neq("id", 0);
     adminRecords = [];
     try { localStorage.removeItem("dv_cache"); } catch {}
     btn.closest(".overlay").remove();
     renderAdmin();
-    alert("ລ້າງຂໍ້ມູນທັງໝົດສຳເລັດ");
+    alert("ລ້າງຂໍ້ມູນທັງໝົດສຳເລັດ ✅");
   } catch(e) {
     document.getElementById("clearall-err").textContent = "ລ້າງບໍ່ສຳເລັດ: " + e.message;
     btn.textContent = "ລ້າງທັງໝົດ"; btn.disabled = false;
@@ -1654,12 +1574,12 @@ async function viewBill(id) {
     <div class="modal-header">
       <span>ບິນ — ${dept.name}</span>
       <div style="display:flex;gap:14px;align-items:center">
-        <button id="billRotateBtn" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;display:none" onclick="rotateBillImg()"><svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7M21 4v6h-6"/></svg></button>
+        <button id="billRotateBtn" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;display:none" onclick="rotateBillImg()">🔄</button>
         <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
       </div>
     </div>
     <div class="modal-img-viewport" id="billImgViewport">
-      <div style="color:#888;font-size:13px;padding:40px 0">${WAIT_ICON} ກຳລັງໂຫຼດຮູບ...</div>
+      <div style="color:#888;font-size:13px;padding:40px 0">⏳ ກຳລັງໂຫຼດຮູບ...</div>
     </div>
     <div class="modal-info"><b>ຈຳນວນ:</b> ${fmtAmt(r.amount,r.currency||"LAK")}<br>${r.note?`<b>ຊື່:</b> ${r.note}<br>`:""}<b>ເວລາ:</b> ${fmtDate(r.timestamp)}</div>
     <div style="font-size:11px;color:#999;text-align:center;padding:0 16px 12px">ແຕະຮູບ 2 ຄັ້ງເພື່ອຊູມ · ລາກເພື່ອເລື່ອນເບິ່ງ</div>
@@ -1704,21 +1624,21 @@ async function doBackup() {
     const time = dt.toLocaleTimeString("lo-LA",{hour:"2-digit",minute:"2-digit"});
     const dateR = dt.toLocaleDateString("lo-LA",{day:"2-digit",month:"short"});
     lines.push(`${i+1}. ${r.departmentName}`);
-    if(r.note) lines.push(`   <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ${r.note}`);
-    lines.push(`   <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ${fmtAmt(r.amount,r.currency||"LAK")}`);
-    lines.push(`   <svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${dateR} ${time}`,"");
+    if(r.note) lines.push(`   👤 ${r.note}`);
+    lines.push(`   💰 ${fmtAmt(r.amount,r.currency||"LAK")}`);
+    lines.push(`   🕐 ${dateR} ${time}`,"");
     if(r.currency==="THB") tTHB+=r.amount; else if(r.currency==="USD") tUSD+=r.amount; else tLAK+=r.amount;
   });
   lines.push("───────────────────────","  ສະຫຼຸບຍອດລວມ");
-  if(tLAK>0) lines.push(`  <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ${fmtKIP(tLAK)}`);
-  if(tTHB>0) lines.push(`  <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ${fmtTHB(tTHB)}`);
-  if(tUSD>0) lines.push(`  <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ${fmtUSD(tUSD)}`);
-  lines.push(`  <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h6"/></svg> ທັງໝົດ ${filtered.length} ລາຍການ`,"═══════════════════════");
+  if(tLAK>0) lines.push(`  💵 ${fmtKIP(tLAK)}`);
+  if(tTHB>0) lines.push(`  💵 ${fmtTHB(tTHB)}`);
+  if(tUSD>0) lines.push(`  💵 ${fmtUSD(tUSD)}`);
+  lines.push(`  📋 ທັງໝົດ ${filtered.length} ລາຍການ`,"═══════════════════════");
   const text = lines.join("\n");
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="backup-modal">
-    <div style="font-size:36px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h6"/></svg></div>
+    <div style="font-size:36px">📋</div>
     <div style="font-size:18px;font-weight:800">Backup ຂໍ້ຄວາມ</div>
     <div style="font-size:12px;color:#aaa">ກົດທີ່ຊ່ອງດ້ານລຸ່ມ → Copy → Paste ໃນ Note/Line</div>
     <textarea class="backup-textarea" readonly onclick="this.select();navigator.clipboard.writeText(this.value).catch(()=>{})">${text}</textarea>
@@ -1761,7 +1681,7 @@ function doRestore(el) {
         try { await dbSave(rec); ok++; } catch { fail++; }
       }
       await refreshAdmin();
-      alert(`ນຳເຂົ້າສຳເລັດ: ${ok} ລາຍການ${fail>0?" (ຜິດພາດ "+fail+" ລາຍການ)":""}`)
+      alert(`ນຳເຂົ້າສຳເລັດ: ${ok} ລາຍການ${fail>0?" (ລ້ົ້ ​ +"+fail+" ລາຍການ)":""}`)
     } catch(e) { alert("ໄຟລ໌ JSON ບໍ່ຖືກຕ້ອງ: "+e.message); }
   };
   r.readAsText(file); el.value="";
@@ -1834,45 +1754,45 @@ function bankCashSummaryHTML(records) {
   if (lakBal.cashRecords > 0 || lakBal.toBoss > 0) {
     rowsHTML += `
       <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ເງິນສົດຄ້າງ (ກີບ) <span style="font-size:10px;color:#a89f88">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
+        <span class="cash-row-label">💰 ເງິນສົດຄ້າງ (ກີບ) <span style="font-size:10px;color:rgba(255,255,255,0.35)">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
         <span class="cash-row-value gold">${fmtKIP(lakBal.withAdmin)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ເຂົ້າບັນຊີຫົວໜ້າ (ກີບ)</span>
+        <span class="cash-row-label">🏦 ເຂົ້າບັນຊີຫົວໜ້າ (ກີບ)</span>
         <span class="cash-row-value blue">${fmtKIP(lakBal.toBoss)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg> ຍອດລວມທັງໝົດ (ກີບ)</span>
+        <span class="cash-row-label" style="font-weight:700;color:#fff">📊 ຍອດລວມທັງໝົด (ກີບ)</span>
         <span class="cash-row-value green">${fmtKIP(lakBal.grand)}</span>
       </div>`;
   }
   if (thbBal.cashRecords > 0 || thbBal.toBoss > 0) {
     rowsHTML += `
       <div class="cash-row" style="margin-top:14px">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ເງິນສົດຄ້າງ (ບາດ) <span style="font-size:10px;color:#a89f88">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
+        <span class="cash-row-label">💰 ເງິນສົດຄ້າງ (ບາດ) <span style="font-size:10px;color:rgba(255,255,255,0.35)">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
         <span class="cash-row-value gold">${fmtTHB(thbBal.withAdmin)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ເຂົ້າບັນຊີຫົວໜ້າ (ບາດ)</span>
+        <span class="cash-row-label">🏦 ເຂົ້າບັນຊີຫົວໜ້າ (ບາດ)</span>
         <span class="cash-row-value blue">${fmtTHB(thbBal.toBoss)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg> ຍອດລວມທັງໝົດ (ບາດ)</span>
+        <span class="cash-row-label" style="font-weight:700;color:#fff">📊 ຍອດລວມທັງໝົด (ບາດ)</span>
         <span class="cash-row-value green">${fmtTHB(thbBal.grand)}</span>
       </div>`;
   }
   if (usdBal.cashRecords > 0 || usdBal.toBoss > 0) {
     rowsHTML += `
       <div class="cash-row" style="margin-top:14px">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ເງິນສົດຄ້າງ (USD) <span style="font-size:10px;color:#a89f88">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
+        <span class="cash-row-label">💰 ເງິນສົດຄ້າງ (USD) <span style="font-size:10px;color:rgba(255,255,255,0.35)">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
         <span class="cash-row-value gold">${fmtUSD(usdBal.withAdmin)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ເຂົ້າບັນຊີຫົວໜ້າ (USD)</span>
+        <span class="cash-row-label">🏦 ເຂົ້າບັນຊີຫົວໜ້າ (USD)</span>
         <span class="cash-row-value blue">${fmtUSD(usdBal.toBoss)}</span>
       </div>
       <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg> ຍອດລວມທັງໝົດ (USD)</span>
+        <span class="cash-row-label" style="font-weight:700;color:#fff">📊 ຍອດລວມທັງໝົด (USD)</span>
         <span class="cash-row-value green">${fmtUSD(usdBal.grand)}</span>
       </div>`;
   }
@@ -1881,9 +1801,9 @@ function bankCashSummaryHTML(records) {
   }
 
   return `<div class="cash-summary-card">
-    <div class="cash-summary-title"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ສະຫຼຸບເງິນ (ຄ້າງ / ເຂົ້າທະນາຄານ)</div>
+    <div class="cash-summary-title">💰 ສະຫຼຸບເງິນ (ຄ້າງ / ເຂົ້າທະນາຄານ)</div>
     ${rowsHTML}
-    <button class="btn-bank" style="margin-top:16px" onclick="openBankModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ບັນທຶກມອບທະນາຄານ (ຂອງຜູ້ຮັບ)</button>
+    <button class="btn-bank" style="margin-top:16px" onclick="openBankModal()">🏦 ບັນທຶກມອບທະນາຄານ (ຂອງຜູ້ຮັບ)</button>
   </div>`;
 }
 
@@ -1896,11 +1816,11 @@ function bankHistoryItemHTML(dep) {
     <div class="bank-history-item">
       <div class="bank-history-left">
         <span class="bank-history-amt" style="color:${dep.currency==="THB"?"#2980b9":dep.currency==="USD"?"#27ae60":"#27ae60"}">${fmtAmt(dep.amount, dep.currency||"LAK")}</span>
-        ${note ? `<span class="bank-history-note"><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg> ${note}</span>` : ""}
+        ${note ? `<span class="bank-history-note">📝 ${note}</span>` : ""}
         ${dep.image ? `<div style="margin-top:6px"><img src="${dep.image}" style="max-width:100%;border-radius:8px;max-height:170px;object-fit:cover;cursor:zoom-in" onclick="showImgFull('${dep.image}')"></div>` : ""}
-        <span class="bank-history-time"><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${fmtDate(dep.ts)}</span>
+        <span class="bank-history-time">🕐 ${fmtDate(dep.ts)}</span>
       </div>
-      <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}')"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+      <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}')">🗑</button>
     </div>`;
 }
 
@@ -1913,13 +1833,13 @@ function bankHistoryCardHTML() {
   let html = "";
   if (staffDeps.length) {
     html += `<div class="bank-history-card">
-      <div class="cash-summary-title"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ປະຫວັດພະນັກງານມອບ → ບັນຊີຫົວໜ້າ (${staffDeps.length})</div>
+      <div class="cash-summary-title">👷 ປະຫວັດພະນັກງານມອບ → ບັນຊີຫົວໜ້າ (${staffDeps.length})</div>
       <div class="bank-history-scroll">${staffDeps.map(bankHistoryItemHTML).join("")}</div>
     </div>`;
   }
   if (adminDeps.length) {
     html += `<div class="bank-history-card">
-      <div class="cash-summary-title"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ປະຫວັດຜູ້ຮັບມອບເຂົ້າທະນາຄານ (${adminDeps.length})</div>
+      <div class="cash-summary-title">👤 ປະຫວັດຜູ້ຮັບມອບເຂົ້າທະນາຄານ (${adminDeps.length})</div>
       <div class="bank-history-scroll">${adminDeps.map(bankHistoryItemHTML).join("")}</div>
     </div>`;
   }
@@ -1932,7 +1852,7 @@ function openBankHistoryModal() {
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="bank-modal" style="max-height:85vh;overflow-y:auto">
     <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center">
-      <span class="bank-modal-title" style="margin:0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດການມອບເຂົ້າບັນຊີ</span>
+      <span class="bank-modal-title" style="margin:0">📜 ປະຫວັດການມອບເຂົ້າບັນຊີ</span>
       <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
     ${inner || `<div style="text-align:center;color:#888;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
@@ -1948,18 +1868,18 @@ function openBankModal() {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `<div class="bank-modal">
-    <div class="bank-modal-title"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ບັນທຶກມອບທະນາຄານ</div>
+    <div class="bank-modal-title">🏦 ບັນທຶກມອບທະນາຄານ</div>
     <div style="display:flex;gap:8px;margin-bottom:4px">
-      <button id="cur-lak" class="cur-btn cur-active" onclick="setBankCur('LAK')">ກີບ</button>
-      <button id="cur-thb" class="cur-btn" onclick="setBankCur('THB')">ບາດ</button>
-      <button id="cur-usd" class="cur-btn" onclick="setBankCur('USD')">USD</button>
+      <button id="cur-lak" class="cur-btn cur-active" onclick="setBankCur('LAK')">🇱🇦 ກີບ</button>
+      <button id="cur-thb" class="cur-btn" onclick="setBankCur('THB')">🇹🇭 ບາດ</button>
+      <button id="cur-usd" class="cur-btn" onclick="setBankCur('USD')">🇺🇸 USD</button>
     </div>
     <div class="bank-modal-avail" id="bank-avail-box">
       <span>ເງິນສົດທີ່ມີ</span>
       <b id="bank-avail-amt">${fmtKIP(lakBal.balance)}</b>
     </div>
     <div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin-bottom:8px">ຈຳນວນທີ່ຈະມອບ</div>
+      <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px">ຈຳນວນທີ່ຈະມອບ</div>
       <div class="bank-input-wrap">
         <input type="text" inputmode="numeric" placeholder="0" id="bank-amt-input" oninput="onBankAmtInput(this)" autofocus>
         <span id="bank-cur-badge">ກີບ</span>
@@ -1968,7 +1888,7 @@ function openBankModal() {
       <div id="bank-remain" style="font-size:12px;color:#aaa;margin-top:2px;min-height:18px"></div>
     </div>
     <div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin-bottom:8px">ໝາຍເຫດ (ຖ້າມີ)</div>
+      <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px">ໝາຍເຫດ (ຖ້ານ)</div>
       <div class="bank-note-wrap">
         <input type="text" placeholder="ເຊັ່ນ: ທະນາຄານ BCEL, ຊ່ອງ 3..." id="bank-note-input">
       </div>
@@ -1976,7 +1896,7 @@ function openBankModal() {
     <div id="bank-err" style="color:#e74c3c;font-size:12px;min-height:16px;text-align:center"></div>
     <div style="display:flex;gap:10px">
       <button class="btn-cancel" style="flex:1" onclick="this.closest('.overlay').remove()">ຍົກເລີກ</button>
-      <button class="btn-bank-confirm" style="flex:1.5" id="bank-confirm-btn" onclick="confirmBankDeposit(this)" disabled><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> ຢືນຢັນ</button>
+      <button class="btn-bank-confirm" style="flex:1.5" id="bank-confirm-btn" onclick="confirmBankDeposit(this)" disabled>✅ ຢືນຢັນ</button>
     </div>
   </div>`;
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
@@ -2033,7 +1953,7 @@ function onBankAmtInput(el) {
       btn.disabled = false;
     } else {
       remainEl.textContent = "";
-      errEl.textContent = "ເກີນຈຳນວນທີ່ມີ!";
+      errEl.textContent = "⚠️ ເກີນຈຳນວນທີ່ມີ!";
       btn.disabled = true;
     }
   } else {
@@ -2051,7 +1971,7 @@ async function confirmBankDeposit(btn) {
   if(num <= 0) return;
   const note = (document.getElementById("bank-note-input").value||"").trim();
   btn.disabled = true;
-  btn.textContent = "ກຳລັງບັນທຶກ...";
+  btn.textContent = "⏳ ກຳລັງບັນທຶກ...";
   const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: cur, note };
   // Optimistic update: add to cache immediately and re-render
   if (!_bankDepositsCache) _bankDepositsCache = [];
@@ -2095,33 +2015,33 @@ function renderStaffBankForm() {
   if (header) app.appendChild(header);
   const chip = d && DEPT_IMGS[d.id]
     ? '<img src="'+DEPT_IMGS[d.id]+'" alt="" style="width:42px;height:42px;border-radius:12px;object-fit:cover">'
-    : '<span style="font-size:30px">'+((d&&d.icon)||BOX_ICON)+'</span>';
-  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="padding:22px 18px 100px">
+    : '<span style="font-size:30px">'+((d&&d.icon)||"📦")+'</span>';
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll" style="background:#08080f;padding:22px 18px 100px">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
       ${chip}
-      <div><div style="font-size:16px;font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ມອບເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:#a89f88">${d?d.name:""}</div></div>
+      <div><div style="font-size:16px;font-weight:700;color:#fff">🏦 ມອບເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:rgba(255,255,255,0.4)">${d?d.name:""}</div></div>
     </div>
-    <div style="background:rgba(41,128,185,0.08);border:1px solid rgba(41,128,185,0.22);border-radius:12px;padding:11px 14px;font-size:12px;color:#1B2A4A;margin-bottom:20px;line-height:1.5">ℹ ເງິນກ້ອນນີ້ຈະເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ (ນັບເປັນຍອດ “ເຂົ້າບັນຊີຫົວໜ້າ”)</div>
+    <div style="background:rgba(41,128,185,0.08);border:1px solid rgba(41,128,185,0.22);border-radius:12px;padding:11px 14px;font-size:12px;color:#7fb3e0;margin-bottom:20px;line-height:1.5">ℹ️ ເງິນກ້ອນນີ້ຈະເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ (ນັບເປັນຍອດ “ເຂົ້າບັນຊີຫົວໜ້າ”)</div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button id="scur-lak" class="cur-btn cur-active" onclick="setStaffBankCur('LAK')">ກີບ</button>
-      <button id="scur-thb" class="cur-btn" onclick="setStaffBankCur('THB')">ບາດ</button>
-      <button id="scur-usd" class="cur-btn" onclick="setStaffBankCur('USD')">USD</button>
+      <button id="scur-lak" class="cur-btn cur-active" onclick="setStaffBankCur('LAK')">🇱🇦 ກີບ</button>
+      <button id="scur-thb" class="cur-btn" onclick="setStaffBankCur('THB')">🇹🇭 ບາດ</button>
+      <button id="scur-usd" class="cur-btn" onclick="setStaffBankCur('USD')">🇺🇸 USD</button>
     </div>
-    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin-bottom:8px">ຈຳນວນທີ່ມອບ</div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px">ຈຳນວນທີ່ມອບ</div>
     <div class="bank-input-wrap">
       <input type="text" inputmode="numeric" placeholder="0" id="sbank-amt" oninput="onStaffBankInput(this)" autofocus>
       <span id="sbank-badge">ກີບ</span>
     </div>
     <div id="sbank-preview" style="font-size:15px;font-weight:700;color:#27ae60;margin-top:8px;min-height:22px"></div>
-    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin:18px 0 8px">ໝາຍເຫດ (ຊື່ທະນາຄານ / ຜູ້ມອບ)</div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 8px">ໝາຍເຫດ (ຊື່ທະນາຄານ / ຜູ້ມອບ)</div>
     <div class="bank-note-wrap">
       <input type="text" placeholder="ເຊັ່ນ: BCEL, ທ້າວ x ນຳໄປຝາກ..." id="sbank-note">
     </div>
-    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin:18px 0 8px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-9 9a5 5 0 01-7-7l9-9a3 3 0 014 4l-9 9a1 1 0 01-2-2l8-8"/></svg> ຮູບໃບໂອນ / ສະລິບ (ຖ້າມີ)</div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 8px">📎 ຮູບໃບໂອນ / ສະລິບ (ຖ້ານ)</div>
     <input type="file" id="sbank-file" accept="image/*" capture="environment" class="hidden" onchange="onStaffBankFileChange(this)">
     <div id="sbank-photo-zone"></div>
     <div id="sbank-err" style="color:#e74c3c;font-size:12px;min-height:16px;text-align:center;margin-top:10px"></div>
-    <button class="btn-bank-confirm" style="width:100%;margin-top:18px" id="sbank-confirm" onclick="confirmStaffBank(this)" disabled><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> ຢືນຢັນມອບເຂົ້າທະນາຄານ</button>
+    <button class="btn-bank-confirm" style="width:100%;margin-top:18px" id="sbank-confirm" onclick="confirmStaffBank(this)" disabled>✅ ຢືນຢັນມອບເຂົ້າທະນາຄານ</button>
   </div>`);
   setTimeout(() => {
     const i = document.getElementById("sbank-amt"); if (i) i.focus();
@@ -2135,7 +2055,7 @@ function renderSbankPhotoZone() {
   if (_staffBankImg) {
     zone.innerHTML = '<div class="img-preview-wrap" style="border-radius:12px;overflow:hidden">'
       + '<img src="'+_staffBankImg+'" style="width:100%;display:block;border-radius:12px">'
-      + '<button class="rephoto-btn" onclick="document.getElementById(\'sbank-file\').click()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> ຖ່າຍໃໝ່</button>'
+      + '<button class="rephoto-btn" onclick="document.getElementById(\'sbank-file\').click()">📷 ຖ່າຍໃໝ່</button>'
       + '</div>';
   } else {
     zone.innerHTML = '<div class="photo-zone-pro" onclick="document.getElementById(\'sbank-file\').click()">'
@@ -2188,7 +2108,7 @@ async function confirmStaffBank(btn) {
   const deptName = staffState.dept ? staffState.dept.name : "";
   // "S|" prefix marks a STAFF deposit (money went straight to the boss); dept name records the source
   const note = "S|" + deptName + (userNote ? " · " + userNote : "");
-  btn.disabled = true; btn.textContent = "ກຳລັງບັນທຶກ...";
+  btn.disabled = true; btn.textContent = "⏳ ກຳລັງບັນທຶກ...";
   const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: _staffBankCur, note, image: _staffBankImg || null };
   try {
     await addBankDeposit(dep);
@@ -2196,7 +2116,7 @@ async function confirmStaffBank(btn) {
     _staffBankImg = null;
     showStaffBankDone(num, _staffBankCur);
   } catch {
-    btn.disabled = false; btn.textContent = "ຢືນຢັນມອບເຂົ້າທະນາຄານ";
+    btn.disabled = false; btn.textContent = "✅ ຢືນຢັນມອບເຂົ້າທະນາຄານ";
   }
 }
 
@@ -2206,20 +2126,32 @@ function showStaffBankDone(num, cur) {
   app.innerHTML = "";
   if (header) app.appendChild(header);
   app.insertAdjacentHTML("beforeend", `<div class="center"><div class="done-box">
-    <div class="done-check" style="background:#1a5276"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg></div>
+    <div class="done-check" style="background:#1a5276">🏦</div>
     <div class="done-title">ມອບເຂົ້າທະນາຄານສຳເລັດ!</div>
     <div class="done-amount ${cur === "THB" ? "thb" : cur === "USD" ? "usd" : ""}">${fmtAmt(num, cur)}</div>
     <button class="btn-green" onclick="backToDept()" style="margin-bottom:0">ກັບໜ້າຫຼັກ</button>
   </div></div>`);
 }
 
-let isDark = false;
+let isDark = localStorage.getItem("dv_theme") !== "light";
 function applyTheme() {
-  document.body.classList.add("light");
+  document.body.classList.toggle("light", !isDark);
+  const btn = document.getElementById("theme-btn");
+  if (btn) {
+    btn.textContent = isDark ? "☀️" : "🌙";
+    btn.className = "theme-btn " + (isDark ? "dark" : "light");
+  }
 }
 function toggleTheme() {
-  // Bank Ledger is now the only theme; kept as a no-op so old calls don't error.
+  isDark = !isDark;
+  localStorage.setItem("dv_theme", isDark ? "dark" : "light");
+  applyTheme();
 }
+
+const themeBtn = document.createElement("button");
+themeBtn.id = "theme-btn";
+themeBtn.onclick = toggleTheme;
+document.body.appendChild(themeBtn);
 
 applyTheme();
 render();
@@ -2230,7 +2162,7 @@ function showImgFull(src) {
   overlay.innerHTML = '<div class="zoom-wrap" style="width:100%;height:85vh;overflow:auto;display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch">'
     + '<img src="'+src+'" class="zoom-img" style="max-width:100%;border-radius:12px;transition:transform .15s;transform-origin:top center;cursor:zoom-in">'
     + '</div>'
-    + '<div style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:8px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/></svg> ແຕະຮູບເພື່ອຂະຫຍາຍ · ລູບເພື່ອເລື່ອນ</div>'
+    + '<div style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:8px">👆 ແຕະຮູບເພື່ອຂະຫຍາຍ · ລູບເພື່ອເລື່ອນ</div>'
     + '<button onclick="this.parentNode.remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;width:44px;height:44px;border-radius:50%;cursor:pointer">✕</button>';
   const img = overlay.querySelector(".zoom-img");
   let zoomed = false;
