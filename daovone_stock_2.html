@@ -25,12 +25,13 @@
   .brand{text-align:center;margin-bottom:28px;}
   .brand .name{font-size:22px;letter-spacing:1px;color:var(--orange-soft);font-weight:600;}
   .brand .sub{font-size:13px;color:var(--muted);margin-top:4px;}
-  .login-form{width:100%;max-width:300px;display:flex;flex-direction:column;gap:12px;margin-top:6px;}
-  .login-input{width:100%;padding:13px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--ink);font-size:15px;font-family:var(--font-body);outline:none;}
-  .login-input:focus{border-color:var(--orange);}
-  .login-btn{width:100%;padding:13px;border:none;border-radius:8px;background:var(--orange);color:#fff;font-weight:600;font-size:14px;letter-spacing:.03em;font-family:var(--font-body);margin-top:2px;}
-  .login-btn:active{filter:brightness(.92);}
-  .loginErr{color:var(--danger);font-size:13px;min-height:18px;margin-top:2px;text-align:center;}
+  .pin-dots{display:flex;gap:12px;margin:20px 0;}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--orange);background:transparent;}
+  .pin-dot.filled{background:var(--orange);}
+  .keypad{display:grid;grid-template-columns:repeat(3,64px);gap:14px;}
+  .keypad button{width:64px;height:64px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--ink);font-size:20px;font-family:var(--font-body);box-shadow:0 1px 3px rgba(0,0,0,.07);}
+  .keypad button:active{background:var(--panel2);}
+  .loginErr{color:var(--danger);font-size:13px;height:18px;margin-top:6px;}
 
   /* ---- Header / Nav ---- */
   header{background:var(--panel);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;gap:10px;}
@@ -165,7 +166,7 @@
     .card-grid.cols-2{grid-template-columns:1fr 1fr;}
     .card-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
     .stats-row{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));max-width:1100px;}
-    .login-btn:hover{filter:brightness(1.06);cursor:pointer;}
+    .keypad button:hover{border-color:var(--orange);cursor:pointer;}
     nav button:hover{color:var(--orange-soft);cursor:pointer;}
     .logout:hover{border-color:var(--orange);cursor:pointer;}
     .list-item, .row{cursor:default;}
@@ -178,6 +179,13 @@
     .icon-btn{padding:7px 13px;font-size:13px;}
     .btn.small{padding:8px 15px;font-size:13px;}
   }
+  /* ຊ່ອງຄົ້ນຫາສິນຄ້າ (ພິມຊື່/ລະຫັດເພື່ອກັ່ນຕອງ ແທນການເລື່ອນລິດຢາວໆ) */
+  .model-search-wrap{position:relative;}
+  .model-search-dropdown{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--panel);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;z-index:60;box-shadow:0 10px 24px -8px rgba(0,0,0,.3);}
+  .model-search-item{padding:10px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);}
+  .model-search-item:last-child{border-bottom:none;}
+  .model-search-item:hover,.model-search-item.active{background:var(--panel2);}
+  .model-search-empty{padding:10px 12px;font-size:13px;color:var(--muted);}
 </style>
 </head>
 <body>
@@ -191,12 +199,11 @@
       <div class="name">DAVONE SHOP</div>
       <div class="sub">ລະບົບສະຕັອກ &amp; ບິນຂາຍ</div>
     </div>
-    <div class="login-form">
-      <input class="login-input" type="text" id="loginUsername" placeholder="ຊື່ຜູ້ໃຊ້" autocomplete="username" autocapitalize="off" spellcheck="false">
-      <input class="login-input" type="password" id="loginPassword" placeholder="ລະຫັດຜ່ານ" autocomplete="current-password">
-      <div class="loginErr" id="loginErr">&nbsp;</div>
-      <button class="login-btn" id="loginBtn">ເຂົ້າສູ່ລະບົບ</button>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
+    <div class="loginErr" id="loginErr"></div>
+    <div class="keypad" id="keypad"></div>
     </div>
   </div>
 
@@ -246,19 +253,15 @@
 const SUPABASE_URL = 'https://snyyhmeprngskneaaubb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNueXlobWVwcm5nc2tuZWFhdWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIyMTgsImV4cCI6MjA5NTEzODIxOH0.3ltbo2EDzbHuMIC-TkoRew7asII0rIGNF0qoz2DkWHs';
 
-// ບັນຊີຜູ້ໃຊ້ໃຊ້ຮ່ວມກັນກັບ hub_2.html (ຕາຕະລາງ hub_accounts) ຜ່ານ username/password
-// ຄ່າ role ໃນຖານຂໍ້ມູນ (owner/admin/staff/viewer) ຈະຖືກແປງເປັນສິດໃນລະບົບນີ້ (appRole)
-const DB_ROLE_TO_APP_ROLE = {
-  owner: 'admin',   // ສິດເຕັມ: ເບິ່ງກຳໄລ, ລຶບໄດ້ທຸກຢ່າງ
-  admin: 'admin',   // ສິດເຕັມ: ເບິ່ງກຳໄລ, ລຶບໄດ້ທຸກຢ່າງ
-  staff: 'staff',   // ພະນັກງານ: ອອກບິນຂາຍ, ຮັບເຂົ້າ, ເບິ່ງສະຕັອກ (ບໍ່ເຫັນກຳໄລ/ລຶບບໍ່ໄດ້)
-  viewer: 'viewer'  // ເບິ່ງຢ່າງດຽວ: ໜ້າຫຼັກ, ສິນຄ້າ, ລາຍງານ (ບໍ່ອອກບິນ/ບໍ່ຮັບເຂົ້າ)
+// ປ່ຽນ PIN ຕາມທີ່ຕ້ອງການ: { pin : role }
+const PIN_ROLES = {
+  '1234': 'staff',   // ພະນັກງານ: ອອກບິນຂາຍ, ເບິ່ງສະຕັອກ
+  '9999': 'admin'    // ແອດມິນ: ທຸກຢ່າງ + ຮັບເຂົ້າ + ລາຍງານ
 };
-const ROLE_LABEL = { admin:'ແອດມິນ', staff:'ພະນັກງານ', viewer:'ຜູ້ຊົມ (ເບິ່ງຢ່າງດຽວ)' };
+const ROLE_LABEL = { staff:'ພະນັກງານ', admin:'ແອດມິນ' };
 
 let currentRole = null;
-let currentUsername = null;
-let currentUserFullName = null;
+let pinBuffer = '';
 
 /* ============================================================
    SUPABASE REST HELPER (fetch ตรงๆ, ไม่ใช้ supabase-js เพื่อความเข้ากันได้กับ iOS Safari)
@@ -385,68 +388,163 @@ function bindEnterAdvance(inputIds, finalId){
   });
 }
 
+/* ປ່ຽນ <select> ທີ່ມີລາຍການສິນຄ້າຫຼາຍໆໃຫ້ພິມຄົ້ນຫາໄດ້ (ຊື່ ຫຼື ລະຫັດ) ແທນການເລື່ອນຫາເອງ
+   ໃຊ້ໄດ້ກັບ select ໃດກໍ່ໄດ້ ໂດຍ select ເກົ່າຍັງຢູ່ໃນ DOM (ເຊື່ອງໄວ້) ເພື່ອບໍ່ໃຫ້ໂຄ້ດອື່ນທີ່ອ້າງອີງ .value / .selectedOptions ພັງ */
+function enableSearchableSelect(selectEl){
+  if(!selectEl || selectEl.dataset.searchable) return;
+  selectEl.dataset.searchable = 'true';
+  const wrap = document.createElement('div');
+  wrap.className = 'model-search-wrap';
+  selectEl.parentNode.insertBefore(wrap, selectEl);
+  wrap.appendChild(selectEl);
+  selectEl.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = selectEl.id + '_search';
+  input.autocomplete = 'off';
+  input.placeholder = 'ພິມຊື່ ຫຼື ລະຫັດສິນຄ້າ ເພື່ອຄົ້ນຫາ...';
+  wrap.appendChild(input);
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'model-search-dropdown';
+  dropdown.style.display = 'none';
+  wrap.appendChild(dropdown);
+
+  const options = Array.from(selectEl.options).filter(o=>o.value);
+  let highlighted = -1;
+
+  function renderList(filter){
+    const f = (filter||'').trim().toLowerCase();
+    const filtered = f ? options.filter(o=> o.textContent.toLowerCase().includes(f)) : options;
+    highlighted = -1;
+    dropdown.innerHTML = filtered.length
+      ? filtered.map(o=> `<div class="model-search-item" data-value="${o.value}">${o.textContent}</div>`).join('')
+      : '<div class="model-search-empty">ບໍ່ພົບສິນຄ້າ</div>';
+  }
+  function openDropdown(){ renderList(input.value); dropdown.style.display = 'block'; }
+  function closeDropdown(){ dropdown.style.display = 'none'; }
+  function selectOption(value){
+    selectEl.value = value;
+    const opt = selectEl.selectedOptions[0];
+    input.value = opt ? opt.textContent : '';
+    closeDropdown();
+    selectEl.dispatchEvent(new Event('change', {bubbles:true}));
+  }
+  function updateHighlight(items){
+    items.forEach((it,i)=> it.classList.toggle('active', i===highlighted));
+    if(items[highlighted]) items[highlighted].scrollIntoView({block:'nearest'});
+  }
+
+  input.addEventListener('focus', openDropdown);
+  input.addEventListener('click', openDropdown);
+  input.addEventListener('input', openDropdown);
+  dropdown.addEventListener('click', (e)=>{
+    const item = e.target.closest('.model-search-item');
+    if(item && item.dataset.value) selectOption(item.dataset.value);
+  });
+  input.addEventListener('keydown', (e)=>{
+    if(dropdown.style.display === 'none' && (e.key === 'ArrowDown' || e.key === 'Enter')){
+      openDropdown();
+      if(e.key === 'Enter') return;
+    }
+    const items = dropdown.querySelectorAll('.model-search-item[data-value]');
+    if(e.key === 'ArrowDown'){
+      e.preventDefault();
+      highlighted = Math.min(highlighted+1, items.length-1);
+      updateHighlight(items);
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault();
+      highlighted = Math.max(highlighted-1, 0);
+      updateHighlight(items);
+    } else if(e.key === 'Enter'){
+      if(dropdown.style.display !== 'none' && items.length){
+        e.preventDefault();
+        e.stopPropagation();
+        const idx = highlighted >= 0 ? highlighted : 0;
+        if(items[idx]) selectOption(items[idx].dataset.value);
+      }
+    } else if(e.key === 'Escape'){
+      closeDropdown();
+      input.blur();
+    }
+  });
+  input.addEventListener('blur', ()=>{
+    setTimeout(()=>{
+      closeDropdown();
+      const opt = selectEl.selectedOptions[0];
+      input.value = (opt && opt.value) ? opt.textContent : '';
+    }, 150);
+  });
+  document.addEventListener('click', (e)=>{
+    if(!wrap.contains(e.target)) closeDropdown();
+  });
+}
+
 /* ============================================================
    LOGIN
    ============================================================ */
-async function tryLogin(){
-  const userEl = document.getElementById('loginUsername');
-  const passEl = document.getElementById('loginPassword');
-  const errEl = document.getElementById('loginErr');
-  const btnEl = document.getElementById('loginBtn');
-  const username = userEl.value.trim();
-  const password = passEl.value;
-  errEl.textContent = '';
-  if(!username || !password){
-    errEl.textContent = 'ກະລຸນາປ້ອນຊື່ຜູ້ໃຊ້ ແລະ ລະຫັດຜ່ານ';
-    return;
-  }
-  btnEl.disabled = true;
-  try{
-    const rows = await sb(`hub_accounts?username=eq.${encodeURIComponent(username)}&password=eq.${encodeURIComponent(password)}&active=eq.true&select=*`);
-    const account = rows && rows[0];
-    const appRole = account ? DB_ROLE_TO_APP_ROLE[account.role] : null;
-    if(account && appRole){
-      currentRole = appRole;
-      currentUsername = account.username;
-      currentUserFullName = account.name || account.username;
-      sessionStorage.setItem('dv_stock_session', JSON.stringify({ role: appRole, username: currentUsername, name: currentUserFullName }));
-      passEl.value = '';
-      enterApp();
-    } else {
-      errEl.textContent = 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
-      passEl.value = '';
-    }
-  }catch(e){
-    errEl.textContent = 'ເຊື່ອມຕໍ່ບໍ່ໄດ້ ລອງໃໝ່';
-  }finally{
-    btnEl.disabled = false;
+function buildKeypad(){
+  const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+  const kp = document.getElementById('keypad');
+  kp.innerHTML = '';
+  keys.forEach(k=>{
+    const b = document.createElement('button');
+    b.textContent = k;
+    if(k === '') { b.style.visibility='hidden'; }
+    b.addEventListener('click', ()=> handleKey(k));
+    kp.appendChild(b);
+  });
+}
+function handleKey(k){
+  if(k === '' ) return;
+  if(k === '⌫'){ pinBuffer = pinBuffer.slice(0,-1); }
+  else if(pinBuffer.length < 4){ pinBuffer += k; }
+  renderPinDots();
+  if(pinBuffer.length === 4){ setTimeout(tryLogin, 150); }
+}
+function renderPinDots(){
+  const dots = document.querySelectorAll('.pin-dot');
+  dots.forEach((d,i)=> d.classList.toggle('filled', i < pinBuffer.length));
+}
+document.addEventListener('keydown', (e)=>{
+  const loginVisible = document.getElementById('loginScreen').style.display !== 'none';
+  if(!loginVisible) return;
+  if(e.key >= '0' && e.key <= '9'){ handleKey(e.key); }
+  else if(e.key === 'Backspace' || e.key === 'Delete'){ handleKey('⌫'); }
+});
+function tryLogin(){
+  const role = PIN_ROLES[pinBuffer];
+  document.getElementById('loginErr').textContent = '';
+  if(role){
+    currentRole = role;
+    sessionStorage.setItem('dv_stock_role', role);
+    pinBuffer = '';
+    renderPinDots();
+    enterApp();
+  } else {
+    document.getElementById('loginErr').textContent = 'ລະຫັດບໍ່ຖືກຕ້ອງ';
+    pinBuffer = '';
+    setTimeout(renderPinDots, 300);
   }
 }
-document.getElementById('loginBtn').addEventListener('click', tryLogin);
-document.getElementById('loginUsername').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
-document.getElementById('loginPassword').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
 document.getElementById('logoutBtn').addEventListener('click', ()=>{
   currentRole = null;
-  currentUsername = null;
-  currentUserFullName = null;
-  sessionStorage.removeItem('dv_stock_session');
+  sessionStorage.removeItem('dv_stock_role');
   document.getElementById('mainScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('loginUsername').value = '';
-  document.getElementById('loginPassword').value = '';
-  document.getElementById('loginErr').innerHTML = '&nbsp;';
 });
 
 /* ============================================================
    APP SHELL / TABS
    ============================================================ */
 const TABS = [
-  { id:'dashboard', label:'ໜ້າຫຼັກ', icon:'i-home',    roles:['staff','admin','viewer'] },
-  { id:'products',  label:'ສິນຄ້າ',   icon:'i-box',     roles:['staff','admin','viewer'] },
+  { id:'dashboard', label:'ໜ້າຫຼັກ', icon:'i-home',    roles:['staff','admin'] },
+  { id:'products',  label:'ສິນຄ້າ',   icon:'i-box',     roles:['staff','admin'] },
   { id:'receive',   label:'ຮັບເຂົ້າ', icon:'i-truck',   roles:['staff','admin'] },
   { id:'sell',      label:'ອອກບິນຂາຍ', icon:'i-receipt', roles:['staff','admin'] },
   { id:'transfer',  label:'ໂອນສາຂາ',  icon:'i-truck',   roles:['staff','admin'] },
-  { id:'report',    label:'ລາຍງານ',  icon:'i-chart',   roles:['staff','admin','viewer'] },
+  { id:'report',    label:'ລາຍງານ',  icon:'i-chart',   roles:['staff','admin'] },
 ];
 let activeTab = 'dashboard';
 
@@ -454,7 +552,7 @@ function enterApp(){
   document.getElementById('loginScreen').style.display = 'none';
   const main = document.getElementById('mainScreen');
   main.style.display = 'flex';
-  document.getElementById('roleLabel').textContent = `${currentUserFullName || ''} · ${ROLE_LABEL[currentRole]}`;
+  document.getElementById('roleLabel').textContent = ROLE_LABEL[currentRole];
   buildNav();
   renderTab();
 }
@@ -957,6 +1055,7 @@ async function renderReceive(main){
   loadReceiveHistory(historyMonth);
   if(canSeeCost) attachMoneyInput('r_cost', 0);
   const modelSel = document.getElementById('r_model');
+  enableSearchableSelect(modelSel);
   /* ອັດຕາຕ້ອງພິມໃໝ່ທຸກຄັ້ງທີ່ຮັບເຂົ້າ (ບໍ່ຈື່ອັດຕາເກົ່າໄວ້) ​ຕົ້ນທຶນກີບຈະລ໋ອກຕາມມື້ນີ້ ບໍ່ປ່ຽນຕາມພາຍຫຼັງ */
   function updateReceiveCostLabel(){
     if(!canSeeCost) return;
@@ -1107,7 +1206,7 @@ async function renderReceive(main){
       if(e.key === 'Enter'){ e.preventDefault(); handleReceiveFieldEnter(id); }
     });
   });
-  bindEnterAdvance(['r_supplier','r_date'], 'r_model');
+  bindEnterAdvance(['r_supplier','r_date'], 'r_model_search');
   document.getElementById('r_serials').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
       e.preventDefault();
@@ -1137,7 +1236,7 @@ async function renderReceive(main){
         supplier_name: document.getElementById('r_supplier').value.trim(),
         receipt_date: document.getElementById('r_date').value || todayStr(),
         total_amount: total,
-        created_by: currentUsername
+        created_by: currentRole
       }});
       /* ບັນທຶກທັງໝົດເປັນຊຸດ (bulk) ແທນທີລະລາຍການ: ສ້າງເລກເຄື່ອງ (unit) ກ່ອນ (ຖ້າມີ) ເພາະ movement ຕ້ອງອ້າງອີງ unit ທີ່ມີແລ້ວ ຈາກນັ້ນບັນທຶກລາຍການ/ການເຄື່ອນໄຫວ/ຕົ້ນທຶນພ້ອມກັນ */
       const receiptDate = document.getElementById('r_date').value || todayStr();
@@ -1155,7 +1254,7 @@ async function renderReceive(main){
       }));
       const movementsBody = receiveCart.map(item=> ({
         id: uid(), model_id: item.model_id, unit_id: item.serial_no ? unitIdBySerial[item.serial_no] : null, movement_type:'in',
-        quantity: item.quantity, ref_type:'purchase', ref_id: receiptId, created_by: currentUsername
+        quantity: item.quantity, ref_type:'purchase', ref_id: receiptId, created_by: currentRole
       }));
       /* ອັບເດດຕົ້ນທຶນອ້າງອິງຂອງແຕ່ລະຮຸ່ນສິນຄ້າ (ໜຶ່ງຄຳຂໍຕໍ່ 1 ຮຸ່ນ ເຖິງຈະມີຫຼາຍລາຍການຂອງຮຸ່ນດຽວກັນ) */
       const costByModel = {};
@@ -1419,6 +1518,7 @@ async function renderSell(main){
   attachMoneyInput('s_discount', 0);
   attachMoneyInput('s_pay_amount', '');
   const modelSel = document.getElementById('s_model');
+  enableSearchableSelect(modelSel);
   /* ໃສ່ລາຄາໃຫ້ອັດຕະໂນມັດຕາມສະກຸນເງິນທີ່ເລືອກ (ກີບ ໃຊ້ sale_price, ບາດ ໃຊ້ sale_price_thb) */
   function fillSellPrice(){
     const opt = modelSel.selectedOptions[0];
@@ -1486,7 +1586,7 @@ async function renderSell(main){
   });
   bindEnterKey(['s_qty','s_price'], 's_addItem');
   document.getElementById('s_discount').addEventListener('input', updateSellTotals);
-  bindEnterAdvance(['s_name','s_phone','s_village','s_district','s_province'], 's_model');
+  bindEnterAdvance(['s_name','s_phone','s_village','s_district','s_province'], 's_model_search');
   bindSellCartRemove();
   document.getElementById('s_addPayment').addEventListener('click', ()=>{
     const amt = moneyValue('s_pay_amount');
@@ -1542,7 +1642,7 @@ async function renderSell(main){
         currency,
         paid_amount: paid,
         payment_status: status,
-        created_by: currentUsername
+        created_by: currentRole
       }});
       /* ບັນທຶກລາຍການ/ການເຄື່ອນໄຫວ/ການຈ່າຍເງິນທັງໝົດເປັນຊຸດດຽວ (bulk insert) ແທນການສົ່ງທີລະລາຍການ ໃຫ້ໄວຂຶ້ນຫຼາຍ ໂດຍສະເພາະເມື່ອບິນມີຫຼາຍລາຍການ ຫຼືເນັດຊ້າ */
       const soldAt = todayStr();
@@ -1552,13 +1652,13 @@ async function renderSell(main){
       }));
       const movementsBody = sellCart.map(item=> ({
         id: uid(), model_id: item.model_id, unit_id: item.unit_id, movement_type:'out',
-        quantity: item.quantity, ref_type:'sale', ref_id: invoiceId, created_by: currentUsername
+        quantity: item.quantity, ref_type:'sale', ref_id: invoiceId, created_by: currentRole
       }));
       const soldUnitIds = sellCart.filter(item=> item.unit_id).map(item=> item.unit_id);
       const paymentsBody = sellPayments.map(p=> ({
         id: uid(), invoice_id: invoiceId, payment_date: soldAt,
         method: p.method, currency: p.currency, amount: p.amount,
-        exchange_rate: p.exchange_rate, converted_amount: p.converted_amount, created_by: currentUsername
+        exchange_rate: p.exchange_rate, converted_amount: p.converted_amount, created_by: currentRole
       }));
       await Promise.all([
         sb('sales_invoice_items', { method:'POST', body: itemsBody }),
@@ -1668,6 +1768,7 @@ async function renderTransfer(main){
     </div>
   `;
   const modelSel = document.getElementById('tr_model');
+  enableSearchableSelect(modelSel);
   async function refreshSerialList(){
     const opt = modelSel.selectedOptions[0];
     const listEl = document.getElementById('tr_serialList');
@@ -1756,7 +1857,7 @@ async function renderTransfer(main){
       if(e.key === 'Enter'){ e.preventDefault(); handleTransferFieldEnter(id); }
     });
   });
-  bindEnterAdvance(['tr_branch','tr_date'], 'tr_model');
+  bindEnterAdvance(['tr_branch','tr_date'], 'tr_model_search');
   document.getElementById('tr_submit').addEventListener('click', async (e)=>{
     if(!transferCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
     const branch = document.getElementById('tr_branch').value.trim();
@@ -1771,7 +1872,7 @@ async function renderTransfer(main){
       /* ບັນທຶກທັງໝົດເປັນຊຸດດຽວ (bulk) ແທນທີລະລາຍການ ໃຫ້ໄວຂຶ້ນ */
       const movementsBody = transferCart.map(item=> ({
         id: uid(), model_id: item.model_id, unit_id: item.unit_id, movement_type:'out',
-        quantity: item.quantity, ref_type:'transfer', ref_id: transferId, note: fullNote, created_by: currentUsername
+        quantity: item.quantity, ref_type:'transfer', ref_id: transferId, note: fullNote, created_by: currentRole
       }));
       const transferredUnitIds = transferCart.filter(item=> item.unit_id).map(item=> item.unit_id);
       await Promise.all([
@@ -2188,7 +2289,7 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
           await sb('sales_payments', { method:'POST', body:{
             id: uid(), invoice_id: invoiceId, payment_date: todayStr(),
             method: bg.querySelector('#pay_method').value, currency: payCurrency,
-            amount: amt, exchange_rate: rate, converted_amount: convertedAmt, created_by: currentUsername
+            amount: amt, exchange_rate: rate, converted_amount: convertedAmt, created_by: currentRole
           }});
           const newPaid = Number(inv.paid_amount||0) + convertedAmt;
           const newStatus = newPaid >= Number(inv.total_amount||0) ? 'paid' : 'partial';
@@ -2245,14 +2346,10 @@ async function bulkVoidInvoices(ids){
 /* ============================================================
    INIT
    ============================================================ */
-const savedSession = sessionStorage.getItem('dv_stock_session');
-if(savedSession){
-  try{
-    const s = JSON.parse(savedSession);
-    currentRole = s.role; currentUsername = s.username; currentUserFullName = s.name;
-    enterApp();
-  }catch(e){ sessionStorage.removeItem('dv_stock_session'); }
-}
+buildKeypad();
+renderPinDots();
+const savedRole = sessionStorage.getItem('dv_stock_role');
+if(savedRole){ currentRole = savedRole; enterApp(); }
 </script>
 </body>
 </html>
