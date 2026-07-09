@@ -307,10 +307,14 @@
   /* OVERLAY */
   .overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:100; }
   .modal { background:#16213e; border-radius:20px; padding:32px 24px; text-align:center; width:80%; max-width:320px; display:flex; flex-direction:column; align-items:center; gap:10px; color:#fff; }
-  .modal-img-box { background:#fff; border-radius:16px; overflow:hidden; width:90%; max-width:420px; }
-  .modal-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#1a1a1a; color:#fff; font-size:14px; font-weight:600; }
-  .modal-img { width:100%; display:block; }
-  .modal-info { padding:14px 16px; font-size:13px; line-height:1.8; color:#ccc; text-align:left; width:100%; }
+  .modal-img-box { background:#fff; border-radius:16px; overflow:hidden; width:96vw; max-width:640px; max-height:94vh; display:flex; flex-direction:column; }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#1a1a1a; color:#fff; font-size:14px; font-weight:600; flex-shrink:0; }
+  .modal-img-viewport { flex:1 1 auto; min-height:0; overflow:auto; background:#0c0c0c; display:flex; align-items:flex-start; justify-content:center; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y pinch-zoom; }
+  .modal-img { width:100%; display:block; cursor:zoom-in; transition:transform 0.15s; }
+  .modal-img.zoomed { width:260%; max-width:none; cursor:zoom-out; }
+  .modal-img.rot-side { width:auto; height:94vh; max-width:none; }
+  .modal-img.rot-side.zoomed { height:260%; }
+  .modal-info { padding:14px 16px; font-size:13px; line-height:1.8; color:#ccc; text-align:left; width:100%; flex-shrink:0; }
   .modal-actions { display:flex; gap:12px; width:100%; }
   .btn-cancel { flex:1; padding:13px; border-radius:12px; border:1.5px solid #555; background:#1a1a2e; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; color:#ccc; }
   .btn-delete { flex:1; padding:13px; border-radius:12px; border:none; background:#e74c3c; color:#fff; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
@@ -409,17 +413,31 @@ function getSupa() {
 
 async function dbGet() {
   try {
-    const { data, error } = await Promise.race([
-      getSupa().from("records").select("*").order("timestamp", {ascending:true}),
+    // Speed fix: the list view used to select "*", which downloaded every
+    // receipt photo (base64) for every record on every load and every 30s
+    // poll. That was the main cause of slow admin loading + slow confirm.
+    // Now we only pull the lightweight fields for the list, plus a separate
+    // tiny query for just the IDs that have a photo (no image bytes at all).
+    // The actual photo is fetched on-demand only when "ເບິ່ງບິນ" is tapped.
+    const listPromise = getSupa().from("records")
+      .select("id,timestamp,department,department_name,amount,currency,note,verified,approved")
+      .order("timestamp", {ascending:true});
+    const imgIdsPromise = getSupa().from("records")
+      .select("id")
+      .not("image","is",null);
+
+    const [{ data, error }, { data: imgRows }] = await Promise.race([
+      Promise.all([listPromise, imgIdsPromise]),
       new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
     ]);
     if (error || !data) return getCached();
+    const hasImageSet = new Set((imgRows||[]).map(x=>x.id));
     const approvedMap = getApprovedMap();
     const records = data.map(r => ({
       id: r.id, timestamp: r.timestamp,
       department: r.department, departmentName: r.department_name,
       amount: Number(r.amount), currency: r.currency||"LAK",
-      note: r.note||"", image: r.image||null,
+      note: r.note||"", hasImage: hasImageSet.has(r.id),
       verified: r.verified||false, approved: r.approved||false,
       approvedAt: approvedMap[r.id] || null,
     }));
@@ -429,6 +447,13 @@ async function dbGet() {
     console.error(e);
     return getCached();
   }
+}
+
+// Fetch a single record's photo only when actually needed (viewing the bill).
+async function dbGetImage(id) {
+  const { data, error } = await getSupa().from("records").select("image").eq("id", id).single();
+  if (error) throw error;
+  return data?.image || null;
 }
 
 function getCached() {
@@ -496,11 +521,11 @@ function compressImg(dataUrl) {
   return new Promise(res => {
     const i = new Image();
     i.onload = () => {
-      const MAX=1280; let w=i.width,h=i.height;
+      const MAX=1600; let w=i.width,h=i.height;
       if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
       const c=document.createElement("canvas");c.width=w;c.height=h;
       c.getContext("2d").drawImage(i,0,0,w,h);
-      res(c.toDataURL("image/jpeg",0.72));
+      res(c.toDataURL("image/jpeg",0.8));
     };
     i.onerror=()=>res(null); i.src=dataUrl;
   });
@@ -1086,8 +1111,8 @@ function recordsHTML(filtered, isOwner) {
       const { members } = g;
       const verified = members.every(m => m.verified);
       const note = members.map(m => m.note).find(n => n) || "";
-      const imgMember = members.find(m => m.image);
-      const image = imgMember ? imgMember.image : null;
+      const imgMember = members.find(m => m.hasImage);
+      const hasImage = !!imgMember;
       const imageId = imgMember ? imgMember.id : null;
       const ids = members.map(m => m.id).join(",");
       const flagsStr = members.map(m => CUR_DISPLAY[m.currency||"LAK"].flag).join("");
@@ -1110,7 +1135,7 @@ function recordsHTML(filtered, isOwner) {
         </div>
         ${note?`<div class="record-name">👤 ${note}</div>`:""}
         <div class="record-actions">
-          ${image?`<button class="view-btn" onclick="viewBill(${imageId})">🖼 ເບິ່ງບິນ</button>`:""}
+          ${hasImage?`<button class="view-btn" onclick="viewBill(${imageId})">🖼 ເບິ່ງບິນ</button>`:""}
           ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyGroup('${ids}')">${verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
           ${!isOwner?`<button class="delete-btn" onclick="confirmDeleteGroup('${ids}')">🗑</button>`:""}
         </div>
@@ -1128,7 +1153,7 @@ function recordsHTML(filtered, isOwner) {
         </div>
         ${r.note?`<div class="record-name">👤 ${r.note}</div>`:""}
         <div class="record-actions">
-          ${r.image?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
+          ${r.hasImage?`<button class="view-btn" onclick="viewBill(${r.id})">🖼 ເບິ່ງບິນ</button>`:""}
           ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?"✅ ສຳເລັດ":"⏳ ກົດຢືນຢັນ"}</button>`:""}
           ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})">🗑</button>`:""}
         </div>
@@ -1143,17 +1168,23 @@ async function tapVerifyGroup(idsStr) {
   if(!members.length) return;
   const newVal = !members.every(m => m.verified);
   const patch = {approved:newVal, verified:newVal};
-  for(const m of members) { await dbUpdate(m.id, patch); }
-  // Store approvedAt in localStorage (no new DB column needed)
+  // Speed fix: update the screen immediately, write to the DB for every
+  // member in parallel (instead of one-by-one), and skip the full re-fetch.
   const approvedMap = getApprovedMap();
-  if (newVal) {
-    const ts = Date.now();
-    for(const m of members) approvedMap[m.id] = ts;
-  } else {
-    for(const m of members) delete approvedMap[m.id];
+  const ts = Date.now();
+  for(const m of members) {
+    m.verified = newVal; m.approved = newVal;
+    if (newVal) { approvedMap[m.id] = ts; m.approvedAt = ts; }
+    else { delete approvedMap[m.id]; m.approvedAt = null; }
   }
   saveApprovedMap(approvedMap);
-  await refreshAdmin();
+  renderAdmin();
+  try {
+    await Promise.all(members.map(m => dbUpdate(m.id, patch)));
+  } catch(e) {
+    console.error(e);
+    await refreshAdmin(); // fall back to a real refresh if a save failed
+  }
 }
 
 function confirmDeleteGroup(idsStr) {
@@ -1200,14 +1231,15 @@ async function checkAndDeleteGroup(idsStr, btn) {
 
 
 function calcStorage(records) {
-  // Estimate DB size: each record ~500 bytes base + image size
+  // Estimate DB size: each record ~500 bytes base + image size.
+  // Photos are no longer downloaded to the client for the list view (for
+  // speed), so we estimate using a typical compressed-photo size instead
+  // of the exact byte length.
+  const AVG_IMAGE_BYTES = 260 * 1024; // ~260KB average for a compressed receipt photo
   let totalBytes = 0;
   for(const r of records) {
     totalBytes += 500; // base fields
-    if(r.image) {
-      // base64 length * 0.75 = approx bytes
-      totalBytes += Math.round(r.image.length * 0.75);
-    }
+    if(r.hasImage) totalBytes += AVG_IMAGE_BYTES;
   }
   const MAX_BYTES = 500 * 1024 * 1024; // 500 MB Supabase free limit
   const pct = Math.min(100, Math.round(totalBytes / MAX_BYTES * 100 * 100) / 100);
@@ -1382,13 +1414,21 @@ async function tapVerify(id) {
   const r=adminRecords.find(x=>x.id===id); if(!r) return;
   const newVerified = !r.verified;
   const patch = {approved: newVerified, verified: newVerified};
-  await dbUpdate(id, patch);
-  // Store approvedAt in localStorage (no new DB column needed)
+  // Speed fix: update the screen immediately (optimistic UI) instead of
+  // waiting for the network round-trip + a full list re-fetch before the
+  // button changes. The DB write happens in the background.
+  r.verified = newVerified; r.approved = newVerified;
   const approvedMap = getApprovedMap();
-  if (newVerified) approvedMap[id] = Date.now();
-  else delete approvedMap[id];
+  if (newVerified) { approvedMap[id] = Date.now(); r.approvedAt = approvedMap[id]; }
+  else { delete approvedMap[id]; r.approvedAt = null; }
   saveApprovedMap(approvedMap);
-  await refreshAdmin();
+  renderAdmin();
+  try {
+    await dbUpdate(id, patch);
+  } catch(e) {
+    console.error(e);
+    await refreshAdmin(); // fall back to a real refresh if the save failed
+  }
 }
 
 function confirmDelete(id) {
@@ -1524,18 +1564,52 @@ async function doClearAll(btn) {
   }
 }
 
-function viewBill(id) {
-  const r=adminRecords.find(x=>x.id===id); if(!r||!r.image) return;
+async function viewBill(id) {
+  const r=adminRecords.find(x=>x.id===id); if(!r) return;
+  billRotation = 0;
   const dept=DEPTS.find(d=>d.id===r.department)||{name:r.departmentName};
   const overlay=document.createElement("div");
   overlay.className="overlay";
   overlay.innerHTML=`<div class="modal-img-box">
-    <div class="modal-header"><span>ບິນ — ${dept.name}</span><button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button></div>
-    <img src="${r.image}" class="modal-img">
+    <div class="modal-header">
+      <span>ບິນ — ${dept.name}</span>
+      <div style="display:flex;gap:14px;align-items:center">
+        <button id="billRotateBtn" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;display:none" onclick="rotateBillImg()">🔄</button>
+        <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
+      </div>
+    </div>
+    <div class="modal-img-viewport" id="billImgViewport">
+      <div style="color:#888;font-size:13px;padding:40px 0">⏳ ກຳລັງໂຫຼດຮູບ...</div>
+    </div>
     <div class="modal-info"><b>ຈຳນວນ:</b> ${fmtAmt(r.amount,r.currency||"LAK")}<br>${r.note?`<b>ຊື່:</b> ${r.note}<br>`:""}<b>ເວລາ:</b> ${fmtDate(r.timestamp)}</div>
+    <div style="font-size:11px;color:#999;text-align:center;padding:0 16px 12px">ແຕະຮູບ 2 ຄັ້ງເພື່ອຊູມ · ລາກເພື່ອເລື່ອນເບິ່ງ</div>
   </div>`;
   overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
   document.body.appendChild(overlay);
+
+  try {
+    const image = await dbGetImage(id);
+    const viewport = document.getElementById("billImgViewport");
+    if (!viewport) return; // modal already closed
+    if (!image) { viewport.innerHTML = `<div style="color:#888;font-size:13px;padding:40px 0">ບໍ່ມີຮູບບິນ</div>`; return; }
+    viewport.innerHTML = `<img src="${image}" class="modal-img" id="billImgEl" ondblclick="toggleZoomBillImg()">`;
+    document.getElementById("billRotateBtn").style.display = "";
+  } catch(e) {
+    const viewport = document.getElementById("billImgViewport");
+    if (viewport) viewport.innerHTML = `<div style="color:#e74c3c;font-size:13px;padding:40px 0">ໂຫຼດຮູບບໍ່ສຳເລັດ</div>`;
+  }
+}
+
+let billRotation = 0;
+function toggleZoomBillImg() {
+  const img = document.getElementById("billImgEl");
+  if (img) img.classList.toggle("zoomed");
+}
+function rotateBillImg() {
+  const img = document.getElementById("billImgEl"); if (!img) return;
+  billRotation = (billRotation + 90) % 360;
+  img.style.transform = `rotate(${billRotation}deg)`;
+  img.classList.toggle("rot-side", billRotation===90 || billRotation===270);
 }
 
 async function doBackup() {
