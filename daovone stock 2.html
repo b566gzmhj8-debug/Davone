@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Davone Shop - ລະບົບສະຕັອກ &amp; ບິນຂາຍ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Lao:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F3ED; --panel:#FFFFFF; --panel2:#EFEAE0; --border:#DBD2C0;
+    --orange:#B8471C; --orange-soft:#B8471C; --ink:#2A241E; --muted:#7C7266;
+    --danger:#A23327; --ok:#3E7A52;
+    --font-body:'Noto Serif Lao','Source Serif 4',Georgia,serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink);min-height:100vh;}
+  #app{width:100%;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);}
+  .narrow{max-width:520px;margin:0 auto;width:100%;}
+
+  /* ---- Login ---- */
+  #loginScreen{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;}
+  .brand{text-align:center;margin-bottom:28px;}
+  .brand .name{font-size:22px;letter-spacing:1px;color:var(--orange-soft);font-weight:600;}
+  .brand .sub{font-size:13px;color:var(--muted);margin-top:4px;}
+  .pin-dots{display:flex;gap:12px;margin:20px 0;}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--orange);background:transparent;}
+  .pin-dot.filled{background:var(--orange);}
+  .keypad{display:grid;grid-template-columns:repeat(3,64px);gap:14px;}
+  .keypad button{width:64px;height:64px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--ink);font-size:20px;font-family:var(--font-body);box-shadow:0 1px 3px rgba(0,0,0,.07);}
+  .keypad button:active{background:var(--panel2);}
+  .loginErr{color:var(--danger);font-size:13px;height:18px;margin-top:6px;}
+
+  /* ---- Header / Nav ---- */
+  header{background:var(--panel);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;gap:10px;}
+  .head-left{display:flex;align-items:center;gap:10px;min-width:0;}
+  .seal-mark{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;position:relative;border-radius:50%;border:1.4px solid var(--orange);color:var(--orange);}
+  .seal-mark::before{content:'';position:absolute;inset:3px;border:1px dashed var(--orange);border-radius:50%;}
+  .seal-mark .dv-icon{width:15px;height:15px;}
+  header .title{font-size:15px;color:var(--orange-soft);font-weight:700;line-height:1.2;}
+  header .role{font-size:11px;color:var(--muted);}
+  header .logout{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:6px 10px;font-size:12px;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-body);}
+
+  nav{display:flex;overflow-x:auto;background:var(--panel2);border-bottom:1px solid var(--border);}
+  nav button{flex:1;min-width:70px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);padding:8px 4px 7px;font-size:10.5px;border-bottom:2px solid transparent;white-space:nowrap;font-family:var(--font-body);}
+  nav button.active{color:var(--orange-soft);border-bottom:2px solid var(--orange);font-weight:600;}
+
+  main{flex:1;padding:14px 14px 90px;overflow-y:auto;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+  .card h3{margin:0 0 10px;font-size:14px;color:var(--orange-soft);border-bottom:1px solid var(--border);padding-bottom:8px;display:flex;align-items:center;gap:7px;}
+  .card h3 .dv-icon{color:var(--orange);}
+  .row{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;font-size:13px;border-bottom:1px solid var(--border);}
+  .row:last-child{border-bottom:none;}
+  .row>span:first-child{flex:1 1 auto;min-width:0;}
+  .row>span:last-child{flex:none;white-space:nowrap;text-align:right;}
+  .row>span:only-child{flex:1 1 auto;white-space:normal;text-align:left;}
+  .muted{color:var(--muted);}
+  .gold{color:var(--orange-soft);}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;}
+  input,select,textarea{width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;}
+  input:focus,select:focus,textarea:focus{outline:1px solid var(--orange);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:600;width:100%;margin-top:10px;font-family:var(--font-body);}
+  .btn.secondary{background:none;border:1px solid var(--orange);color:var(--orange-soft);}
+  .btn.danger{background:var(--danger);color:#fff;}
+  .btn.small{width:auto;padding:6px 10px;font-size:12px;margin-top:0;}
+  .btn .dv-icon{width:15px;height:15px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat{background:var(--panel2);border-radius:10px;padding:12px;text-align:center;}
+  .stat .num{font-size:19px;color:var(--orange-soft);font-weight:700;font-variant-numeric:tabular-nums;}
+  .stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:12px;}
+  .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
+  .tag.ok{border-color:var(--ok);color:var(--ok);}
+  .tag.sold{border-color:var(--danger);color:var(--danger);}
+  .list-item{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .list-item:last-child{border-bottom:none;}
+  .list-item>span:first-child,.list-item>div:first-child{flex:1 1 auto;min-width:0;}
+  .list-item>span:last-child,.list-item>div:last-child{flex:none;white-space:nowrap;text-align:right;}
+  .empty{text-align:center;color:var(--muted);font-size:13px;padding:20px 0;}
+  .cart-item{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px;}
+  .cart-item .x{color:var(--danger);font-size:16px;padding:0 6px;}
+  .search-box{position:relative;margin-bottom:8px;}
+  .picker-list{max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-top:6px;}
+  .picker-row{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;}
+  .picker-row:last-child{border-bottom:none;}
+  .picker-row .n{color:var(--ink);}
+  .picker-row .p{color:var(--orange-soft);font-size:12px;}
+  .toast-container{position:fixed;left:0;right:0;top:calc(66px + env(safe-area-inset-top));z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 16px;pointer-events:none;}
+  .toast{background:var(--ink);border:none;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;box-shadow:0 10px 24px -8px rgba(0,0,0,.45);text-align:center;max-width:440px;animation:toastIn .18s ease-out;display:flex;align-items:center;gap:7px;justify-content:center;font-family:var(--font-body);}
+  .toast .dv-icon{color:#8fd0a0;width:15px;height:15px;flex:none;}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:50;}
+  .modal{background:var(--panel);border-top:1px solid var(--border);border-radius:16px 16px 0 0;padding:16px;width:100%;max-width:520px;margin:0 auto;max-height:85vh;overflow-y:auto;}
+  .modal h3{margin-top:0;color:var(--orange-soft);display:flex;align-items:center;gap:7px;}
+  .invoice-total{font-size:20px;color:var(--orange-soft);font-weight:700;text-align:right;margin-top:10px;font-variant-numeric:tabular-nums;}
+
+  /* ---- Document-style card (receipt / transfer note), mimics printed receipt layout ---- */
+  .doc-card{margin:-16px -16px 14px;border-radius:16px 16px 0 0;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-top:none;}
+  .doc-head{background:linear-gradient(135deg,var(--orange),#D9752F);color:#fff;padding:16px 18px 14px;}
+  .doc-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .doc-brand{display:flex;align-items:center;gap:8px;min-width:0;}
+  .doc-brand .seal-mark{width:32px;height:32px;border-color:#fff;color:#fff;flex:none;}
+  .doc-brand .seal-mark::before{border-color:rgba(255,255,255,.6);}
+  .doc-brand-name{font-weight:700;font-size:14px;letter-spacing:.4px;white-space:nowrap;}
+  .doc-head-title{text-align:right;flex:none;}
+  .doc-head-title h3{margin:0;color:#fff;font-size:14px;justify-content:flex-end;font-family:var(--font-mono);}
+  .doc-head-meta{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:9px;font-size:11px;}
+  .doc-tag{font-size:11px;font-weight:700;border:1.3px solid rgba(255,255,255,.9);border-radius:6px;padding:3px 8px;color:#fff;white-space:nowrap;background:rgba(0,0,0,.18);text-shadow:0 1px 2px rgba(0,0,0,.35);}
+  .doc-tag.solid{background:rgba(0,0,0,.36);border-color:transparent;}
+  .doc-tag.solid, .doc-tag.solid *{color:#fff !important;}
+  .doc-body{padding:14px 18px 2px;}
+  .doc-box{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start;}
+  .doc-avatar{width:38px;height:38px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;}
+  .doc-avatar .dv-icon{width:18px;height:18px;}
+  .doc-box-info{flex:1;min-width:0;}
+  .doc-line{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);margin-top:4px;}
+  .doc-line:first-child{margin-top:0;}
+  .doc-line .dv-icon{width:13px;height:13px;color:var(--orange-soft);flex:none;}
+  .doc-section-label{font-size:11px;font-weight:700;color:var(--orange-soft);letter-spacing:.02em;margin:2px 0 6px;}
+  .doc-table-head{display:flex;flex-wrap:nowrap;justify-content:space-between;gap:10px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:7px 12px;border-radius:8px 8px 0 0;}
+  .doc-table-body{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:0 12px;margin-bottom:12px;}
+  .doc-table-body .row{font-size:12.5px;}
+  .doc-total-band{background:var(--orange);color:#fff;border-radius:9px;padding:10px 14px;display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:10px;font-size:16px;font-weight:700;margin:6px 0 14px;}
+  .doc-total-band span:last-child{white-space:nowrap;flex:none;}
+  .doc-footer{padding:12px 18px;border-top:1px solid var(--border);background:var(--panel2);text-align:center;font-size:11px;color:var(--muted);}
+  @media (min-width:860px){
+    .doc-card{margin:-28px -32px 16px;border-radius:16px;}
+  }
+  .switch{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0;}
+  .icon{width:16px;height:16px;display:inline-block;vertical-align:middle;}
+  hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0;}
+
+  .body-row{display:flex;flex-direction:column;flex:1;min-height:0;}
+  .card-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+  .row-actions{display:flex;gap:8px;align-items:center;}
+  .icon-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 9px;font-size:12px;line-height:1;display:inline-flex;align-items:center;gap:4px;font-family:var(--font-body);}
+  .icon-btn:hover{color:var(--orange-soft);border-color:var(--orange);}
+  .icon-btn .dv-icon{width:12px;height:12px;}
+
+  /* ---- Icons & mono reference codes ---- */
+  .dv-icon{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;}
+  .mono{font-family:var(--font-mono);letter-spacing:-.01em;}
+
+  /* ===================== DESKTOP / MacBook LAYOUT ===================== */
+  @media (min-width:860px){
+    body{padding:0;}
+    #loginScreen{min-height:100vh;}
+    header{padding:16px 28px;}
+    header .title{font-size:17px;}
+    .body-row{flex-direction:row;align-items:stretch;}
+    nav{
+      flex-direction:column;overflow-x:visible;width:190px;flex:none;
+      border-bottom:none;border-right:1px solid var(--border);
+      position:sticky;top:53px;align-self:flex-start;height:calc(100vh - 53px);
+    }
+    nav button{
+      flex:none;width:100%;flex-direction:row;justify-content:flex-start;text-align:left;padding:13px 20px;font-size:13px;
+      border-bottom:none;border-left:3px solid transparent;
+    }
+    nav button .dv-icon{width:16px;height:16px;}
+    nav button.active{border-left:3px solid var(--orange);border-bottom:none;background:var(--panel2);}
+    main{flex:1;padding:26px 40px 70px;max-width:1560px;}
+    .card{padding:18px 22px;}
+    .card-grid.cols-2{grid-template-columns:1fr 1fr;}
+    .card-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
+    .stats-row{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));max-width:1100px;}
+    .keypad button:hover{border-color:var(--orange);cursor:pointer;}
+    nav button:hover{color:var(--orange-soft);cursor:pointer;}
+    .logout:hover{border-color:var(--orange);cursor:pointer;}
+    .list-item, .row{cursor:default;}
+    .row.clickable, .list-item.clickable{cursor:pointer;}
+    .row.clickable:hover, .list-item.clickable:hover{background:var(--panel2);border-radius:6px;}
+    .modal-bg{align-items:center;}
+    .modal{border-radius:16px;width:90vw;max-width:900px;max-height:88vh;padding:28px 32px;}
+    .modal input, .modal select, .modal textarea{padding:11px 13px;font-size:15px;}
+    .modal label{font-size:13px;margin:12px 0 5px;}
+    .icon-btn{padding:7px 13px;font-size:13px;}
+    .btn.small{padding:8px 15px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== LOGIN ===================== -->
+  <div id="loginScreen">
+    <div class="narrow" style="display:flex;flex-direction:column;align-items:center;">
+    <div class="brand">
+      <div class="seal-mark" style="width:44px;height:44px;margin:0 auto 12px;"><svg class="dv-icon" style="width:20px;height:20px;"><use href="#i-gear"></use></svg></div>
+      <div class="name">DAVONE SHOP</div>
+      <div class="sub">ລະບົບສະຕັອກ &amp; ບິນຂາຍ</div>
+    </div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="loginErr" id="loginErr"></div>
+    <div class="keypad" id="keypad"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN APP ===================== -->
+  <div id="mainScreen" style="display:none;flex-direction:column;flex:1;">
+    <header>
+      <div class="head-left">
+        <div class="seal-mark"><svg class="dv-icon"><use href="#i-gear"></use></svg></div>
+        <div>
+          <div class="title">DAVONE SHOP</div>
+          <div class="role" id="roleLabel"></div>
+        </div>
+      </div>
+      <button class="logout" id="logoutBtn"><svg class="dv-icon" style="width:13px;height:13px;"><use href="#i-logout"></use></svg>ອອກລະບົບ</button>
+    </header>
+    <div class="body-row">
+      <nav id="tabNav"></nav>
+      <main id="mainContent"></main>
+    </div>
+  </div>
+
+</div>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<symbol id="i-home" viewBox="0 0 24 24"><polyline points="3 11 12 4 21 11"></polyline><path d="M5 10v9a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1v-9"></path></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5l9-4 9 4-9 4-9-4z"></path><path d="M3 7.5v9l9 4 9-4v-9"></path><path d="M12 11.5v9"></path></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="7" width="13" height="9" rx="1"></rect><path d="M14 10h4l3 3v3h-7z"></path><circle cx="5.5" cy="18.2" r="1.6"></circle><circle cx="17" cy="18.2" r="1.6"></circle></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20V3z"></path><line x1="8.5" y1="8" x2="15.5" y2="8"></line><line x1="8.5" y1="11.5" x2="15.5" y2="11.5"></line><line x1="8.5" y1="15" x2="13" y2="15"></line></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="20"></line><rect x="6" y="12" width="3" height="8"></rect><rect x="11" y="8" width="3" height="12"></rect><rect x="16" y="4" width="3" height="16"></rect></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"></path><line x1="14" y1="7" x2="17" y2="10"></line></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"></line><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"></path><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z"></path><polyline points="9 12 11 14 15 9.5"></polyline></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"></path><polyline points="14 8 18 12 14 16"></polyline><line x1="18" y1="12" x2="9" y2="12"></line></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v3M12 18.5v3M4.4 4.4l2.1 2.1M17.5 17.5l2.1 2.1M2.5 12h3M18.5 12h3M4.4 19.6l2.1-2.1M17.5 6.5l2.1-2.1"></path></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><polyline points="8 12.5 11 15.5 16 9"></polyline></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="7.5" x2="12" y2="13"></line><circle cx="12" cy="16.3" r="0.9" fill="currentColor" stroke="none"></circle></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><path d="M16 4.5c1.7.4 3 2 3 3.9 0 1.9-1.3 3.5-3 3.9"></path><path d="M21 20c0-2.8-2-5.1-4.7-5.8"></path></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"></path><circle cx="16.5" cy="13.5" r="1.4"></circle></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4 1.5V19a2 2 0 0 1-2 2C10.5 21 3 13.5 3 6a2 2 0 0 1 2-2z"></path></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"></path><circle cx="12" cy="10" r="2.6"></circle></symbol>
+</svg>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const SUPABASE_URL = 'https://snyyhmeprngskneaaubb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNueXlobWVwcm5nc2tuZWFhdWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIyMTgsImV4cCI6MjA5NTEzODIxOH0.3ltbo2EDzbHuMIC-TkoRew7asII0rIGNF0qoz2DkWHs';
+
+// ປ່ຽນ PIN ຕາມທີ່ຕ້ອງການ: { pin : role }
+const PIN_ROLES = {
+  '1234': 'staff',   // ພະນັກງານ: ອອກບິນຂາຍ, ເບິ່ງສະຕັອກ
+  '9999': 'admin'    // ແອດມິນ: ທຸກຢ່າງ + ຮັບເຂົ້າ + ລາຍງານ
+};
+const ROLE_LABEL = { staff:'ພະນັກງານ', admin:'ແອດມິນ' };
+
+let currentRole = null;
+let pinBuffer = '';
+
+/* ============================================================
+   SUPABASE REST HELPER (fetch ตรงๆ, ไม่ใช้ supabase-js เพื่อความเข้ากันได้กับ iOS Safari)
+   ============================================================ */
+async function sb(path, options={}){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method: options.method || 'GET',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...(options.headers||{})
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  if(!res.ok){
+    const t = await res.text().catch(()=> '');
+    throw new Error(`Supabase error ${res.status}: ${t}`);
+  }
+  if(res.status === 204) return null;
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+function uid(){ return crypto.randomUUID(); }
+function fmtMoney(n){ return (Math.round(n||0)).toLocaleString('en-US').replace(/,/g,'.'); }
+
+/* ยอดกีบกับยอดบาทเป็นคนละสกุลเงิน เอามาบวกรวมกันตรงๆ ไม่ได้ (จะได้ตัวเลขที่ไม่มีความหมาย) ฟังก์ชันนี้เลยรวมแยกตามสกุลเงินแทน แล้วโชว์ทีละบรรทัด */
+function sumByCurrency(rows, amountField){
+  const out = {};
+  rows.forEach(r=>{
+    const c = r.currency || 'LAK';
+    out[c] = (out[c]||0) + Number(r[amountField]||0);
+  });
+  return out;
+}
+function fmtByCurrency(obj){
+  const parts = Object.keys(obj).filter(c=> obj[c]).map(c=> fmtMoney(obj[c]) + ' ' + (c==='THB' ? 'ບາດ' : 'ກີບ'));
+  return parts.length ? parts.join('<br>') : (fmtMoney(0) + ' ກີບ');
+}
+
+/* ป้อนตัวเลขเงิน ให้ขึ้นจุดคั่นหลักพันอัตโนมัติ (ตามธรรมเนียมบิลลาว เช่น 1.550.000) */
+function attachMoneyInput(id, initial){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.setAttribute('inputmode','numeric');
+  el.setAttribute('autocomplete','off');
+  if(initial !== undefined && initial !== null && initial !== ''){
+    const n = Number(initial)||0;
+    el.value = n.toLocaleString('en-US').replace(/,/g,'.');
+  }
+  if(!el.dataset.moneyBound){
+    el.dataset.moneyBound = '1';
+    el.addEventListener('input', ()=>{
+      const raw = el.value.replace(/[^\d]/g,'');
+      el.value = raw ? Number(raw).toLocaleString('en-US').replace(/,/g,'.') : '';
+    });
+  }
+}
+function moneyValue(id){
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  return Number((el.value||'').replace(/[^\d]/g,'')) || 0;
+}
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+/* ปรับวันที่จาก YYYY-MM-DD (รูปแบบมาตรฐานที่เก็บในฐานข้อมูล/ช่อง input date) ให้แสดงผลเป็น วัน-เดือน-ปี ตามที่ผู้ใช้ต้องการเห็น (ใช้แค่ตอนแสดงผล ไม่กระทบข้อมูลที่เก็บจริง) */
+function fmtDateDMY(dateStr){
+  if(!dateStr) return '';
+  const d = String(dateStr).slice(0,10);
+  const parts = d.split('-');
+  if(parts.length !== 3) return d;
+  const [y,m,day] = parts;
+  return `${day}-${m}-${y}`;
+}
+
+function toast(msg){
+  let c = document.getElementById('toastContainer');
+  if(!c){
+    c = document.createElement('div');
+    c.id = 'toastContainer';
+    c.className = 'toast-container';
+    document.body.appendChild(c);
+  }
+  const t = document.createElement('div');
+  t.className = 'toast';
+  const isWarn = msg.includes('ຜິດພາດ') || msg.includes('ບໍ່ໄດ້');
+  const isOk = !isWarn && msg.includes('ສຳເລັດ');
+  const iconId = isWarn ? 'i-alert' : (isOk ? 'i-check-circle' : '');
+  t.innerHTML = (iconId ? `<svg class="dv-icon"><use href="#${iconId}"></use></svg>` : '') + `<span></span>`;
+  t.querySelector('span').textContent = msg;
+  if(isWarn) t.querySelector('.dv-icon').style.color = '#e7a494';
+  c.appendChild(t);
+  setTimeout(()=> t.remove(), 2200);
+}
+
+/* กด Enter/Return ในช่องพวกนี้ = กดปุ่มเดียวกับปุ่มที่ระบุ (สะดวกเวลาพิมพ์ด้วยคีย์บอร์ด MacBook) */
+function bindEnterKey(inputIds, buttonId){
+  inputIds.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const btn = document.getElementById(buttonId);
+        if(btn) btn.click();
+      }
+    });
+  });
+}
+/* กด Enter/Return ในช่องเหล่านี้ = โดดไปโฟกัสช่องถัดไปในลำดับ (ช่องสุดท้ายโดดไป finalId ถ้ามีระบุ) */
+function bindEnterAdvance(inputIds, finalId){
+  inputIds.forEach((id, idx)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const nextId = inputIds[idx+1] || finalId;
+        const nextEl = nextId ? document.getElementById(nextId) : null;
+        if(nextEl) nextEl.focus();
+      }
+    });
+  });
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function buildKeypad(){
+  const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+  const kp = document.getElementById('keypad');
+  kp.innerHTML = '';
+  keys.forEach(k=>{
+    const b = document.createElement('button');
+    b.textContent = k;
+    if(k === '') { b.style.visibility='hidden'; }
+    b.addEventListener('click', ()=> handleKey(k));
+    kp.appendChild(b);
+  });
+}
+function handleKey(k){
+  if(k === '' ) return;
+  if(k === '⌫'){ pinBuffer = pinBuffer.slice(0,-1); }
+  else if(pinBuffer.length < 4){ pinBuffer += k; }
+  renderPinDots();
+  if(pinBuffer.length === 4){ setTimeout(tryLogin, 150); }
+}
+function renderPinDots(){
+  const dots = document.querySelectorAll('.pin-dot');
+  dots.forEach((d,i)=> d.classList.toggle('filled', i < pinBuffer.length));
+}
+document.addEventListener('keydown', (e)=>{
+  const loginVisible = document.getElementById('loginScreen').style.display !== 'none';
+  if(!loginVisible) return;
+  if(e.key >= '0' && e.key <= '9'){ handleKey(e.key); }
+  else if(e.key === 'Backspace' || e.key === 'Delete'){ handleKey('⌫'); }
+});
+function tryLogin(){
+  const role = PIN_ROLES[pinBuffer];
+  document.getElementById('loginErr').textContent = '';
+  if(role){
+    currentRole = role;
+    sessionStorage.setItem('dv_stock_role', role);
+    pinBuffer = '';
+    renderPinDots();
+    enterApp();
+  } else {
+    document.getElementById('loginErr').textContent = 'ລະຫັດບໍ່ຖືກຕ້ອງ';
+    pinBuffer = '';
+    setTimeout(renderPinDots, 300);
+  }
+}
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  currentRole = null;
+  sessionStorage.removeItem('dv_stock_role');
+  document.getElementById('mainScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+});
+
+/* ============================================================
+   APP SHELL / TABS
+   ============================================================ */
+const TABS = [
+  { id:'dashboard', label:'ໜ້າຫຼັກ', icon:'i-home',    roles:['staff','admin'] },
+  { id:'products',  label:'ສິນຄ້າ',   icon:'i-box',     roles:['staff','admin'] },
+  { id:'receive',   label:'ຮັບເຂົ້າ', icon:'i-truck',   roles:['staff','admin'] },
+  { id:'sell',      label:'ອອກບິນຂາຍ', icon:'i-receipt', roles:['staff','admin'] },
+  { id:'transfer',  label:'ໂອນສາຂາ',  icon:'i-truck',   roles:['staff','admin'] },
+  { id:'report',    label:'ລາຍງານ',  icon:'i-chart',   roles:['staff','admin'] },
+];
+let activeTab = 'dashboard';
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display = 'none';
+  const main = document.getElementById('mainScreen');
+  main.style.display = 'flex';
+  document.getElementById('roleLabel').textContent = ROLE_LABEL[currentRole];
+  buildNav();
+  renderTab();
+}
+function buildNav(){
+  const nav = document.getElementById('tabNav');
+  nav.innerHTML = '';
+  TABS.filter(t=> t.roles.includes(currentRole)).forEach(t=>{
+    const b = document.createElement('button');
+    b.innerHTML = `<svg class="dv-icon"><use href="#${t.icon}"></use></svg><span>${t.label}</span>`;
+    b.className = t.id === activeTab ? 'active' : '';
+    b.addEventListener('click', ()=>{ activeTab = t.id; buildNav(); renderTab(); });
+    nav.appendChild(b);
+  });
+}
+
+async function renderTab(){
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="empty">ກຳລັງໂຫລດ...</div>';
+  try{
+    if(activeTab === 'dashboard') await renderDashboard(main);
+    else if(activeTab === 'products') await renderProducts(main);
+    else if(activeTab === 'receive') await renderReceive(main);
+    else if(activeTab === 'sell') await renderSell(main);
+    else if(activeTab === 'transfer') await renderTransfer(main);
+    else if(activeTab === 'report') await renderReport(main);
+  }catch(err){
+    console.error(err);
+    main.innerHTML = `<div class="card"><div class="empty">ເກີດຂໍ້ຜິດພາດ: ${err.message}</div></div>`;
+  }
+}
+
+/* ============================================================
+   DATA HELPERS
+   ============================================================ */
+async function getModels(){
+  return await sb('stock_product_models?select=*&active=eq.true&order=name.asc');
+}
+async function getBalanceMap(){
+  const rows = await sb('stock_balance?select=*');
+  const map = {};
+  rows.forEach(r=> map[r.model_id] = Number(r.qty)||0);
+  return map;
+}
+async function getInStockUnits(modelId){
+  return await sb(`stock_product_units?model_id=eq.${modelId}&status=eq.in_stock&order=received_at.asc`);
+}
+async function getUnitCountMap(){
+  const rows = await sb('stock_product_units?select=model_id,status&status=eq.in_stock');
+  const map = {};
+  rows.forEach(r=> map[r.model_id] = (map[r.model_id]||0) + 1);
+  return map;
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+async function renderDashboard(main){
+  const today = todayStr();
+  const monthStart = today.slice(0,7) + '-01';
+  const [todayInv, monthInv, models, balMap, unitMap] = await Promise.all([
+    sb(`sales_invoices?select=id,total_amount,currency&invoice_date=eq.${today}&status=eq.confirmed`),
+    sb(`sales_invoices?select=id,total_amount,currency&invoice_date=gte.${monthStart}&status=eq.confirmed`),
+    getModels(), getBalanceMap(), getUnitCountMap()
+  ]);
+  const [todayByCur, monthByCur] = await Promise.all([
+    sumInvoicesByPaidCurrency(todayInv),
+    sumInvoicesByPaidCurrency(monthInv)
+  ]);
+
+  const lowStock = models.filter(m=>{
+    const qty = m.has_serial ? (unitMap[m.id]||0) : (balMap[m.id]||0);
+    const threshold = m.low_stock_threshold!=null ? Number(m.low_stock_threshold) : 1;
+    return qty <= threshold;
+  }).sort((a,b)=>{
+    const qtyA = a.has_serial ? (unitMap[a.id]||0) : (balMap[a.id]||0);
+    const qtyB = b.has_serial ? (unitMap[b.id]||0) : (balMap[b.id]||0);
+    return qtyA - qtyB;
+  });
+
+  const isAdmin = currentRole === 'admin';
+  let profitBlock = '';
+  if(isAdmin){
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    const monthProfitByCur = await getPeriodProfit(monthStart, tomorrow.toISOString().slice(0,10));
+    profitBlock = `<div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(monthProfitByCur)}</div><div class="lbl">ກຳໄລເດືອນນີ້ (ແອດມິນ)</div></div>`;
+  }
+
+  main.innerHTML = `
+    <div class="stats-row">
+      <div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(todayByCur)}</div><div class="lbl">ຍອດຂາຍມື້ນີ້</div></div>
+      <div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(monthByCur)}</div><div class="lbl">ຍອດຂາຍເດືອນນີ້</div></div>
+      ${profitBlock}
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-alert"></use></svg>ສິນຄ້າໃກ້ໝົດ / ໝົດແລ້ວ</h3>
+      ${lowStock.length ? lowStock.map(m=>{
+        const qty = m.has_serial ? (unitMap[m.id]||0) : (balMap[m.id]||0);
+        return `<div class="row"><span>${m.name}</span><span style="color:${qty<=0?'var(--danger)':'var(--orange-soft)'};font-weight:600;">ເຫຼືອ ${qty} ${m.unit||''}</span></div>`;
+      }).join('') : '<div class="empty">ສະຕັອກຍັງປົກກະຕິ</div>'}
+    </div>
+  `;
+}
+
+/* ต้นทุนที่บันทึกไว้ (cost_lak ของแต่ละเครื่อง / cost_price ของรุ่นสินค้า) เป็นเงินกีบเสมอ ถ้าบิลขายเป็นสกุลบาทต้องเทียบกับ cost_price_thb ของรุ่นสินค้าแทน ไม่งั้นเอากีบไปลบบาทตรงๆ กำไรจะผิดเพี้ยนมหาศาล (ติดลบทั้งที่จริงกำไรอยู่) ถ้าบิลเป็นบาทแต่ยังไม่ได้ตั้ง cost_price_thb ไว้ ให้ถือว่าไม่ทราบต้นทุน (คืนค่า null) แล้วไม่รวมรายการนั้นในการคิดกำไร แทนที่จะโชว์ตัวเลขผิดๆ */
+function itemUnitCostForInvoice(it, invCurrency){
+  const model = it.stock_product_models || {};
+  if(invCurrency === 'THB'){
+    return model.cost_price_thb ? Number(model.cost_price_thb) : null;
+  }
+  if(it.unit_id && it.stock_product_units && it.stock_product_units.cost_lak != null){
+    return Number(it.stock_product_units.cost_lak);
+  }
+  return model.cost_price != null ? (Number(model.cost_price)||0) : 0;
+}
+/* รวมกำไรของรายการสินค้าทั้งหมดในบิลเดียว คิดเป็นสกุลเงินของบิลนั้น (ยังไม่แปลงเป็นสกุลที่รับจ่ายจริง) */
+function computeInvoiceItemProfit(items, invCurrency){
+  let unknownCostCount = 0;
+  const profit = items.reduce((s,it)=>{
+    const unitCost = itemUnitCostForInvoice(it, invCurrency);
+    if(unitCost === null){ unknownCostCount++; return s; }
+    const cost = unitCost * Number(it.quantity||0);
+    return s + (Number(it.amount||0) - cost);
+  }, 0);
+  return { profit, unknownCostCount };
+}
+/* ตั้งบิลไว้เป็นสกุลไหน ไม่ได้แปลว่าลูกค้าจ่ายเป็นสกุลนั้นจริงๆ (เช่นตั้งบิลเป็นบาท แต่ลูกค้าโอนมาเป็นกีบ) ยอดขาย/กำไรควรนับตามสกุลเงินที่ร้านได้รับจริงจากการจ่ายเงินแต่ละครั้ง ไม่ใช่สกุลเงินที่ตั้งราคาไว้ตอนออกบิล ฟังก์ชันนี้กระจายมูลค่าของบิล (ที่คิดไว้เป็นสกุลบิล เช่น ยอดขายทั้งบิล หรือ กำไรทั้งบิล) ไปตามสัดส่วนที่แต่ละการจ่ายเงินครอบคลุมยอดบิล แล้วแปลงส่วนนั้นเป็นสกุลเงินที่จ่ายจริง ส่วนที่ยังไม่ได้จ่าย (ค้างชำระ) จะยังนับเป็นสกุลเงินของบิลไปก่อน เพราะยังไม่รู้ว่าสุดท้ายจะได้รับเป็นสกุลไหน */
+function splitByPaidCurrency(valueInInvCurrency, invCurrency, totalAmount, payments){
+  const out = {};
+  if(!totalAmount){
+    out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency;
+    return out;
+  }
+  let coveredShare = 0;
+  payments.forEach(p=>{
+    const coveredInInvCurrency = p.converted_amount != null ? Number(p.converted_amount) : Number(p.amount);
+    if(!coveredInInvCurrency) return;
+    const share = Math.min(coveredInInvCurrency / totalAmount, 1 - coveredShare);
+    if(share <= 0) return;
+    coveredShare += share;
+    const valueShare = valueInInvCurrency * share;
+    const payCurrency = p.currency || invCurrency;
+    let valueInPayCurrency = valueShare;
+    if(payCurrency !== invCurrency){
+      valueInPayCurrency = valueShare * (Number(p.amount) / coveredInInvCurrency);
+    }
+    out[payCurrency] = (out[payCurrency]||0) + valueInPayCurrency;
+  });
+  const remainingShare = Math.max(0, 1 - coveredShare);
+  if(remainingShare > 0){
+    out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency * remainingShare;
+  }
+  return out;
+}
+/* รวมยอดขาย (total_amount) ของบิลหลายใบ แยกตามสกุลเงินที่รับจ่ายจริง (ไม่ใช่สกุลเงินที่ตั้งบิลไว้เฉยๆ) ต้องมี id ในแต่ละแถวของ invoices */
+async function sumInvoicesByPaidCurrency(invoices){
+  const out = {};
+  if(!invoices.length) return out;
+  const ids = invoices.map(i=>i.id).join(',');
+  const payments = await sb(`sales_payments?select=invoice_id,currency,amount,converted_amount&invoice_id=in.(${ids})`);
+  const paymentsByInvoice = {};
+  payments.forEach(p=> (paymentsByInvoice[p.invoice_id] = paymentsByInvoice[p.invoice_id]||[]).push(p));
+  invoices.forEach(inv=>{
+    const invCurrency = inv.currency || 'LAK';
+    const totalAmount = Number(inv.total_amount||0);
+    const split = splitByPaidCurrency(totalAmount, invCurrency, totalAmount, paymentsByInvoice[inv.id]||[]);
+    Object.keys(split).forEach(c=>{ out[c] = (out[c]||0) + split[c]; });
+  });
+  return out;
+}
+/* คำนวณกำไร (ยอดขาย - ต้นทุน) ของບິນທັງໝົດในช่วงวันที่ที่กำหนด ใช้ต้นทุนปัจจุบันของสินค้า (ไม่ได้เก็บ snapshot ต้นทุน ณ วันขาย) แล้วนับกำไรตามสกุลเงินที่รับจ่ายจริงของแต่ละบิล ไม่ใช่สกุลเงินที่ตั้งบิลไว้ */
+async function getPeriodProfit(start, end){
+  const invoices = await sb(`sales_invoices?select=id,currency,total_amount&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed`);
+  if(!invoices.length) return {};
+  const ids = invoices.map(i=>i.id).join(',');
+  const [items, payments] = await Promise.all([
+    sb(`sales_invoice_items?select=amount,quantity,unit_id,invoice_id,stock_product_models(cost_price,cost_price_thb),stock_product_units(cost_lak)&invoice_id=in.(${ids})`),
+    sb(`sales_payments?select=invoice_id,currency,amount,converted_amount&invoice_id=in.(${ids})`)
+  ]);
+  const itemsByInvoice = {};
+  items.forEach(it=> (itemsByInvoice[it.invoice_id] = itemsByInvoice[it.invoice_id]||[]).push(it));
+  const paymentsByInvoice = {};
+  payments.forEach(p=> (paymentsByInvoice[p.invoice_id] = paymentsByInvoice[p.invoice_id]||[]).push(p));
+  const profitByCurrency = {};
+  invoices.forEach(inv=>{
+    const invCurrency = inv.currency || 'LAK';
+    const { profit } = computeInvoiceItemProfit(itemsByInvoice[inv.id]||[], invCurrency);
+    const perCurrency = splitByPaidCurrency(profit, invCurrency, Number(inv.total_amount||0), paymentsByInvoice[inv.id]||[]);
+    Object.keys(perCurrency).forEach(c=>{
+      profitByCurrency[c] = (profitByCurrency[c]||0) + perCurrency[c];
+    });
+  });
+  return profitByCurrency;
+}
+
+/* ============================================================
+   PRODUCTS
+   ============================================================ */
+async function renderProducts(main){
+  const [models, balMap, unitMap] = await Promise.all([getModels(), getBalanceMap(), getUnitCountMap()]);
+  const isAdmin = currentRole === 'admin';
+  function rowsHtml(list){
+    return list.length ? list.map(m=>{
+      const qty = m.has_serial ? (unitMap[m.id]||0) : (balMap[m.id]||0);
+      return `
+      <div class="row${m.has_serial ? ' clickable' : ''}" data-id="${m.id}">
+        <span>
+          <div>${m.name}${m.has_serial?' <span class="tag ok">ມີເລກເຄື່ອງ</span>':''}</div>
+          <div class="muted mono" style="font-size:11px;">${m.code||''} ${m.category?('· '+m.category):''}</div>
+        </span>
+        <span class="row-actions">
+          <span style="text-align:right;">
+            <div class="gold mono">${m.sale_price ? fmtMoney(m.sale_price)+' ກີບ' : (m.sale_price_thb ? fmtMoney(m.sale_price_thb)+' ບາດ' : fmtMoney(0))}</div>
+            <div class="muted" style="font-size:11px;">ເຫຼືອ ${qty} ${m.unit||''}${m.has_serial ? ' <span class="muted" style="font-size:10px;">(ກົດເບິ່ງ)</span>' : ''}</div>
+          </span>
+          ${isAdmin ? `<button class="icon-btn" data-edit="${m.id}"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂ</button><button class="icon-btn" data-del="${m.id}" style="color:var(--danger);border-color:var(--danger);"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບ</button>` : ''}
+        </span>
+      </div>`;
+    }).join('') : '<div class="empty">ບໍ່ພົບສິນຄ້າທີ່ຄົ້ນຫາ</div>';
+  }
+  function bindRowEvents(){
+    main.querySelectorAll('.row.clickable[data-id]').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if(e.target.closest('[data-edit],[data-del]')) return;
+        const model = models.find(m=> m.id === row.dataset.id);
+        if(model) openUnitsModal(model);
+      });
+    });
+    if(isAdmin){
+      main.querySelectorAll('[data-edit]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const model = models.find(m=> m.id === btn.dataset.edit);
+          if(model) openModelModal(model);
+        });
+      });
+      main.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', async (e)=>{
+          e.stopPropagation();
+          const model = models.find(m=> m.id === btn.dataset.del);
+          if(!model) return;
+          if(!confirm(`ລົບ "${model.name}" ອອກຈາກລາຍການສິນຄ້າ? ຖ້າສິນຄ້ານີ້ມີປະຫວັດຮັບເຂົ້າ/ຂາຍໄປແລ້ວ ຈະລົບບໍ່ໄດ້ (ໃຫ້ໃຊ້ "ແກ້ໄຂ" ແລ້ວປິດການໃຊ້ງານແທນ)`)) return;
+          try{
+            await sb(`stock_product_models?id=eq.${model.id}`, { method:'DELETE' });
+            toast('ລົບສຳເລັດ');
+            renderTab();
+          }catch(err){
+            toast('ລົບບໍ່ໄດ້ (ອາດມີປະຫວັດຮັບເຂົ້າ/ຂາຍແລ້ວ) — ລອງ "ແກ້ໄຂ" ແລ້ວປິດການໃຊ້ງານແທນ');
+          }
+        });
+      });
+    }
+  }
+  main.innerHTML = `
+    <button class="btn" id="addModelBtn"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມສິນຄ້າ/ຮຸ່ນໃໝ່</button>
+    ${isAdmin ? `<button class="btn secondary" id="checkDupBtn"><svg class="dv-icon"><use href="#i-alert"></use></svg>ກວດເລກເຄື່ອງຊ້ຳ</button>` : ''}
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ລາຍການສິນຄ້າ (<span id="prod_count">${models.length}</span>)</h3>
+      <input id="prod_search" placeholder="ຄົ້ນຫາສິນຄ້າ (ຊື່ / ລະຫັດ / ໝວດໝູ່)..." style="margin-bottom:10px;">
+      <div id="prod_list">${rowsHtml(models)}</div>
+    </div>
+  `;
+  document.getElementById('addModelBtn').addEventListener('click', ()=> openModelModal());
+  if(isAdmin){
+    document.getElementById('checkDupBtn').addEventListener('click', ()=> openDuplicateSerialsModal(models));
+  }
+  bindRowEvents();
+  const searchEl = document.getElementById('prod_search');
+  searchEl.addEventListener('input', ()=>{
+    const q = searchEl.value.trim().toLowerCase();
+    const filtered = q ? models.filter(m=>
+      (m.name||'').toLowerCase().includes(q) ||
+      (m.code||'').toLowerCase().includes(q) ||
+      (m.category||'').toLowerCase().includes(q)
+    ) : models;
+    document.getElementById('prod_list').innerHTML = rowsHtml(filtered);
+    document.getElementById('prod_count').textContent = filtered.length;
+    bindRowEvents();
+  });
+}
+
+/* ເບິ່ງລາຍລະອຽດເລກເຄື່ອງ (serial) ຂອງສິນຄ້າທີ່ຕ້ອງເກັບເລກແຍກແຕ່ລະໜ່ວຍ */
+async function openUnitsModal(model){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງໂຫລດ...</div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  try{
+    const units = await getInStockUnits(model.id);
+    bg.querySelector('.modal').innerHTML = `
+      <h3><svg class="dv-icon"><use href="#i-box"></use></svg>${model.name}</h3>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">ເລກເຄື່ອງທີ່ຍັງຄົງເຫຼືອໃນສະຕັອກ (${units.length} ${model.unit||'ໜ່ວຍ'})</div>
+      <hr class="sep">
+      ${units.length ? units.map(u=> `
+        <div class="row">
+          <span class="mono">${u.serial_no}</span>
+          <span style="text-align:right;">
+            <div class="muted" style="font-size:11px;">${fmtDateDMY(u.received_at)}</div>
+            ${currentRole==='admin' ? `<div class="gold mono" style="font-size:12px;">${u.cost_lak!=null ? fmtMoney(u.cost_lak)+' ກີບ' : '-'}</div>` : ''}
+          </span>
+        </div>`).join('') : '<div class="empty">ບໍ່ມີເຄື່ອງເຫຼືອໃນສະຕັອກ</div>'}
+      <button class="btn secondary" id="unitsClose" style="margin-top:12px;">ປິດ</button>
+    `;
+    bg.querySelector('#unitsClose').addEventListener('click', ()=> bg.remove());
+  }catch(err){
+    bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="unitsClose2">ປິດ</button>`;
+    bg.querySelector('#unitsClose2').addEventListener('click', ()=> bg.remove());
+  }
+}
+/* ກວດເລກເຄື່ອງທີ່ຊ້ຳກັນຢູ່ໃນລະບົບ (ສຳລັບລ້າງຂໍ້ມູນເກົ່າກ່ອນຈະມີການກັນຊ້ຳ) — ອ່ານຢ່າງດຽວ ບໍ່ລົບຫຍັງໃຫ້ອັດຕະໂນມັດ */
+async function openDuplicateSerialsModal(models){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງກວດ...</div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  try{
+    const units = await sb('stock_product_units?select=id,model_id,serial_no,status,received_at&order=serial_no.asc');
+    const modelName = id => (models.find(m=>m.id===id)||{}).name || '-';
+    const groups = {};
+    units.forEach(u=>{
+      const key = (u.serial_no||'').trim().toUpperCase();
+      if(!key) return;
+      (groups[key] = groups[key] || []).push(u);
+    });
+    const dupGroups = Object.values(groups).filter(g=> g.length > 1);
+    bg.querySelector('.modal').innerHTML = `
+      <h3><svg class="dv-icon"><use href="#i-alert"></use></svg>ກວດເລກເຄື່ອງຊ້ຳ</h3>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">${dupGroups.length ? `ພົບເລກເຄື່ອງຊ້ຳ ${dupGroups.length} ຊຸດ — ລາຍການລຸ່ມນີ້ຄື 2 (ຫຼືຫຼາຍກວ່າ) ໜ່ວຍທີ່ໃຊ້ເລກເຄື່ອງດຽວກັນ, ໄປແກ້ໄຂ/ລົບອັນທີ່ຜິດໃນ Supabase ໄດ້ເລີຍ` : 'ບໍ່ພົບເລກເຄື່ອງຊ້ຳໃນລະບົບ ✓'}</div>
+      <hr class="sep">
+      ${dupGroups.length ? dupGroups.map(g=> `
+        <div style="margin-bottom:10px;">
+          <div class="mono" style="font-weight:700;color:var(--danger);">${g[0].serial_no}</div>
+          ${g.map(u=> `<div class="row" style="padding:4px 0;"><span style="font-size:12px;">${modelName(u.model_id)}</span><span class="muted" style="font-size:11px;">${u.status==='in_stock'?'ຄົງຄັງ':(u.status==='transferred'?'ໂອນສາຂາແລ້ວ':'ຂາຍແລ້ວ')} · ${fmtDateDMY(u.received_at)}</span></div>`).join('')}
+        </div>`).join('') : ''}
+      <button class="btn secondary" id="dupClose" style="margin-top:8px;">ປິດ</button>
+    `;
+    bg.querySelector('#dupClose').addEventListener('click', ()=> bg.remove());
+  }catch(err){
+    bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="dupClose2">ປິດ</button>`;
+    bg.querySelector('#dupClose2').addEventListener('click', ()=> bg.remove());
+  }
+}
+
+function openModelModal(existing){
+  const isEdit = !!existing;
+  const canSeeCost = currentRole === 'admin';
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h3><svg class="dv-icon"><use href="#i-box"></use></svg>${isEdit ? 'ແກ້ໄຂສິນຄ້າ' : 'ເພີ່ມສິນຄ້າ/ຮຸ່ນໃໝ່'}</h3>
+      <label>ຊື່ສິນຄ້າ *</label>
+      <input id="m_name" placeholder="ເຊັ່ນ ແທັກເຕີ M6040" value="${isEdit ? (existing.name||'').replace(/"/g,'&quot;') : ''}">
+      <label>ລະຫັດ (code)</label>
+      <input id="m_code" placeholder="ເຊັ່ນ W9500-95511" value="${isEdit ? (existing.code||'').replace(/"/g,'&quot;') : ''}">
+      <label>ໝວດໝູ່</label>
+      <input id="m_cat" placeholder="ເຊັ່ນ ແທັກເຕີ / ອາໄຫລ່ / ຢາງ" value="${isEdit ? (existing.category||'').replace(/"/g,'&quot;') : ''}">
+      <label>ຫົວໜ່ວຍ</label>
+      <input id="m_unit" placeholder="ຖັງ / ອັນ / ຄູ່ / ໃບ" value="${isEdit ? (existing.unit||'ອັນ') : 'ອັນ'}">
+      <label>ລາຄາຂາຍ</label>
+      <div class="grid2">
+        <div><input id="m_price" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ກີບ (LAK)</div></div>
+        <div><input id="m_price_thb" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ບາດ (THB)</div></div>
+      </div>
+      ${canSeeCost ? `
+      <label>ຕົ້ນທຶນ</label>
+      <div class="grid2">
+        <div><input id="m_cost" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ກີບ (LAK)</div></div>
+        <div><input id="m_cost_thb" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ບາດ (THB)</div></div>
+      </div>` : `
+      <div class="muted" style="font-size:11px;margin-top:2px;">* ຕົ້ນທຶນຈະໃສ່ໂດຍແອດມິນທີ່ຫຼັງ</div>`}
+      <label>ແຈ້ງເຕືອນເມື່ອເຫຼືອ ≤</label>
+      <input id="m_threshold" type="number" min="0" value="${isEdit ? (existing.low_stock_threshold!=null ? existing.low_stock_threshold : 1) : 1}">
+      <div class="switch"><input type="checkbox" id="m_serial" style="width:auto;" ${isEdit && existing.has_serial ? 'checked':''}> ຕ້ອງເກັບເລກເຄື່ອງແຍກທີລະໜ່ວຍ (ແທັກເຕີ/ເຄື່ອງຈັກ)</div>
+      ${isEdit ? `<div class="switch"><input type="checkbox" id="m_active" style="width:auto;" ${existing.active!==false ? 'checked':''}> ໃຊ້ງານຢູ່ (ຖ້າເອົາອອກ ຈະບໍ່ຂຶ້ນໃນລາຍການໃຫ້ເລືອກອີກ)</div>` : ''}
+      <button class="btn" id="m_save"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກ</button>
+      <button class="btn secondary" id="m_cancel">ຍົກເລີກ</button>
+    </div>`;
+  document.body.appendChild(bg);
+  attachMoneyInput('m_price', isEdit ? existing.sale_price : '');
+  attachMoneyInput('m_price_thb', isEdit ? existing.sale_price_thb : '');
+  if(canSeeCost){
+    attachMoneyInput('m_cost', isEdit ? existing.cost_price : '');
+    attachMoneyInput('m_cost_thb', isEdit ? existing.cost_price_thb : '');
+  }
+  /* กด Enter ในแต่ละช่อง = โดดลงช่องถัดไปตามลำดับ พอถึงช่องสุดท้ายโดดไปโฟกัสปุ่ม "บันทึก" (กด Enter อีกทีค่อยบันทึกจริง) ไม่ใช่บันทึกทันทีทีละช่องเหมือนก่อน */
+  {
+    const modelFieldOrder = ['m_name','m_code','m_cat','m_unit','m_price','m_price_thb'];
+    if(canSeeCost) modelFieldOrder.push('m_cost','m_cost_thb');
+    modelFieldOrder.push('m_threshold');
+    bindEnterAdvance(modelFieldOrder, 'm_save');
+  }
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  document.getElementById('m_cancel').addEventListener('click', ()=> bg.remove());
+  document.getElementById('m_save').addEventListener('click', async ()=>{
+    const name = document.getElementById('m_name').value.trim();
+    if(!name){ toast('ກະລຸນາໃສ່ຊື່ສິນຄ້າ'); return; }
+    const payload = {
+      name,
+      code: document.getElementById('m_code').value.trim(),
+      category: document.getElementById('m_cat').value.trim(),
+      unit: document.getElementById('m_unit').value.trim() || 'ອັນ',
+      sale_price: moneyValue('m_price'),
+      sale_price_thb: moneyValue('m_price_thb'),
+      low_stock_threshold: Number(document.getElementById('m_threshold').value)||0,
+      has_serial: document.getElementById('m_serial').checked
+    };
+    if(canSeeCost){
+      payload.cost_price = moneyValue('m_cost');
+      payload.cost_price_thb = moneyValue('m_cost_thb');
+    }
+    try{
+      if(isEdit){
+        payload.active = document.getElementById('m_active').checked;
+        await sb(`stock_product_models?id=eq.${existing.id}`, { method:'PATCH', body: payload });
+      } else {
+        payload.id = uid();
+        await sb('stock_product_models', { method:'POST', body: payload });
+      }
+      toast('ບັນທຶກສຳເລັດ');
+      bg.remove();
+      renderTab();
+    }catch(err){ toast('ຜິດພາດ: '+err.message); }
+  });
+}
+
+/* ============================================================
+   RECEIVE STOCK (ຮັບເຂົ້າ)
+   ============================================================ */
+let receiveCart = [];
+/* ถ้ากด Enter ตอนที่ไม่ได้อยู่ในช่องพิมพ์ไหนเลย (เช่น เพิ่งกด X ลบรายการ หรือคลิกออกจากช่องไปแล้ว) แล้วอยู่แท็บຮับเข้า+มีรายการในตะกร้าแล้ว = บันทึกรับเข้าทันที กันปัญหากด Enter ไม่ติดตอนโฟกัสหลุดจากช่อง */
+document.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter') return;
+  const submitBtn = document.getElementById('r_submit');
+  if(!submitBtn) return; // ไม่ได้อยู่แท็บຮับเข้าตอนนี้
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return; // ปล่อยให้ตัวจัดการเฉพาะช่องทำงานแทน
+  if(!receiveCart.length) return;
+  e.preventDefault();
+  submitBtn.click();
+});
+async function renderReceive(main){
+  const models = await getModels();
+  const historyMonth = main.dataset.rcvMonth || todayStr().slice(0,7);
+  const canSeeCost = currentRole === 'admin';
+  main.innerHTML = `
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ຮັບສິນຄ້າເຂົ້າສະຕັອກ</h3>
+      <label>ຜູ້ສະໜອງ / ຈາກໃສ</label>
+      <input id="r_supplier" placeholder="ຊື່ຜູ້ສະໜອງ (ຖ້າມີ)">
+      <label>ວັນທີ</label>
+      <input id="r_date" type="date" value="${todayStr()}">
+      <hr class="sep">
+      <label>ເລືອກສິນຄ້າ</label>
+      <select id="r_model">
+        <option value="">-- ເລືອກສິນຄ້າ --</option>
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}">${m.name}</option>`).join('')}
+      </select>
+      <div id="r_qtyBlock">
+        <label>ຈຳນວນ</label>
+        <input id="r_qty" type="number" value="1" min="1">
+      </div>
+      <div id="r_serialBlock" style="display:none;">
+        <label>ເລກເຄື່ອງ (ພິມແລ້ວກົດ Enter ເພື່ອເພີ່ມເຂົ້າລາຍການທັນທີ)</label>
+        <textarea id="r_serials" rows="3" placeholder="W95TD-00011&#10;W95TD-00012"></textarea>
+      </div>
+      ${canSeeCost ? `
+      <label>ຊື້ເປັນສະກຸນ</label>
+      <select id="r_currency">
+        <option value="LAK">ກີບ (LAK)</option>
+        <option value="THB">ບາດ (THB)</option>
+      </select>
+      <label id="r_cost_lbl">ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)</label>
+      <input id="r_cost" type="text" value="0">
+      <div id="r_rateBlock" style="display:none;">
+        <label>ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)</label>
+        <input id="r_rate" type="text" placeholder="ເຊັ່ນ 620">
+        <div class="muted" style="font-size:11px;margin-top:3px;" id="r_lockedPreview"></div>
+      </div>` : ''}
+      <button class="btn secondary" id="r_addItem"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າລາຍການ</button>
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການທີ່ຈະຮັບເຂົ້າ</h3>
+      <div id="r_cartList">${renderReceiveCart()}</div>
+      ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receiveCart.reduce((s,i)=>s+i.amount,0))}</div>` : ''}
+      <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກຮັບເຂົ້າ</button>
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການຮັບເຂົ້າ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
+      <label>ເລືອກເດືອນ</label>
+      <input type="month" id="rcv_month" value="${historyMonth}">
+      <div id="rcv_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+    </div>
+  `;
+  document.getElementById('rcv_month').addEventListener('change', (e)=>{
+    main.dataset.rcvMonth = e.target.value;
+    loadReceiveHistory(e.target.value);
+  });
+  loadReceiveHistory(historyMonth);
+  if(canSeeCost) attachMoneyInput('r_cost', 0);
+  const modelSel = document.getElementById('r_model');
+  /* ອັດຕາຕ້ອງພິມໃໝ່ທຸກຄັ້ງທີ່ຮັບເຂົ້າ (ບໍ່ຈື່ອັດຕາເກົ່າໄວ້) ​ຕົ້ນທຶນກີບຈະລ໋ອກຕາມມື້ນີ້ ບໍ່ປ່ຽນຕາມພາຍຫຼັງ */
+  function updateReceiveCostLabel(){
+    if(!canSeeCost) return;
+    const currency = document.getElementById('r_currency').value;
+    const rateBlock = document.getElementById('r_rateBlock');
+    const lbl = document.getElementById('r_cost_lbl');
+    rateBlock.style.display = currency === 'THB' ? 'block' : 'none';
+    lbl.textContent = currency === 'THB' ? 'ຕົ້ນທຶນ/ໜ່ວຍ (ບາດ)' : 'ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)';
+    updateReceiveCostPreview();
+  }
+  function updateReceiveCostPreview(){
+    const preview = document.getElementById('r_lockedPreview');
+    if(!preview) return;
+    const currency = document.getElementById('r_currency').value;
+    if(currency !== 'THB'){ preview.textContent=''; return; }
+    const costThb = moneyValue('r_cost');
+    const rate = Number((document.getElementById('r_rate').value||'').replace(/,/g,''));
+    if(costThb && rate) preview.textContent = `≈ ${fmtMoney(costThb*rate)} ກີບ/ໜ່ວຍ (ລ໋ອກຕົ້ນທຶນນີ້ໄວ້)`;
+    else preview.textContent = 'ໃສ່ອັດຕາແລກປ່ຽນເພື່ອລ໋ອກຕົ້ນທຶນເປັນກີບ';
+  }
+  if(canSeeCost){
+    document.getElementById('r_currency').addEventListener('change', updateReceiveCostLabel);
+    document.getElementById('r_cost').addEventListener('input', updateReceiveCostPreview);
+    document.getElementById('r_rate').addEventListener('input', updateReceiveCostPreview);
+  }
+  modelSel.addEventListener('change', ()=>{
+    const opt = modelSel.selectedOptions[0];
+    const isSerial = opt && opt.dataset.serial === 'true';
+    document.getElementById('r_qtyBlock').style.display = isSerial ? 'none' : 'block';
+    document.getElementById('r_serialBlock').style.display = isSerial ? 'block' : 'none';
+    if(canSeeCost){
+      document.getElementById('r_currency').value = 'LAK';
+      updateReceiveCostLabel();
+      attachMoneyInput('r_cost', opt ? (opt.dataset.cost||0) : 0);
+    }
+  });
+  document.getElementById('r_addItem').addEventListener('click', async ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value){ toast('ເລືອກສິນຄ້າກ່ອນ'); return; }
+    const isSerial = opt.dataset.serial === 'true';
+    const currency = canSeeCost ? document.getElementById('r_currency').value : 'LAK';
+    const costInput = canSeeCost ? moneyValue('r_cost') : 0;
+    let cost = costInput; // locked LAK unit cost, used everywhere below
+    let costThb = null, exchangeRate = null;
+    if(canSeeCost && currency === 'THB'){
+      exchangeRate = Number((document.getElementById('r_rate').value||'').replace(/,/g,''));
+      if(!exchangeRate){ toast('ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)'); return; }
+      costThb = costInput;
+      cost = costThb * exchangeRate; // ລ໋ອກເປັນກີບຕາມອັດຕາມື້ນີ້
+    }
+    let addedCount = 0;
+    if(isSerial){
+      const rawSerials = document.getElementById('r_serials').value.split('\n').map(s=>s.trim()).filter(Boolean);
+      if(!rawSerials.length){ toast('ໃສ່ເລກເຄື່ອງຢ່າງໜ້ອຍ 1 ຕົວ'); return; }
+
+      /* ກັນເລກເຄື່ອງຊ້ຳກັນເອງໃນລາຍການທີ່ພິມ/ວາງເຂົ້າມາຄັ້ງນີ້ */
+      const seen = new Set();
+      const dupInInput = [];
+      const serials = [];
+      rawSerials.forEach(sn=>{
+        const key = sn.toUpperCase();
+        if(seen.has(key)){ dupInInput.push(sn); } else { seen.add(key); serials.push(sn); }
+      });
+      if(dupInInput.length){ toast(`ເລກເຄື່ອງຊ້ຳກັນເອງ: ${[...new Set(dupInInput)].join(', ')}`); return; }
+
+      /* ກັນຊ້ຳກັບລາຍການທີ່ຄ້າງຢູ່ໃນກະຕ່າ (ຍັງບໍ່ທັນບັນທຶກຮັບເຂົ້າ) */
+      const cartSerials = new Set(receiveCart.filter(i=>i.serial_no).map(i=>i.serial_no.toUpperCase()));
+      const dupInCart = serials.filter(sn=> cartSerials.has(sn.toUpperCase()));
+      if(dupInCart.length){ toast(`ເລກເຄື່ອງນີ້ຢູ່ໃນລາຍການແລ້ວ: ${dupInCart.join(', ')}`); return; }
+
+      /* ກັນຊ້ຳກັບເລກເຄື່ອງທີ່ມີຢູ່ແລ້ວໃນລະບົບ (ຮັບເຂົ້າໄປແລ້ວກ່ອນໜ້ານີ້ ບໍ່ວ່າຈະຄົງຄັງ ຫຼື ຂາຍໄປແລ້ວ) */
+      try{
+        const list = serials.map(sn=> encodeURIComponent(sn)).join(',');
+        const existing = await sb(`stock_product_units?select=serial_no&serial_no=in.(${list})`);
+        if(existing.length){
+          toast(`ເລກເຄື່ອງນີ້ມີໃນລະບົບແລ້ວ: ${existing.map(e=>e.serial_no).join(', ')}`);
+          return;
+        }
+      }catch(err){ toast('ກວດເລກເຄື່ອງຊ້ຳບໍ່ໄດ້: '+err.message); return; }
+
+      serials.forEach(sn=>{
+        receiveCart.push({ model_id: opt.value, model_name: opt.textContent, serial_no: sn, quantity:1, unit_cost:cost, amount:cost, cost_currency:currency, unit_cost_thb:costThb, exchange_rate:exchangeRate });
+      });
+      addedCount = serials.length;
+      document.getElementById('r_serials').value = '';
+    } else {
+      const qty = Number(document.getElementById('r_qty').value)||1;
+      receiveCart.push({ model_id: opt.value, model_name: opt.textContent, serial_no:null, quantity:qty, unit_cost:cost, amount: qty*cost, cost_currency:currency, unit_cost_thb:costThb, exchange_rate:exchangeRate });
+      addedCount = qty;
+    }
+    document.getElementById('r_cartList').innerHTML = renderReceiveCart();
+    const totalEl = main.querySelector('.invoice-total');
+    if(totalEl) totalEl.textContent = 'ລວມ: ' + fmtMoney(receiveCart.reduce((s,i)=>s+i.amount,0));
+    bindReceiveCartRemove();
+    toast(`ເພີ່ມ ${opt.textContent} ແລ້ວ`);
+  });
+  /* Enter ในแต่ละช่อง = ไล่ลงช่องถัดไปตามลำดับจริงในฟอร์ม (เลขเครื่อง/จำนวน → สกุลເງິນ → ต้นทุน → อัตราแลกเปลี่ยน[ถ้าเป็นบาท]) พอถึงช่องสุดท้ายค่อยเพิ่มเข้ารายการ แล้วต้องกดปุ่ม "บันทึกรับเข้า" (r_submit) เองเสมอ เพื่อกันบันทึกค้างๆ โดยไม่ตั้งใจ */
+  function handleReceiveEnter(){
+    document.getElementById('r_addItem').click();
+  }
+  /* หลังเพิ่มเข้ารายการแล้ว โฟกัสกลับไปช่องที่เหมาะสมเพื่อพิมพ์/สแกนตัวถัดไปได้ทันที */
+  function focusBackAfterAdd(){
+    const serialBlock = document.getElementById('r_serialBlock');
+    const isSerialVisible = serialBlock && serialBlock.style.display !== 'none';
+    if(isSerialVisible){
+      const serialsEl = document.getElementById('r_serials');
+      if(serialsEl) serialsEl.focus();
+    } else {
+      const qtyEl = document.getElementById('r_qty');
+      if(qtyEl) qtyEl.focus();
+    }
+  }
+  /* ลำดับช่องจริงของฟอร์ม ณ ขณะนั้น (ขึ้นกับว่ามีเลขเครื่องไหม / เห็นต้นทุนไหม / เลือกสกุลบาทไหม) */
+  function getReceiveFieldChain(){
+    const canSeeCost2 = currentRole === 'admin';
+    const serialBlock = document.getElementById('r_serialBlock');
+    const isSerialVisible = serialBlock && serialBlock.style.display !== 'none';
+    const chain = [isSerialVisible ? 'r_serials' : 'r_qty'];
+    if(canSeeCost2){
+      chain.push('r_currency', 'r_cost');
+      const currencyEl = document.getElementById('r_currency');
+      if(currencyEl && currencyEl.value === 'THB') chain.push('r_rate');
+    }
+    return chain;
+  }
+  function focusReceiveField(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.focus();
+    if(el.select) el.select();
+  }
+  /* กด Enter จากช่อง id นี้ → ถ้ายังไม่ใช่ช่องสุดท้ายในลำดับ ให้ลงไปช่องถัดไป, ถ้าเป็นช่องสุดท้ายแล้วให้เพิ่มเข้ารายการเลย */
+  function handleReceiveFieldEnter(currentId){
+    const chain = getReceiveFieldChain();
+    const idx = chain.indexOf(currentId);
+    if(idx === -1) return;
+    if(idx < chain.length - 1){
+      focusReceiveField(chain[idx+1]);
+    } else {
+      handleReceiveEnter();
+      focusBackAfterAdd();
+    }
+  }
+  ['r_qty','r_currency','r_cost','r_rate'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); handleReceiveFieldEnter(id); }
+    });
+  });
+  bindEnterAdvance(['r_supplier','r_date'], 'r_model');
+  document.getElementById('r_serials').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if(!val){
+        /* ไม่มีเลขเครื่องเหลือให้เพิ่มแล้ว = พิมพ์เสร็จหมดแล้ว กด Enter ครั้งนี้จึงบันทึกเข้าระบบทั้งใบ */
+        document.getElementById('r_submit').click();
+      } else {
+        /* พิมพ์เลขเครื่องแล้วกด Enter ครั้งแรก = ไล่ลงช่องถัดไปตามลำดับจริง (สกุลเงิน → ต้นทุน → อัตราแลกเปลี่ยน → เพิ่มเข้ารายการ) */
+        handleReceiveFieldEnter('r_serials');
+      }
+    }
+  });
+  bindReceiveCartRemove();
+  document.getElementById('r_submit').addEventListener('click', async (e)=>{
+    if(!receiveCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
+    const btn = e.currentTarget;
+    if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
+    btn.disabled = true;
+    try{
+      const receiptId = uid();
+      const total = receiveCart.reduce((s,i)=>s+i.amount,0);
+      const receiptNo = 'RCV-' + Date.now().toString().slice(-8);
+      await sb('stock_purchase_receipts', { method:'POST', body:{
+        id: receiptId,
+        receipt_no: receiptNo,
+        supplier_name: document.getElementById('r_supplier').value.trim(),
+        receipt_date: document.getElementById('r_date').value || todayStr(),
+        total_amount: total,
+        created_by: currentRole
+      }});
+      /* ບັນທຶກທັງໝົດເປັນຊຸດ (bulk) ແທນທີລະລາຍການ: ສ້າງເລກເຄື່ອງ (unit) ກ່ອນ (ຖ້າມີ) ເພາະ movement ຕ້ອງອ້າງອີງ unit ທີ່ມີແລ້ວ ຈາກນັ້ນບັນທຶກລາຍການ/ການເຄື່ອນໄຫວ/ຕົ້ນທຶນພ້ອມກັນ */
+      const receiptDate = document.getElementById('r_date').value || todayStr();
+      const unitsBody = receiveCart.filter(item=> item.serial_no).map(item=> ({
+        id: uid(), model_id: item.model_id, serial_no: item.serial_no, status:'in_stock',
+        received_at: receiptDate, cost_lak: item.unit_cost
+      }));
+      if(unitsBody.length) await sb('stock_product_units', { method:'POST', body: unitsBody });
+      const unitIdBySerial = {};
+      unitsBody.forEach(u=> unitIdBySerial[u.serial_no] = u.id);
+      const receiptItemsBody = receiveCart.map(item=> ({
+        id: uid(), receipt_id: receiptId, model_id: item.model_id, serial_no: item.serial_no,
+        quantity: item.quantity, unit_cost: item.unit_cost, amount: item.amount,
+        cost_currency: item.cost_currency||'LAK', unit_cost_thb: item.unit_cost_thb, exchange_rate: item.exchange_rate
+      }));
+      const movementsBody = receiveCart.map(item=> ({
+        id: uid(), model_id: item.model_id, unit_id: item.serial_no ? unitIdBySerial[item.serial_no] : null, movement_type:'in',
+        quantity: item.quantity, ref_type:'purchase', ref_id: receiptId, created_by: currentRole
+      }));
+      /* ອັບເດດຕົ້ນທຶນອ້າງອິງຂອງແຕ່ລະຮຸ່ນສິນຄ້າ (ໜຶ່ງຄຳຂໍຕໍ່ 1 ຮຸ່ນ ເຖິງຈະມີຫຼາຍລາຍການຂອງຮຸ່ນດຽວກັນ) */
+      const costByModel = {};
+      if(currentRole==='admin'){
+        receiveCart.forEach(item=> { costByModel[item.model_id] = item.unit_cost; });
+      }
+      await Promise.all([
+        sb('stock_purchase_receipt_items', { method:'POST', body: receiptItemsBody }),
+        sb('stock_movements', { method:'POST', body: movementsBody }),
+        ...Object.entries(costByModel).map(([modelId, cost])=>
+          sb(`stock_product_models?id=eq.${modelId}`, { method:'PATCH', body:{ cost_price: cost } }))
+      ]);
+      toast(`ຮັບເຂົ້າສະຕັອກສຳເລັດ · ${receiptNo}`);
+      receiveCart = [];
+      renderTab();
+    }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
+  });
+}
+function renderReceiveCart(){
+  if(!receiveCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
+  const canSeeCost = currentRole === 'admin';
+  return receiveCart.map((it,idx)=> `
+    <div class="cart-item">
+      <span>${it.model_name}${it.serial_no?(' · '+it.serial_no):(' × '+it.quantity)}${it.cost_currency==='THB' ? ' <span class="muted" style="font-size:11px;">(ຊື້ ' + fmtMoney(it.unit_cost_thb) + ' ບາດ @' + it.exchange_rate + ')</span>' : ''}</span>
+      <span>${canSeeCost ? fmtMoney(it.amount)+' ກີບ ' : ''}<span class="x" data-idx="${idx}">✕</span></span>
+    </div>`).join('');
+}
+function bindReceiveCartRemove(){
+  document.querySelectorAll('#r_cartList .x').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      receiveCart.splice(Number(el.dataset.idx),1);
+      renderTab();
+    });
+  });
+}
+
+/* ປະຫວັດການຮັບເຂົ້າ (ເບິ່ງຍ້ອນຫຼັງລາຍເດືອນ) */
+async function getPurchaseReceipts(start, end){
+  return await sb(`stock_purchase_receipts?select=*&receipt_date=gte.${start}&receipt_date=lt.${end}&order=receipt_date.desc,receipt_no.desc`);
+}
+async function getPurchaseReceiptItems(receiptId){
+  return await sb(`stock_purchase_receipt_items?select=*,stock_product_models(name,unit)&receipt_id=eq.${receiptId}`);
+}
+async function loadReceiveHistory(month){
+  const el = document.getElementById('rcv_history');
+  if(!el) return;
+  const canSeeCost = currentRole === 'admin';
+  try{
+    const start = month + '-01';
+    const endDate = new Date(start); endDate.setMonth(endDate.getMonth()+1);
+    const end = endDate.toISOString().slice(0,10);
+    const receipts = await getPurchaseReceipts(start, end);
+    el.innerHTML = `
+      ${canSeeCost && receipts.length ? `
+        <div class="row" style="padding:6px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);margin:0;">
+            <input type="checkbox" id="rcv_selectAll" style="width:17px;height:17px;margin:0;">ເລືອກທັງໝົດ
+          </label>
+          <button class="btn danger" id="rcv_deleteSelected" style="display:none;padding:6px 12px;font-size:12px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບທີ່ເລືອກ (<span id="rcv_selectedCount">0</span>)</button>
+        </div>
+      ` : ''}
+      ${receipts.length ? receipts.map(r=> `
+      <div class="row clickable" data-rcv="${r.id}">
+        <span style="display:flex;align-items:center;gap:10px;">
+          ${canSeeCost ? `<input type="checkbox" class="rcv-check" value="${r.id}" style="width:17px;height:17px;flex:none;margin:0;" onclick="event.stopPropagation()">` : ''}
+          <span>
+            <div class="mono">${r.receipt_no || '-'} <span style="font-family:var(--font-body);">${r.supplier_name ? '· '+r.supplier_name : ''}</span></div>
+            <div class="muted" style="font-size:11px;">${fmtDateDMY(r.receipt_date)}</div>
+          </span>
+        </span>
+        ${canSeeCost ? `<span class="gold mono">${fmtMoney(r.total_amount)}</span>` : ''}
+      </div>`).join('') : '<div class="empty">ບໍ່ມີການຮັບເຂົ້າໃນເດືອນນີ້</div>'}`;
+    el.querySelectorAll('.row[data-rcv]').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if(e.target.closest('.rcv-check')) return;
+        openReceiptDetail(row.dataset.rcv, receipts.find(r=>r.id===row.dataset.rcv));
+      });
+    });
+    if(canSeeCost && receipts.length){
+      const selectAllEl = document.getElementById('rcv_selectAll');
+      const deleteBtn = document.getElementById('rcv_deleteSelected');
+      const countEl = document.getElementById('rcv_selectedCount');
+      const checks = ()=> Array.from(el.querySelectorAll('.rcv-check'));
+      function refreshSelection(){
+        const selected = checks().filter(c=> c.checked);
+        countEl.textContent = selected.length;
+        deleteBtn.style.display = selected.length ? 'inline-flex' : 'none';
+        selectAllEl.checked = selected.length === checks().length;
+      }
+      selectAllEl.addEventListener('change', ()=>{
+        checks().forEach(c=> c.checked = selectAllEl.checked);
+        refreshSelection();
+      });
+      checks().forEach(c=> c.addEventListener('change', refreshSelection));
+      deleteBtn.addEventListener('click', async ()=>{
+        const ids = checks().filter(c=> c.checked).map(c=> c.value);
+        if(!ids.length) return;
+        if(!confirm(`ລົບການຮັບເຂົ້າ ${ids.length} ໃບທີ່ເລືອກ? ສະຕັອກທີ່ຮັບເຂົ້າຈະຖືກຫັກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        if(deleteBtn.disabled) return;
+        deleteBtn.disabled = true;
+        try{
+          await bulkVoidReceipts(ids);
+          toast(`ລົບການຮັບເຂົ້າສຳເລັດ ${ids.length} ໃບ ຄືນສະຕັອກແລ້ວ`);
+          renderTab();
+        }catch(err){
+          toast('ລົບບໍ່ໄດ້: ອາດມີສິນຄ້າຈາກໃບໃດໜຶ່ງທີ່ເລືອກຖືກຂາຍ/ໂອນໄປແລ້ວ — ລອງຍົກເລີກການເລືອກໃບນັ້ນແລ້ວລົບໃໝ່');
+          deleteBtn.disabled = false;
+        }
+      });
+    }
+  }catch(err){
+    el.innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div>`;
+  }
+}
+async function openReceiptDetail(receiptId, receipt){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງໂຫລດ...</div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  const canSeeCost = currentRole === 'admin';
+  try{
+    const items = await getPurchaseReceiptItems(receiptId);
+    bg.querySelector('.modal').innerHTML = `
+      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg><span class="mono">${receipt.receipt_no || 'ການຮັບເຂົ້າ'}</span></h3>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">
+        ${receipt.supplier_name ? 'ຈາກ: '+receipt.supplier_name : ''}<br>
+        ${fmtDateDMY(receipt.receipt_date)}
+      </div>
+      <hr class="sep">
+      ${items.length ? items.map(it=> `
+        <div class="row">
+          <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.serial_no ? (' · <span class="mono">'+it.serial_no+'</span>') : (' × '+it.quantity)}</span>
+          ${canSeeCost ? `<span class="mono">${fmtMoney(it.amount)}</span>` : ''}
+        </div>`).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
+      ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receipt.total_amount)}</div>` : ''}
+      ${currentRole==='admin' ? `<button class="btn danger" id="rcvDeleteBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການຮັບເຂົ້ານີ້ (ຄືນສະຕັອກ)</button>` : ''}
+      <button class="btn secondary" id="rcvDetailClose">ປິດ</button>
+    `;
+    if(currentRole==='admin'){
+      bg.querySelector('#rcvDeleteBtn').addEventListener('click', async ()=>{
+        if(!confirm(`ລົບການຮັບເຂົ້າ ${receipt.receipt_no || ''} ? ສະຕັອກທີ່ຮັບເຂົ້າຄັ້ງນີ້ຈະຖືກຫັກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        try{
+          await voidReceipt(receiptId);
+          toast('ລົບການຮັບເຂົ້າສຳເລັດ ຄືນສະຕັອກແລ້ວ');
+          bg.remove();
+          renderTab();
+        }catch(err){
+          toast('ລົບບໍ່ໄດ້ (ອາດມີສິນຄ້າຈາກຄັ້ງນີ້ຖືກຂາຍໄປແລ້ວ) — ລົບ/ຍົກເລີກບິນຂາຍທີ່ກ່ຽວຂ້ອງກ່ອນ');
+        }
+      });
+    }
+    bg.querySelector('#rcvDetailClose').addEventListener('click', ()=> bg.remove());
+  }catch(err){
+    bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="rcvDetailClose2">ປິດ</button>`;
+    bg.querySelector('#rcvDetailClose2').addEventListener('click', ()=> bg.remove());
+  }
+}
+/* ລົບການຮັບເຂົ້າ: ຖ້າມີເລກເຄື່ອງທີ່ຂາຍໄປແລ້ວຈາກຄັ້ງນີ້ ຈະລົບບໍ່ໄດ້ (unit ຈະຕິດ FK ກັບບິນຂາຍ) */
+async function voidReceipt(receiptId){
+  const movements = await sb(`stock_movements?select=id,unit_id&ref_type=eq.purchase&ref_id=eq.${receiptId}`);
+  await Promise.all(movements.map(mv=>{
+    if(mv.unit_id){
+      return sb(`stock_product_units?id=eq.${mv.unit_id}`, { method:'DELETE' });
+    }
+    return Promise.resolve();
+  }));
+  await sb(`stock_movements?ref_type=eq.purchase&ref_id=eq.${receiptId}`, { method:'DELETE' });
+  await sb(`stock_purchase_receipts?id=eq.${receiptId}`, { method:'DELETE' });
+}
+/* ລົບໃບຮັບເຂົ້າຫຼາຍໃບພ້ອມກັນ ດ້ວຍ 4 request ລວມ (ບໍ່ວ່າຈະເລືອກຈັກໃບ) ແທນທີ່ຈະລົບເທື່ອລະໃບ (ໄວກວ່າຫຼາຍເມື່ອເລືອກຫຼາຍໆໃບ) — ຕ້ອງລົບ unit ກ່ອນ movement ຄືເກົ່າ ເພື່ອໃຫ້ FK ກວດ "ຂາຍໄປແລ້ວບໍ່ໃຫ້ລົບ" ຍັງເຮັດວຽກຄືເດີມ */
+async function bulkVoidReceipts(ids){
+  const idList = ids.join(',');
+  const movements = await sb(`stock_movements?select=unit_id&ref_type=eq.purchase&ref_id=in.(${idList})`);
+  const unitIds = [...new Set(movements.filter(m=> m.unit_id).map(m=> m.unit_id))];
+  if(unitIds.length){
+    await sb(`stock_product_units?id=in.(${unitIds.join(',')})`, { method:'DELETE' });
+  }
+  await sb(`stock_movements?ref_type=eq.purchase&ref_id=in.(${idList})`, { method:'DELETE' });
+  await sb(`stock_purchase_receipts?id=in.(${idList})`, { method:'DELETE' });
+}
+
+/* ============================================================
+   SELL (ອອກບິນຂາຍ)
+   ============================================================ */
+let sellCart = [];
+let sellPayments = [];
+async function renderSell(main){
+  const models = await getModels();
+  sellPayments = [];
+  main.innerHTML = `
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-users"></use></svg>ຂໍ້ມູນລູກຄ້າ</h3>
+      <label>ຊື່ລູກຄ້າ</label>
+      <input id="s_name" placeholder="ຊື່ ນາມສະກຸນ">
+      <label>ເບີໂທ</label>
+      <input id="s_phone" placeholder="020xxxxxxxx">
+      <div class="grid2">
+        <div><label>ບ້ານ</label><input id="s_village"></div>
+        <div><label>ເມືອງ</label><input id="s_district"></div>
+      </div>
+      <label>ແຂວງ</label>
+      <input id="s_province">
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ເລືອກລາຍການ</h3>
+      <select id="s_model">
+        <option value="">-- ເລືອກສິນຄ້າ --</option>
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}">${m.name}</option>`).join('')}
+      </select>
+      <div id="s_unitBlock" style="display:none;">
+        <label>ເລືອກໜ່ວຍ (ເລກເຄື່ອງ)</label>
+        <select id="s_unitSelect"></select>
+      </div>
+      <div class="grid2" id="s_qtyPriceBlock">
+        <div><label>ຈຳນວນ</label><input id="s_qty" type="number" value="1" min="1"></div>
+        <div><label>ລາຄາ/ໜ່ວຍ</label><input id="s_price" type="text" value="0"></div>
+      </div>
+      <button class="btn secondary" id="s_addItem"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າບິນ</button>
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການໃນບິນ</h3>
+      <div id="s_cartList">${renderSellCart()}</div>
+      <div class="row"><span>ລວມຍ່ອຍ</span><span class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))}</span></div>
+      <label>ຫຼຸດລາຄາ (ຖ້າມີ)</label>
+      <input id="s_discount" type="text" value="0">
+      <div class="invoice-total mono" id="s_totalDisplay">ລວມ: ${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))}</div>
+      <label>ສະກຸນເງິນ</label>
+      <select id="s_currency">
+        <option value="LAK">ກີບ (LAK)</option>
+        <option value="THB">ບາດ (THB)</option>
+      </select>
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-wallet"></use></svg>ການຈ່າຍເງິນ</h3>
+      <div id="s_paymentList"></div>
+      <div class="grid2">
+        <select id="s_pay_method">
+          <option value="cash">ເງິນສົດ</option>
+          <option value="transfer">ໂອນ</option>
+        </select>
+        <select id="s_pay_currency">
+          <option value="LAK">ກີບ (LAK)</option>
+          <option value="THB">ບາດ (THB)</option>
+        </select>
+      </div>
+      <input id="s_pay_amount" type="text" placeholder="ຈຳນວນ" style="margin-top:8px;">
+      <div id="s_pay_rateBlock" style="display:none;">
+        <label>ອັດຕາແລກປ່ຽນມື້ນີ້ (1 ບາດ = ? ກີບ)</label>
+        <input id="s_pay_rate" type="text" placeholder="ເຊັ່ນ 620">
+      </div>
+      <button class="btn secondary" id="s_addPayment"><svg class="dv-icon"><use href="#i-wallet"></use></svg>ເພີ່ມການຈ່າຍ</button>
+      <hr class="sep">
+      <div class="row"><span>ຍອດບິນ</span><span class="mono" id="s_sumTotal">0</span></div>
+      <div class="row"><span>ຈ່າຍແລ້ວ</span><span class="mono" id="s_sumPaid">0</span></div>
+      <div class="row"><span class="gold">ຄ້າງຊຳລະ</span><span class="gold mono" id="s_sumRemain">0</span></div>
+      <button class="btn" id="s_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ຢືນຢັນອອກບິນ (ຫັກສະຕັອກທັນທີ)</button>
+    </div>
+  `;
+  attachMoneyInput('s_price', 0);
+  attachMoneyInput('s_discount', 0);
+  attachMoneyInput('s_pay_amount', '');
+  const modelSel = document.getElementById('s_model');
+  /* ໃສ່ລາຄາໃຫ້ອັດຕະໂນມັດຕາມສະກຸນເງິນທີ່ເລືອກ (ກີບ ໃຊ້ sale_price, ບາດ ໃຊ້ sale_price_thb) */
+  function fillSellPrice(){
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value) return;
+    const currency = document.getElementById('s_currency').value;
+    const price = currency === 'THB' ? (opt.dataset.priceThb || 0) : (opt.dataset.price || 0);
+    attachMoneyInput('s_price', price);
+  }
+  modelSel.addEventListener('change', async ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value) return;
+    const isSerial = opt.dataset.serial === 'true';
+    /* ເລືອກສະກຸນເງິນຂອງບິນໃຫ້ອັດຕະໂນມັດຕາມລາຄາທີ່ສິນຄ້ານີ້ຕັ້ງໄວ້ຈິງ (ຖ້າມີແຕ່ລາຄາບາດ ກໍ່ໃຫ້ສະຫຼັບເປັນບາດເອງ ບໍ່ຕ້ອງໃຫ້ຜູ້ໃຊ້ໄປເລືອກສະກຸນເງິນເອງກ່ອນ ບໍ່ຄືອອກຄ່າ 0) */
+    const priceLak = Number(opt.dataset.price || 0);
+    const priceThb = Number(opt.dataset.priceThb || 0);
+    const currencySel = document.getElementById('s_currency');
+    if(priceLak > 0){
+      currencySel.value = 'LAK';
+    } else if(priceThb > 0){
+      currencySel.value = 'THB';
+    }
+    syncPayCurrencyDefault();
+    fillSellPrice();
+    document.getElementById('s_unitBlock').style.display = isSerial ? 'block' : 'none';
+    document.getElementById('s_qtyPriceBlock').style.display = isSerial ? 'none' : 'grid';
+    if(isSerial){
+      const units = await getInStockUnits(opt.value);
+      const sel = document.getElementById('s_unitSelect');
+      sel.innerHTML = units.length
+        ? units.map(u=> `<option value="${u.id}" data-serial="${u.serial_no}">${u.serial_no}</option>`).join('')
+        : '<option value="">-- ບໍ່ມີໃນສະຕັອກ --</option>';
+    }
+  });
+  function syncPayCurrencyDefault(){
+    document.getElementById('s_pay_currency').value = document.getElementById('s_currency').value;
+    document.getElementById('s_pay_rateBlock').style.display = 'none';
+  }
+  document.getElementById('s_currency').addEventListener('change', ()=>{ fillSellPrice(); syncPayCurrencyDefault(); });
+  syncPayCurrencyDefault();
+  document.getElementById('s_pay_currency').addEventListener('change', ()=>{
+    const invCurrency = document.getElementById('s_currency').value;
+    document.getElementById('s_pay_rateBlock').style.display =
+      document.getElementById('s_pay_currency').value !== invCurrency ? 'block' : 'none';
+  });
+  document.getElementById('s_addItem').addEventListener('click', ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value){ toast('ເລືອກສິນຄ້າກ່ອນ'); return; }
+    const isSerial = opt.dataset.serial === 'true';
+    const price = moneyValue('s_price');
+    if(isSerial){
+      const unitSel = document.getElementById('s_unitSelect');
+      const uOpt = unitSel.selectedOptions[0];
+      if(!uOpt || !uOpt.value){ toast('ບໍ່ມີໜ່ວຍໃນສະຕັອກ'); return; }
+      sellCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id: uOpt.value,
+        variant_note: uOpt.dataset.serial, quantity:1, unit_price: price, amount: price });
+    } else {
+      const qty = Number(document.getElementById('s_qty').value)||1;
+      sellCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id:null,
+        variant_note:null, quantity: qty, unit_price: price, amount: qty*price });
+    }
+    document.getElementById('s_cartList').innerHTML = renderSellCart();
+    bindSellCartRemove();
+    updateSellTotals();
+    toast(`ເພີ່ມ ${opt.textContent} ເຂົ້າບິນແລ້ວ`);
+  });
+  bindEnterKey(['s_qty','s_price'], 's_addItem');
+  document.getElementById('s_discount').addEventListener('input', updateSellTotals);
+  bindEnterAdvance(['s_name','s_phone','s_village','s_district','s_province'], 's_model');
+  bindSellCartRemove();
+  document.getElementById('s_addPayment').addEventListener('click', ()=>{
+    const amt = moneyValue('s_pay_amount');
+    if(!amt){ toast('ໃສ່ຈຳນວນເງິນ'); return; }
+    const method = document.getElementById('s_pay_method').value;
+    const invCurrency = document.getElementById('s_currency').value;
+    const payCurrency = document.getElementById('s_pay_currency').value;
+    let rate = null, convertedAmt = amt;
+    if(payCurrency !== invCurrency){
+      rate = Number((document.getElementById('s_pay_rate').value||'').replace(/,/g,''));
+      if(!rate){ toast('ໃສ່ອັດຕາແລກປ່ຽນເພື່ອກວດຍອດຊຳລະ'); return; }
+      convertedAmt = invCurrency === 'LAK' ? amt * rate : amt / rate;
+    }
+    sellPayments.push({ method, currency: payCurrency, amount: amt, exchange_rate: rate, converted_amount: convertedAmt });
+    document.getElementById('s_pay_amount').value = '';
+    renderPaymentList();
+    updateSellTotals();
+    toast('ເພີ່ມການຈ່າຍແລ້ວ');
+  });
+  document.getElementById('s_pay_amount').addEventListener('keydown', (e)=>{
+    /* ຖ້າພິມຈຳນວນເງິນໄວ້ + Enter = ເພີ່ມການຈ່າຍ, ຖ້າຊ່ອງນີ້ຍັງຫວ່າງ + Enter = ຢືນຢັນອອກບິນເລີຍ */
+    if(e.key !== 'Enter') return;
+    e.preventDefault();
+    if(moneyValue('s_pay_amount')){ document.getElementById('s_addPayment').click(); }
+    else { document.getElementById('s_submit').click(); }
+  });
+  renderPaymentList();
+  updateSellTotals();
+  document.getElementById('s_submit').addEventListener('click', async (e)=>{
+    if(!sellCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
+    const btn = e.currentTarget;
+    if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
+    btn.disabled = true;
+    try{
+      const invoiceId = uid();
+      const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
+      const discount = Math.min(moneyValue('s_discount'), subtotal);
+      const total = subtotal - discount;
+      const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
+      const currency = document.getElementById('s_currency').value;
+      const status = paid <= 0 ? 'unpaid' : (paid >= total ? 'paid' : 'partial');
+      const invNo = 'INV-' + Date.now().toString().slice(-8);
+      await sb('sales_invoices', { method:'POST', body:{
+        id: invoiceId, invoice_no: invNo,
+        customer_name: document.getElementById('s_name').value.trim(),
+        customer_phone: document.getElementById('s_phone').value.trim(),
+        village: document.getElementById('s_village').value.trim(),
+        district: document.getElementById('s_district').value.trim(),
+        province: document.getElementById('s_province').value.trim(),
+        invoice_date: todayStr(),
+        total_amount: total,
+        discount_amount: discount,
+        currency,
+        paid_amount: paid,
+        payment_status: status,
+        created_by: currentRole
+      }});
+      /* ບັນທຶກລາຍການ/ການເຄື່ອນໄຫວ/ການຈ່າຍເງິນທັງໝົດເປັນຊຸດດຽວ (bulk insert) ແທນການສົ່ງທີລະລາຍການ ໃຫ້ໄວຂຶ້ນຫຼາຍ ໂດຍສະເພາະເມື່ອບິນມີຫຼາຍລາຍການ ຫຼືເນັດຊ້າ */
+      const soldAt = todayStr();
+      const itemsBody = sellCart.map(item=> ({
+        id: uid(), invoice_id: invoiceId, model_id: item.model_id, unit_id: item.unit_id,
+        variant_note: item.variant_note, quantity: item.quantity, unit_price: item.unit_price, amount: item.amount
+      }));
+      const movementsBody = sellCart.map(item=> ({
+        id: uid(), model_id: item.model_id, unit_id: item.unit_id, movement_type:'out',
+        quantity: item.quantity, ref_type:'sale', ref_id: invoiceId, created_by: currentRole
+      }));
+      const soldUnitIds = sellCart.filter(item=> item.unit_id).map(item=> item.unit_id);
+      const paymentsBody = sellPayments.map(p=> ({
+        id: uid(), invoice_id: invoiceId, payment_date: soldAt,
+        method: p.method, currency: p.currency, amount: p.amount,
+        exchange_rate: p.exchange_rate, converted_amount: p.converted_amount, created_by: currentRole
+      }));
+      await Promise.all([
+        sb('sales_invoice_items', { method:'POST', body: itemsBody }),
+        sb('stock_movements', { method:'POST', body: movementsBody }),
+        soldUnitIds.length ? sb(`stock_product_units?id=in.(${soldUnitIds.join(',')})`, { method:'PATCH', body:{ status:'sold', sold_at: soldAt } }) : Promise.resolve(),
+        paymentsBody.length ? sb('sales_payments', { method:'POST', body: paymentsBody }) : Promise.resolve()
+      ]);
+      toast(`ອອກບິນ ${invNo} ສຳເລັດ · ${fmtMoney(total)}`);
+      sellCart = [];
+      sellPayments = [];
+      renderTab();
+    }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
+  });
+}
+function renderPaymentList(){
+  const el = document.getElementById('s_paymentList');
+  if(!el) return;
+  el.innerHTML = sellPayments.length ? sellPayments.map((p,idx)=> `
+    <div class="cart-item">
+      <span>${p.method==='cash'?'ເງິນສົດ':'ໂອນ'} · ${p.currency}</span>
+      <span>${fmtMoney(p.amount)}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''} <span class="x" data-pidx="${idx}">✕</span></span>
+    </div>`).join('') : '<div class="empty">ຍັງບໍ່ໄດ້ບັນທຶກການຈ່າຍ (ຄ້າງໝົດ)</div>';
+  el.querySelectorAll('.x').forEach(x=>{
+    x.addEventListener('click', ()=>{
+      sellPayments.splice(Number(x.dataset.pidx),1);
+      renderPaymentList();
+      updateSellTotals();
+    });
+  });
+}
+function updateSellTotals(){
+  const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
+  const discount = Math.min(moneyValue('s_discount'), subtotal);
+  const total = subtotal - discount;
+  const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
+  const remain = total - paid;
+  const subtotalDisplay = document.getElementById('s_subtotalDisplay');
+  if(subtotalDisplay) subtotalDisplay.textContent = fmtMoney(subtotal);
+  const totalDisplay = document.getElementById('s_totalDisplay');
+  if(totalDisplay) totalDisplay.textContent = 'ລວມ: ' + fmtMoney(total);
+  const st = document.getElementById('s_sumTotal'); if(st) st.textContent = fmtMoney(total);
+  const sp = document.getElementById('s_sumPaid'); if(sp) sp.textContent = fmtMoney(paid);
+  const sr = document.getElementById('s_sumRemain'); if(sr) sr.textContent = fmtMoney(remain > 0 ? remain : 0);
+}
+function renderSellCart(){
+  if(!sellCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
+  return sellCart.map((it,idx)=> `
+    <div class="cart-item">
+      <span>${it.model_name}${it.variant_note?(' · '+it.variant_note):(' × '+it.quantity)}</span>
+      <span>${fmtMoney(it.amount)} <span class="x" data-idx="${idx}">✕</span></span>
+    </div>`).join('');
+}
+function bindSellCartRemove(){
+  document.querySelectorAll('#s_cartList .x').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      sellCart.splice(Number(el.dataset.idx),1);
+      document.getElementById('s_cartList').innerHTML = renderSellCart();
+      bindSellCartRemove();
+      updateSellTotals();
+    });
+  });
+}
+
+/* ============================================================
+   BRANCH TRANSFER (ໂອນສາຂາ) — ตัดสต๊อกไปสาขาอื่นอย่างเดียว ไม่มีรายรับ/ไม่ยุ่งกับเงิน
+   ============================================================ */
+let transferCart = [];
+async function renderTransfer(main){
+  const models = await getModels();
+  const historyMonth = main.dataset.trMonth || todayStr().slice(0,7);
+  main.innerHTML = `
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ໂອນສິນຄ້າໄປສາຂາອື່ນ</h3>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">ຟັງຊັນນີ້ຕັດສະຕັອກອອກຈາກສາຂານີ້ເທົ່ານັ້ນ ບໍ່ມີການອອກບິນ ບໍ່ຮັບເງິນ ບໍ່ກະທົບຍອດຂາຍ/ກຳໄລ</div>
+      <label>ສາຂາປາຍທາງ</label>
+      <input id="tr_branch" placeholder="ເຊັ່ນ: ສາຂາ 2 - ຫຼວງພະບາງ">
+      <label>ວັນທີ</label>
+      <input id="tr_date" type="date" value="${todayStr()}">
+      <hr class="sep">
+      <label>ເລືອກສິນຄ້າ</label>
+      <select id="tr_model">
+        <option value="">-- ເລືອກສິນຄ້າ --</option>
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-unit="${m.unit||''}">${m.name}</option>`).join('')}
+      </select>
+      <div id="tr_qtyBlock">
+        <label>ຈຳນວນ</label>
+        <input id="tr_qty" type="number" value="1" min="1">
+      </div>
+      <div id="tr_serialBlock" style="display:none;">
+        <label>ເລືອກເລກເຄື່ອງທີ່ຈະໂອນ (ເລືອກໄດ້ຫຼາຍລາຍການ)</label>
+        <div id="tr_serialList" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--panel);"></div>
+      </div>
+      <label>ໝາຍເຫດ (ຖ້າມີ)</label>
+      <input id="tr_note" placeholder="ເຊັ່ນ ຜູ້ຮັບຜິດຊອບຂົນສົ່ງ">
+      <button class="btn secondary" id="tr_addItem" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າລາຍການ</button>
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການທີ່ຈະໂອນ</h3>
+      <div id="tr_cartList">${renderTransferCart()}</div>
+      <button class="btn" id="tr_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກໂອນສາຂາ (ຕັດສະຕັອກ)</button>
+    </div>
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການໂອນສາຂາ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
+      <label>ເລືອກເດືອນ</label>
+      <input type="month" id="tr_month" value="${historyMonth}">
+      <div id="tr_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+    </div>
+  `;
+  const modelSel = document.getElementById('tr_model');
+  async function refreshSerialList(){
+    const opt = modelSel.selectedOptions[0];
+    const listEl = document.getElementById('tr_serialList');
+    if(!opt || !opt.value){ listEl.innerHTML = ''; return; }
+    const units = await getInStockUnits(opt.value);
+    const cartSerialIds = new Set(transferCart.filter(i=> i.model_id===opt.value && i.unit_id).map(i=> i.unit_id));
+    const available = units.filter(u=> !cartSerialIds.has(u.id));
+    listEl.innerHTML = available.length
+      ? available.map(u=> `
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--border);">
+          <input type="checkbox" id="trchk_${u.id}" value="${u.id}" data-serial="${(u.serial_no||'').replace(/"/g,'&quot;')}" style="width:17px;height:17px;flex:none;margin:0;">
+          <label for="trchk_${u.id}" style="display:inline-block;margin:0;font-size:14px;font-weight:600;color:var(--ink);">${u.serial_no || '(ບໍ່ມີເລກ)'}</label>
+        </div>`).join('')
+      : '<div class="empty">ບໍ່ມີເລກເຄື່ອງໃນສະຕັອກສາຂານີ້ (ຫຼືເລືອກໝົດແລ້ວ)</div>';
+  }
+  modelSel.addEventListener('change', async ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value) return;
+    const isSerial = opt.dataset.serial === 'true';
+    document.getElementById('tr_qtyBlock').style.display = isSerial ? 'none' : 'block';
+    document.getElementById('tr_serialBlock').style.display = isSerial ? 'block' : 'none';
+    if(isSerial) await refreshSerialList();
+  });
+  document.getElementById('tr_addItem').addEventListener('click', async ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value){ toast('ເລືອກສິນຄ້າກ່ອນ'); return; }
+    const isSerial = opt.dataset.serial === 'true';
+    let addedCount = 0;
+    if(isSerial){
+      const checked = Array.from(document.querySelectorAll('#tr_serialList input:checked'));
+      if(!checked.length){ toast('ເລືອກເລກເຄື່ອງຢ່າງໜ້ອຍ 1 ຕົວ'); return; }
+      checked.forEach(cb=>{
+        transferCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id: cb.value, serial_no: cb.dataset.serial, quantity:1 });
+      });
+      addedCount = checked.length;
+      await refreshSerialList();
+    } else {
+      const qty = Number(document.getElementById('tr_qty').value)||1;
+      transferCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id:null, serial_no:null, quantity: qty });
+      addedCount = qty;
+    }
+    document.getElementById('tr_cartList').innerHTML = renderTransferCart();
+    bindTransferCartRemove();
+    toast(`ເພີ່ມ ${opt.textContent} ເຂົ້າລາຍການແລ້ວ`);
+  });
+  bindTransferCartRemove();
+  document.getElementById('tr_month').addEventListener('change', (e)=>{
+    main.dataset.trMonth = e.target.value;
+    loadTransferHistory(e.target.value);
+  });
+  loadTransferHistory(historyMonth);
+  /* Enter ในแต่ละช่อง = ไล่ลงช่องถัดไปตามลำดับจริงในฟอร์ม (จำนวน/ไม่มีเลขเครื่อง → หมายเหตุ) พอถึงช่องสุดท้ายค่อยเพิ่มเข้ารายการ แล้วโฟกัสไปที่ปุ่ม "บันทึกโอນสาขา" ให้พร้อมกด Enter อีกครั้งเพื่อบันทึกเลย */
+  function getTransferFieldChain(){
+    const serialBlock = document.getElementById('tr_serialBlock');
+    const isSerialVisible = serialBlock && serialBlock.style.display !== 'none';
+    const chain = [];
+    if(!isSerialVisible) chain.push('tr_qty');
+    chain.push('tr_note');
+    return chain;
+  }
+  function focusTransferField(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.focus();
+    if(el.select) el.select();
+  }
+  function handleTransferFieldEnter(currentId){
+    const chain = getTransferFieldChain();
+    const idx = chain.indexOf(currentId);
+    if(idx === -1) return;
+    if(idx < chain.length - 1){
+      focusTransferField(chain[idx+1]);
+    } else {
+      document.getElementById('tr_addItem').click();
+      /* หน่วงการโฟกัสไปช่วงถัดไปด้วย setTimeout เพื่อไม่ให้คีย์ Enter ตัวเดียวกันไปกระตุ้น click ที่ปุ่มบันทึกซ้ำอีกที (ถ้าโฟกัสปุ่มทันทีในอีเวนต์เดียวกัน บางเบราว์เซอร์จะยิง click ซ้ำตอนปล่อยคีย์) */
+      setTimeout(()=>{
+        const submitBtn = document.getElementById('tr_submit');
+        if(submitBtn) submitBtn.focus();
+      }, 0);
+    }
+  }
+  ['tr_qty','tr_note'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); handleTransferFieldEnter(id); }
+    });
+  });
+  bindEnterAdvance(['tr_branch','tr_date'], 'tr_model');
+  document.getElementById('tr_submit').addEventListener('click', async (e)=>{
+    if(!transferCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
+    const branch = document.getElementById('tr_branch').value.trim();
+    if(!branch){ toast('ໃສ່ຊື່ສາຂາປາຍທາງກ່ອນ'); return; }
+    const btn = e.currentTarget;
+    if(btn.disabled) return;
+    btn.disabled = true;
+    try{
+      const note = document.getElementById('tr_note').value.trim();
+      const fullNote = `ໂອນໄປ: ${branch}${note ? ' - '+note : ''}`;
+      const transferId = uid();
+      /* ບັນທຶກທັງໝົດເປັນຊຸດດຽວ (bulk) ແທນທີລະລາຍການ ໃຫ້ໄວຂຶ້ນ */
+      const movementsBody = transferCart.map(item=> ({
+        id: uid(), model_id: item.model_id, unit_id: item.unit_id, movement_type:'out',
+        quantity: item.quantity, ref_type:'transfer', ref_id: transferId, note: fullNote, created_by: currentRole
+      }));
+      const transferredUnitIds = transferCart.filter(item=> item.unit_id).map(item=> item.unit_id);
+      await Promise.all([
+        sb('stock_movements', { method:'POST', body: movementsBody }),
+        transferredUnitIds.length ? sb(`stock_product_units?id=in.(${transferredUnitIds.join(',')})`, { method:'PATCH', body:{ status:'transferred', note: fullNote } }) : Promise.resolve()
+      ]);
+      toast(`ໂອນສາຂາສຳເລັດ · ${transferCart.length} ລາຍການ`);
+      transferCart = [];
+      renderTab();
+    }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
+  });
+}
+function renderTransferCart(){
+  if(!transferCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
+  return transferCart.map((it,idx)=> `
+    <div class="cart-item">
+      <span>${it.model_name}${it.serial_no ? (' · <span class="mono">'+it.serial_no+'</span>') : (' × '+it.quantity)}</span>
+      <span class="x" data-idx="${idx}">✕</span>
+    </div>`).join('');
+}
+function bindTransferCartRemove(){
+  document.querySelectorAll('#tr_cartList .x').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      transferCart.splice(Number(el.dataset.idx),1);
+      document.getElementById('tr_cartList').innerHTML = renderTransferCart();
+      bindTransferCartRemove();
+    });
+  });
+}
+async function loadTransferHistory(month){
+  const el = document.getElementById('tr_history');
+  if(!el) return;
+  const isAdmin = currentRole === 'admin';
+  try{
+    const start = month + '-01';
+    const endDate = new Date(start); endDate.setMonth(endDate.getMonth()+1);
+    const end = endDate.toISOString().slice(0,10);
+    const rows = await sb(`stock_movements?select=*,stock_product_models(name,unit),stock_product_units(serial_no)&ref_type=eq.transfer&created_at=gte.${start}&created_at=lt.${end}&order=created_at.desc`);
+    const groups = {};
+    rows.forEach(r=>{
+      const key = r.ref_id || r.id;
+      if(!groups[key]) groups[key] = { key, note: r.note, date: r.created_at, items: [] };
+      groups[key].items.push(r);
+    });
+    const groupList = Object.values(groups);
+    el.innerHTML = `
+      ${isAdmin && groupList.length ? `
+        <div class="row" style="padding:6px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);margin:0;">
+            <input type="checkbox" id="tr_selectAll" style="width:17px;height:17px;margin:0;">ເລືອກທັງໝົດ
+          </label>
+          <button class="btn danger" id="tr_deleteSelected" style="display:none;padding:6px 12px;font-size:12px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບທີ່ເລືອກ (<span id="tr_selectedCount">0</span>)</button>
+        </div>
+      ` : ''}
+      ${groupList.length ? groupList.map(g=> `
+      <div class="row clickable" data-trgroup="${g.key}">
+        <span style="display:flex;align-items:center;gap:10px;">
+          ${isAdmin ? `<input type="checkbox" class="tr-check" value="${g.key}" style="width:17px;height:17px;flex:none;margin:0;" onclick="event.stopPropagation()">` : ''}
+          <span>
+            <div>${g.note || 'ໂອນສາຂາ'}</div>
+            <div class="muted" style="font-size:11px;">${fmtDateDMY((g.date||'').slice(0,10))} · ${g.items.length} ລາຍການ</div>
+          </span>
+        </span>
+      </div>`).join('') : '<div class="empty">ບໍ່ມີການໂອນສາຂາໃນເດືອນນີ້</div>'}`;
+    el.querySelectorAll('.row[data-trgroup]').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if(e.target.closest('.tr-check')) return;
+        openTransferDetail(groups[row.dataset.trgroup]);
+      });
+    });
+    if(isAdmin && groupList.length){
+      const selectAllEl = document.getElementById('tr_selectAll');
+      const deleteBtn = document.getElementById('tr_deleteSelected');
+      const countEl = document.getElementById('tr_selectedCount');
+      const checks = ()=> Array.from(el.querySelectorAll('.tr-check'));
+      function refreshSelection(){
+        const selected = checks().filter(c=> c.checked);
+        countEl.textContent = selected.length;
+        deleteBtn.style.display = selected.length ? 'inline-flex' : 'none';
+        selectAllEl.checked = selected.length === checks().length;
+      }
+      selectAllEl.addEventListener('change', ()=>{
+        checks().forEach(c=> c.checked = selectAllEl.checked);
+        refreshSelection();
+      });
+      checks().forEach(c=> c.addEventListener('change', refreshSelection));
+      deleteBtn.addEventListener('click', async ()=>{
+        const keys = checks().filter(c=> c.checked).map(c=> c.value);
+        if(!keys.length) return;
+        if(!confirm(`ລົບການໂອນສາຂາ ${keys.length} ລາຍການທີ່ເລືອກ? ສະຕັອກຈະຖືກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        if(deleteBtn.disabled) return;
+        deleteBtn.disabled = true;
+        try{
+          await bulkVoidTransferGroups(keys.map(k=> groups[k]));
+          toast(`ລົບການໂອນສາຂາສຳເລັດ ${keys.length} ລາຍການ ຄືນສະຕັອກແລ້ວ`);
+          renderTab();
+        }catch(err){
+          toast('ລົບບໍ່ໄດ້: '+err.message);
+          deleteBtn.disabled = false;
+        }
+      });
+    }
+  }catch(err){
+    el.innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div>`;
+  }
+}
+function openTransferDetail(group){
+  if(!group) return;
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <div class="doc-card">
+        <div class="doc-head">
+          <div class="doc-head-row">
+            <div class="doc-brand">
+              <div class="seal-mark"><svg class="dv-icon"><use href="#i-gear"></use></svg></div>
+              <div class="doc-brand-name">DAVONE SHOP</div>
+            </div>
+            <div class="doc-head-title">
+              <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ໃບເບີກໂອນສາຂາ</h3>
+            </div>
+          </div>
+          <div class="doc-head-meta"><span class="doc-tag solid">${fmtDateDMY((group.date||'').slice(0,10))}</span></div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-box">
+            <div class="doc-avatar"><svg class="dv-icon"><use href="#i-truck"></use></svg></div>
+            <div class="doc-box-info">
+              <div class="doc-line" style="margin-top:0;">${group.note || 'ໂອນສາຂາ'}</div>
+            </div>
+          </div>
+          <div class="doc-section-label">ລາຍການສິນຄ້າ</div>
+          <div class="doc-table-head"><span>ລາຍການສິນຄ້າ</span></div>
+          <div class="doc-table-body">
+            ${group.items.map(it=> `
+              <div class="row">
+                <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.stock_product_units && it.stock_product_units.serial_no ? (' · <span class="mono">'+it.stock_product_units.serial_no+'</span>') : (' × '+it.quantity)}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div class="doc-footer">ຂອບໃຈທີ່ໃຊ້ບໍລິການ · DAVONE SHOP</div>
+      </div>
+      ${currentRole==='admin' ? `<button class="btn danger" id="trDeleteBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການໂອນນີ້ (ຄືນສະຕັອກ)</button>` : ''}
+      <button class="btn secondary" id="trDetailClose">ປິດ</button>
+    </div>
+  `;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  bg.querySelector('#trDetailClose').addEventListener('click', ()=> bg.remove());
+  if(currentRole==='admin'){
+    const delBtn = bg.querySelector('#trDeleteBtn');
+    delBtn.addEventListener('click', async ()=>{
+      if(!confirm('ລົບການໂອນສາຂານີ້? ສິນຄ້າທີ່ມີເລກເຄື່ອງຈະຄືນເປັນສະຕັອກຄົງເຫຼືອຄືນ')) return;
+      if(delBtn.disabled) return;
+      delBtn.disabled = true;
+      try{
+        await voidTransfer(group);
+        toast('ລົບການໂອນສາຂາສຳເລັດ ຄືນສະຕັອກແລ້ວ');
+        bg.remove();
+        renderTab();
+      }catch(err){ toast('ຜິດພາດ: '+err.message); delBtn.disabled = false; }
+    });
+  }
+}
+/* ລົບການໂອນສາຂາ: ຄືນສະຕັອກ (ເຄື່ອງທີ່ມີເລກເຄື່ອງກັບເປັນ in_stock) ແລ້ວລົບ movement ທັງໝົດຂອງການໂອນຄັ້ງນີ້ */
+async function voidTransfer(group){
+  const unitIds = group.items.filter(it=> it.unit_id).map(it=> it.unit_id);
+  const movementIds = group.items.map(it=> it.id);
+  await Promise.all([
+    unitIds.length ? sb(`stock_product_units?id=in.(${unitIds.join(',')})`, { method:'PATCH', body:{ status:'in_stock', note: null } }) : Promise.resolve(),
+    movementIds.length ? sb(`stock_movements?id=in.(${movementIds.join(',')})`, { method:'DELETE' }) : Promise.resolve()
+  ]);
+}
+/* ລົບການໂອນສາຂາຫຼາຍລາຍການພ້ອມກັນ ດ້ວຍ 2 request ລວມ (ຂໍ້ມູນ items ມີຢູ່ໃນໜ້າຈໍແລ້ວ ບໍ່ຕ້ອງໄປດຶງໃໝ່) ໄວກວ່າການລົບເທື່ອລະລາຍການຫຼາຍ */
+async function bulkVoidTransferGroups(groupsArr){
+  const allItems = groupsArr.flatMap(g=> g.items);
+  const unitIds = [...new Set(allItems.filter(it=> it.unit_id).map(it=> it.unit_id))];
+  const movementIds = allItems.map(it=> it.id);
+  await Promise.all([
+    unitIds.length ? sb(`stock_product_units?id=in.(${unitIds.join(',')})`, { method:'PATCH', body:{ status:'in_stock', note: null } }) : Promise.resolve(),
+    movementIds.length ? sb(`stock_movements?id=in.(${movementIds.join(',')})`, { method:'DELETE' }) : Promise.resolve()
+  ]);
+}
+
+/* ============================================================
+   MONTHLY REPORT
+   ============================================================ */
+async function renderReport(main){
+  const month = (main.dataset.month) || todayStr().slice(0,7);
+  const start = month + '-01';
+  const endDate = new Date(start); endDate.setMonth(endDate.getMonth()+1);
+  const end = endDate.toISOString().slice(0,10);
+
+  const invoices = await sb(`sales_invoices?select=*&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed&order=invoice_date.desc`);
+  const totalByCur = await sumInvoicesByPaidCurrency(invoices);
+  const outstandingInv = invoices.filter(r=> r.payment_status==='partial' || r.payment_status==='unpaid' || r.payment_status==='credit');
+  const outstandingByCur = {};
+  outstandingInv.forEach(r=>{
+    const c = r.currency || 'LAK';
+    outstandingByCur[c] = (outstandingByCur[c]||0) + (Number(r.total_amount||0) - Number(r.paid_amount||0));
+  });
+  const outstanding = Object.values(outstandingByCur).reduce((s,v)=>s+v,0);
+  const profitByCur = currentRole === 'admin' ? await getPeriodProfit(start, end) : null;
+
+  main.innerHTML = `
+    <div class="card">
+      <label>ເລືອກເດືອນ</label>
+      <input type="month" id="rep_month" value="${month}">
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(totalByCur)}</div><div class="lbl">ຍອດຂາຍລວມ</div></div>
+      <div class="stat"><div class="num mono">${invoices.length}</div><div class="lbl">ຈຳນວນບິນ</div></div>
+      ${profitByCur !== null ? `<div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(profitByCur)}</div><div class="lbl">ກຳໄລ (ແອດມິນ)</div></div>` : ''}
+    </div>
+    ${outstanding > 0 ? `<div class="card"><div class="row"><span>ຄ້າງຊຳລະລວມ</span><span class="gold mono">${fmtByCurrency(outstandingByCur)}</span></div></div>` : ''}
+    <div class="card">
+      <h3><svg class="dv-icon"><use href="#i-chart"></use></svg>ບິນຂາຍໃນເດືອນນີ້ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
+      ${currentRole==='admin' && invoices.length ? `
+        <div class="row" style="padding:6px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);margin:0;">
+            <input type="checkbox" id="inv_selectAll" style="width:17px;height:17px;margin:0;">ເລືອກທັງໝົດ
+          </label>
+          <button class="btn danger" id="inv_deleteSelected" style="display:none;padding:6px 12px;font-size:12px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບທີ່ເລືອກ (<span id="inv_selectedCount">0</span>)</button>
+        </div>
+      ` : ''}
+      ${invoices.length ? invoices.map(inv=> `
+        <div class="row clickable" data-inv="${inv.id}">
+          <span style="display:flex;align-items:center;gap:10px;">
+            ${currentRole==='admin' ? `<input type="checkbox" class="inv-check" value="${inv.id}" style="width:17px;height:17px;flex:none;margin:0;" onclick="event.stopPropagation()">` : ''}
+            <span>
+              <div class="mono">${inv.invoice_no || '-'} <span style="font-family:var(--font-body);">${inv.customer_name ? '· '+inv.customer_name : ''}</span></div>
+              <div class="muted" style="font-size:11px;">${fmtDateDMY(inv.invoice_date)} · ${inv.currency||'LAK'} ${statusTag(inv)}</div>
+            </span>
+          </span>
+          <span class="gold mono">${fmtMoney(inv.total_amount)}</span>
+        </div>`).join('') : '<div class="empty">ບໍ່ມີບິນຂາຍໃນເດືອນນີ້</div>'}
+    </div>
+  `;
+  document.getElementById('rep_month').addEventListener('change', (e)=>{
+    main.dataset.month = e.target.value;
+    renderTab();
+  });
+  main.querySelectorAll('.row[data-inv]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('.inv-check')) return;
+      openInvoiceDetail(el.dataset.inv, invoices.find(i=>i.id===el.dataset.inv));
+    });
+  });
+  if(currentRole==='admin' && invoices.length){
+    const selectAllEl = document.getElementById('inv_selectAll');
+    const deleteBtn = document.getElementById('inv_deleteSelected');
+    const countEl = document.getElementById('inv_selectedCount');
+    const checks = ()=> Array.from(main.querySelectorAll('.inv-check'));
+    function refreshSelection(){
+      const selected = checks().filter(c=> c.checked);
+      countEl.textContent = selected.length;
+      deleteBtn.style.display = selected.length ? 'inline-flex' : 'none';
+      selectAllEl.checked = selected.length === checks().length;
+    }
+    selectAllEl.addEventListener('change', ()=>{
+      checks().forEach(c=> c.checked = selectAllEl.checked);
+      refreshSelection();
+    });
+    checks().forEach(c=> c.addEventListener('change', refreshSelection));
+    deleteBtn.addEventListener('click', async ()=>{
+      const ids = checks().filter(c=> c.checked).map(c=> c.value);
+      if(!ids.length) return;
+      if(!confirm(`ລົບບິນຂາຍ ${ids.length} ໃບທີ່ເລືອກ? ສະຕັອກຈະຖືກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+      if(deleteBtn.disabled) return;
+      deleteBtn.disabled = true;
+      try{
+        await bulkVoidInvoices(ids);
+        toast(`ລົບບິນຂາຍສຳເລັດ ${ids.length} ໃບ ຄືນສະຕັອກແລ້ວ`);
+        renderTab();
+      }catch(err){
+        toast('ລົບບໍ່ໄດ້: ອາດມີບິນໃດໜຶ່ງທີ່ເລືອກມີບັນຫາ — ລອງເລືອກຊ້ຳໃໝ່');
+        deleteBtn.disabled = false;
+      }
+    });
+  }
+}
+function statusTag(inv){
+  if(inv.payment_status === 'paid') return '· <span style="color:var(--ok);font-weight:600;">ຈ່າຍຄົບ</span>';
+  const remain = Number(inv.total_amount||0) - Number(inv.paid_amount||0);
+  if(inv.payment_status === 'partial') return `· <span class="gold">ຄ້າງ ${fmtMoney(remain)}</span>`;
+  return `· <span style="color:var(--danger);font-weight:600;">ຍັງບໍ່ຈ່າຍ</span>`;
+}
+
+async function getInvoiceItems(invoiceId){
+  return await sb(`sales_invoice_items?select=*,stock_product_models(name,unit,cost_price,cost_price_thb),stock_product_units(cost_lak)&invoice_id=eq.${invoiceId}`);
+}
+async function getInvoicePayments(invoiceId){
+  return await sb(`sales_payments?select=*&invoice_id=eq.${invoiceId}&order=payment_date.asc`);
+}
+
+async function openInvoiceDetail(invoiceId, inv){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງໂຫລດ...</div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  await refreshInvoiceDetail(bg, invoiceId, inv);
+}
+
+async function refreshInvoiceDetail(bg, invoiceId, inv){
+  try{
+    const [items, payments] = await Promise.all([getInvoiceItems(invoiceId), getInvoicePayments(invoiceId)]);
+    const remain = Number(inv.total_amount||0) - Number(inv.paid_amount||0);
+    const invCurrency = inv.currency || 'LAK';
+    const { profit: itemProfit, unknownCostCount } = computeInvoiceItemProfit(items, invCurrency);
+    const profitByPaid = splitByPaidCurrency(itemProfit, invCurrency, Number(inv.total_amount||0), payments);
+    const paidCurrencies = [...new Set(payments.map(p=> p.currency || invCurrency))].filter(c=> c !== invCurrency);
+    const discount = Number(inv.discount_amount||0);
+    const subtotal = Number(inv.total_amount||0) + discount;
+    const address = [inv.village, inv.district, inv.province].filter(Boolean).join(' · ');
+    bg.querySelector('.modal').innerHTML = `
+      <div class="doc-card">
+        <div class="doc-head">
+          <div class="doc-head-row">
+            <div class="doc-brand">
+              <div class="seal-mark"><svg class="dv-icon"><use href="#i-gear"></use></svg></div>
+              <div class="doc-brand-name">DAVONE SHOP</div>
+            </div>
+            <div class="doc-head-title">
+              <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg><span class="mono">${inv.invoice_no || 'ບິນຂາຍ'}</span></h3>
+            </div>
+          </div>
+          <div class="doc-head-meta">
+            <span class="doc-tag">${invCurrency}</span>
+            ${paidCurrencies.map(c=> `<span class="doc-tag solid">ຮັບຈິງ: ${c==='THB'?'ບາດ':'ກີບ'}</span>`).join('')}
+            <span class="doc-tag solid">${fmtDateDMY(inv.invoice_date)}</span>
+            <span class="doc-tag solid">${statusTag(inv)}</span>
+          </div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-box">
+            <div class="doc-avatar"><svg class="dv-icon"><use href="#i-users"></use></svg></div>
+            <div class="doc-box-info">
+              <div style="font-size:17px;font-weight:700;color:var(--ink);line-height:1.3;">${inv.customer_name || '-'}</div>
+              ${inv.customer_phone ? `<div class="doc-line"><svg class="dv-icon"><use href="#i-phone"></use></svg>${inv.customer_phone}</div>` : ''}
+              ${address ? `<div class="doc-line"><svg class="dv-icon"><use href="#i-pin"></use></svg>${address}</div>` : ''}
+            </div>
+          </div>
+          <div class="doc-section-label">ລາຍການສິນຄ້າ</div>
+          <div class="doc-table-head"><span>ລາຍການ</span><span>ຈຳນວນເງິນ</span></div>
+          <div class="doc-table-body">
+            ${items.length ? items.map(it=> `
+              <div class="row">
+                <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.variant_note ? (' · <span class="mono">'+it.variant_note+'</span>') : (' × '+it.quantity)}</span>
+                <span class="mono">${fmtMoney(it.amount)}</span>
+              </div>`).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
+            <div class="row"><span class="muted">ລວມຍ່ອຍ</span><span class="mono muted">${fmtMoney(subtotal)}</span></div>
+            ${discount > 0 ? `<div class="row"><span class="muted">ຫຼຸດລາຄາ</span><span class="mono muted">-${fmtMoney(discount)}</span></div>` : ''}
+          </div>
+          <div class="doc-total-band mono"><span style="font-family:var(--font-body);font-weight:600;">ລວມ</span><span>${fmtMoney(inv.total_amount)}</span></div>
+          ${currentRole==='admin' ? `<div class="row" style="font-size:12px;"><span class="gold">ກຳໄລບິນນີ້ (ແອດມິນ)${unknownCostCount ? ' *' : ''}</span><span class="gold mono">${fmtByCurrency(profitByPaid)}</span></div>` : ''}
+          ${currentRole==='admin' && unknownCostCount ? `<div class="muted" style="font-size:11px;margin-top:-4px;">* ບໍ່ນັບລວມ ${unknownCostCount} ລາຍການທີ່ຍັງບໍ່ໄດ້ຕັ້ງຕົ້ນທຶນສະກຸນບາດໄວ້ (ໄປຕັ້ງທີ່ໜ້າສິນຄ້າ)</div>` : ''}
+          <hr class="sep">
+          <div class="doc-section-label">ການຈ່າຍເງິນ</div>
+          ${payments.length ? payments.map(p=> `
+            <div class="row" style="font-size:12px;">
+              <span>${p.method==='cash'?'ເງິນສົດ':'ໂອນ'} · ${p.currency||inv.currency||'LAK'} · ${fmtDateDMY(p.payment_date)}</span>
+              <span class="mono">${fmtMoney(p.amount)}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''}</span>
+            </div>`).join('') : '<div class="empty">ຍັງບໍ່ມີການຈ່າຍບັນທຶກໄວ້</div>'}
+        </div>
+        <div class="doc-footer">ຂອບໃຈທີ່ໃຊ້ບໍລິການ · DAVONE SHOP</div>
+      </div>
+      ${remain > 0 ? `
+        <div class="row" style="font-size:12px;"><span class="gold">ຍັງຄ້າງ (${inv.currency||'LAK'})</span><span class="gold mono">${fmtMoney(remain)}</span></div>
+        <hr class="sep">
+        <div class="muted" style="font-size:12px;margin-bottom:4px;">ຮັບຊຳລະເພີ່ມ ​· ຮັບໄດ້ທັງກີບ ຫຼື ບາດ</div>
+        <div class="grid2">
+          <select id="pay_method">
+            <option value="cash">ເງິນສົດ</option>
+            <option value="transfer">ໂອນ</option>
+          </select>
+          <select id="pay_currency">
+            <option value="LAK">ກີບ (LAK)</option>
+            <option value="THB">ບາດ (THB)</option>
+          </select>
+        </div>
+        <input id="pay_amount" type="text" placeholder="ຈຳນວນ" style="margin-top:8px;">
+        <div id="pay_rateBlock" style="display:none;">
+          <label>ອັດຕາແລກປ່ຽນມື້ນີ້ (1 ບາດ = ? ກີບ)</label>
+          <input id="pay_rate" type="text" placeholder="ເຊັ່ນ 620">
+        </div>
+        <button class="btn secondary" id="pay_submit"><svg class="dv-icon"><use href="#i-wallet"></use></svg>ບັນທຶກການຈ່າຍ</button>
+      ` : ''}
+      ${currentRole==='admin' ? `<button class="btn danger" id="invDeleteBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບບິນນີ້ (ຄືນສະຕັອກ)</button>` : ''}
+      <button class="btn ${remain>0?'secondary':''}" id="invDetailClose">ປິດ</button>
+    `;
+    if(remain > 0){
+      attachMoneyInput('pay_amount', '');
+      bindEnterKey(['pay_amount'], 'pay_submit');
+      const invCurrency = inv.currency || 'LAK';
+      document.getElementById('pay_currency').value = invCurrency;
+      document.getElementById('pay_currency').addEventListener('change', ()=>{
+        document.getElementById('pay_rateBlock').style.display =
+          document.getElementById('pay_currency').value !== invCurrency ? 'block' : 'none';
+      });
+      bg.querySelector('#pay_submit').addEventListener('click', async ()=>{
+        const amt = moneyValue('pay_amount');
+        if(!amt){ toast('ໃສ່ຈຳນວນເງິນ'); return; }
+        const payCurrency = document.getElementById('pay_currency').value;
+        let rate = null, convertedAmt = amt;
+        if(payCurrency !== invCurrency){
+          rate = Number((document.getElementById('pay_rate').value||'').replace(/,/g,''));
+          if(!rate){ toast('ໃສ່ອັດຕາແລກປ່ຽນເພື່ອກວດຍອດຊຳລະ'); return; }
+          /* rate = 1 THB ເປັນຈຳນວນກີບ ສະເໝີ, ໃຊ້ແປງໃຫ້ຢູ່ໃນສະກຸນຂອງບິນເພື່ອກວດຍອດຄ້າງເທົ່ານັ້ນ (ຈຳນວນທີ່ຮັບແທ້ໆເກັບໄວ້ຄືເດີມ) */
+          convertedAmt = invCurrency === 'LAK' ? amt * rate : amt / rate;
+        }
+        try{
+          await sb('sales_payments', { method:'POST', body:{
+            id: uid(), invoice_id: invoiceId, payment_date: todayStr(),
+            method: bg.querySelector('#pay_method').value, currency: payCurrency,
+            amount: amt, exchange_rate: rate, converted_amount: convertedAmt, created_by: currentRole
+          }});
+          const newPaid = Number(inv.paid_amount||0) + convertedAmt;
+          const newStatus = newPaid >= Number(inv.total_amount||0) ? 'paid' : 'partial';
+          await sb(`sales_invoices?id=eq.${invoiceId}`, { method:'PATCH', body:{ paid_amount: newPaid, payment_status: newStatus } });
+          inv.paid_amount = newPaid;
+          inv.payment_status = newStatus;
+          toast('ບັນທຶກການຈ່າຍສຳເລັດ');
+          await refreshInvoiceDetail(bg, invoiceId, inv);
+          renderTab();
+        }catch(err){ toast('ຜິດພາດ: '+err.message); }
+      });
+    }
+    if(currentRole==='admin'){
+      bg.querySelector('#invDeleteBtn').addEventListener('click', async ()=>{
+        if(!confirm(`ລົບບິນ ${inv.invoice_no || ''} ? ສະຕັອກທີ່ຫັກໄປຈະຄືນທັງໝົດ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        try{
+          await voidInvoice(invoiceId, items);
+          toast('ລົບບິນສຳເລັດ ຄືນສະຕັອກແລ້ວ');
+          bg.remove();
+          renderTab();
+        }catch(err){ toast('ຜິດພາດ: '+err.message); }
+      });
+    }
+    bg.querySelector('#invDetailClose').addEventListener('click', ()=> bg.remove());
+  }catch(err){
+    bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="invDetailClose2">ປິດ</button>`;
+    bg.querySelector('#invDetailClose2').addEventListener('click', ()=> bg.remove());
+  }
+}
+
+/* ລົບບິນຂາຍ: ຄືນສະຕັອກທັງໝົດ (ເຄື່ອງທີ່ມີເລກເຄື່ອງກັບເປັນ in_stock, ລົບ movement ຂາອອກ) ແລ້ວຄ່ອຍລົບບິນ (cascade ລົບ items/payments ໃຫ້ອັດຕະໂນມັດ) */
+async function voidInvoice(invoiceId, items){
+  await Promise.all(items.map(it=>{
+    if(it.unit_id){
+      return sb(`stock_product_units?id=eq.${it.unit_id}`, { method:'PATCH', body:{ status:'in_stock', sold_at:null } });
+    }
+    return Promise.resolve();
+  }));
+  await sb(`stock_movements?ref_type=eq.sale&ref_id=eq.${invoiceId}`, { method:'DELETE' });
+  await sb(`sales_invoices?id=eq.${invoiceId}`, { method:'DELETE' });
+}
+/* ລົບບິນຂາຍຫຼາຍໃບພ້ອມກັນ ດ້ວຍ 3 request ລວມ (ບໍ່ວ່າຈະເລືອກຈັກໃບ) ແທນທີ່ຈະດຶງ/ລົບເທື່ອລະໃບ ໄວກວ່າຫຼາຍເມື່ອເລືອກຫຼາຍໆໃບ */
+async function bulkVoidInvoices(ids){
+  const idList = ids.join(',');
+  const items = await sb(`sales_invoice_items?select=unit_id&invoice_id=in.(${idList})`);
+  const unitIds = [...new Set(items.filter(it=> it.unit_id).map(it=> it.unit_id))];
+  await Promise.all([
+    unitIds.length ? sb(`stock_product_units?id=in.(${unitIds.join(',')})`, { method:'PATCH', body:{ status:'in_stock', sold_at:null } }) : Promise.resolve(),
+    sb(`stock_movements?ref_type=eq.sale&ref_id=in.(${idList})`, { method:'DELETE' })
+  ]);
+  await sb(`sales_invoices?id=in.(${idList})`, { method:'DELETE' });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+buildKeypad();
+renderPinDots();
+const savedRole = sessionStorage.getItem('dv_stock_role');
+if(savedRole){ currentRole = savedRole; enterApp(); }
+</script>
+</body>
+</html>
