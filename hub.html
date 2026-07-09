@@ -131,17 +131,29 @@ const ICONS = {
   cash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="6" width="19" height="12" rx="1"/><circle cx="12" cy="12" r="2.6"/><path d="M5.5 6v12M18.5 6v12"/></svg>`,
   payroll: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 2.5h9l3.5 3.5V21a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5z"/><path d="M15 2.5V6h3.5"/><path d="M8.5 11h7M8.5 14h7M8.5 17h4.5"/></svg>`,
   expense: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 5.2C4 4 5 3.4 6.3 3.6c1.7.3 3.3.9 5.7 1v14.8c-2.4-.1-4-.7-5.7-1C5 18.2 4 17.6 4 16.4z"/><path d="M20 5.2c0-1.2-1-1.8-2.3-1.6-1.7.3-3.3.9-5.7 1v14.8c2.4-.1 4-.7 5.7-1 1.3-.2 2.3-.8 2.3-2z"/></svg>`,
-  stock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 7.5 12 3l8.5 4.5V16.5L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5"/><path d="M12 12v9"/></svg>`
+  stock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 8.2 12 4l8.5 4.2-8.5 4.2-8.5-4.2z"/><path d="M3.5 8.2v7.6L12 20l8.5-4.2V8.2"/><path d="M12 12.4V20"/></svg>`
 };
 const MODULES = {
   cash:    { label: "ເງິນສົດ",    file: "cash.html" },
   payroll: { label: "ເງິນເດືອນ",  file: "payroll.html" },
   expense: { label: "ລາຍຈ່າຍ",    file: "expense.html" },
-  stock:   { label: "ສະຕັອກສິນຄ້າ", file: "daovone_stock_2.html" },
+  stock:   { label: "ສະຕັອກ & ບິນຂາຍ", file: "daovone_stock_2.html" },
 };
+
+// ແປງ role ໃນຖານຂໍ້ມູນ (owner/admin/staff/viewer) ເປັນສິດພາຍໃນແອັບສະຕັອກ
+// ໃຊ້ຄູ່ກັບ daovone_stock_2.html ເພື່ອໃຫ້ login ຄັ້ງດຽວທີ່ Hub ແລ້ວເຂົ້າສະຕັອກໄດ້ເລີຍ ບໍ່ຕ້ອງ login ຊ້ຳ
+const DB_ROLE_TO_STOCK_APP_ROLE = { owner: 'admin', admin: 'admin', staff: 'staff', viewer: 'viewer' };
 
 /* ================= LOGIN LOGIC ================= */
 let currentUser = null;
+
+// ຂຽນ session ໃຫ້ daovone_stock_2.html ອ່ານໄດ້ທັນທີ (ຄົນລະ page ແຕ່ໂດເມນດຽວກັນ ຈຶ່ງໃຊ້ sessionStorage ຮ່ວມກັນໄດ້)
+// ເຮັດໃຫ້ login ຄັ້ງດຽວທີ່ Hub ແລ້ວກົດເຂົ້າ "ສະຕັອກ & ບິນຂາຍ" ໄດ້ເລີຍ ບໍ່ຕ້ອງ login ຊ້ຳ
+function syncStockSession(user){
+  const appRole = DB_ROLE_TO_STOCK_APP_ROLE[user.role];
+  if(!appRole){ sessionStorage.removeItem('dv_stock_session'); return; }
+  sessionStorage.setItem('dv_stock_session', JSON.stringify({ role: appRole, username: user.username, name: user.name }));
+}
 
 async function tryLogin(){
   const username = document.getElementById('username').value.trim();
@@ -157,6 +169,7 @@ async function tryLogin(){
     if(rows && rows.length){
       currentUser = rows[0];
       sessionStorage.setItem('daovone_hub_user', JSON.stringify(currentUser));
+      syncStockSession(currentUser);
       showMenu();
     } else {
       errEl.textContent = "ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ";
@@ -209,6 +222,7 @@ function closeModule(){
 }
 function logout(){
   sessionStorage.removeItem('daovone_hub_user');
+  sessionStorage.removeItem('dv_stock_session');
   currentUser = null;
   document.getElementById('menu-wrap').style.display='none';
   document.getElementById('module-wrap').style.display='none';
@@ -221,7 +235,7 @@ function logout(){
 /* ================= INIT ================= */
 const saved = sessionStorage.getItem('daovone_hub_user');
 if(saved){
-  try{ currentUser = JSON.parse(saved); showMenu(); }catch(e){}
+  try{ currentUser = JSON.parse(saved); syncStockSession(currentUser); showMenu(); }catch(e){}
 }
 </script>
 </body>
