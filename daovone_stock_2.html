@@ -1049,7 +1049,7 @@ async function renderReceive(main){
       <label>ເລືອກສິນຄ້າ</label>
       <select id="r_model">
         <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}">${m.name}</option>`).join('')}
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}">${m.name}</option>`).join('')}
       </select>
       <div id="r_qtyBlock">
         <label>ຈຳນວນ</label>
@@ -1096,6 +1096,14 @@ async function renderReceive(main){
   const modelSel = document.getElementById('r_model');
   enableSearchableSelect(modelSel);
   /* ອັດຕາຕ້ອງພິມໃໝ່ທຸກຄັ້ງທີ່ຮັບເຂົ້າ (ບໍ່ຈື່ອັດຕາເກົ່າໄວ້) ​ຕົ້ນທຶນກີບຈະລ໋ອກຕາມມື້ນີ້ ບໍ່ປ່ຽນຕາມພາຍຫຼັງ */
+  /* ດຶງຕົ້ນທຶນທີ່ເຄີຍບັນທຶກໄວ້ຂອງສິນຄ້ານີ້ (ຕາມສະກຸນທີ່ເລືອກ: ບາດ→cost_price_thb, ກີບ→cost_price) ມາເຕີມໃຫ້ ບໍ່ຕ້ອງພິມໃໝ່ທຸກຄັ້ງ */
+  function fillReceiveCostFromModel(){
+    if(!canSeeCost) return;
+    const opt = modelSel.selectedOptions[0];
+    const currency = document.getElementById('r_currency').value;
+    const saved = opt ? (currency === 'THB' ? (opt.dataset.costThb||0) : (opt.dataset.cost||0)) : 0;
+    attachMoneyInput('r_cost', saved);
+  }
   function updateReceiveCostLabel(){
     if(!canSeeCost) return;
     const currency = document.getElementById('r_currency').value;
@@ -1103,6 +1111,7 @@ async function renderReceive(main){
     const lbl = document.getElementById('r_cost_lbl');
     rateBlock.style.display = currency === 'THB' ? 'block' : 'none';
     lbl.textContent = currency === 'THB' ? 'ຕົ້ນທຶນ/ໜ່ວຍ (ບາດ)' : 'ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)';
+    fillReceiveCostFromModel();
     updateReceiveCostPreview();
   }
   function updateReceiveCostPreview(){
@@ -1126,9 +1135,8 @@ async function renderReceive(main){
     document.getElementById('r_qtyBlock').style.display = isSerial ? 'none' : 'block';
     document.getElementById('r_serialBlock').style.display = isSerial ? 'block' : 'none';
     if(canSeeCost){
-      document.getElementById('r_currency').value = 'LAK';
+      /* ຄົງສະກຸນທີ່ເລືອກໄວ້ (ບໍ່ບັງຄັບກັບເປັນກີບ) ແລ້ວດຶງຕົ້ນທຶນທີ່ເຄີຍບັນທຶກໄວ້ຕາມສະກຸນນັ້ນມາເຕີມ */
       updateReceiveCostLabel();
-      attachMoneyInput('r_cost', opt ? (opt.dataset.cost||0) : 0);
     }
   });
   document.getElementById('r_addItem').addEventListener('click', async ()=>{
@@ -1296,15 +1304,22 @@ async function renderReceive(main){
         quantity: item.quantity, ref_type:'purchase', ref_id: receiptId, created_by: currentUsername
       }));
       /* ອັບເດດຕົ້ນທຶນອ້າງອິງຂອງແຕ່ລະຮຸ່ນສິນຄ້າ (ໜຶ່ງຄຳຂໍຕໍ່ 1 ຮຸ່ນ ເຖິງຈະມີຫຼາຍລາຍການຂອງຮຸ່ນດຽວກັນ) */
-      const costByModel = {};
+      const costPatchByModel = {};
       if(currentRole==='admin'){
-        receiveCart.forEach(item=> { costByModel[item.model_id] = item.unit_cost; });
+        receiveCart.forEach(item=> {
+          const patch = costPatchByModel[item.model_id] || (costPatchByModel[item.model_id] = {});
+          patch.cost_price = item.unit_cost; /* ຕົ້ນທຶນກີບ (ລ໋ອກຕາມອັດຕາມື້ນີ້) */
+          /* ຖ້າຊື້ເປັນບາດ ໃຫ້ຈື່ຕົ້ນທຶນບາດທີ່ຫາກໍຊື້ໄວ້ນຳ ເພື່ອຄັ້ງໜ້າຊື້ຮຸ່ນເກົ່າຈະດຶງມາເຕີມໃຫ້ອັດຕະໂນມັດ */
+          if(item.cost_currency === 'THB' && item.unit_cost_thb){
+            patch.cost_price_thb = item.unit_cost_thb;
+          }
+        });
       }
       await Promise.all([
         sb('stock_purchase_receipt_items', { method:'POST', body: receiptItemsBody }),
         sb('stock_movements', { method:'POST', body: movementsBody }),
-        ...Object.entries(costByModel).map(([modelId, cost])=>
-          sb(`stock_product_models?id=eq.${modelId}`, { method:'PATCH', body:{ cost_price: cost } }))
+        ...Object.entries(costPatchByModel).map(([modelId, patch])=>
+          sb(`stock_product_models?id=eq.${modelId}`, { method:'PATCH', body: patch }))
       ]);
       toast(`ຮັບເຂົ້າສະຕັອກສຳເລັດ · ${receiptNo}`);
       receiveCart = [];
