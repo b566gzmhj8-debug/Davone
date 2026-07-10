@@ -183,6 +183,7 @@
   .model-search-dropdown{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--panel);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;z-index:60;box-shadow:0 10px 24px -8px rgba(0,0,0,.3);}
   .model-search-item{padding:10px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);}
   .model-search-item:last-child{border-bottom:none;}
+  .model-search-meta{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:2px;}
   .model-search-item:hover,.model-search-item.active{background:var(--panel2);}
   .model-search-empty{padding:10px 12px;font-size:13px;color:var(--muted);}
 </style>
@@ -420,7 +421,7 @@ function enableSearchableSelect(selectEl){
   input.type = 'text';
   input.id = selectEl.id + '_search';
   input.autocomplete = 'off';
-  input.placeholder = 'ພິມຊື່ ຫຼື ລະຫັດສິນຄ້າ ເພື່ອຄົ້ນຫາ...';
+  input.placeholder = 'ພິມຊື່ / ລະຫັດ / ໝວດໝູ່ ເພື່ອຄົ້ນຫາ...';
   wrap.appendChild(input);
 
   const dropdown = document.createElement('div');
@@ -431,12 +432,23 @@ function enableSearchableSelect(selectEl){
   const options = Array.from(selectEl.options).filter(o=>o.value);
   let highlighted = -1;
 
+  /* ສິນຄ້າຫຼາຍລາຍການຊື່ຊ້ຳກັນ ແຕ່ຄົນລະໝວດໝູ່ ຈຶ່ງຕ້ອງສະແດງລະຫັດ · ໝວດໝູ່ ໃຕ້ຊື່ ບໍ່ດັ່ງນັ້ນເລືອກຜິດໄດ້
+     ອ່ານຈາກ data-code / data-cat ຂອງ <option> ຖ້າ select ໃດບໍ່ໄດ້ໃສ່ໄວ້ ກໍ່ສະແດງແຕ່ຊື່ຄືເກົ່າ */
+  function optionMeta(o){
+    return [o.dataset.code, o.dataset.cat].filter(Boolean).join(' · ');
+  }
   function renderList(filter){
     const f = (filter||'').trim().toLowerCase();
-    const filtered = f ? options.filter(o=> o.textContent.toLowerCase().includes(f)) : options;
+    /* ຄົ້ນຫາໃຫ້ຕົງກັບ ຊື່ + ລະຫັດ + ໝວດໝູ່ ບໍ່ແມ່ນແຕ່ຊື່ຢ່າງດຽວ */
+    const filtered = f
+      ? options.filter(o=> (o.textContent + ' ' + optionMeta(o)).toLowerCase().includes(f))
+      : options;
     highlighted = -1;
     dropdown.innerHTML = filtered.length
-      ? filtered.map(o=> `<div class="model-search-item" data-value="${o.value}">${o.textContent}</div>`).join('')
+      ? filtered.map(o=>{
+          const meta = optionMeta(o);
+          return `<div class="model-search-item" data-value="${o.value}">${o.textContent}${meta ? `<div class="model-search-meta">${meta}</div>` : ''}</div>`;
+        }).join('')
       : '<div class="model-search-empty">ບໍ່ພົບສິນຄ້າ</div>';
   }
   function openDropdown(){ renderList(input.value); dropdown.style.display = 'block'; }
@@ -1064,7 +1076,7 @@ async function renderReceive(main){
       <label>ເລືອກສິນຄ້າ</label>
       <select id="r_model">
         <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}">${m.name}</option>`).join('')}
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
       </select>
       <div id="r_qtyBlock">
         <label>ຈຳນວນ</label>
@@ -1866,7 +1878,7 @@ async function renderTransfer(main){
       <label>ເລືອກສິນຄ້າ</label>
       <select id="tr_model">
         <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-unit="${m.unit||''}">${m.name}</option>`).join('')}
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
       </select>
       <div id="tr_qtyBlock">
         <label>ຈຳນວນ</label>
