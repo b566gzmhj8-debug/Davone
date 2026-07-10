@@ -742,6 +742,25 @@ async function sumInvoicesByPaidCurrency(invoices){
   });
   return out;
 }
+/* ຄິດຍອດຮັບຈິງແຍກຕາມສະກຸນເງິນ ຂອງແຕ່ລະບິນ (perInvoice) ພ້ອມຍອດລວມ (total)
+   ໃຊ້ສະແດງໃນລາຍການບິນ ໃຫ້ໂຊວ໌ "ເງິນທີ່ຮັບຈິງ" ຂອງແຕ່ລະໃບ ແທນ "ລາຄາສິນຄ້າ/ຍອດບິນ" */
+async function getReceivedByInvoice(invoices){
+  const perInvoice = {};
+  const total = {};
+  if(!invoices.length) return { perInvoice, total };
+  const ids = invoices.map(i=>i.id).join(',');
+  const payments = await sb(`sales_payments?select=invoice_id,currency,amount,converted_amount&invoice_id=in.(${ids})`);
+  const paymentsByInvoice = {};
+  payments.forEach(p=> (paymentsByInvoice[p.invoice_id] = paymentsByInvoice[p.invoice_id]||[]).push(p));
+  invoices.forEach(inv=>{
+    const invCurrency = inv.currency || 'LAK';
+    const totalAmount = Number(inv.total_amount||0);
+    const split = splitByPaidCurrency(totalAmount, invCurrency, totalAmount, paymentsByInvoice[inv.id]||[]);
+    perInvoice[inv.id] = split;
+    Object.keys(split).forEach(c=>{ total[c] = (total[c]||0) + split[c]; });
+  });
+  return { perInvoice, total };
+}
 /* คำนวณกำไร (ยอดขาย - ต้นทุน) ของບິນທັງໝົດในช่วงวันที่ที่กำหนด ใช้ต้นทุนปัจจุบันของสินค้า (ไม่ได้เก็บ snapshot ต้นทุน ณ วันขาย) แล้วนับกำไรตามสกุลเงินที่รับจ่ายจริงของแต่ละบิล ไม่ใช่สกุลเงินที่ตั้งบิลไว้ */
 async function getPeriodProfit(start, end){
   const invoices = await sb(`sales_invoices?select=id,currency,total_amount&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed`);
@@ -2088,7 +2107,7 @@ async function renderReport(main){
   const end = endDate.toISOString().slice(0,10);
 
   const invoices = await sb(`sales_invoices?select=*&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed&order=invoice_date.desc`);
-  const totalByCur = await sumInvoicesByPaidCurrency(invoices);
+  const { perInvoice: receivedByInvoice, total: totalByCur } = await getReceivedByInvoice(invoices);
   const outstandingInv = invoices.filter(r=> r.payment_status==='partial' || r.payment_status==='unpaid' || r.payment_status==='credit');
   const outstandingByCur = {};
   outstandingInv.forEach(r=>{
@@ -2128,7 +2147,7 @@ async function renderReport(main){
               <div class="muted" style="font-size:11px;">${fmtDateDMY(inv.invoice_date)} · ${inv.currency||'LAK'} ${statusTag(inv)}</div>
             </span>
           </span>
-          <span class="gold mono">${fmtMoney(inv.total_amount)}</span>
+          <span class="gold mono">${fmtByCurrency(receivedByInvoice[inv.id] || {})}</span>
         </div>`).join('') : '<div class="empty">ບໍ່ມີບິນຂາຍໃນເດືອນນີ້</div>'}
     </div>
   `;
