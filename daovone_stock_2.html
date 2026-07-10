@@ -147,6 +147,14 @@
     /* iOS ບໍ່ຍອມໃຫ້ input[type=date/month] ຫົດຕາມກ່ອງ ຈຶ່ງລົ້ນອອກນອກຂອບ ຕ້ອງປິດ appearance ແລະ ປົດ min-width */
     input[type=date],input[type=month]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;height:auto;text-align:left;}
   }
+  /* ປຸ່ມເລືອກຊ່ອງທາງຈ່າຍ (ແທນ dropdown ເກົ່າ) — ເຫັນທຸກທາງເລືອກພ້ອມກັນ ບໍ່ຕ້ອງກົດເປີດ */
+  .pay-chips{display:flex;gap:6px;}
+  .pay-chips button{flex:1;background:var(--panel);border:1px solid var(--border);color:var(--muted);
+    border-radius:20px;padding:9px 4px;font-size:13px;font-family:var(--font-body);cursor:pointer;}
+  .pay-chips button[aria-pressed="true"]{background:var(--orange);color:#fff;border-color:var(--orange);font-weight:600;}
+  .pay-quick{display:flex;gap:6px;margin-top:6px;}
+  .pay-quick button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--muted);
+    border-radius:6px;padding:6px 4px;font-size:11.5px;font-family:var(--font-mono);cursor:pointer;}
   .switch{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0;}
   .icon{width:16px;height:16px;display:inline-block;vertical-align:middle;}
   hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0;}
@@ -1616,17 +1624,27 @@ async function renderSell(main){
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-wallet"></use></svg>ການຈ່າຍເງິນ</h3>
       <div id="s_paymentList"></div>
-      <div class="grid2">
-        <select id="s_pay_method">
-          <option value="cash">ເງິນສົດ</option>
-          <option value="transfer">ໂອນ</option>
-        </select>
+      <hr class="sep">
+      <label>ຊ່ອງທາງຈ່າຍ</label>
+      <div class="pay-chips" id="s_pay_methodChips">
+        <button type="button" data-method="cash" aria-pressed="true">ເງິນສົດ</button>
+        <button type="button" data-method="transfer" aria-pressed="false">ໂອນ</button>
+      </div>
+      <!-- select ເກົ່າເຊື່ອງໄວ້ ໃຫ້ປຸ່ມຂ້າງເທິງເປັນຄົນຕັ້ງຄ່າ .value ໂຄ້ດສ່ວນອື່ນຈຶ່ງອ່ານໄດ້ຄືເກົ່າ -->
+      <select id="s_pay_method" style="display:none;">
+        <option value="cash">ເງິນສົດ</option>
+        <option value="transfer">ໂອນ</option>
+      </select>
+      <div class="grid2" style="margin-top:10px;">
+        <input id="s_pay_amount" type="text" placeholder="ຈຳນວນ">
         <select id="s_pay_currency">
           <option value="LAK">ກີບ (LAK)</option>
           <option value="THB">ບາດ (THB)</option>
         </select>
       </div>
-      <input id="s_pay_amount" type="text" placeholder="ຈຳນວນ" style="margin-top:8px;">
+      <div class="pay-quick">
+        <button type="button" id="s_pay_fillRest">ໃສ່ຍອດຄ້າງທັງໝົດ</button>
+      </div>
       <div id="s_pay_rateBlock" style="display:none;">
         <label>ອັດຕາແລກປ່ຽນມື້ນີ້ (1 ບາດ = ? ກີບ)</label>
         <input id="s_pay_rate" type="text" placeholder="ເຊັ່ນ 620">
@@ -1733,23 +1751,60 @@ async function renderSell(main){
   document.getElementById('s_discount').addEventListener('input', updateSellTotals);
   bindEnterAdvance(['s_name','s_phone','s_village','s_district','s_province'], 's_model_search');
   bindSellCartRemove();
-  document.getElementById('s_addPayment').addEventListener('click', ()=>{
+  /* ປຸ່ມ ເງິນສົດ / ໂອນ ຕັ້ງຄ່າໃສ່ select ທີ່ເຊື່ອງໄວ້ ໂຄ້ດທີ່ອ່ານ s_pay_method.value ຈຶ່ງບໍ່ຕ້ອງແກ້ */
+  const payChips = document.getElementById('s_pay_methodChips');
+  payChips.addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-method]');
+    if(!b) return;
+    document.getElementById('s_pay_method').value = b.dataset.method;
+    payChips.querySelectorAll('button').forEach(x=> x.setAttribute('aria-pressed', String(x === b)));
+  });
+
+  /* ຍອດທີ່ຍັງຄ້າງ (ສະກຸນຂອງບິນ) */
+  function sellRemainAmount(){
+    const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
+    const discount = Math.min(moneyValue('s_discount'), subtotal);
+    const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
+    return Math.max(subtotal - discount - paid, 0);
+  }
+  /* ປຸ່ມລັດ: ຕື່ມຍອດຄ້າງທັງໝົດໃສ່ຊ່ອງຈຳນວນ ຖ້າຈ່າຍຄົນລະສະກຸນກັບບິນ ຕ້ອງແປງກັບດ້ວຍອັດຕາກ່ອນ */
+  document.getElementById('s_pay_fillRest').addEventListener('click', ()=>{
+    const remain = sellRemainAmount();
+    if(!remain){ toast('ບໍ່ມີຍອດຄ້າງແລ້ວ'); return; }
+    const invCurrency = document.getElementById('s_currency').value;
+    const payCurrency = document.getElementById('s_pay_currency').value;
+    let fill = remain;
+    if(payCurrency !== invCurrency){
+      const rate = Number((document.getElementById('s_pay_rate').value||'').replace(/,/g,''));
+      if(!rate){ toast('ໃສ່ອັດຕາແລກປ່ຽນກ່ອນ'); return; }
+      fill = invCurrency === 'LAK' ? remain / rate : remain * rate;
+    }
+    const el = document.getElementById('s_pay_amount');
+    el.value = fmtMoney(fill);
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+  });
+
+  /* ຄືນຄ່າ true ຖ້າເພີ່ມສຳເລັດ ໃຫ້ຜູ້ເອີ້ນຮູ້ວ່າຄວນໄປຕໍ່ ຫຼື ຢຸດ */
+  function addSellPayment(){
     const amt = moneyValue('s_pay_amount');
-    if(!amt){ toast('ໃສ່ຈຳນວນເງິນ'); return; }
+    if(!amt){ toast('ໃສ່ຈຳນວນເງິນ'); return false; }
     const method = document.getElementById('s_pay_method').value;
     const invCurrency = document.getElementById('s_currency').value;
     const payCurrency = document.getElementById('s_pay_currency').value;
     let rate = null, convertedAmt = amt;
     if(payCurrency !== invCurrency){
       rate = Number((document.getElementById('s_pay_rate').value||'').replace(/,/g,''));
-      if(!rate){ toast('ໃສ່ອັດຕາແລກປ່ຽນເພື່ອກວດຍອດຊຳລະ'); return; }
+      if(!rate){ toast('ໃສ່ອັດຕາແລກປ່ຽນເພື່ອກວດຍອດຊຳລະ'); return false; }
       convertedAmt = invCurrency === 'LAK' ? amt * rate : amt / rate;
     }
     sellPayments.push({ method, currency: payCurrency, amount: amt, exchange_rate: rate, converted_amount: convertedAmt });
     document.getElementById('s_pay_amount').value = '';
     renderPaymentList();
     updateSellTotals();
-    toast('ເພີ່ມການຈ່າຍແລ້ວ');
+    return true;
+  }
+  document.getElementById('s_addPayment').addEventListener('click', ()=>{
+    if(addSellPayment()) toast('ເພີ່ມການຈ່າຍແລ້ວ');
   });
   document.getElementById('s_pay_amount').addEventListener('keydown', (e)=>{
     /* ຖ້າພິມຈຳນວນເງິນໄວ້ + Enter = ເພີ່ມການຈ່າຍ, ຖ້າຊ່ອງນີ້ຍັງຫວ່າງ + Enter = ຢືນຢັນອອກບິນເລີຍ */
@@ -1762,6 +1817,9 @@ async function renderSell(main){
   updateSellTotals();
   document.getElementById('s_submit').addEventListener('click', async (e)=>{
     if(!sellCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
+    /* ພິມຈຳນວນເງິນໄວ້ແຕ່ລືມກົດ "ເພີ່ມການຈ່າຍ" — ເກັບໃຫ້ເລີຍ ຢ່າໃຫ້ຍອດຫາຍງຽບໆ
+       ຖ້າເພີ່ມບໍ່ໄດ້ (ຂາດອັດຕາແລກປ່ຽນ) ຢຸດໄວ້ ຢ່າອອກບິນທັບຍອດຜິດ */
+    if(moneyValue('s_pay_amount') && !addSellPayment()) return;
     const btn = e.currentTarget;
     if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
     btn.disabled = true;
