@@ -680,31 +680,49 @@ function computeInvoiceItemProfit(items, invCurrency){
   }, 0);
   return { profit, unknownCostCount };
 }
-/* ตั้งบิลไว้เป็นสกุลไหน ไม่ได้แปลว่าลูกค้าจ่ายเป็นสกุลนั้นจริงๆ (เช่นตั้งบิลเป็นบาท แต่ลูกค้าโอนมาเป็นกีบ) ยอดขาย/กำไรควรนับตามสกุลเงินที่ร้านได้รับจริงจากการจ่ายเงินแต่ละครั้ง ไม่ใช่สกุลเงินที่ตั้งราคาไว้ตอนออกบิล ฟังก์ชันนี้กระจายมูลค่าของบิล (ที่คิดไว้เป็นสกุลบิล เช่น ยอดขายทั้งบิล หรือ กำไรทั้งบิล) ไปตามสัดส่วนที่แต่ละการจ่ายเงินครอบคลุมยอดบิล แล้วแปลงส่วนนั้นเป็นสกุลเงินที่จ่ายจริง ส่วนที่ยังไม่ได้จ่าย (ค้างชำระ) จะยังนับเป็นสกุลเงินของบิลไปก่อน เพราะยังไม่รู้ว่าสุดท้ายจะได้รับเป็นสกุลไหน */
+/* ตั้งบิลไว้เป็นสกุลไหน ไม่ได้แปลว่าลูกค้าจ่ายเป็นสกุลนั้นจริงๆ (เช่นตั้งบิลเป็นบาท แต่ลูกค้าโอนมาเป็นกีบ) ยอดขาย/กำไรควรนับตามสกุลเงินที่ร้านได้รับจริงจากการจ่ายเงินแต่ละครั้ง ไม่ใช่สกุลเงินที่ตั้งราคาไว้ตอนออกบิล ฟังก์ชันนี้กระจายมูลค่าของบิล (ที่คิดไว้เป็นสกุลบิล เช่น ยอดขายทั้งบิล หรือ กำไรทั้งบิล) ไปตามสัดส่วนที่แต่ละการจ่ายเงินครอบคลุมยอดบิล แล้วแปลงส่วนนั้นเป็นสกุลเงินที่จ่ายจริง ส่วนที่ยังไม่ได้จ่าย (ค้างชำระ) จะยังนับเป็นสกุลเงินของบิลไปก่อน เพราะยังไม่รู้ว่าสุดท้ายจะได้รับเป็นสกุลไหน
+   ถ้าลูกค้าจ่ายเกินยอดบิล (เช่นตั้งบิล 2,200 บาท @700 = 1,540,000 กีบ แต่รับเงินสด 1,600,000 กีบ) ส่วนที่เกิน (60,000 กีบ) จะถูกนับรวมเข้ายอดตามเงินสดที่รับจริง ไม่ตัดทิ้ง ทำให้ยอดขาย/กำไรตรงกับเงินที่ได้รับจริง */
 function splitByPaidCurrency(valueInInvCurrency, invCurrency, totalAmount, payments){
   const out = {};
+  payments = payments || [];
   if(!totalAmount){
+    /* ບໍ່ຮູ້ຍອດບິນ: ຖ້າມີການຈ່າຍ ໃຫ້ນັບຕາມເງິນສົດທີ່ຮັບຈິງ, ບໍ່ດັ່ງນັ້ນຄືນຄ່າຕາມສະກຸນບິນ */
+    if(payments.length){
+      payments.forEach(p=>{
+        const amt = Number(p.amount)||0;
+        if(!amt) return;
+        const payCurrency = p.currency || invCurrency;
+        out[payCurrency] = (out[payCurrency]||0) + amt;
+      });
+      return out;
+    }
     out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency;
     return out;
   }
-  let coveredShare = 0;
+  let coveredInInv = 0; /* ຍອດບິນທີ່ຈ່າຍແລ້ວ ນັບເປັນສະກຸນຂອງບິນ */
   payments.forEach(p=>{
-    const coveredInInvCurrency = p.converted_amount != null ? Number(p.converted_amount) : Number(p.amount);
+    const amt = Number(p.amount)||0;
+    const coveredInInvCurrency = p.converted_amount != null ? Number(p.converted_amount) : amt;
     if(!coveredInInvCurrency) return;
-    const share = Math.min(coveredInInvCurrency / totalAmount, 1 - coveredShare);
-    if(share <= 0) return;
-    coveredShare += share;
-    const valueShare = valueInInvCurrency * share;
     const payCurrency = p.currency || invCurrency;
-    let valueInPayCurrency = valueShare;
-    if(payCurrency !== invCurrency){
-      valueInPayCurrency = valueShare * (Number(p.amount) / coveredInInvCurrency);
+    const payPerInv = amt / coveredInInvCurrency; /* 1 ໜ່ວຍສະກຸນບິນ = ? ໜ່ວຍສະກຸນທີ່ຈ່າຍ */
+    /* ສ່ວນທີ່ໃຊ້ຫັກຍອດບິນ (ບໍ່ເກີນຍອດຄ້າງ) → ໄດ້ສ່ວນແບ່ງຂອງ value ຕາມສັດສ່ວນ */
+    const usableInInv = Math.max(0, Math.min(coveredInInvCurrency, totalAmount - coveredInInv));
+    if(usableInInv > 0){
+      const valueShare = valueInInvCurrency * (usableInInv / totalAmount);
+      out[payCurrency] = (out[payCurrency]||0) + (payCurrency !== invCurrency ? valueShare * payPerInv : valueShare);
+      coveredInInv += usableInInv;
     }
-    out[payCurrency] = (out[payCurrency]||0) + valueInPayCurrency;
+    /* ສ່ວນທີ່ຈ່າຍເກີນຍອດບິນ (overpayment) → ນັບເປັນມູນຄ່າເພີ່ມຕາມເງິນສົດທີ່ຮັບຈິງ ບໍ່ຕັດຖິ້ມ */
+    const overInInv = coveredInInvCurrency - usableInInv;
+    if(overInInv > 0){
+      out[payCurrency] = (out[payCurrency]||0) + (payCurrency !== invCurrency ? overInInv * payPerInv : overInInv);
+    }
   });
-  const remainingShare = Math.max(0, 1 - coveredShare);
-  if(remainingShare > 0){
-    out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency * remainingShare;
+  /* ຍັງຄ້າງຊຳລະ → ນັບເປັນສະກຸນຂອງບິນໄປກ່ອນ ເພາະຍັງບໍ່ຮູ້ວ່າຈະຮັບເປັນສະກຸນໃດ */
+  const remainingInInv = Math.max(0, totalAmount - coveredInInv);
+  if(remainingInInv > 0){
+    out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency * (remainingInInv / totalAmount);
   }
   return out;
 }
