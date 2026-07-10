@@ -68,8 +68,13 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .stat{background:var(--panel2);border-radius:10px;padding:12px;text-align:center;}
   .stat .num{font-size:19px;color:var(--orange-soft);font-weight:700;font-variant-numeric:tabular-nums;}
+  .stat .num.money{font-size:15px;}
   .stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
   .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:12px;}
+  /* ຈໍໃຫຍ່: ແຕ່ລະສະກຸນຂຶ້ນແຖວໃໝ່ ຄືກັບ <br> ເກົ່າ (ຢ່າປ່ຽນໜ້າຕາ desktop) */
+  .cur-stack{display:inline-block;}
+  .cur-line{display:block;white-space:nowrap;}
+  .cur-unit{margin-left:5px;}
   .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
   .tag.ok{border-color:var(--ok);color:var(--ok);}
   .tag.sold{border-color:var(--danger);color:var(--danger);}
@@ -126,6 +131,21 @@
   .doc-footer{padding:12px 18px;border-top:1px solid var(--border);background:var(--panel2);text-align:center;font-size:11px;color:var(--muted);}
   @media (min-width:860px){
     .doc-card{margin:-28px -32px 16px;border-radius:16px;}
+  }
+  /* ================= ມືຖືເທົ່ານັ້ນ (ຈໍໃຫຍ່ເລີ່ມທີ່ 860px ຈຶ່ງບໍ່ຖືກກະທົບ) ================= */
+  @media (max-width:859px){
+    /* ກ່ອງສະຖິຕິ: ວາງເປັນແຖວລະອັນ ປ້າຍຊ້າຍ ຕົວເລກຂວາ ຈຶ່ງບໍ່ຫັກແຖວເມື່ອຕົວເລກຍາວ */
+    .stats-row{grid-template-columns:1fr;gap:6px;}
+    .stat{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:10px 12px;}
+    .stat .lbl{order:-1;margin-top:0;font-size:12px;flex:0 0 auto;}
+    .stat .num{text-align:right;min-width:0;}
+    /* ຈຳນວນເງິນຊິດຂວາ ໜ່ວຍ (ກີບ/ບາດ) ກວ້າງເທົ່າກັນ ຈຶ່ງຕົງເປັນຖັນ ບໍ່ວ່າຕົວເລກຈະຍາວເທົ່າໃດ */
+    .cur-stack{display:block;}
+    .cur-line{display:flex;justify-content:flex-end;align-items:baseline;gap:6px;}
+    .cur-amt{text-align:right;}
+    .cur-unit{margin-left:0;flex:0 0 2.6em;text-align:left;}
+    /* iOS ບໍ່ຍອມໃຫ້ input[type=date/month] ຫົດຕາມກ່ອງ ຈຶ່ງລົ້ນອອກນອກຂອບ ຕ້ອງປິດ appearance ແລະ ປົດ min-width */
+    input[type=date],input[type=month]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;height:auto;text-align:left;}
   }
   .switch{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0;}
   .icon{width:16px;height:16px;display:inline-block;vertical-align:middle;}
@@ -317,9 +337,14 @@ function sumByCurrency(rows, amountField){
   });
   return out;
 }
+/* ແຍກຈຳນວນເງິນກັບໜ່ວຍອອກເປັນຄົນລະ span ເພື່ອໃຫ້ຈັດແຖວ ກີບ/ບາດ ໃຫ້ຕົງກັນໄດ້ໃນຈໍມືຖື
+   ຢູ່ຈໍໃຫຍ່ .cur-line ເປັນ block ຈຶ່ງເຫັນຄືເກົ່າ (ຂຶ້ນແຖວໃໝ່ແຕ່ລະສະກຸນ) */
 function fmtByCurrency(obj){
-  const parts = Object.keys(obj).filter(c=> obj[c]).map(c=> fmtMoney(obj[c]) + ' ' + (c==='THB' ? 'ບາດ' : 'ກີບ'));
-  return parts.length ? parts.join('<br>') : (fmtMoney(0) + ' ກີບ');
+  const parts = Object.keys(obj).filter(c=> obj[c]).map(c=> ({ amt: fmtMoney(obj[c]), unit: c==='THB' ? 'ບາດ' : 'ກີບ' }));
+  const list = parts.length ? parts : [{ amt: fmtMoney(0), unit: 'ກີບ' }];
+  return `<span class="cur-stack">${list.map(p=>
+    `<span class="cur-line"><span class="cur-amt">${p.amt}</span><span class="cur-unit">${p.unit}</span></span>`
+  ).join('')}</span>`;
 }
 
 /* ป้อนตัวเลขเงิน ให้ขึ้นจุดคั่นหลักพันอัตโนมัติ (ตามธรรมเนียมบิลลาว เช่น 1.550.000) */
@@ -666,13 +691,13 @@ async function renderDashboard(main){
   if(isAdmin){
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
     const monthProfitByCur = await getPeriodProfit(monthStart, tomorrow.toISOString().slice(0,10));
-    profitBlock = `<div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(monthProfitByCur)}</div><div class="lbl">ກຳໄລເດືອນນີ້ (ແອດມິນ)</div></div>`;
+    profitBlock = `<div class="stat"><div class="num mono money">${fmtByCurrency(monthProfitByCur)}</div><div class="lbl">ກຳໄລເດືອນນີ້ (ແອດມິນ)</div></div>`;
   }
 
   main.innerHTML = `
     <div class="stats-row">
-      <div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(todayByCur)}</div><div class="lbl">ຍອດຂາຍມື້ນີ້</div></div>
-      <div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(monthByCur)}</div><div class="lbl">ຍອດຂາຍເດືອນນີ້</div></div>
+      <div class="stat"><div class="num mono money">${fmtByCurrency(todayByCur)}</div><div class="lbl">ຍອດຂາຍມື້ນີ້</div></div>
+      <div class="stat"><div class="num mono money">${fmtByCurrency(monthByCur)}</div><div class="lbl">ຍອດຂາຍເດືອນນີ້</div></div>
       ${profitBlock}
     </div>
     <div class="card">
@@ -2222,9 +2247,9 @@ async function renderReport(main){
       <input type="month" id="rep_month" value="${month}">
     </div>
     <div class="stats-row">
-      <div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(totalByCur)}</div><div class="lbl">ຍອດຂາຍລວມ</div></div>
+      <div class="stat"><div class="num mono money">${fmtByCurrency(totalByCur)}</div><div class="lbl">ຍອດຂາຍລວມ</div></div>
       <div class="stat"><div class="num mono">${invoices.length}</div><div class="lbl">ຈຳນວນບິນ</div></div>
-      ${profitByCur !== null ? `<div class="stat"><div class="num mono" style="font-size:15px;">${fmtByCurrency(profitByCur)}</div><div class="lbl">ກຳໄລ (ແອດມິນ)</div></div>` : ''}
+      ${profitByCur !== null ? `<div class="stat"><div class="num mono money">${fmtByCurrency(profitByCur)}</div><div class="lbl">ກຳໄລ (ແອດມິນ)</div></div>` : ''}
     </div>
     ${outstanding > 0 ? `<div class="card"><div class="row"><span>ຄ້າງຊຳລະລວມ</span><span class="gold mono">${fmtByCurrency(outstandingByCur)}</span></div></div>` : ''}
     <div class="card">
