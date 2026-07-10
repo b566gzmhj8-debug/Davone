@@ -292,6 +292,19 @@ async function sb(path, options={}){
 }
 
 function uid(){ return crypto.randomUUID(); }
+
+/* ເລກບິນຮຽງລຳດັບ INV-1, INV-2, INV-3 ...
+   ຮຽງດ້ວຍ SQL (order=invoice_no.desc&limit=1) ບໍ່ໄດ້ ເພາະ invoice_no ເປັນ text ຈຶ່ງທຽບແບບຕົວອັກສອນ
+   (INV-9 > INV-10) ຕ້ອງດຶງທັງໝົດມາແປງເປັນຕົວເລກແລ້ວຫາຄ່າສູງສຸດເອງ */
+async function nextInvoiceNo(){
+  const rows = await sb('sales_invoices?select=invoice_no');
+  let max = 0;
+  (rows||[]).forEach(r=>{
+    const m = /^INV-(\d+)$/.exec(r.invoice_no || '');
+    if(m) max = Math.max(max, Number(m[1]));
+  });
+  return 'INV-' + (max + 1);
+}
 function fmtMoney(n){ return (Math.round(n||0)).toLocaleString('en-US').replace(/,/g,'.'); }
 
 /* ยอดกีบกับยอดบาทเป็นคนละสกุลเงิน เอามาบวกรวมกันตรงๆ ไม่ได้ (จะได้ตัวเลขที่ไม่มีความหมาย) ฟังก์ชันนี้เลยรวมแยกตามสกุลเงินแทน แล้วโชว์ทีละบรรทัด */
@@ -629,9 +642,11 @@ async function renderDashboard(main){
     const threshold = m.low_stock_threshold!=null ? Number(m.low_stock_threshold) : 1;
     return qty <= threshold;
   }).sort((a,b)=>{
+    /* ຮຽງຈາກເຫຼືອໜ້ອຍສຸດ → ຫຼາຍສຸດ; ຖ້າຈຳນວນເທົ່າກັນຈຶ່ງຮຽງຕາມຊື່ ເພື່ອໃຫ້ລຳດັບຄົງທີ່ */
     const qtyA = a.has_serial ? (unitMap[a.id]||0) : (balMap[a.id]||0);
     const qtyB = b.has_serial ? (unitMap[b.id]||0) : (balMap[b.id]||0);
-    return qtyA - qtyB;
+    if(qtyA !== qtyB) return qtyA - qtyB;
+    return (a.name||'').localeCompare(b.name||'');
   });
 
   const isAdmin = currentRole === 'admin';
@@ -1721,7 +1736,7 @@ async function renderSell(main){
       const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
       const currency = document.getElementById('s_currency').value;
       const status = paid <= 0 ? 'unpaid' : (paid >= total ? 'paid' : 'partial');
-      const invNo = 'INV-' + Date.now().toString().slice(-8);
+      const invNo = await nextInvoiceNo();
       await sb('sales_invoices', { method:'POST', body:{
         id: invoiceId, invoice_no: invNo,
         customer_name: document.getElementById('s_name').value.trim(),
@@ -2177,7 +2192,8 @@ async function renderReport(main){
   const endDate = new Date(start); endDate.setMonth(endDate.getMonth()+1);
   const end = endDate.toISOString().slice(0,10);
 
-  const invoices = await sb(`sales_invoices?select=*&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed&order=invoice_date.desc`);
+  /* ບິນທີ່ອອກໃໝ່ສຸດຢູ່ເທິງສຸດ: ບິນຫຼາຍໃບມັກມີ invoice_date ມື້ດຽວກັນ ຈຶ່ງຕ້ອງຮຽງດ້ວຍ created_at ຕໍ່ ບໍ່ດັ່ງນັ້ນລຳດັບຈະບໍ່ແນ່ນອນ */
+  const invoices = await sb(`sales_invoices?select=*&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed&order=invoice_date.desc,created_at.desc`);
   const { perInvoice: receivedByInvoice, total: totalByCur } = await getReceivedByInvoice(invoices);
   const outstandingInv = invoices.filter(r=> r.payment_status==='partial' || r.payment_status==='unpaid' || r.payment_status==='credit');
   const outstandingByCur = {};
