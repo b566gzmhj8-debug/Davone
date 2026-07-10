@@ -1494,6 +1494,25 @@ async function bulkVoidReceipts(ids){
 /* ============================================================
    SELL (ອອກບິນຂາຍ)
    ============================================================ */
+
+/* ============================================================
+   ຊຸດສິນຄ້າ (BUNDLE) — ສິນຄ້າທີ່ຂາຍແລ້ວມີອຸປະກອນມາພ້ອມ (ຕັດສະຕັອກໃຫ້ ບໍ່ຄິດເງິນເພີ່ມ)
+   ຈັບຄູ່ດ້ວຍ "ຊື່ສິນຄ້າ" ຕ້ອງກົງກັບຊື່ໃນໜ້າສິນຄ້າ. ເພີ່ມຊຸດໃໝ່ = ເພີ່ມ 1 ວົງເລັບ { } ໃນ array
+   ============================================================ */
+const PRODUCT_BUNDLES = [
+  { parent: 'ໂຄງ 4ເກຍ', components: [
+    { name: 'ຄາດ 4ເກຍ', qty: 1 },
+    { name: 'ຕີນເຫຼັກ ຊ້າຍ-ຂວາ', qty: 1 },
+    { name: 'ແກັດອຸປະກອນ', qty: 1 },
+  ]},
+];
+const BUNDLE_TAG = 'ຢູ່ໃນຊຸດ'; /* ໝາຍໃນ variant_note ບອກວ່າລາຍການນີ້ເປັນອຸປະກອນທີ່ແຖມມາໃນຊຸດ (ບໍ່ຄິດເງິນ) */
+function findBundleForModel(model){
+  if(!model) return null;
+  const name = (model.name||'').trim();
+  return PRODUCT_BUNDLES.find(b=> b.parent.trim() === name) || null;
+}
+
 let sellCart = [];
 let sellPayments = [];
 async function renderSell(main){
@@ -1622,16 +1641,36 @@ async function renderSell(main){
     if(!opt || !opt.value){ toast('ເລືອກສິນຄ້າກ່ອນ'); return; }
     const isSerial = opt.dataset.serial === 'true';
     const price = moneyValue('s_price');
+    const parentModel = models.find(m=> m.id === opt.value);
+    const bundle = findBundleForModel(parentModel);
+    const groupId = bundle ? uid() : null;
+    let parentQty = 1;
     if(isSerial){
       const unitSel = document.getElementById('s_unitSelect');
       const uOpt = unitSel.selectedOptions[0];
       if(!uOpt || !uOpt.value){ toast('ບໍ່ມີໜ່ວຍໃນສະຕັອກ'); return; }
       sellCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id: uOpt.value,
-        variant_note: uOpt.dataset.serial, quantity:1, unit_price: price, amount: price });
+        variant_note: uOpt.dataset.serial, quantity:1, unit_price: price, amount: price,
+        groupId, bundleParent: !!bundle });
     } else {
-      const qty = Number(document.getElementById('s_qty').value)||1;
+      parentQty = Number(document.getElementById('s_qty').value)||1;
       sellCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id:null,
-        variant_note:null, quantity: qty, unit_price: price, amount: qty*price });
+        variant_note:null, quantity: parentQty, unit_price: price, amount: parentQty*price,
+        groupId, bundleParent: !!bundle });
+    }
+    /* ຖ້າສິນຄ້ານີ້ເປັນ "ຊຸດ" ໃຫ້ເພີ່ມອຸປະກອນທີ່ມາພ້ອມເຂົ້າໄປອັດຕະໂນມັດ: ຕັດສະຕັອກ + ໂຊວ໌ໃນບິນ + ບໍ່ຄິດເງິນ (amount 0) */
+    if(bundle){
+      const billCur = document.getElementById('s_currency').value;
+      const missing = [];
+      bundle.components.forEach(c=>{
+        const cm = models.find(m=> (m.name||'').trim() === c.name.trim());
+        if(!cm){ missing.push(c.name); return; }
+        const dispPrice = billCur === 'THB' ? Number(cm.sale_price_thb||0) : Number(cm.sale_price||0);
+        sellCart.push({ model_id: cm.id, model_name: cm.name, unit_id:null,
+          variant_note: BUNDLE_TAG, quantity: (c.qty||1) * parentQty, unit_price: dispPrice, amount: 0,
+          groupId, bundleComponent: true });
+      });
+      if(missing.length) toast('ຫາອຸປະກອນໃນຊຸດບໍ່ພົບ (ກວດຊື່ໃນໜ້າສິນຄ້າ): ' + missing.join(', '));
     }
     document.getElementById('s_cartList').innerHTML = renderSellCart();
     bindSellCartRemove();
@@ -1759,16 +1798,33 @@ function updateSellTotals(){
 }
 function renderSellCart(){
   if(!sellCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
-  return sellCart.map((it,idx)=> `
+  return sellCart.map((it,idx)=> {
+    if(it.bundleComponent){
+      /* ອຸປະກອນທີ່ມາພ້ອມໃນຊຸດ: ໂຊວ໌ຫຍໍ້ຍໍ້ ລາຄາປົກກະຕິ (ບໍ່ບວກເຂົ້າຍອດ) */
+      return `
+    <div class="cart-item" style="margin-left:16px;opacity:.8;">
+      <span>↳ ${it.model_name} × ${it.quantity} <span class="muted" style="font-size:11px;">(${BUNDLE_TAG})</span></span>
+      <span class="muted">${fmtMoney(it.unit_price)} <span class="x" data-idx="${idx}">✕</span></span>
+    </div>`;
+    }
+    return `
     <div class="cart-item">
       <span>${it.model_name}${it.variant_note?(' · '+it.variant_note):(' × '+it.quantity)}</span>
       <span>${fmtMoney(it.amount)} <span class="x" data-idx="${idx}">✕</span></span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function bindSellCartRemove(){
   document.querySelectorAll('#s_cartList .x').forEach(el=>{
     el.addEventListener('click', ()=>{
-      sellCart.splice(Number(el.dataset.idx),1);
+      const idx = Number(el.dataset.idx);
+      const it = sellCart[idx];
+      if(it && it.bundleParent && it.groupId){
+        /* ລຶບຊຸດ: ເອົາອອກທັງໂຄງ ແລະ ອຸປະກອນທີ່ມາພ້ອມທັງໝົດຂອງກຸ່ມນີ້ */
+        sellCart = sellCart.filter(x=> x.groupId !== it.groupId);
+      } else {
+        sellCart.splice(idx,1);
+      }
       document.getElementById('s_cartList').innerHTML = renderSellCart();
       bindSellCartRemove();
       updateSellTotals();
@@ -2274,11 +2330,22 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
           <div class="doc-section-label">ລາຍການສິນຄ້າ</div>
           <div class="doc-table-head"><span>ລາຍການ</span><span>ຈຳນວນເງິນ</span></div>
           <div class="doc-table-body">
-            ${items.length ? items.map(it=> `
+            ${items.length ? items.map(it=> {
+              const nm = it.stock_product_models ? it.stock_product_models.name : '-';
+              if(it.variant_note === BUNDLE_TAG){
+                /* ອຸປະກອນທີ່ມາພ້ອມໃນຊຸດ: ໂຊວ໌ຊື່ + ລາຄາປົກກະຕິ ແຕ່ບໍ່ບວກເຂົ້າຍອດບິນ */
+                return `
+              <div class="row" style="margin-left:14px;">
+                <span class="muted">↳ ${nm} × ${it.quantity} <span style="font-size:11px;">(${BUNDLE_TAG})</span></span>
+                <span class="mono muted">${fmtMoney(it.unit_price)}</span>
+              </div>`;
+              }
+              return `
               <div class="row">
-                <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.variant_note ? (' · <span class="mono">'+it.variant_note+'</span>') : (' × '+it.quantity)}</span>
+                <span>${nm}${it.variant_note ? (' · <span class="mono">'+it.variant_note+'</span>') : (' × '+it.quantity)}</span>
                 <span class="mono">${fmtMoney(it.amount)}</span>
-              </div>`).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
+              </div>`;
+            }).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
             <div class="row"><span class="muted">ລວມຍ່ອຍ</span><span class="mono muted">${fmtMoney(subtotal)}</span></div>
             ${discount > 0 ? `<div class="row"><span class="muted">ຫຼຸດລາຄາ</span><span class="mono muted">-${fmtMoney(discount)}</span></div>` : ''}
           </div>
