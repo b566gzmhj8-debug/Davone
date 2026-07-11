@@ -445,6 +445,58 @@
 
   /* theme toggle button: quiet ledger version */
   .theme-btn.light { background:#fff !important; color:#8a6010 !important; border:1px solid #E4DBC0; box-shadow:0 2px 10px rgba(30,25,10,0.08); }
+
+  /* ══════════════════════════════════════════════════════════
+     DESKTOP / MACBOOK  (min-width:900px)
+     Present the mobile app as a centered device frame.
+     Mobile layout below 900px is left completely untouched.
+     ══════════════════════════════════════════════════════════ */
+  @media (min-width:900px) {
+    html, body { height:100%; }
+    body {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px 0;
+      overflow:hidden;                 /* the page never scrolls — the frame does */
+    }
+
+    /* the phone-style app window, centered on the desktop */
+    .app {
+      width:460px;
+      max-width:460px;
+      height:min(940px, calc(100vh - 56px));
+      margin:0;
+      border-radius:30px;
+      overflow-y:auto;
+      overflow-x:hidden;
+      position:relative;
+      transform:translateZ(0);         /* makes position:fixed children anchor to the frame */
+      box-shadow:0 30px 90px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.07);
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(255,255,255,0.18) transparent;
+    }
+    .app::-webkit-scrollbar { width:8px; }
+    .app::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.14); border-radius:8px; }
+    body.light .app {
+      box-shadow:0 30px 90px rgba(30,25,10,0.22), 0 0 0 1px #E4DBC0;
+      scrollbar-color:rgba(30,25,10,0.2) transparent;
+    }
+
+    /* screens sized to the viewport should now size to the frame */
+    .home, .pin-wrap, .dept-grid, .admin-wrap { min-height:100%; }
+    .form-scroll { height:auto; min-height:calc(100% - 52px); overflow:visible; }
+    .center { min-height:70vh; }
+
+    /* floating bars: now pinned to the frame edges (via .app transform) */
+    .theme-btn { bottom:18px; right:18px; }
+
+    /* overlays & image viewer fill just the frame, nicely centered */
+    .overlay { border-radius:30px; }
+    .modal-img-box { width:92%; max-width:92%; max-height:86%; }
+    .modal-img.rot-side { height:auto; max-height:78vh; }
+  }
 </style>
 </head>
 <body>
