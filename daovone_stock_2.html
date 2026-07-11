@@ -609,6 +609,55 @@ const TABS = [
 ];
 let activeTab = 'dashboard';
 
+/* ==== ຮ່າງທີ່ພິມຄ້າງໄວ້ (draft) ====
+   ຮັກສາຄ່າໃນຊ່ອງຕ່າງໆ (ຊື່ຜູ້ສະໜອງ/ລູກຄ້າ, ວັນທີ, ຈຳນວນ, ລາຄາ...) ເມື່ອສະຫຼັບແທັບ ບໍ່ໃຫ້ຫາຍ
+   ບັນທຶກ (submit) ສຳເລັດຄ່ອຍລ້າງ. ບໍ່ເກັບ: ຊ່ອງເລືອກສິນຄ້າ (auto-fill ລາຄາເອງ), ຊ່ອງຈ່າຍເງິນ (ຊົ່ວຄາວ),
+   ຕົວເລືອກເດືອນປະຫວັດ (ຈື່ໄວ້ໃນ dataset ຢູ່ແລ້ວ) */
+const tabDrafts = { receive:{}, sell:{}, transfer:{} };
+/* ຊ່ອງເງິນ: ໃສ່ຄືນ "ຫຼັງສຸດ" ເພາະ dispatch change ຊ່ອງສະກຸນເງິນ ຈະ auto-fill ຄ່າພວກນີ້ທັບ */
+const DRAFT_MONEY_LAST = ['r_cost','r_rate','s_price','s_discount'];
+const DRAFT_SKIP = new Set(['r_model','s_model','tr_model','s_unitSelect','rcv_month','tr_month',
+  's_pay_amount','s_pay_currency','s_pay_rate','s_pay_method']);
+let draftRestoring = false;
+function draftSkip(id){
+  return !id || DRAFT_SKIP.has(id) || id.endsWith('_search') || id.startsWith('trchk_');
+}
+function initDraftPersistence(){
+  const main = document.getElementById('mainContent');
+  if(!main || main.dataset.draftBound) return;
+  main.dataset.draftBound = '1';
+  /* ໃຊ້ delegated listener ຕິດຄັ້ງດຽວທີ່ mainContent (ບໍ່ຖືກລ້າງຕອນ re-render) */
+  const capture = (e)=>{
+    if(draftRestoring) return;
+    const el = e.target;
+    if(!el || !('value' in el) || draftSkip(el.id)) return;
+    if(!tabDrafts[activeTab]) return;
+    tabDrafts[activeTab][el.id] = el.value;
+  };
+  main.addEventListener('input', capture, true);
+  main.addEventListener('change', capture, true);
+}
+function restoreTabDraft(tabKey){
+  const draft = tabDrafts[tabKey];
+  if(!draft) return;
+  draftRestoring = true;
+  const ids = Object.keys(draft).filter(id=> !draftSkip(id) && document.getElementById(id));
+  /* ຮອບ 1: ຊ່ອງທົ່ວໄປ — dispatch ໃຫ້ UI ທີ່ຂຶ້ນກັບມັນ (ເຊັ່ນ ບລັອກອັດຕາແລກປ່ຽນ) ປັບຕາມ */
+  ids.filter(id=> !DRAFT_MONEY_LAST.includes(id)).forEach(id=>{
+    const el = document.getElementById(id);
+    el.value = draft[id];
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+  });
+  /* ຮອບ 2: ຊ່ອງເງິນ — ໃສ່ຄືນຫຼັງສຸດ ບໍ່ໃຫ້ auto-fill ຂອງສະກຸນເງິນມາທັບ */
+  ids.filter(id=> DRAFT_MONEY_LAST.includes(id)).forEach(id=>{
+    const el = document.getElementById(id);
+    el.value = draft[id];
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+  });
+  draftRestoring = false;
+}
+
 function enterApp(){
   document.getElementById('loginScreen').style.display = 'none';
   const main = document.getElementById('mainScreen');
@@ -631,6 +680,7 @@ function buildNav(){
 
 async function renderTab(){
   const main = document.getElementById('mainContent');
+  initDraftPersistence();
   main.innerHTML = '<div class="empty">ກຳລັງໂຫລດ...</div>';
   try{
     if(activeTab === 'dashboard') await renderDashboard(main);
@@ -639,6 +689,8 @@ async function renderTab(){
     else if(activeTab === 'sell') await renderSell(main);
     else if(activeTab === 'transfer') await renderTransfer(main);
     else if(activeTab === 'report') await renderReport(main);
+    /* ໃສ່ຄ່າທີ່ພິມຄ້າງໄວ້ຄືນ ຫຼັງ render + ຕິດ event ຄົບແລ້ວ */
+    if(tabDrafts[activeTab]) restoreTabDraft(activeTab);
   }catch(err){
     console.error(err);
     main.innerHTML = `<div class="card"><div class="empty">ເກີດຂໍ້ຜິດພາດ: ${err.message}</div></div>`;
@@ -1384,6 +1436,7 @@ async function renderReceive(main){
       ]);
       toast(`ຮັບເຂົ້າສະຕັອກສຳເລັດ · ${receiptNo}`);
       receiveCart = [];
+      tabDrafts.receive = {};
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
   });
@@ -1873,6 +1926,7 @@ async function renderSell(main){
       toast(`ອອກບິນ ${invNo} ສຳເລັດ · ${fmtMoney(total)}`);
       sellCart = [];
       sellPayments = [];
+      tabDrafts.sell = {};
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
   });
@@ -2102,6 +2156,7 @@ async function renderTransfer(main){
       ]);
       toast(`ໂອນສາຂາສຳເລັດ · ${transferCart.length} ລາຍການ`);
       transferCart = [];
+      tabDrafts.transfer = {};
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
   });
