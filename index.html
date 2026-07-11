@@ -448,54 +448,83 @@
 
   /* ══════════════════════════════════════════════════════════
      DESKTOP / MACBOOK  (min-width:900px)
-     Present the mobile app as a centered device frame.
+     Real desktop layout — fills the screen, multi-column.
      Mobile layout below 900px is left completely untouched.
      ══════════════════════════════════════════════════════════ */
   @media (min-width:900px) {
     html, body { height:100%; }
-    body {
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 0;
-      overflow:hidden;                 /* the page never scrolls — the frame does */
-    }
+    body { overflow:hidden; }          /* the .app scrolls internally, full height */
 
-    /* the phone-style app window, centered on the desktop */
+    /* full-height app that uses the whole width (no phone frame) */
     .app {
-      width:460px;
-      max-width:460px;
-      height:min(940px, calc(100vh - 56px));
+      width:100%;
+      max-width:100%;
+      height:100vh;
       margin:0;
-      border-radius:30px;
       overflow-y:auto;
       overflow-x:hidden;
       position:relative;
-      transform:translateZ(0);         /* makes position:fixed children anchor to the frame */
-      box-shadow:0 30px 90px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.07);
-      -webkit-overflow-scrolling:touch;
+      transform:translateZ(0);         /* makes position:fixed children (submit bar, theme btn) span the app */
       scrollbar-width:thin;
       scrollbar-color:rgba(255,255,255,0.18) transparent;
     }
-    .app::-webkit-scrollbar { width:8px; }
+    .app::-webkit-scrollbar { width:10px; }
     .app::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.14); border-radius:8px; }
-    body.light .app {
-      box-shadow:0 30px 90px rgba(30,25,10,0.22), 0 0 0 1px #E4DBC0;
-      scrollbar-color:rgba(30,25,10,0.2) transparent;
+    body.light .app { scrollbar-color:rgba(30,25,10,0.2) transparent; }
+
+    /* screens fill the height */
+    .home, .pin-wrap, .dept-grid, .admin-wrap { min-height:100vh; }
+    .form-scroll { height:auto; min-height:calc(100vh - 52px); overflow:visible; }
+    .center { min-height:calc(100vh - 52px); }
+
+    /* ── HOME: bigger hero + role cards in one wide row ── */
+    .home { padding:56px 48px 72px; justify-content:center; }
+    .logo-ring { width:132px; height:132px; margin-bottom:22px; }
+    .app-title { font-size:34px; margin-bottom:8px; }
+    .app-sub { font-size:13px; letter-spacing:3px; margin-bottom:52px; }
+    .home-cards {
+      max-width:1100px;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:24px;
     }
+    .home-card { padding:30px 26px; border-radius:20px; }
+    .hc-icon-box { width:64px; height:64px; }
+    .hc-icon-box svg { width:34px; height:34px; }
+    .card-title { font-size:20px; }
+    .card-sub { font-size:13px; }
+    .sync-note { margin-top:48px; }
 
-    /* screens sized to the viewport should now size to the frame */
-    .home, .pin-wrap, .dept-grid, .admin-wrap { min-height:100%; }
-    .form-scroll { height:auto; min-height:calc(100% - 52px); overflow:visible; }
-    .center { min-height:70vh; }
+    /* ── DEPT LIST: search + cards as a wide multi-column grid ── */
+    .dept-header-pro, .dept-search { max-width:1160px; margin-left:auto; margin-right:auto; }
+    .dept-header-pro { padding-left:0; padding-right:0; }
+    .dept-list-wrap {
+      max-width:1160px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+      gap:14px 16px;
+      align-content:start;
+    }
+    /* section headers span the whole row so grouping stays intact */
+    .dept-list-wrap .dept-section-label { grid-column:1 / -1; margin-top:10px; }
 
-    /* floating bars: now pinned to the frame edges (via .app transform) */
-    .theme-btn { bottom:18px; right:18px; }
+    /* ── FORM & per-dept action menus: center to a comfortable column ──
+       (uses !important because these screens set inline padding on .form-scroll) */
+    .form-scroll { padding-left:clamp(20px, calc((100% - 660px)/2), 42%) !important; padding-right:clamp(20px, calc((100% - 660px)/2), 42%) !important; }
+    .form-pro, .form-container { max-width:none; margin:0; padding-left:0; padding-right:0; }
+    .submit-wrap-pro { display:flex; justify-content:center; }
+    .submit-wrap-pro > * { width:100%; max-width:640px; }
 
-    /* overlays & image viewer fill just the frame, nicely centered */
-    .overlay { border-radius:30px; }
-    .modal-img-box { width:92%; max-width:92%; max-height:86%; }
-    .modal-img.rot-side { height:auto; max-height:78vh; }
+    /* ── ADMIN dashboard: centered content column inside full-width bg ── */
+    .admin-wrap { padding-left:clamp(16px, calc((100% - 820px)/2), 40%); padding-right:clamp(16px, calc((100% - 820px)/2), 40%); }
+
+    /* floating bars pin to the app (full width) */
+    .theme-btn { bottom:22px; right:22px; }
+
+    /* image viewer scaled for desktop */
+    .modal-img-box { max-width:720px; max-height:90vh; }
+    .modal-img.rot-side { height:auto; max-height:82vh; }
   }
 </style>
 </head>
