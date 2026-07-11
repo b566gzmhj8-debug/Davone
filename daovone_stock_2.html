@@ -1596,7 +1596,7 @@ async function renderSell(main){
       <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ເລືອກລາຍການ</h3>
       <select id="s_model">
         <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}">${m.name}</option>`).join('')}
+        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
       </select>
       <div id="s_unitBlock" style="display:none;">
         <label>ເລືອກໜ່ວຍ (ເລກເຄື່ອງ)</label>
