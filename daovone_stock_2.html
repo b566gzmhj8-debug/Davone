@@ -972,6 +972,7 @@ async function renderProducts(main){
   }
   main.innerHTML = `
     <button class="btn" id="addModelBtn"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມສິນຄ້າ/ຮຸ່ນໃໝ່</button>
+    ${isAdmin ? `<button class="btn secondary" id="adjHistoryBtn"><svg class="dv-icon"><use href="#i-gear"></use></svg>ປະຫວັດການປรับສะຕັອก</button>` : ''}
     ${isAdmin ? `<button class="btn secondary" id="checkDupBtn"><svg class="dv-icon"><use href="#i-alert"></use></svg>ກວດເລກເຄື່ອງຊ້ຳ</button>` : ''}
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ລາຍການສິນຄ້າ (<span id="prod_count">${models.length}</span>)</h3>
@@ -981,6 +982,7 @@ async function renderProducts(main){
   `;
   document.getElementById('addModelBtn').addEventListener('click', ()=> openModelModal());
   if(isAdmin){
+    document.getElementById('adjHistoryBtn').addEventListener('click', ()=> openAdjustHistoryModal());
     document.getElementById('checkDupBtn').addEventListener('click', ()=> openDuplicateSerialsModal(models));
   }
   bindRowEvents();
@@ -996,6 +998,44 @@ async function renderProducts(main){
     document.getElementById('prod_count').textContent = filtered.length;
     bindRowEvents();
   });
+}
+
+/* ປະຫວັດການປรับສະຕັອກ — ບັນທຶກທຸກຄັ້ງທີ່ແອດມິນປรับ (ref_type=adjust) ໃຫ້ຕรวจสอบย้อนหลังได้ */
+async function openAdjustHistoryModal(){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງໂຫລດ...</div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  try{
+    const rows = await sb('stock_movements?select=*,stock_product_models(name,unit)&ref_type=eq.adjust&order=created_at.desc&limit=200');
+    bg.querySelector('.modal').innerHTML = `
+      <h3><svg class="dv-icon"><use href="#i-gear"></use></svg>ປະຫວັດການປรับສะຕັອก</h3>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">ລ່າສຸດ ${rows.length} ລາຍການ</div>
+      <hr class="sep">
+      ${rows.length ? rows.map(r=>{
+        const model = r.stock_product_models || {};
+        const up = r.movement_type === 'in';
+        const sign = up ? '+' : '−';
+        const color = up ? 'var(--ok)' : 'var(--danger)';
+        return `<div class="row">
+          <span>
+            <div>${model.name || '(ลบไปแล้ว)'}</div>
+            <div class="muted" style="font-size:11px;">${r.note || '-'} · ${r.created_by || '-'}</div>
+          </span>
+          <span style="text-align:right;">
+            <div class="mono" style="font-weight:700;color:${color};">${sign}${fmtMoney(r.quantity)} ${model.unit || ''}</div>
+            <div class="muted" style="font-size:11px;">${fmtDateDMY(r.created_at)}</div>
+          </span>
+        </div>`;
+      }).join('') : '<div class="empty">ຍັງບໍ່ມີການປรับສະຕັອก</div>'}
+      <button class="btn secondary" id="adjHistClose" style="margin-top:12px;">ປິດ</button>
+    `;
+    bg.querySelector('#adjHistClose').addEventListener('click', ()=> bg.remove());
+  }catch(err){
+    bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="adjHistClose2">ປິດ</button>`;
+    bg.querySelector('#adjHistClose2').addEventListener('click', ()=> bg.remove());
+  }
 }
 
 /* ປรับສະຕັອກສິນຄ້າ (ບໍ່ມີເລກເຄື່ອງ) ໃຫ້ເປັນຈຳນວນທີ່ຖືກຕ້ອງ — ສະເພາະແອດມິນ
@@ -1033,7 +1073,7 @@ function openAdjustStockModal(model, currentQty){
       await sb('stock_movements', { method:'POST', body:{
         id: uid(), model_id: model.id, unit_id: null,
         movement_type: delta > 0 ? 'in' : 'out', quantity: Math.abs(delta),
-        ref_type: 'adjust', note: 'ປรับສะຕັອກ' + (note ? ': ' + note : ''), created_by: currentUsername
+        ref_type: 'adjust', note: `ປรับ ${currentQty}→${target}` + (note ? ' · ' + note : ''), created_by: currentUsername
       }});
       toast(`ປรับสะຕັອກ ${model.name} → ${fmtMoney(target)} ${model.unit||''}`);
       bg.remove();
@@ -1043,9 +1083,14 @@ function openAdjustStockModal(model, currentQty){
 }
 
 /* ລົບເລກເຄື່ອງ (serial) ທີ່ເພີ່ມຜິດອອກເປັນຊິ້ນ — ສະເພາະແອດມິນ
-   ລົບ movement ຂອງໜ່ວຍນັ້ນກ່ອນ (unit_id ອ້າງເຖິງ) ແລ້ວຄ່ອຍລົບໜ່ວຍ ເພື່ອບໍ່ໃຫ້ຕິດ FK
+   ບັນທຶກ movement ‘adjust’ ໄວ້ເປັນປະຫວັດກ່ອນ (ບໍ່ໃຫ້ຫາຍງຽບໆ) ແລ້ວຄ່ອຍລົບໜ່ວຍ+movement ເກົ່າ
    ໃຊ້ສຳລັບກໍລະນີ "ຮັບເຂົ້າ/ພິມເລກເຄື່ອງຜິດ" ໂດຍບໍ່ຕ້ອງລົບບິນທັງໃບ */
 async function adjustRemoveUnit(unit){
+  await sb('stock_movements', { method:'POST', body:{
+    id: uid(), model_id: unit.model_id, unit_id: null,
+    movement_type:'out', quantity:1, ref_type:'adjust',
+    note:'ລົບເລກເຄື່ອງ ' + (unit.serial_no||''), created_by: currentUsername
+  }});
   await sb(`stock_movements?unit_id=eq.${unit.id}`, { method:'DELETE' });
   await sb(`stock_product_units?id=eq.${unit.id}`, { method:'DELETE' });
 }
