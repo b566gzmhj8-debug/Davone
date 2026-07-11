@@ -795,7 +795,7 @@ function computeInvoiceItemProfit(items, invCurrency){
 }
 /* ตั้งบิลไว้เป็นสกุลไหน ไม่ได้แปลว่าลูกค้าจ่ายเป็นสกุลนั้นจริงๆ (เช่นตั้งบิลเป็นบาท แต่ลูกค้าโอนมาเป็นกีบ) ยอดขาย/กำไรควรนับตามสกุลเงินที่ร้านได้รับจริงจากการจ่ายเงินแต่ละครั้ง ไม่ใช่สกุลเงินที่ตั้งราคาไว้ตอนออกบิล ฟังก์ชันนี้กระจายมูลค่าของบิล (ที่คิดไว้เป็นสกุลบิล เช่น ยอดขายทั้งบิล หรือ กำไรทั้งบิล) ไปตามสัดส่วนที่แต่ละการจ่ายเงินครอบคลุมยอดบิล แล้วแปลงส่วนนั้นเป็นสกุลเงินที่จ่ายจริง ส่วนที่ยังไม่ได้จ่าย (ค้างชำระ) จะยังนับเป็นสกุลเงินของบิลไปก่อน เพราะยังไม่รู้ว่าสุดท้ายจะได้รับเป็นสกุลไหน
    ถ้าลูกค้าจ่ายเกินยอดบิล (เช่นตั้งบิล 2,200 บาท @700 = 1,540,000 กีบ แต่รับเงินสด 1,600,000 กีบ) ส่วนที่เกิน (60,000 กีบ) จะถูกนับรวมเข้ายอดตามเงินสดที่รับจริง ไม่ตัดทิ้ง ทำให้ยอดขาย/กำไรตรงกับเงินที่ได้รับจริง */
-function splitByPaidCurrency(valueInInvCurrency, invCurrency, totalAmount, payments){
+function splitByPaidCurrency(valueInInvCurrency, invCurrency, totalAmount, payments, receivedOnly){
   const out = {};
   payments = payments || [];
   if(!totalAmount){
@@ -809,6 +809,7 @@ function splitByPaidCurrency(valueInInvCurrency, invCurrency, totalAmount, payme
       });
       return out;
     }
+    if(receivedOnly) return out; /* ຍັງບໍ່ໄດ້ຈ່າຍ = ຍັງບໍ່ໄດ້ຮັບເງິນ */
     out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency;
     return out;
   }
@@ -832,9 +833,10 @@ function splitByPaidCurrency(valueInInvCurrency, invCurrency, totalAmount, payme
       out[payCurrency] = (out[payCurrency]||0) + (payCurrency !== invCurrency ? overInInv * payPerInv : overInInv);
     }
   });
-  /* ຍັງຄ້າງຊຳລະ → ນັບເປັນສະກຸນຂອງບິນໄປກ່ອນ ເພາະຍັງບໍ່ຮູ້ວ່າຈະຮັບເປັນສະກຸນໃດ */
+  /* ຍັງຄ້າງຊຳລະ → ນັບເປັນສະກຸນຂອງບິນໄປກ່ອນ ເພາະຍັງບໍ່ຮູ້ວ່າຈະຮັບເປັນສະກຸນໃດ
+     ຖ້າ receivedOnly ບໍ່ນັບສ່ວນນີ້ (ຍັງບໍ່ໄດ້ຮັບເງິນ) */
   const remainingInInv = Math.max(0, totalAmount - coveredInInv);
-  if(remainingInInv > 0){
+  if(!receivedOnly && remainingInInv > 0){
     out[invCurrency] = (out[invCurrency]||0) + valueInInvCurrency * (remainingInInv / totalAmount);
   }
   return out;
@@ -868,7 +870,8 @@ async function getReceivedByInvoice(invoices){
   invoices.forEach(inv=>{
     const invCurrency = inv.currency || 'LAK';
     const totalAmount = Number(inv.total_amount||0);
-    const split = splitByPaidCurrency(totalAmount, invCurrency, totalAmount, paymentsByInvoice[inv.id]||[]);
+    /* ຍอดขายในรายงาน = เงินที่รับจริงเท่านั้น (ไม่รวมยอดค้าง ซึ่งโชว์แยกที่ ຄ້າງຊຳລະ) */
+    const split = splitByPaidCurrency(totalAmount, invCurrency, totalAmount, paymentsByInvoice[inv.id]||[], true);
     perInvoice[inv.id] = split;
     Object.keys(split).forEach(c=>{ total[c] = (total[c]||0) + split[c]; });
   });
@@ -1669,8 +1672,8 @@ async function renderSell(main){
       <label>ຫຼຸດລາຄາ (ຖ້າມີ)</label>
       <input id="s_discount" type="text" value="0">
       <div class="invoice-total mono" id="s_totalDisplay">ລວມ: ${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))}</div>
-      <label>ສະກຸນເງິນ</label>
-      <select id="s_currency">
+      <!-- ສະກຸນເງິນບິນເລືອກອັດຕະໂນມັດຕາມສິນຄ້າ (ສິນຄ້າແຕ່ລະລາຍການຕັ້ງລາຄາສະກຸນດຽວ) ຈຶ່ງເຊື່ອງ dropdown ໄວ້ ບໍ່ໃຫ້ຜູ້ໃຊ້ເລືອກເອງ -->
+      <select id="s_currency" style="display:none;">
         <option value="LAK">ກີບ (LAK)</option>
         <option value="THB">ບາດ (THB)</option>
       </select>
