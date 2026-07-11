@@ -854,7 +854,8 @@ async function sumInvoicesByPaidCurrency(invoices){
   invoices.forEach(inv=>{
     const invCurrency = inv.currency || 'LAK';
     const totalAmount = Number(inv.total_amount||0);
-    const split = splitByPaidCurrency(totalAmount, invCurrency, totalAmount, paymentsByInvoice[inv.id]||[]);
+    /* ຍอดขายหน้าหลัก = เงินที่รับจริงเท่านั้น (ไม่รวมยอดค้าง) ໃຫ້ຕົງກັບໜ້າລາຍງານ */
+    const split = splitByPaidCurrency(totalAmount, invCurrency, totalAmount, paymentsByInvoice[inv.id]||[], true);
     Object.keys(split).forEach(c=>{ out[c] = (out[c]||0) + split[c]; });
   });
   return out;
@@ -896,7 +897,8 @@ async function getPeriodProfit(start, end){
   invoices.forEach(inv=>{
     const invCurrency = inv.currency || 'LAK';
     const { profit } = computeInvoiceItemProfit(itemsByInvoice[inv.id]||[], invCurrency);
-    const perCurrency = splitByPaidCurrency(profit, invCurrency, Number(inv.total_amount||0), paymentsByInvoice[inv.id]||[]);
+    /* กำไร = เฉพาะส่วนที่ได้รับเงินจริงแล้ว (บิลที่ยังค้างไม่นับกำไรจนกว่าจะจ่าย) */
+    const perCurrency = splitByPaidCurrency(profit, invCurrency, Number(inv.total_amount||0), paymentsByInvoice[inv.id]||[], true);
     Object.keys(perCurrency).forEach(c=>{
       profitByCurrency[c] = (profitByCurrency[c]||0) + perCurrency[c];
     });
