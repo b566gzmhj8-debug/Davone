@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ══ HUB AUTH GUARD — ຕ້ອງ login ຜ່ານ hub.html ແລະ ບັນຊີຕ້ອງມີສິດ module "expense" ══ -->
+<script>
+(function(){
+  var MODULE='expense';
+  var u=null;
+  try{ u=JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null'); }catch(e){}
+  var ok = u && Array.isArray(u.modules) && u.modules.indexOf(MODULE)!==-1;
+  if(!ok){
+    try{ (window.top||window).location.replace('hub.html'); }
+    catch(e){ location.replace('hub.html'); }
+  }
+})();
+</script>
 <title>Davone – ລາຍຈ່າຍ</title>
 <style>
 :root{

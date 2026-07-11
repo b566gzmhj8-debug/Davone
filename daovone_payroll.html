@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ══ HUB AUTH GUARD — ຕ້ອງ login ຜ່ານ hub.html ແລະ ບັນຊີຕ້ອງມີສິດ module "payroll" ══ -->
+<script>
+(function(){
+  var MODULE='payroll';
+  var u=null;
+  try{ u=JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null'); }catch(e){}
+  var ok = u && Array.isArray(u.modules) && u.modules.indexOf(MODULE)!==-1;
+  if(!ok){
+    try{ (window.top||window).location.replace('hub.html'); }
+    catch(e){ location.replace('hub.html'); }
+  }
+})();
+</script>
 <title>ລະບົບສະຫຼຸບເງິນເດືອນ - ດາວອນ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&family=Noto+Serif+Lao:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
