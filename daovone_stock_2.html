@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- ══ HUB AUTH GUARD — ຕ້ອງ login ຜ່ານ hub.html ແລະ ບັນຊີຕ້ອງມີສິດ module "stock" ══ -->
+<script>
+(function(){
+  var MODULE='stock';
+  var u=null;
+  try{ u=JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null'); }catch(e){}
+  var ok = u && Array.isArray(u.modules) && u.modules.indexOf(MODULE)!==-1;
+  if(!ok){
+    try{ (window.top||window).location.replace('hub.html'); }
+    catch(e){ location.replace('hub.html'); }
+  }
+})();
+</script>
 <title>Davone Shop - ລະບົບສະຕັອກ &amp; ບິນຂາຍ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +88,7 @@
   .cur-stack{display:inline-block;}
   .cur-line{display:block;white-space:nowrap;}
   .cur-unit{margin-left:5px;}
-  .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
+  .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);color:var(--muted);white-space:nowrap;vertical-align:middle;}
   .tag.ok{border-color:var(--ok);color:var(--ok);}
   .tag.sold{border-color:var(--danger);color:var(--danger);}
   .list-item{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
@@ -146,6 +159,11 @@
     .cur-unit{margin-left:0;flex:0 0 2.6em;text-align:left;}
     /* iOS ບໍ່ຍອມໃຫ້ input[type=date/month] ຫົດຕາມກ່ອງ ຈຶ່ງລົ້ນອອກນອກຂອບ ຕ້ອງປິດ appearance ແລະ ປົດ min-width */
     input[type=date],input[type=month]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;height:auto;text-align:left;}
+    /* ໜ້າສິນຄ້າ (ມືຖື): ຊື່ຢູ່ແຖວເທິງເຕັມແຖວ (ຕັດຄຳຊື່ຍາວໆໄດ້) ຈຶ່ງບໍ່ທັບລາຄາ ແລ້ວ ລາຄາ+ປຸ່ມ ຢູ່ແຖວລຸ່ມ */
+    #prod_list .row{flex-wrap:wrap;align-items:center;}
+    #prod_list .row > span:first-child{flex:1 1 100%;min-width:0;overflow-wrap:anywhere;margin-bottom:4px;}
+    #prod_list .row .row-actions{flex:1 1 100%;align-items:center;gap:6px;}
+    #prod_list .row .row-actions > span:first-child{flex:1 1 auto;min-width:0;text-align:left;}
   }
   /* ປຸ່ມເລືອກຊ່ອງທາງຈ່າຍ (ແທນ dropdown ເກົ່າ) — ເຫັນທຸກທາງເລືອກພ້ອມກັນ ບໍ່ຕ້ອງກົດເປີດ */
   .pay-chips{display:flex;gap:6px;}
