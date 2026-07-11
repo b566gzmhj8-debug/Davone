@@ -287,10 +287,13 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const DB_ROLE_TO_APP_ROLE = {
   owner: 'admin',   // ສິດເຕັມ: ເບິ່ງກຳໄລ, ລຶບໄດ້ທຸກຢ່າງ
   admin: 'admin',   // ສິດເຕັມ: ເບິ່ງກຳໄລ, ລຶບໄດ້ທຸກຢ່າງ
+  manager: 'manager',// ຜູ້ຈັດການ: ຄືກັບ viewer + ເບິ່ງກຳໄລ + ເບິ່ງປະຫວັດໂອນສາຂາ (ດູຢ່າງດຽວ)
   staff: 'staff',   // ພະນັກງານ: ອອກບິນຂາຍ, ຮັບເຂົ້າ, ເບິ່ງສະຕັອກ (ບໍ່ເຫັນກຳໄລ/ລຶບບໍ່ໄດ້)
   viewer: 'viewer'  // ເບິ່ງຢ່າງດຽວ: ໜ້າຫຼັກ, ສິນຄ້າ, ລາຍງານ (ບໍ່ອອກບິນ/ບໍ່ຮັບເຂົ້າ)
 };
-const ROLE_LABEL = { admin:'ແອດມິນ', staff:'ພະນັກງານ', viewer:'ຜູ້ຊົມ (ເບິ່ງຢ່າງດຽວ)' };
+const ROLE_LABEL = { admin:'ແອດມິນ', manager:'ຜູ້ຈັດການ', staff:'ພະນັກງານ', viewer:'ຜູ້ຊົມ (ເບິ່ງຢ່າງດຽວ)' };
+/* ໃຜເຫັນກຳໄລໄດ້: ແອດມິນ ແລະ ຜູ້ຈັດການ (staff/viewer ບໍ່ເຫັນ) */
+function canSeeProfit(){ return currentRole === 'admin' || currentRole === 'manager'; }
 
 let currentRole = null;
 let currentUsername = null;
@@ -600,12 +603,12 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
    APP SHELL / TABS
    ============================================================ */
 const TABS = [
-  { id:'dashboard', label:'ໜ້າຫຼັກ', icon:'i-home',    roles:['staff','admin','viewer'] },
-  { id:'products',  label:'ສິນຄ້າ',   icon:'i-box',     roles:['staff','admin','viewer'] },
+  { id:'dashboard', label:'ໜ້າຫຼັກ', icon:'i-home',    roles:['staff','admin','viewer','manager'] },
+  { id:'products',  label:'ສິນຄ້າ',   icon:'i-box',     roles:['staff','admin','viewer','manager'] },
   { id:'receive',   label:'ຮັບເຂົ້າ', icon:'i-truck',   roles:['staff','admin'] },
   { id:'sell',      label:'ອອກບິນຂາຍ', icon:'i-receipt', roles:['staff','admin'] },
-  { id:'transfer',  label:'ໂອນສາຂາ',  icon:'i-truck',   roles:['staff','admin'] },
-  { id:'report',    label:'ລາຍງານ',  icon:'i-chart',   roles:['staff','admin','viewer'] },
+  { id:'transfer',  label:'ໂອນສາຂາ',  icon:'i-truck',   roles:['staff','admin','manager'] },
+  { id:'report',    label:'ລາຍງານ',  icon:'i-chart',   roles:['staff','admin','viewer','manager'] },
 ];
 let activeTab = 'dashboard';
 
@@ -747,12 +750,11 @@ async function renderDashboard(main){
     return (a.name||'').localeCompare(b.name||'');
   });
 
-  const isAdmin = currentRole === 'admin';
   let profitBlock = '';
-  if(isAdmin){
+  if(canSeeProfit()){
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
     const monthProfitByCur = await getPeriodProfit(monthStart, tomorrow.toISOString().slice(0,10));
-    profitBlock = `<div class="stat"><div class="num mono money">${fmtByCurrency(monthProfitByCur)}</div><div class="lbl">ກຳໄລເດືອນນີ້ (ແອດມິນ)</div></div>`;
+    profitBlock = `<div class="stat"><div class="num mono money">${fmtByCurrency(monthProfitByCur)}</div><div class="lbl">ກຳໄລເດືອນນີ້</div></div>`;
   }
 
   main.innerHTML = `
@@ -2137,7 +2139,11 @@ let transferCart = [];
 async function renderTransfer(main){
   const models = await getModels();
   const historyMonth = main.dataset.trMonth || todayStr().slice(0,7);
+  /* ຜູ້ຈັດການ (manager) ເບິ່ງໄດ້ຢ່າງດຽວ: ເຫັນປະຫວັດການໂອນ ແຕ່ບໍ່ເຫັນຟອມສ້າງໂອນ */
+  const canTransfer = currentRole === 'staff' || currentRole === 'admin';
   main.innerHTML = `
+    ${!canTransfer ? '<div class="card"><div class="muted" style="font-size:12px;">ທ່ານເບິ່ງໄດ້ຢ່າງດຽວ · ເບິ່ງປະຫວັດການໂອນສາຂາລຸ່ມນີ້</div></div>' : ''}
+    ${canTransfer ? `
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ໂອນສິນຄ້າໄປສາຂາອື່ນ</h3>
       <div class="muted" style="font-size:12px;margin-bottom:8px;">ຟັງຊັນນີ້ຕັດສະຕັອກອອກຈາກສາຂານີ້ເທົ່ານັ້ນ ບໍ່ມີການອອກບິນ ບໍ່ຮັບເງິນ ບໍ່ກະທົບຍອດຂາຍ/ກຳໄລ</div>
@@ -2168,6 +2174,7 @@ async function renderTransfer(main){
       <div id="tr_cartList">${renderTransferCart()}</div>
       <button class="btn" id="tr_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກໂອນສາຂາ (ຕັດສະຕັອກ)</button>
     </div>
+    ` : ''}
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການໂອນສາຂາ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
       <label>ເລືອກເດືອນ</label>
@@ -2175,6 +2182,13 @@ async function renderTransfer(main){
       <div id="tr_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
     </div>
   `;
+  /* ປະຫວັດການໂອນ — ຜູກໄວ້ກ່ອນສະເໝີ ໃຫ້ manager (view only) ກໍ່ເຫັນ */
+  document.getElementById('tr_month').addEventListener('change', (e)=>{
+    main.dataset.trMonth = e.target.value;
+    loadTransferHistory(e.target.value);
+  });
+  loadTransferHistory(historyMonth);
+  if(!canTransfer) return; /* ຜູ້ຈັດການ ບໍ່ຕ້ອງຜູກຟອມສ້າງໂອນ (ບໍ່ໄດ້ render ຟອມ) */
   const modelSel = document.getElementById('tr_model');
   enableSearchableSelect(modelSel);
   async function refreshSerialList(){
@@ -2223,11 +2237,6 @@ async function renderTransfer(main){
     toast(`ເພີ່ມ ${opt.textContent} ເຂົ້າລາຍການແລ້ວ`);
   });
   bindTransferCartRemove();
-  document.getElementById('tr_month').addEventListener('change', (e)=>{
-    main.dataset.trMonth = e.target.value;
-    loadTransferHistory(e.target.value);
-  });
-  loadTransferHistory(historyMonth);
   /* Enter ในแต่ละช่อง = ไล่ลงช่องถัดไปตามลำดับจริงในฟอร์ม (จำนวน/ไม่มีเลขเครื่อง → หมายเหตุ) พอถึงช่องสุดท้ายค่อยเพิ่มเข้ารายการ แล้วโฟกัสไปที่ปุ่ม "บันทึกโอນสาขา" ให้พร้อมกด Enter อีกครั้งเพื่อบันทึกเลย */
   function getTransferFieldChain(){
     const serialBlock = document.getElementById('tr_serialBlock');
@@ -2486,7 +2495,7 @@ async function renderReport(main){
     outstandingByCur[c] = (outstandingByCur[c]||0) + (Number(r.total_amount||0) - Number(r.paid_amount||0));
   });
   const outstanding = Object.values(outstandingByCur).reduce((s,v)=>s+v,0);
-  const profitByCur = currentRole === 'admin' ? await getPeriodProfit(start, end) : null;
+  const profitByCur = canSeeProfit() ? await getPeriodProfit(start, end) : null;
 
   main.innerHTML = `
     <div class="card">
@@ -2496,7 +2505,7 @@ async function renderReport(main){
     <div class="stats-row">
       <div class="stat"><div class="num mono money">${fmtByCurrency(totalByCur)}</div><div class="lbl">ຍອດຂາຍລວມ</div></div>
       <div class="stat"><div class="num mono">${invoices.length}</div><div class="lbl">ຈຳນວນບິນ</div></div>
-      ${profitByCur !== null ? `<div class="stat"><div class="num mono money">${fmtByCurrency(profitByCur)}</div><div class="lbl">ກຳໄລ (ແອດມິນ)</div></div>` : ''}
+      ${profitByCur !== null ? `<div class="stat"><div class="num mono money">${fmtByCurrency(profitByCur)}</div><div class="lbl">ກຳໄລ</div></div>` : ''}
     </div>
     ${outstanding > 0 ? `<div class="card"><div class="row"><span>ຄ້າງຊຳລະລວມ</span><span class="gold mono">${fmtByCurrency(outstandingByCur)}</span></div></div>` : ''}
     <div class="card">
