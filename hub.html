@@ -81,6 +81,23 @@
     .logout-btn:hover{background:rgba(233,221,196,.08);}
     .back-btn:hover{filter:brightness(1.08);}
   }
+
+  /* ---------- MOBILE ONLY (phones) — MacBook design untouched ---------- */
+  @media (max-width:640px){
+    .menu-header{padding:22px 18px 18px;}
+    .menu-header .eyebrow{
+      font-size:1.02rem;
+      font-weight:700;
+      letter-spacing:0;
+      line-height:1.4;
+      max-width:none;
+      padding-right:66px;          /* reserve room for the ອອກ button */
+      word-break:keep-all;         /* don't split Lao words */
+      overflow-wrap:break-word;
+    }
+    .menu-header .name{font-size:1.2rem;font-weight:700;}
+    .logout-btn{top:20px;right:18px;padding:7px 13px;}
+  }
 </style>
 </head>
 <body>
@@ -91,7 +108,7 @@
   <h1>ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ<br>ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ</h1>
   <div class="sub">ປ້ອນຊື່ຜູ້ໃຊ້ ແລະ ລະຫັດຜ່ານ</div>
   <div class="login-form">
-    <input class="login-input" type="text" id="username" placeholder="ຊື່ຜູ້ໃຊ້" autocomplete="username" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')tryLogin()">
+    <input class="login-input" type="text" id="username" placeholder="ຊື່ຜູ້ໃຊ້" autocomplete="username" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('password').focus();}">
     <input class="login-input" type="password" id="password" placeholder="ລະຫັດຜ່ານ" autocomplete="current-password" onkeydown="if(event.key==='Enter')tryLogin()">
     <div class="login-err" id="loginErr">&nbsp;</div>
     <button class="login-btn" onclick="tryLogin()">ເຂົ້າສູ່ລະບົບ</button>
@@ -134,10 +151,10 @@ const ICONS = {
   stock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 8.2 12 4l8.5 4.2-8.5 4.2-8.5-4.2z"/><path d="M3.5 8.2v7.6L12 20l8.5-4.2V8.2"/><path d="M12 12.4V20"/></svg>`
 };
 const MODULES = {
-  cash:    { label: "ເງິນສົດ",    file: "https://b566gzmhj8-debug.github.io/Davone/index.html" },
-  payroll: { label: "ເງິນເດືອນ",  file: "https://b566gzmhj8-debug.github.io/Davone/daovone_payroll.html" },
-  expense: { label: "ລາຍຈ່າຍ",    file: "https://b566gzmhj8-debug.github.io/Davone/Davone-ລາຍຈ່າຍ.html" },
-  stock:   { label: "ສະຕັອກ & ບິນຂາຍ", file: "https://b566gzmhj8-debug.github.io/Davone/daovone_stock_2.html" },
+  cash:    { label: "ເງິນສົດ",    file: "cash.html" },
+  payroll: { label: "ເງິນເດືອນ",  file: "payroll.html" },
+  expense: { label: "ລາຍຈ່າຍ",    file: "expense.html" },
+  stock:   { label: "ສະຕັອກ & ບິນຂາຍ", file: "daovone_stock_2.html" },
 };
 
 // ແປງ role ໃນຖານຂໍ້ມູນ (owner/admin/staff/viewer) ເປັນສິດພາຍໃນແອັບສະຕັອກ
