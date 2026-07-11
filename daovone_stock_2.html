@@ -922,7 +922,7 @@ async function renderProducts(main){
             <div class="gold mono">${m.sale_price ? fmtMoney(m.sale_price)+' ກີບ' : (m.sale_price_thb ? fmtMoney(m.sale_price_thb)+' ບາດ' : fmtMoney(0))}</div>
             <div class="muted" style="font-size:11px;">ເຫຼືອ ${qty} ${m.unit||''}${m.has_serial ? ' <span class="muted" style="font-size:10px;">(ກົດເບິ່ງ)</span>' : ''}</div>
           </span>
-          ${isAdmin ? `<button class="icon-btn" data-edit="${m.id}"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂ</button><button class="icon-btn" data-del="${m.id}" style="color:var(--danger);border-color:var(--danger);"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບ</button>` : ''}
+          ${isAdmin ? `<button class="icon-btn" data-adjust="${m.id}"><svg class="dv-icon"><use href="#i-gear"></use></svg>ປรับສะຕັອກ</button><button class="icon-btn" data-edit="${m.id}"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂ</button><button class="icon-btn" data-del="${m.id}" style="color:var(--danger);border-color:var(--danger);"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບ</button>` : ''}
         </span>
       </div>`;
     }).join('') : '<div class="empty">ບໍ່ພົບສິນຄ້າທີ່ຄົ້ນຫາ</div>';
@@ -930,12 +930,22 @@ async function renderProducts(main){
   function bindRowEvents(){
     main.querySelectorAll('.row.clickable[data-id]').forEach(row=>{
       row.addEventListener('click', (e)=>{
-        if(e.target.closest('[data-edit],[data-del]')) return;
+        if(e.target.closest('[data-edit],[data-del],[data-adjust]')) return;
         const model = models.find(m=> m.id === row.dataset.id);
         if(model) openUnitsModal(model);
       });
     });
     if(isAdmin){
+      main.querySelectorAll('[data-adjust]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const model = models.find(m=> m.id === btn.dataset.adjust);
+          if(!model) return;
+          /* ມີເລກເຄື່ອງ: ລົບເລກເຄື່ອງທີ່ເພີ່ມຜິດເປັນຊິ້ນ (ໃນ units modal) ບໍ່ມີເລກເຄື່ອງ: ຕັ້ງຈຳນວນທີ່ຖືກຕ້ອງ */
+          if(model.has_serial) openUnitsModal(model);
+          else openAdjustStockModal(model, balMap[model.id]||0);
+        });
+      });
       main.querySelectorAll('[data-edit]').forEach(btn=>{
         btn.addEventListener('click', (e)=>{
           e.stopPropagation();
@@ -988,6 +998,57 @@ async function renderProducts(main){
   });
 }
 
+/* ປรับສະຕັອກສິນຄ້າ (ບໍ່ມີເລກເຄື່ອງ) ໃຫ້ເປັນຈຳນວນທີ່ຖືກຕ້ອງ — ສະເພາະແອດມິນ
+   ບໍ່ໄດ້ໄປລົບບິນ/ຮັບເຂົ້າເກົ່າ ແຕ່ບັນທຶກ movement ‘adjust’ ຊົດເຊີຍໃຫ້ຍອດເທົ່າທີ່ຕ້ອງການ (stock_balance ຄິດໃໝ່ໃຫ້ເອງ) */
+function openAdjustStockModal(model, currentQty){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h3><svg class="dv-icon"><use href="#i-gear"></use></svg>ປรับສะຕັອກ</h3>
+      <div style="font-weight:600;margin-bottom:2px;">${model.name}</div>
+      <div class="muted" style="font-size:12px;margin-bottom:10px;">ຕອນນີ້ໃນລະບົບ: <span class="mono" style="font-weight:700;">${fmtMoney(currentQty)}</span> ${model.unit||''}</div>
+      <label>ຈຳນວນຄົງເຫຼືອທີ່ຖືກຕ້ອງ</label>
+      <input id="adj_qty" type="number" min="0" step="1" value="${currentQty}">
+      <label>ເຫດຜົນ (ຖ້າມີ)</label>
+      <input id="adj_note" placeholder="ເຊັ່ນ ນັບສະຕັອກຈິງ / ພິມຮັບເຂົ້າຜິດ">
+      <div class="grid2" style="margin-top:12px;">
+        <button class="btn secondary" id="adj_cancel">ຍົກເລີກ</button>
+        <button class="btn" id="adj_save"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກ</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  bg.querySelector('#adj_cancel').addEventListener('click', ()=> bg.remove());
+  bg.querySelector('#adj_save').addEventListener('click', async (e)=>{
+    const btn = e.currentTarget;
+    const raw = document.getElementById('adj_qty').value;
+    const target = Math.round(Number(raw));
+    if(raw === '' || !Number.isFinite(target) || target < 0){ toast('ໃສ່ຈຳນວນທີ່ຖືກຕ້ອງ (0 ຂຶ້ນໄປ)'); return; }
+    const delta = target - currentQty;
+    if(delta === 0){ toast('ຈຳນວນບໍ່ປ່ຽນແປງ'); bg.remove(); return; }
+    const note = document.getElementById('adj_note').value.trim();
+    btn.disabled = true;
+    try{
+      await sb('stock_movements', { method:'POST', body:{
+        id: uid(), model_id: model.id, unit_id: null,
+        movement_type: delta > 0 ? 'in' : 'out', quantity: Math.abs(delta),
+        ref_type: 'adjust', note: 'ປรับສะຕັອກ' + (note ? ': ' + note : ''), created_by: currentUsername
+      }});
+      toast(`ປรับสะຕັອກ ${model.name} → ${fmtMoney(target)} ${model.unit||''}`);
+      bg.remove();
+      renderTab();
+    }catch(err){ toast('ຜິດພາດ: ' + err.message); btn.disabled = false; }
+  });
+}
+
+/* ລົບເລກເຄື່ອງ (serial) ທີ່ເພີ່ມຜິດອອກເປັນຊິ້ນ — ສະເພາະແອດມິນ
+   ລົບ movement ຂອງໜ່ວຍນັ້ນກ່ອນ (unit_id ອ້າງເຖິງ) ແລ້ວຄ່ອຍລົບໜ່ວຍ ເພື່ອບໍ່ໃຫ້ຕິດ FK
+   ໃຊ້ສຳລັບກໍລະນີ "ຮັບເຂົ້າ/ພິມເລກເຄື່ອງຜິດ" ໂດຍບໍ່ຕ້ອງລົບບິນທັງໃບ */
+async function adjustRemoveUnit(unit){
+  await sb(`stock_movements?unit_id=eq.${unit.id}`, { method:'DELETE' });
+  await sb(`stock_product_units?id=eq.${unit.id}`, { method:'DELETE' });
+}
 /* ເບິ່ງລາຍລະອຽດເລກເຄື່ອງ (serial) ຂອງສິນຄ້າທີ່ຕ້ອງເກັບເລກແຍກແຕ່ລະໜ່ວຍ */
 async function openUnitsModal(model){
   const bg = document.createElement('div');
@@ -995,23 +1056,47 @@ async function openUnitsModal(model){
   bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງໂຫລດ...</div></div>`;
   document.body.appendChild(bg);
   bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
-  try{
+  const isAdmin = currentRole === 'admin';
+  let stockChanged = false;
+  async function paint(){
     const units = await getInStockUnits(model.id);
     bg.querySelector('.modal').innerHTML = `
       <h3><svg class="dv-icon"><use href="#i-box"></use></svg>${model.name}</h3>
-      <div class="muted" style="font-size:12px;margin-bottom:8px;">ເລກເຄື່ອງທີ່ຍັງຄົງເຫຼືອໃນສະຕັອກ (${units.length} ${model.unit||'ໜ່ວຍ'})</div>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">ເລກເຄື່ອງທີ່ຍັງຄົງເຫຼືອໃນສະຕັອກ (${units.length} ${model.unit||'ໜ່ວຍ'})${isAdmin ? ' · ກົດ ✕ ເພື່ອລົບເລກເຄື່ອງທີ່ເພີ່ມຜິດ' : ''}</div>
       <hr class="sep">
-      ${units.length ? units.map(u=> `
+      ${units.length ? units.map((u,idx)=> `
         <div class="row">
           <span class="mono">${u.serial_no}</span>
-          <span style="text-align:right;">
-            <div class="muted" style="font-size:11px;">${fmtDateDMY(u.received_at)}</div>
-            ${currentRole==='admin' ? `<div class="gold mono" style="font-size:12px;">${u.cost_lak!=null ? fmtMoney(u.cost_lak)+' ກີບ' : '-'}</div>` : ''}
+          <span class="row-actions">
+            <span style="text-align:right;">
+              <div class="muted" style="font-size:11px;">${fmtDateDMY(u.received_at)}</div>
+              ${isAdmin ? `<div class="gold mono" style="font-size:12px;">${u.cost_lak!=null ? fmtMoney(u.cost_lak)+' ກີບ' : '-'}</div>` : ''}
+            </span>
+            ${isAdmin ? `<button class="icon-btn" data-rm="${idx}" style="color:var(--danger);border-color:var(--danger);">✕</button>` : ''}
           </span>
         </div>`).join('') : '<div class="empty">ບໍ່ມີເຄື່ອງເຫຼືອໃນສະຕັອກ</div>'}
       <button class="btn secondary" id="unitsClose" style="margin-top:12px;">ປິດ</button>
     `;
-    bg.querySelector('#unitsClose').addEventListener('click', ()=> bg.remove());
+    bg.querySelector('#unitsClose').addEventListener('click', ()=>{ bg.remove(); if(stockChanged) renderTab(); });
+    if(isAdmin){
+      bg.querySelectorAll('[data-rm]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const u = units[Number(btn.dataset.rm)];
+          if(!u) return;
+          if(!confirm(`ລົບເລກເຄື່ອງ ${u.serial_no} ອອກຈາກສະຕັອກ? ໃຊ້ເມື່ອເພີ່ມ/ພິມຜິດ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+          btn.disabled = true;
+          try{
+            await adjustRemoveUnit(u);
+            stockChanged = true;
+            toast(`ລົບເລກເຄື່ອງ ${u.serial_no} ແລ້ວ`);
+            await paint();
+          }catch(err){ toast('ຜິດພາດ: ' + err.message); btn.disabled = false; }
+        });
+      });
+    }
+  }
+  try{
+    await paint();
   }catch(err){
     bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="unitsClose2">ປິດ</button>`;
     bg.querySelector('#unitsClose2').addEventListener('click', ()=> bg.remove());
