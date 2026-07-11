@@ -581,7 +581,8 @@ async function tryLogin(){
   }
 }
 document.getElementById('loginBtn').addEventListener('click', tryLogin);
-document.getElementById('loginUsername').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
+/* ຊ່ອງຊື່ຜູ້ໃຊ້ກົດ Enter = ລົງໄປຊ່ອງລະຫັດຜ່ານ ບໍ່ແມ່ນເຂົ້າສູ່ລະບົບເລີຍ (ຍັງບໍ່ທັນໃສ່ລະຫັດ) */
+document.getElementById('loginUsername').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('loginPassword').focus(); } });
 document.getElementById('loginPassword').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
 document.getElementById('logoutBtn').addEventListener('click', ()=>{
   currentRole = null;
