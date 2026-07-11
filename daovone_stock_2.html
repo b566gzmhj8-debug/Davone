@@ -355,6 +355,19 @@ async function nextInvoiceNo(){
   });
   return 'INV-' + (max + 1);
 }
+
+/* ເລກໃບບິນຮັບເຂົ້າຮຽງລຳດັບ RCV-1, RCV-2, RCV-3 ...
+   ໃຊ້ວິທີດຽວກັບ nextInvoiceNo(): receipt_no ເປັນ text ຮຽງດ້ວຍ SQL ບໍ່ໄດ້
+   ຕ້ອງດຶງທັງໝົດມາແປງເປັນຕົວເລກແລ້ວຫາຄ່າສູງສຸດເອງ ແລ້ວ +1 */
+async function nextReceiptNo(){
+  const rows = await sb('stock_purchase_receipts?select=receipt_no');
+  let max = 0;
+  (rows||[]).forEach(r=>{
+    const m = /^RCV-(\d+)$/.exec(r.receipt_no || '');
+    if(m) max = Math.max(max, Number(m[1]));
+  });
+  return 'RCV-' + (max + 1);
+}
 function fmtMoney(n){ return (Math.round(n||0)).toLocaleString('en-US').replace(/,/g,'.'); }
 
 /* ยอดกีบกับยอดบาทเป็นคนละสกุลเงิน เอามาบวกรวมกันตรงๆ ไม่ได้ (จะได้ตัวเลขที่ไม่มีความหมาย) ฟังก์ชันนี้เลยรวมแยกตามสกุลเงินแทน แล้วโชว์ทีละบรรทัด */
@@ -1544,7 +1557,7 @@ async function renderReceive(main){
     try{
       const receiptId = uid();
       const total = receiveCart.reduce((s,i)=>s+i.amount,0);
-      const receiptNo = 'RCV-' + Date.now().toString().slice(-8);
+      const receiptNo = await nextReceiptNo();
       await sb('stock_purchase_receipts', { method:'POST', body:{
         id: receiptId,
         receipt_no: receiptNo,
