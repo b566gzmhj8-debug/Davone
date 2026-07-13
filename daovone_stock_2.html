@@ -1642,7 +1642,11 @@ function bindReceiveCartRemove(){
 
 /* ປະຫວັດການຮັບເຂົ້າ (ເບິ່ງຍ້ອນຫຼັງລາຍເດືອນ) */
 async function getPurchaseReceipts(start, end){
-  return await sb(`stock_purchase_receipts?select=*&receipt_date=gte.${start}&receipt_date=lt.${end}&order=receipt_date.desc,receipt_no.desc`);
+  /* receipt_no ເປັນ text ("RCV-9","RCV-10") ຖ້າຮຽງແບບ text ຈະໄດ້ RCV-9 ກ່ອນ RCV-10 (ຍ້ອນ '9'>'1')
+     ຈຶ່ງດຶງມາແລ້ວຮຽງເອງ: ວັນທີໃໝ່ກ່ອນ ຕໍ່ດ້ວຍເລກໃບຫຼາຍກ່ອນ (ຕົວເລກແທ້ ບໍ່ແມ່ນ text) */
+  const rows = await sb(`stock_purchase_receipts?select=*&receipt_date=gte.${start}&receipt_date=lt.${end}`);
+  const rcvNum = r=>{ const m = String(r.receipt_no||'').match(/(\d+)/); return m ? Number(m[1]) : 0; };
+  return rows.sort((a,b)=> a.receipt_date < b.receipt_date ? 1 : a.receipt_date > b.receipt_date ? -1 : rcvNum(b)-rcvNum(a));
 }
 async function getPurchaseReceiptItems(receiptId){
   return await sb(`stock_purchase_receipt_items?select=*,stock_product_models(name,unit)&receipt_id=eq.${receiptId}`);
