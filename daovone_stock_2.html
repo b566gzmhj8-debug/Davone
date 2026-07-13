@@ -1087,11 +1087,14 @@ async function renderProducts(main){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ນັບສະຕັອກ-${todayStr()}.csv`;
+    /* ຊື່ໄຟລ໌ເປັນ ASCII (stock-count-YYYY-MM-DD) — Safari ບໍ່ຮັບ download attribute ຖ້າຊື່ເປັນພາສາລາວ ຈະເປີດເປັນໜ້າເວັບແທນການດາວໂຫລດ */
+    a.download = `stock-count-${todayStr()}.csv`;
+    a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(url);
+    /* ຢ່າ revoke ທັນທີ! Safari ດາວໂຫລດແບບ async ຖ້າລຶບ blob ໄວເກີນ ຈະຂຶ້ນ error "WebKitBlobResource error 1" — ລໍຖ້າໃຫ້ດາວໂຫລດແລ້ວຄ່ອຍລຶบ */
+    setTimeout(()=> URL.revokeObjectURL(url), 60000);
     toast(`ສ້າງໃບນັບສະຕັອກແລ້ວ · ${n} ລາຍການ`);
   }
 }
