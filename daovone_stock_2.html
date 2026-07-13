@@ -956,6 +956,7 @@ async function getPeriodProfit(start, end){
 async function renderProducts(main){
   const [models, balMap, unitMap] = await Promise.all([getModels(), getBalanceMap(), getUnitCountMap()]);
   const isAdmin = currentRole === 'admin';
+  let currentList = models; /* ລາຍการที่กำลังโชว์ (ตามคำค้นหา) — ใช้ตอนส่งออกใบนับสต๊อก */
   function rowsHtml(list){
     return list.length ? list.map(m=>{
       const qty = m.has_serial ? (unitMap[m.id]||0) : (balMap[m.id]||0);
@@ -1022,6 +1023,7 @@ async function renderProducts(main){
     <button class="btn" id="addModelBtn"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມສິນຄ້າ/ຮຸ່ນໃໝ່</button>
     ${isAdmin ? `<button class="btn secondary" id="adjHistoryBtn"><svg class="dv-icon"><use href="#i-gear"></use></svg>ປະຫວັດການປรับສะຕັອก</button>` : ''}
     ${isAdmin ? `<button class="btn secondary" id="checkDupBtn"><svg class="dv-icon"><use href="#i-alert"></use></svg>ກວດເລກເຄື່ອງຊ້ຳ</button>` : ''}
+    <button class="btn secondary" id="exportStockBtn"><svg class="dv-icon"><use href="#i-receipt"></use></svg>ສົ່ງອອກໃບນັບສະຕັອກ (CSV)</button>
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ລາຍການສິນຄ້າ (<span id="prod_count">${models.length}</span>)</h3>
       <input id="prod_search" placeholder="ຄົ້ນຫາສິນຄ້າ (ຊື່ / ລະຫັດ / ໝວດໝູ່)..." style="margin-bottom:10px;">
@@ -1033,6 +1035,7 @@ async function renderProducts(main){
     document.getElementById('adjHistoryBtn').addEventListener('click', ()=> openAdjustHistoryModal());
     document.getElementById('checkDupBtn').addEventListener('click', ()=> openDuplicateSerialsModal(models));
   }
+  document.getElementById('exportStockBtn').addEventListener('click', ()=> exportStockCount(currentList));
   bindRowEvents();
   const searchEl = document.getElementById('prod_search');
   searchEl.addEventListener('input', ()=>{
@@ -1042,10 +1045,55 @@ async function renderProducts(main){
       (m.code||'').toLowerCase().includes(q) ||
       (m.category||'').toLowerCase().includes(q)
     ) : models;
+    currentList = filtered;
     document.getElementById('prod_list').innerHTML = rowsHtml(filtered);
     document.getElementById('prod_count').textContent = filtered.length;
     bindRowEvents();
   });
+
+  /* ສ້າງໃບນັບສະຕັອກ (CSV) ໃຫ້ພະນັກງານພິມ/ເປີດ Excel ໄປນັບກັບຂອງຈິງ:
+     ສິນຄ້າມີເລກເຄື່ອງ → 1 ແຖວ/1 ເລກເຄື່ອງ (ຈຳນວນ 1), ສິນຄ້າບໍ່ມີເລກເຄື່ອງ → 1 ແຖວ (ຈຳນວນຕາມສະຕັອກ)
+     ຄໍລຳ "ຈຳນວນນັບຈິງ / ຜົນຕ່າງ / ໝາຍເຫດ" ວ່າງໄວ້ ໃຫ້ພະນັກງານຕື່ມເອງຕອນນັບ */
+  async function exportStockCount(list){
+    if(!list || !list.length){ toast('ບໍ່ມີສິນຄ້າໃຫ້ສົ່ງອອກ'); return; }
+    let units = [];
+    try{
+      units = await sb('stock_product_units?select=model_id,serial_no&status=eq.in_stock');
+    }catch(err){ toast('ດຶງເລກເຄື່ອງບໍ່ໄດ້: '+err.message); return; }
+    const serialsByModel = {};
+    units.forEach(u=>{ (serialsByModel[u.model_id] = serialsByModel[u.model_id] || []).push(u.serial_no || ''); });
+
+    const header = ['ລຳດັບ','ໝວດໝູ່','ລະຫັດ','ຊື່ສິນຄ້າ','ເລກເຄື່ອງ','ຈຳນວນໃນລະບົບ','ຈຳນວນນັບຈິງ','ຜົນຕ່າງ','ໝາຍເຫດ'];
+    const sorted = [...list].sort((a,b)=> (a.category||'').localeCompare(b.category||'') || (a.name||'').localeCompare(b.name||''));
+    const rows = [];
+    let n = 0;
+    sorted.forEach(m=>{
+      if(m.has_serial){
+        const serials = (serialsByModel[m.id] || []).slice().sort((x,y)=> String(x).localeCompare(String(y)));
+        if(serials.length) serials.forEach(sn=> rows.push([++n, m.category||'', m.code||'', m.name||'', sn, 1, '', '', '']));
+        else rows.push([++n, m.category||'', m.code||'', m.name||'', '', 0, '', '', '']);
+      } else {
+        rows.push([++n, m.category||'', m.code||'', m.name||'', '', (balMap[m.id]||0), '', '', '']);
+      }
+    });
+    const totalQty = rows.reduce((s,r)=> s + (Number(r[5])||0), 0);
+    /* ແຖວສະຫຼຸບທ້າຍໄຟລ໌ */
+    rows.push([]);
+    rows.push(['','','','','ລວມ', totalQty, '', '', `${n} ແຖວ · ວັນທີ ${todayStr()}`]);
+
+    const esc = v=>{ const s = String(v==null?'':v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+    const csv = '﻿' + [header, ...rows].map(r=> r.map(esc).join(',')).join('\r\n'); /* BOM ໃຫ້ Excel ອ່ານພາສາລາວຖືກ */
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ນັບສະຕັອກ-${todayStr()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast(`ສ້າງໃບນັບສະຕັອກແລ້ວ · ${n} ລາຍການ`);
+  }
 }
 
 /* ປະຫວັດການປรับສະຕັອກ — ບັນທຶກທຸກຄັ້ງທີ່ແອດມິນປรับ (ref_type=adjust) ໃຫ້ຕรวจสอบย้อนหลังได้ */
