@@ -98,6 +98,9 @@
   .empty{text-align:center;color:var(--muted);font-size:13px;padding:20px 0;}
   .cart-item{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px;}
   .cart-item .x{color:var(--danger);font-size:16px;padding:0 6px;}
+  .rcv-seq{color:var(--muted);font-weight:600;margin-right:2px;font-variant-numeric:tabular-nums;}
+  .rcv-count-badge{display:inline-block;background:var(--orange-soft);color:#fff;font-size:12px;font-weight:600;padding:1px 9px;border-radius:999px;vertical-align:middle;margin-left:6px;}
+  .rcv-count-badge:empty{display:none;}
   .search-box{position:relative;margin-bottom:8px;}
   .picker-list{max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-top:6px;}
   .picker-row{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;}
@@ -1356,7 +1359,7 @@ async function renderReceive(main){
       <button class="btn secondary" id="r_addItem"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າລາຍການ</button>
     </div>
     <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການທີ່ຈະຮັບເຂົ້າ</h3>
+      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການທີ່ຈະຮັບເຂົ້າ <span id="r_count" class="rcv-count-badge">${receiveCartCountText()}</span></h3>
       <div id="r_cartList">${renderReceiveCart()}</div>
       ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receiveCart.reduce((s,i)=>s+i.amount,0))}</div>` : ''}
       <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກຮັບເຂົ້າ</button>
@@ -1477,8 +1480,10 @@ async function renderReceive(main){
     document.getElementById('r_cartList').innerHTML = renderReceiveCart();
     const totalEl = main.querySelector('.invoice-total');
     if(totalEl) totalEl.textContent = 'ລວມ: ' + fmtMoney(receiveCart.reduce((s,i)=>s+i.amount,0));
+    const countEl = document.getElementById('r_count');
+    if(countEl) countEl.textContent = receiveCartCountText();
     bindReceiveCartRemove();
-    toast(`ເພີ່ມ ${opt.textContent} ແລ້ວ`);
+    toast(`ເພີ່ມ ${opt.textContent} ແລ້ວ (ລວມ ${receiveCartCountText()})`);
   });
   /* Enter ในแต่ละช่อง = ไล่ลงช่องถัดไปตามลำดับจริงในฟอร์ม (เลขเครื่อง/จำนวน → สกุลເງິນ → ต้นทุน → อัตราแลกเปลี่ยน[ถ้าเป็นบาท]) พอถึงช่องสุดท้ายค่อยเพิ่มเข้ารายการ แล้วต้องกดปุ่ม "บันทึกรับเข้า" (r_submit) เองเสมอ เพื่อกันบันทึกค้างๆ โดยไม่ตั้งใจ */
   function handleReceiveEnter(){
@@ -1609,12 +1614,20 @@ async function renderReceive(main){
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
   });
 }
+/* ຂໍ້ຄວາມສະຫຼຸບຈຳນວນລາຍການທີ່ຈະຮັບເຂົ້າ: ນັບຈຳນວນແຖວ (ລາຍການ) ແລະ ຈຳນວນໜ່ວຍລວມ ຖ້າບໍ່ເທົ່າກັນ */
+function receiveCartCountText(){
+  const lines = receiveCart.length;
+  if(!lines) return '';
+  const units = receiveCart.reduce((s,i)=>s+(Number(i.quantity)||0),0);
+  return units !== lines ? `${lines} ລາຍການ · ${units} ໜ່ວຍ` : `${lines} ລາຍການ`;
+}
 function renderReceiveCart(){
   if(!receiveCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
   const canSeeCost = currentRole === 'admin';
+  /* ຮຽງລຳດັບ 1, 2, 3 ... ໃຫ້ ບໍ່ຕ້ອງນັບເອງ */
   return receiveCart.map((it,idx)=> `
     <div class="cart-item">
-      <span>${it.model_name}${it.serial_no?(' · '+it.serial_no):(' × '+it.quantity)}${it.cost_currency==='THB' ? ' <span class="muted" style="font-size:11px;">(ຊື້ ' + fmtMoney(it.unit_cost_thb) + ' ບາດ @' + it.exchange_rate + ')</span>' : ''}</span>
+      <span><span class="rcv-seq mono">${idx+1}.</span> ${it.model_name}${it.serial_no?(' · '+it.serial_no):(' × '+it.quantity)}${it.cost_currency==='THB' ? ' <span class="muted" style="font-size:11px;">(ຊື້ ' + fmtMoney(it.unit_cost_thb) + ' ບາດ @' + it.exchange_rate + ')</span>' : ''}</span>
       <span>${canSeeCost ? fmtMoney(it.amount)+' ກີບ ' : ''}<span class="x" data-idx="${idx}">✕</span></span>
     </div>`).join('');
 }
