@@ -478,8 +478,9 @@ function bindEnterAdvance(inputIds, finalId){
 
 /* ປ່ຽນ <select> ທີ່ມີລາຍການສິນຄ້າຫຼາຍໆໃຫ້ພິມຄົ້ນຫາໄດ້ (ຊື່ ຫຼື ລະຫັດ) ແທນການເລື່ອນຫາເອງ
    ໃຊ້ໄດ້ກັບ select ໃດກໍ່ໄດ້ ໂດຍ select ເກົ່າຍັງຢູ່ໃນ DOM (ເຊື່ອງໄວ້) ເພື່ອບໍ່ໃຫ້ໂຄ້ດອື່ນທີ່ອ້າງອີງ .value / .selectedOptions ພັງ */
-function enableSearchableSelect(selectEl){
+function enableSearchableSelect(selectEl, opts){
   if(!selectEl || selectEl.dataset.searchable) return;
+  opts = opts || {};
   selectEl.dataset.searchable = 'true';
   const wrap = document.createElement('div');
   wrap.className = 'model-search-wrap';
@@ -491,7 +492,8 @@ function enableSearchableSelect(selectEl){
   input.type = 'text';
   input.id = selectEl.id + '_search';
   input.autocomplete = 'off';
-  input.placeholder = 'ພິມຊື່ / ລະຫັດ / ໝວດໝູ່ ເພື່ອຄົ້ນຫາ...';
+  input.placeholder = opts.placeholder || 'ພິມຊື່ / ລະຫັດ / ໝວດໝູ່ ເພື່ອຄົ້ນຫາ...';
+  const emptyText = opts.emptyText || 'ບໍ່ພົບສິນຄ້າ';
   wrap.appendChild(input);
 
   const dropdown = document.createElement('div');
@@ -499,7 +501,8 @@ function enableSearchableSelect(selectEl){
   dropdown.style.display = 'none';
   wrap.appendChild(dropdown);
 
-  const options = Array.from(selectEl.options).filter(o=>o.value);
+  /* ອ່ານ options ໃໝ່ທຸກຄັ້ງ (ບໍ່ cache) ເພື່ອຮອງຮັບ select ທີ່ຖືກເຕີມຂໍ້ມູນຄືນ ເຊັ່ນ ລາຍການເລກເຄື່ອງ ທີ່ປ່ຽນຕາມສິນຄ້າທີ່ເລືອກ */
+  const getOptions = ()=> Array.from(selectEl.options).filter(o=>o.value);
   let highlighted = -1;
 
   /* ສິນຄ້າຫຼາຍລາຍການຊື່ຊ້ຳກັນ ແຕ່ຄົນລະໝວດໝູ່ ຈຶ່ງຕ້ອງສະແດງລະຫັດ · ໝວດໝູ່ ໃຕ້ຊື່ ບໍ່ດັ່ງນັ້ນເລືອກຜິດໄດ້
@@ -508,10 +511,11 @@ function enableSearchableSelect(selectEl){
     return [o.dataset.code, o.dataset.cat].filter(Boolean).join(' · ');
   }
   function renderList(filter){
-    const f = (filter||'').trim().toLowerCase();
-    /* ຄົ້ນຫາໃຫ້ຕົງກັບ ຊື່ + ລະຫັດ + ໝວດໝູ່ ບໍ່ແມ່ນແຕ່ຊື່ຢ່າງດຽວ */
-    const filtered = f
-      ? options.filter(o=> (o.textContent + ' ' + optionMeta(o)).toLowerCase().includes(f))
+    /* ຄົ້ນຫາແບບແຍກຄຳ: ພິມຫຼາຍຄຳ (ເຊັ່ນ ຊື່ + ໝວດໝູ່) ຕ້ອງພົບຄົບທຸກຄຳຈຶ່ງຂຶ້ນ ບໍ່ບັງຄັບຕ້ອງຕິດກັນ */
+    const tokens = (filter||'').trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const options = getOptions();
+    const filtered = tokens.length
+      ? options.filter(o=>{ const hay = (o.textContent + ' ' + optionMeta(o)).toLowerCase(); return tokens.every(t=> hay.includes(t)); })
       : options;
     highlighted = -1;
     dropdown.innerHTML = filtered.length
@@ -519,7 +523,7 @@ function enableSearchableSelect(selectEl){
           const meta = optionMeta(o);
           return `<div class="model-search-item" data-value="${o.value}">${o.textContent}${meta ? `<div class="model-search-meta">${meta}</div>` : ''}</div>`;
         }).join('')
-      : '<div class="model-search-empty">ບໍ່ພົບສິນຄ້າ</div>';
+      : `<div class="model-search-empty">${emptyText}</div>`;
   }
   function openDropdown(){ renderList(input.value); dropdown.style.display = 'block'; }
   function closeDropdown(){ dropdown.style.display = 'none'; }
@@ -578,6 +582,12 @@ function enableSearchableSelect(selectEl){
   document.addEventListener('click', (e)=>{
     if(!wrap.contains(e.target)) closeDropdown();
   });
+  /* ຖ້າ options ຖືກເຕີມຄືນ (ເຊັ່ນ ປ່ຽນສິນຄ້າແລ້ວ ໂຫລດເລກເຄື່ອງໃໝ່) ໃຫ້ອັບເດດຊ່ອງພິມ ຕາມຄ່າທີ່ເລືອກປັດຈຸບັນ ແລະ ຮີເຟຣຊລາຍການທີ່ເປີດຢູ່ */
+  new MutationObserver(()=>{
+    const opt = selectEl.selectedOptions[0];
+    input.value = (opt && opt.value) ? opt.textContent : '';
+    if(dropdown.style.display !== 'none') renderList('');
+  }).observe(selectEl, {childList:true});
 }
 
 /* ============================================================
@@ -1901,6 +1911,8 @@ async function renderSell(main){
   attachMoneyInput('s_pay_amount', '');
   const modelSel = document.getElementById('s_model');
   enableSearchableSelect(modelSel);
+  /* ຊ່ອງເລກເຄື່ອງ ພິມຄົ້ນຫາໄດ້ (ບໍ່ຕ້ອງເລື່ອນຫາເອງ ເມື່ອມີເລກເຄື່ອງຫຼາຍ) */
+  enableSearchableSelect(document.getElementById('s_unitSelect'), {placeholder:'ພິມເລກເຄື່ອງເພື່ອຄົ້ນຫາ...', emptyText:'ບໍ່ພົບເລກເຄື່ອງ'});
   /* ໃສ່ລາຄາໃຫ້ອັດຕະໂນມັດຕາມສະກຸນເງິນທີ່ເລືອກ (ກີບ ໃຊ້ sale_price, ບາດ ໃຊ້ sale_price_thb) */
   function fillSellPrice(){
     const opt = modelSel.selectedOptions[0];
@@ -2213,6 +2225,7 @@ async function renderTransfer(main){
       </div>
       <div id="tr_serialBlock" style="display:none;">
         <label>ເລືອກເລກເຄື່ອງທີ່ຈະໂອນ (ເລືອກໄດ້ຫຼາຍລາຍການ)</label>
+        <input id="tr_serialSearch" placeholder="ພິມເລກເຄື່ອງເພື່ອຄົ້ນຫາ..." autocomplete="off" style="margin-bottom:8px;">
         <div id="tr_serialList" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--panel);"></div>
       </div>
       <label>ໝາຍເຫດ (ຖ້າມີ)</label>
@@ -2241,6 +2254,16 @@ async function renderTransfer(main){
   if(!canTransfer) return; /* ຜູ້ຈັດການ ບໍ່ຕ້ອງຜູກຟອມສ້າງໂອນ (ບໍ່ໄດ້ render ຟອມ) */
   const modelSel = document.getElementById('tr_model');
   enableSearchableSelect(modelSel);
+  /* ພິມຄົ້ນຫາເລກເຄື່ອງໃນລາຍການ (checkbox) — ເຊື່ອງແຖວທີ່ບໍ່ຕົງ ບໍ່ໃຫ້ຕ້ອງເລື່ອນຫາເອງ */
+  function filterTransferSerials(){
+    const q = (document.getElementById('tr_serialSearch').value||'').trim().toLowerCase();
+    document.querySelectorAll('#tr_serialList > div').forEach(row=>{
+      const cb = row.querySelector('input[type=checkbox]');
+      if(!cb) return;
+      row.style.display = (!q || (cb.dataset.serial||'').toLowerCase().includes(q)) ? '' : 'none';
+    });
+  }
+  document.getElementById('tr_serialSearch').addEventListener('input', filterTransferSerials);
   async function refreshSerialList(){
     const opt = modelSel.selectedOptions[0];
     const listEl = document.getElementById('tr_serialList');
@@ -2255,6 +2278,7 @@ async function renderTransfer(main){
           <label for="trchk_${u.id}" style="display:inline-block;margin:0;font-size:14px;font-weight:600;color:var(--ink);">${u.serial_no || '(ບໍ່ມີເລກ)'}</label>
         </div>`).join('')
       : '<div class="empty">ບໍ່ມີເລກເຄື່ອງໃນສະຕັອກສາຂານີ້ (ຫຼືເລືອກໝົດແລ້ວ)</div>';
+    filterTransferSerials(); /* ຄົງຄຳຄົ້ນຫາເດີມໄວ້ ຫຼັງໂຫລດລາຍການໃໝ່ */
   }
   modelSel.addEventListener('change', async ()=>{
     const opt = modelSel.selectedOptions[0];
