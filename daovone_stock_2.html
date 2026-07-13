@@ -1744,8 +1744,8 @@ async function openReceiptDetail(receiptId, receipt){
     bg.querySelector('.modal').innerHTML = `
       <h3><svg class="dv-icon"><use href="#i-truck"></use></svg><span class="mono">${receipt.receipt_no || 'ການຮັບເຂົ້າ'}</span></h3>
       <div class="muted" style="font-size:12px;margin-bottom:8px;">
-        ${receipt.supplier_name ? 'ຈາກ: '+receipt.supplier_name : ''}<br>
-        ${fmtDateDMY(receipt.receipt_date)}
+        ${receipt.supplier_name ? 'ຈາກ: '+receipt.supplier_name+'<br>' : ''}${fmtDateDMY(receipt.receipt_date)}<br>
+        <svg class="dv-icon" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-users"></use></svg> ຮັບເຂົ້າໂດຍ: <span style="color:var(--ink);font-weight:600;">${receipt.created_by || '-'}</span>
       </div>
       <hr class="sep">
       ${items.length ? items.map(it=> `
@@ -2406,7 +2406,7 @@ async function loadTransferHistory(month){
     const groups = {};
     rows.forEach(r=>{
       const key = r.ref_id || r.id;
-      if(!groups[key]) groups[key] = { key, note: r.note, date: r.created_at, items: [] };
+      if(!groups[key]) groups[key] = { key, note: r.note, date: r.created_at, created_by: r.created_by, items: [] };
       groups[key].items.push(r);
     });
     const groupList = Object.values(groups);
@@ -2505,6 +2505,8 @@ function openTransferDetail(group){
                 <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.stock_product_units && it.stock_product_units.serial_no ? (' · <span class="mono">'+it.stock_product_units.serial_no+'</span>') : (' × '+it.quantity)}</span>
               </div>`).join('')}
           </div>
+          <hr class="sep">
+          <div class="doc-line" style="font-size:12px;"><svg class="dv-icon"><use href="#i-users"></use></svg>ອອກໃບໂອນໂດຍ: <span style="color:var(--ink);font-weight:600;">${group.created_by || '-'}</span></div>
         </div>
         <div class="doc-footer">ຂອບໃຈທີ່ໃຊ້ບໍລິການ · DAVONE SHOP</div>
       </div>
@@ -2742,6 +2744,8 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
               <span>${p.method==='cash'?'ເງິນສົດ':'ໂອນ'} · ${p.currency||inv.currency||'LAK'} · ${fmtDateDMY(p.payment_date)}</span>
               <span class="mono">${fmtMoney(p.amount)}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''}</span>
             </div>`).join('') : '<div class="empty">ຍັງບໍ່ມີການຈ່າຍບັນທຶກໄວ້</div>'}
+          <hr class="sep">
+          <div class="doc-line" style="font-size:12px;"><svg class="dv-icon"><use href="#i-users"></use></svg>ອອກບິນໂດຍ: <span style="color:var(--ink);font-weight:600;">${inv.created_by || '-'}</span></div>
         </div>
         <div class="doc-footer">ຂອບໃຈທີ່ໃຊ້ບໍລິການ · DAVONE SHOP</div>
       </div>
