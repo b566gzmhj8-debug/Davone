@@ -1072,7 +1072,7 @@ async function submitRecord() {
     if(numLAK>0) lineItems.push({amount:numLAK,currency:"LAK"});
     if(numTHB>0) lineItems.push({amount:numTHB,currency:"THB"});
     if(numUSD>0) lineItems.push({amount:numUSD,currency:"USD"});
-    notifyLine({name:staffState.name,dept:staffState.dept.name,items:lineItems,time:ts});
+    notifyLine({name:staffState.name,dept:staffState.dept.name,items:lineItems,time:ts,method:"cash"});
     showDone(numLAK,numTHB,numUSD);
   } catch(e) {
     console.error(e);
@@ -2284,6 +2284,7 @@ async function confirmStaffBank(btn) {
   const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: _staffBankCur, note, image: _staffBankImg || null };
   try {
     await addBankDeposit(dep);
+    notifyLine({name:userNote,dept:deptName,items:[{amount:num,currency:_staffBankCur}],time:dep.ts,method:"bank"});
     if (navigator.vibrate) navigator.vibrate(80);
     _staffBankImg = null;
     showStaffBankDone(num, _staffBankCur);
