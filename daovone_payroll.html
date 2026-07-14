@@ -143,6 +143,9 @@
   .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
   .btn-xs { padding: 3px 8px; font-size: 0.74rem; }
   .btn-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .hdr-reset { margin-top:4px; display:inline-flex; align-items:center; gap:3px; padding:2px 7px; font-size:0.62rem; font-weight:600; line-height:1; border:1px solid rgba(255,255,255,0.55); background:rgba(255,255,255,0.15); color:#fff; border-radius:6px; cursor:pointer; white-space:nowrap; }
+  .hdr-reset:hover { background:rgba(255,255,255,0.28); }
+  .hdr-reset .ico { width:11px; height:11px; }
 
   /* Bonus badge */
   .bonus-badge {
@@ -537,12 +540,12 @@
             <th style="width:36px">#</th>
             <th>ຊື່ພະນັກງານ</th>
             <th style="width:120px">ເງິນເດືອນ<br>ຕໍ່ 30 ວັນ</th>
-            <th style="width:60px">ວັນ<br>ວຽກ</th>
+            <th style="width:60px">ວັນ<br>ວຽກ<br><button class="hdr-reset" onclick="resetAllDays()" title="ຣີເຊັດວັນວຽກທັງໝົດເປັນ 0"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg> Reset</button></th>
             <th style="width:110px">ລວມ<br>ຕາມວັນ</th>
             <th style="width:120px">ລາຍຮັບ<br>ພິເສດ</th>
             <th style="width:140px">ເບີກລ່ວງໜ້າ<br>(ຄ້າງ / ຫັກເດືອນນີ້)</th>
             <th style="width:115px">ສຸດທິ<br>(ກີບ)</th>
-            <th style="width:54px">ໂອນ<br>ແລ້ວ?</th>
+            <th style="width:54px">ໂອນ<br>ແລ້ວ?<br><button class="hdr-reset" onclick="resetAllPaid()" title="ຣີເຊັດການໂອນທັງໝົດ (ຍົກເລີກຕິກ)"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg> Reset</button></th>
             <th style="width:46px">ບັນຊີ</th>
             <th style="width:50px">ໃບ</th>
           </tr>
@@ -1387,6 +1390,24 @@ function deleteEmployee(i) {
 // ── Toggle paid status ──
 function togglePaid(i) {
   employees[i].paid = !employees[i].paid;
+  autoSave();
+  renderTable();
+}
+
+// ── ຣີເຊັດວັນວຽກທັງໝົດເປັນ 0 ──
+function resetAllDays() {
+  if (!employees.length) return;
+  if (!confirm('ຣີເຊັດ "ວັນວຽກ" ຂອງພະນັກງານທຸກຄົນ (' + employees.length + ' ຄົນ) ໃຫ້ເປັນ 0 ແທ້ບໍ?')) return;
+  employees.forEach(e => e.workDays = 0);
+  autoSave();
+  renderTable();
+}
+
+// ── ຣີເຊັດການໂອນທັງໝົດ (ຍົກເລີກຕິກ) ──
+function resetAllPaid() {
+  if (!employees.length) return;
+  if (!confirm('ຣີເຊັດການ "ໂອນແລ້ວ" ຂອງພະນັກງານທຸກຄົນ (ຍົກເລີກຕິກທັງໝົດ) ແທ້ບໍ?')) return;
+  employees.forEach(e => e.paid = false);
   autoSave();
   renderTable();
 }
