@@ -517,7 +517,11 @@
     .submit-wrap-pro > * { width:100%; max-width:640px; }
 
     /* ── ADMIN dashboard: centered content column inside full-width bg ── */
-    .admin-wrap { padding-left:clamp(16px, calc((100% - 820px)/2), 40%); padding-right:clamp(16px, calc((100% - 820px)/2), 40%); }
+    .admin-wrap { padding-left:clamp(16px, calc((100% - 1000px)/2), 40%); padding-right:clamp(16px, calc((100% - 1000px)/2), 40%); }
+    /* wider popups on MacBook so they don't feel cramped */
+    .bank-modal { max-width:620px; width:72%; padding:28px 30px; }
+    .modal { max-width:460px; }
+    .backup-modal { max-width:620px; }
 
     /* floating bars pin to the app (full width) */
     .theme-btn { bottom:22px; right:22px; }
@@ -1890,7 +1894,7 @@ async function removeBankDeposit(id) {
   try {
     const { error } = await getSupa().from("bank_deposits").delete().eq("id", id);
     if (error) throw error;
-    _bankDepositsCache = null; // invalidate cache
+    // cache is updated optimistically by the caller; don't null it here
   } catch(e) { alert("ລຶບບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
 
@@ -1992,7 +1996,7 @@ function bankHistoryItemHTML(dep) {
         ${dep.image ? `<div style="margin-top:6px"><img src="${dep.image}" style="max-width:100%;border-radius:8px;max-height:170px;object-fit:cover;cursor:zoom-in" onclick="showImgFull('${dep.image}')"></div>` : ""}
         <span class="bank-history-time"><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${fmtDate(dep.ts)}</span>
       </div>
-      <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}')"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+      <button class="bank-delete-btn" onclick="deleteBankDeposit('${dep.id}', this)"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
     </div>`;
 }
 
@@ -2162,19 +2166,25 @@ async function confirmBankDeposit(btn) {
 }
 
 
-async function deleteBankDeposit(id) {
-  // Optimistic update: remove from cache immediately
-  if (_bankDepositsCache) {
-    _bankDepositsCache = _bankDepositsCache.filter(d => d.id !== id);
-  }
-  renderAdmin();
+async function deleteBankDeposit(id, btn) {
+  if (btn && btn.dataset.deleting === "1") return;        // guard against double-tap
+  if (!confirm("ຢືນຢັນລຶບລາຍການນີ້?")) return;             // guard against accidental delete
+  const item = btn ? btn.closest(".bank-history-item") : null;
+  // Instant feedback so it never feels "stuck" while the server responds
+  if (btn) { btn.dataset.deleting = "1"; btn.disabled = true; btn.style.opacity = "0.5"; }
+  if (item) { item.style.opacity = "0.4"; item.style.pointerEvents = "none"; }
+  // Optimistic: drop it from the cache right away
+  if (_bankDepositsCache) _bankDepositsCache = _bankDepositsCache.filter(d => d.id !== id);
   try {
     await removeBankDeposit(id);
+    if (item) item.remove();                               // pull the row out of the open popup
   } catch {
-    // Refresh from server on failure
+    // Roll back on failure
+    if (item) { item.style.opacity = "1"; item.style.pointerEvents = "auto"; }
+    if (btn) { btn.dataset.deleting = "0"; btn.disabled = false; btn.style.opacity = "1"; }
     await fetchBankDeposits();
-    renderAdmin();
   }
+  renderAdmin();
 }
 
 let _staffBankCur = "LAK";
