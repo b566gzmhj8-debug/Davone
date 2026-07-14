@@ -31,9 +31,12 @@ Deno.serve(async (req) => {
 
     const amounts = (items ?? []).map((it: any) => "• " + fmt(it.amount, it.currency)).join("\n");
     const t = time ? new Date(Number(time)) : new Date();
-    const timeStr = t.toLocaleString("th-TH", {
-      dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Bangkok",
-    });
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Bangkok", calendar: "gregory",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).formatToParts(t).map((x) => [x.type, x.value]));
+    const timeStr = `${p.day}/${p.month}/${p.year} ${p.hour}.${p.minute}`;
 
     const text =
       `💰 ມີການມອບເງິນສົດ\n` +
