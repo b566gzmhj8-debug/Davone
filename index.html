@@ -1059,6 +1059,7 @@ function onFileChange(el) {
 }
 
 async function submitRecord() {
+  if (staffState.saving) return;               // block double-submit
   const numLAK=staffState.rawLAK?parseInt(staffState.rawLAK,10):0;
   const numTHB=staffState.rawTHB?parseInt(staffState.rawTHB,10):0;
   const numUSD=staffState.rawUSD?parseInt(staffState.rawUSD,10):0;
@@ -2189,6 +2190,7 @@ async function deleteBankDeposit(id, btn) {
 
 let _staffBankCur = "LAK";
 let _staffBankImg = null;
+let _staffBankSaving = false;   // in-flight guard: blocks double-submit
 function renderStaffBankForm() {
   const d = staffState.dept;
   const app = document.getElementById("app");
@@ -2283,6 +2285,7 @@ function onStaffBankInput(el) {
 }
 
 async function confirmStaffBank(btn) {
+  if (_staffBankSaving) return;                 // block double-submit
   const digits = (document.getElementById("sbank-amt").value || "").replace(/\D/g, "");
   const num = digits ? parseInt(digits, 10) : 0;
   if (num <= 0) return;
@@ -2290,6 +2293,7 @@ async function confirmStaffBank(btn) {
   const deptName = staffState.dept ? staffState.dept.name : "";
   // "S|" prefix marks a STAFF deposit (money went straight to the boss); dept name records the source
   const note = "S|" + deptName + (userNote ? " · " + userNote : "");
+  _staffBankSaving = true;
   btn.disabled = true; btn.textContent = "ກຳລັງບັນທຶກ...";
   const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: _staffBankCur, note, image: _staffBankImg || null };
   try {
@@ -2300,6 +2304,8 @@ async function confirmStaffBank(btn) {
     showStaffBankDone(num, _staffBankCur);
   } catch {
     btn.disabled = false; btn.textContent = "ຢືນຢັນມອບເຂົ້າທະນາຄານ";
+  } finally {
+    _staffBankSaving = false;
   }
 }
 
