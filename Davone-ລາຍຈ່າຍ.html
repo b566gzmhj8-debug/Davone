@@ -19,17 +19,18 @@
 <title>Davone – ລາຍຈ່າຍ</title>
 <style>
 :root{
-  --bg:#060608;
-  --surface:#0e0e12;
-  --card:#131318;
-  --card2:#1a1a22;
-  --border:rgba(255,255,255,0.06);
-  --border-gold:rgba(196,156,60,0.3);
-  --gold:#c49c3c;--gold-lt:#e8c870;--gold-dim:rgba(196,156,60,0.1);
-  --admin:#4a90d9;--admin-dim:rgba(74,144,217,0.1);
-  --goods:#3daa80;--goods-dim:rgba(61,170,128,0.1);
-  --text:#f0f0f0;--text2:#c8c8c8;--muted:#707070;
-  --danger:#c04040;
+  /* ── Royal Sapphire · Dark Blue + Gold ── */
+  --bg:#132145;
+  --surface:#1b2b52;
+  --card:#243867;
+  --card2:#2d447a;
+  --border:rgba(255,255,255,0.09);
+  --border-gold:rgba(232,200,116,0.32);
+  --gold:#e8c874;--gold-lt:#f0d68a;--gold-dim:rgba(232,200,116,0.12);
+  --admin:#5f9de8;--admin-dim:rgba(95,157,232,0.14);
+  --goods:#45c99a;--goods-dim:rgba(69,201,154,0.14);
+  --text:#f2f5fc;--text2:#b3bdd4;--muted:#8f9ab5;
+  --danger:#e06666;
   --font:'Lao MN','Lao Sangam MN',system-ui,sans-serif;
   --mono:'Menlo','Monaco',monospace;
   --sidebar:260px;
@@ -126,7 +127,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .stitle p{font-size:11px;color:var(--muted);margin-top:2px}
 .sbody{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
 .field{display:flex;flex-direction:column;gap:5px}
-.field>label{font-size:11px;font-weight:700;color:#b0b0b0;letter-spacing:.04em}
+.field>label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.04em}
 
 input[type=text],textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font);font-size:14px;padding:9px 12px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
 input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
@@ -141,7 +142,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .tag.active-goods{border-color:var(--goods);background:var(--goods-dim);color:var(--goods)}
 
 .cur-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px}
-.cur-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);color:#808080;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 6px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;border-radius:8px}
+.cur-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);color:#9aa6bd;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 6px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;border-radius:8px}
 .cur-btn:hover{border-color:rgba(255,255,255,0.22);color:var(--text2)}
 .cur-btn .csym{font-size:16px;font-weight:800}
 .cur-btn .cname{font-size:10px;opacity:.7;font-family:var(--font)}
@@ -369,7 +370,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
       </svg>
       <span>ສະຫຼຸບ</span>
     </button>
-    <button class="btn-summary" onclick="exportCSV()" style="background:rgba(61,170,128,0.1);border-color:rgba(61,170,128,0.3);color:#3daa80" title="ສຳຮອງຂໍ້ມູນ CSV">
+    <button class="btn-summary" onclick="exportCSV()" style="background:var(--goods-dim);border-color:rgba(69,201,154,0.35);color:var(--goods)" title="ສຳຮອງຂໍ້ມູນ CSV">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M5 7l3 3 3-3"/><path d="M2 12h12"/></svg>
       <span>ສຳຮອງ</span>
     </button>
