@@ -2305,6 +2305,21 @@ function toggleTheme() {
 applyTheme();
 render();
 
+// ── PIN keyboard support: type the PIN with a physical keyboard ──
+// Works on both the approver (admin) and owner login PIN screens.
+document.addEventListener("keydown", function (e) {
+  if (state.pin !== "admin" && state.pin !== "owner") return;
+  if (!document.querySelector(".pin-wrap")) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key >= "0" && e.key <= "9") {
+    e.preventDefault();
+    tapPin(e.key, state.pin);
+  } else if (e.key === "Backspace" || e.key === "Delete") {
+    e.preventDefault();
+    tapPin("DEL", state.pin);
+  }
+});
+
 function showImgFull(src) {
   const overlay = document.createElement("div");
   overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow:hidden";
