@@ -530,6 +530,67 @@
     .modal-img-box { max-width:720px; max-height:90vh; }
     .modal-img.rot-side { height:auto; max-height:82vh; }
   }
+
+/* ═══════════ ADMIN / OWNER REDESIGN — C1 LEDGER ═══════════ */
+.av-wrap{padding:16px 14px 60px;max-width:1120px;margin:0 auto;font-family:'Noto Sans Lao',system-ui,sans-serif}
+.av-mono{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;font-variant-numeric:tabular-nums}
+.av-hero{background:linear-gradient(120deg,#0f1d33,#1d3a5f);color:#fff;padding:22px 24px;border-radius:16px 16px 0 0}
+.av-hero .r1{display:flex;align-items:center;gap:12px}
+.av-hero .av-seal{width:42px;height:42px;border-radius:9px;border:1.5px solid #c9a227;color:#c9a227;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex-shrink:0;font-family:'Noto Serif Lao',serif}
+.av-hero h1{font-size:18px;font-weight:800;line-height:1.2;color:#fff;margin:0}
+.av-hero .sub{font-size:10px;letter-spacing:2px;color:#9fb2cf;text-transform:uppercase;margin-top:3px}
+.av-hero .period{margin-left:auto;text-align:right}
+.av-hero .period .s{font-size:9px;letter-spacing:2px;color:#9fb2cf;text-transform:uppercase}
+.av-hero .period .b{font-weight:700;font-size:14px;margin-top:2px;color:#fff}
+.av-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px}
+.av-kk{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:11px 14px}
+.av-kk .k{font-size:10.5px;color:#9fb2cf}
+.av-kk .v{font-size:18px;font-weight:800;font-family:'IBM Plex Mono',monospace;margin-top:4px;line-height:1.1;color:#fff}
+.av-kk .v small{font-size:10px;color:#c9a227;font-weight:600}
+.av-kk.warn .v{color:#ffcf6b}
+.av-summary{background:#fff;border:1px solid #e3e7ee;border-top:none;border-radius:0 0 16px 16px;padding:14px 18px;margin-bottom:16px}
+.av-seg{display:flex;background:#e5e9f0;border-radius:12px;padding:4px;gap:4px;margin:0 0 16px}
+.av-seg button{flex:1;font-family:inherit;font-size:14px;font-weight:700;padding:11px;border-radius:9px;border:none;background:transparent;color:#5a6675;cursor:pointer}
+.av-seg button.on{background:#0f1d33;color:#fff;box-shadow:0 2px 8px rgba(15,29,51,.25)}
+.av-card{background:#fff;border:1px solid #e3e7ee;border-radius:14px;overflow:hidden;margin-bottom:16px}
+.av-card .hd{padding:13px 18px;border-bottom:1px solid #eef1f5;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#0f1d33;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.av-card .hd .c2{color:#8a94a3;font-weight:700}
+.av-card .bd{padding:14px 18px}
+.av-scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.av-tbl{width:100%;border-collapse:collapse}
+.av-tbl thead td{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#8a94a3;padding:11px 8px;border-bottom:1px solid #dfe3ea;font-weight:700;white-space:nowrap}
+.av-tbl tbody td{padding:12px 8px;font-size:13.5px;border-bottom:1px solid #eef1f5;color:#26333f;vertical-align:middle}
+.av-tbl tbody tr:last-child td{border-bottom:none}
+.av-tbl td.r{text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.av-tbl td.c{text-align:center}
+.av-tbl tr.tot td{border-top:2px solid #0f1d33;font-weight:800;padding-top:12px}
+.av-tbl tr.tot td.r{color:#0f6b3d}
+.av-tbl.zebra tbody tr:nth-child(even){background:#fafbfc}
+.av-dname{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.av-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.av-sub2{font-size:11px;color:#9aa3b1}
+.av-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;white-space:nowrap;border:none;font-family:inherit;line-height:1}
+.av-pill.wait{color:#a8791a;background:#fbf1d6}
+.av-pill.ok{color:#0f7a44;background:#e2f3ea}
+button.av-pill{cursor:pointer}
+.av-act{width:32px;height:32px;border-radius:8px;border:1px solid #dbe0e8;background:#f6f8fb;color:#3a4757;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle}
+.av-act.del{border-color:#e6b0a8;background:#fdeeec;color:#c0392b}
+.av-act svg{width:15px;height:15px}
+.av-barwrap{height:9px;background:#e7ebf1;border-radius:6px;overflow:hidden;margin:4px 0 8px}
+.av-barwrap>i{display:block;height:100%;border-radius:6px;transition:width .5s}
+.av-btn{font-family:inherit;font-size:13px;font-weight:700;border-radius:11px;padding:13px 16px;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.av-btn.full{width:100%}
+.av-btn.blue{background:#1c3357;color:#fff}
+.av-btn.green{background:#0f6b3d;color:#fff}
+.av-btn.ghost{background:#fff;color:#1c3357;border:1.5px solid #cdd6e2}
+.av-btn.warnb{background:#12203a;color:#ffcf6b;border:1.5px solid #c9a227}
+.av-btn.danger{background:#fff;color:#c0392b;border:1.5px solid #eabbb4}
+.av-note{background:#fbf1d6;color:#8a6d1a;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:12px;line-height:1.6}
+.av-mpick{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.av-mpick select{flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid #d3dae4;background:#fff;color:#16202e;font-family:inherit;font-size:14px}
+.av-empty{text-align:center;color:#9aa3b1;padding:30px 0;font-size:13px}
+@media(min-width:900px){.av-wrap{padding:24px 22px 70px}}
+
 </style>
 </head>
 <body>
@@ -680,6 +741,7 @@ function fmtTHB(n) { return (n||0).toLocaleString("th-TH") + " ບາດ"; }
 function fmtUSD(n) { return "$" + (n||0).toLocaleString("en-US"); }
 function fmtAmt(n,c) { return c==="THB" ? fmtTHB(n) : c==="USD" ? fmtUSD(n) : fmtKIP(n); }
 function fmtDate(ts) { return new Date(ts).toLocaleDateString("lo-LA",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
+function fmtShort(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,"0");return p(d.getDate())+"/"+p(d.getMonth()+1)+" "+p(d.getHours())+"."+p(d.getMinutes());}
 function fmtNum(d) { return d ? d.replace(/\B(?=(\d{3})+(?!\d))/g,".") : ""; }
 function todayKey() { const d=new Date(); return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function monthKey() { const d=new Date(); return d.getFullYear()+"-"+d.getMonth(); }
@@ -1241,13 +1303,10 @@ const CUR_DISPLAY = {
 const CUR_ORDER = ["LAK", "THB", "USD"];
 
 function recordsHTML(filtered, isOwner) {
-  if(filtered.length===0) return `<div class="empty">${isOwner?"ຍັງບໍ່ມີລາຍການທີ່ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
+  if(filtered.length===0) return `<div class="av-empty">${isOwner?"ຍັງບໍ່ມີລາຍການທີ່ສຳເລັດ":"ຍັງບໍ່ມີລາຍການ"}</div>`;
 
-  // Group records: a single staff submission may create up to 3 rows (LAK/THB/USD)
-  // sharing the same department & a timestamp within 5 seconds of each other.
   const used = new Set();
   const groups = [];
-  // For owner: sort verified by approvedAt desc, then unverified by timestamp desc
   const sorted = [...filtered].sort((a,b) => {
     const aSort = (a.verified && a.approvedAt) ? a.approvedAt : a.timestamp;
     const bSort = (b.verified && b.approvedAt) ? b.approvedAt : b.timestamp;
@@ -1257,7 +1316,6 @@ function recordsHTML(filtered, isOwner) {
     if(used.has(r.id)) continue;
     used.add(r.id);
     const members = [r];
-    // Find any other un-used records: same dept, different currency, within 5000ms
     let found = true;
     while(found) {
       found = false;
@@ -1270,7 +1328,6 @@ function recordsHTML(filtered, isOwner) {
       if(partner) { used.add(partner.id); members.push(partner); found = true; }
     }
     if(members.length > 1) {
-      // Sort members by canonical currency order (LAK, THB, USD) for consistent display
       members.sort((a,b) => CUR_ORDER.indexOf(a.currency||"LAK") - CUR_ORDER.indexOf(b.currency||"LAK"));
       groups.push({ type:"group", members, dept:r.department, departmentName:r.departmentName, timestamp:r.timestamp });
     } else {
@@ -1278,65 +1335,55 @@ function recordsHTML(filtered, isOwner) {
     }
   }
 
-  return groups.map(g => {
-    const dept=DEPTS.find(d=>d.id===g.dept)||{icon:BOX_ICON,name:g.departmentName,color:"#999"};
-    const iconHtml = DEPT_IMGS[dept.id]
-      ? `<img src="${DEPT_IMGS[dept.id]}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px;" alt="">`
-      : (dept.icon + " ");
+  const pill = (verified, onclick) => {
+    if (verified) return isOwner
+      ? `<span class="av-pill ok">${CHECK_ICON} ສຳເລັດ</span>`
+      : `<button class="av-pill ok" onclick="${onclick}">${CHECK_ICON} ກວດແລ້ວ</button>`;
+    return isOwner
+      ? `<span class="av-pill wait">${WAIT_ICON} ລໍຖ້າ</span>`
+      : `<button class="av-pill wait" onclick="${onclick}">${WAIT_ICON} ກົດຢືນຢັນ</button>`;
+  };
+  const viewBtn = (imgId) => imgId!=null ? `<button class="av-act" onclick="viewBill(${imgId})" title="ເບິ່ງບິນ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>` : "";
+  const delBtn = (onclick) => !isOwner ? `<button class="av-act del" onclick="${onclick}" title="ລຶບ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>` : "";
 
-    if(g.type==="group") {
+  const rows = groups.map(g => {
+    const dept=DEPTS.find(d=>d.id===g.dept)||{icon:BOX_ICON,name:g.departmentName,color:"#8a94a3"};
+    let amtHTML, verified, note, imgId=null, ids="", when, id;
+    if (g.type==="group") {
       const { members } = g;
-      const verified = members.every(m => m.verified);
-      const note = members.map(m => m.note).find(n => n) || "";
+      verified = members.every(m => m.verified);
+      note = members.map(m => m.note).find(n => n) || "";
       const imgMember = members.find(m => m.hasImage);
-      const hasImage = !!imgMember;
-      const imageId = imgMember ? imgMember.id : null;
-      const ids = members.map(m => m.id).join(",");
-      const flagsStr = members.map(m => CUR_DISPLAY[m.currency||"LAK"].flag).join("");
+      imgId = imgMember ? imgMember.id : null;
+      ids = members.map(m => m.id).join(",");
       const lastApprovedAt = members.reduce((mx,m) => m.approvedAt && m.approvedAt>mx ? m.approvedAt : mx, 0);
-      return `<div class="record-card" style="border-left-color:${dept.color}">
-        <div class="record-top">
-          <span class="record-dept">${iconHtml}${g.departmentName}</span>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-            ${members.map((m,i) => {
-              const cInfo = CUR_DISPLAY[m.currency||"LAK"];
-              const color = cInfo.color || dept.color;
-              const fontSize = i===0 ? "" : "font-size:13px;";
-              return `<span class="record-amt" style="color:${color};${fontSize}">${fmtAmt(m.amount, m.currency||"LAK")}</span>`;
-            }).join("")}
-          </div>
-        </div>
-        <div class="record-meta">
-          <span class="record-time">${fmtDate(isOwner && verified && lastApprovedAt ? lastApprovedAt : g.timestamp)} ${flagsStr}</span>
-          <span class="status-badge ${verified?"status-done":"status-wait"}">${verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ລໍຖ້າ'}</span>
-        </div>
-        ${note?`<div class="record-name"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ${note}</div>`:""}
-        <div class="record-actions">
-          ${hasImage?`<button class="view-btn" onclick="viewBill(${imageId})"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${verified?"done":"wait"}" onclick="tapVerifyGroup('${ids}')">${verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ກົດຢືນຢັນ'}</button>`:""}
-          ${!isOwner?`<button class="delete-btn" onclick="confirmDeleteGroup('${ids}')"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>`:""}
-        </div>
-      </div>`;
+      when = (isOwner && verified && lastApprovedAt) ? lastApprovedAt : g.timestamp;
+      amtHTML = members.map(m => {
+        const cInfo = CUR_DISPLAY[m.currency||"LAK"];
+        return `<div style="color:${cInfo.color||dept.color}">${fmtAmt(m.amount, m.currency||"LAK")}</div>`;
+      }).join("");
     } else {
-      const r = g.r;
-      return `<div class="record-card" style="border-left-color:${dept.color}">
-        <div class="record-top">
-          <span class="record-dept">${iconHtml}${r.departmentName}</span>
-          <span class="record-amt" style="color:${dept.color}">${fmtAmt(r.amount,r.currency||"LAK")}</span>
-        </div>
-        <div class="record-meta">
-          <span class="record-time">${fmtDate(isOwner && r.verified && r.approvedAt ? r.approvedAt : r.timestamp)} ${CUR_DISPLAY[r.currency||"LAK"].flag}</span>
-          <span class="status-badge ${r.verified?"status-done":"status-wait"}">${r.verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ລໍຖ້າ'}</span>
-        </div>
-        ${r.note?`<div class="record-name"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ${r.note}</div>`:""}
-        <div class="record-actions">
-          ${r.hasImage?`<button class="view-btn" onclick="viewBill(${r.id})"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> ເບິ່ງບິນ</button>`:""}
-          ${!isOwner?`<button class="verify-btn ${r.verified?"done":"wait"}" onclick="tapVerify(${r.id})">${r.verified?CHECK_ICON+' ສຳເລັດ':WAIT_ICON+' ກົດຢືນຢັນ'}</button>`:""}
-          ${!isOwner?`<button class="delete-btn" onclick="confirmDelete(${r.id})"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>`:""}
-        </div>
-      </div>`;
+      const r = g.r; id = r.id;
+      verified = r.verified; note = r.note || ""; imgId = r.hasImage ? r.id : null;
+      when = (isOwner && r.verified && r.approvedAt) ? r.approvedAt : r.timestamp;
+      const cInfo = CUR_DISPLAY[r.currency||"LAK"];
+      amtHTML = `<div style="color:${cInfo.color||dept.color}">${fmtAmt(r.amount, r.currency||"LAK")}</div>`;
     }
+    const vOnclick = g.type==="group" ? `tapVerifyGroup('${ids}')` : `tapVerify(${id})`;
+    const dOnclick = g.type==="group" ? `confirmDeleteGroup('${ids}')` : `confirmDelete(${id})`;
+    return `<tr>
+      <td class="av-mono">${fmtShort(when)}</td>
+      <td><span class="av-dname"><span class="av-dot" style="background:${dept.color}"></span>${g.departmentName}</span></td>
+      <td>${note?note:'<span class="av-sub2">—</span>'}</td>
+      <td class="r">${amtHTML}</td>
+      <td class="c">${pill(verified, vOnclick)}</td>
+      <td class="c" style="white-space:nowrap">${viewBtn(imgId)}${delBtn(dOnclick)}</td>
+    </tr>`;
   }).join("");
+
+  return `<div class="av-scrollx"><table class="av-tbl zebra">
+    <thead><tr><td>ວັນທີ່</td><td>ພະແນກ</td><td>ພະນັກງານ</td><td class="r">ຈຳນວນ</td><td class="c">ສະຖານະ</td><td></td></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
 }
 
 async function tapVerifyGroup(idsStr) {
@@ -1427,35 +1474,17 @@ function storageHTML(records) {
   const { totalBytes, pct } = calcStorage(records);
   const mb = (totalBytes / (1024*1024)).toFixed(2);
   const maxMb = 500;
-  // Minimum bar width 3% so it's always visible
   const barWidth = Math.max(pct, 3);
-  let barColor = "#27ae60";
+  let barColor = "#1f9d55";
   let warnHTML = "";
-  if(pct >= 90) {
-    barColor = "#e74c3c";
-    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fdecea;color:#e74c3c;font-size:12px;font-weight:700;text-align:center"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> ໃກ້ຈະເຕັມແລ້ວ! Export ຂໍ້ມູນດ່ວນ!</div>';
-  } else if(pct >= 70) {
-    barColor = "#f39c12";
-    warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fff8e1;color:#f39c12;font-size:12px;font-weight:700;text-align:center"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> Storage ໃຊ້ໄປ ' + pct + '% ຄວນ Backup ຂໍ້ມູນ</div>';
-  } else if(pct >= 50) {
-    barColor = "#f39c12";
-  }
+  if(pct >= 90) { barColor = "#e74c3c"; warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fdecea;color:#c0392b;font-size:12px;font-weight:700;text-align:center">⚠ ໃກ້ຈະເຕັມແລ້ວ — Export ຂໍ້ມູນດ່ວນ!</div>'; }
+  else if(pct >= 70) { barColor = "#e0932a"; warnHTML = '<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#fff5df;color:#a8791a;font-size:12px;font-weight:700;text-align:center">⚠ Storage ໃຊ້ໄປ '+pct+'% — ຄວນ Backup ຂໍ້ມູນ</div>'; }
+  else if(pct >= 50) { barColor = "#e0932a"; }
   const displayPct = pct < 0.01 ? "< 0.01" : pct;
-  return '<div style="background:#1e2d40;border:1.5px solid #2d4a6a;border-radius:14px;padding:14px 16px;margin-bottom:12px;">'
-    + '<div style="font-size:12px;font-weight:700;color:#7fb3d3;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> ການໃຊ້ Storage (Supabase Free 500MB)</div>'
-    + '<div style="background:#0d1117;border-radius:20px;height:14px;overflow:hidden;margin-bottom:8px;">'
-    + '<div style="height:100%;border-radius:20px;width:' + barWidth + '%;background:' + barColor + ';transition:width 0.5s;"></div>'
-    + '</div>'
-    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:#ccc;margin-bottom:4px;">'
-    + '<span>ໃຊ້ໄປ: <b>~' + mb + ' MB</b></span>'
-    + '<span><b>' + displayPct + '%</b> / 500 MB</span>'
-    + '</div>'
-    + '<div style="display:flex;justify-content:space-between;font-size:12px;color:#888;">'
-    + '<span>Records: ' + records.length + ' ລາຍການ</span>'
-    + '<span>ເຫຼືອ: ~' + (maxMb - parseFloat(mb)).toFixed(1) + ' MB</span>'
-    + '</div>'
-    + warnHTML
-    + '</div>';
+  const left = (maxMb - parseFloat(mb)).toFixed(1);
+  return `<div class="av-card"><div class="hd"><span>💾 Storage · Supabase Free 500MB</span><span class="c2 av-mono">${displayPct}% / 500MB</span></div>
+    <div class="bd"><div class="av-barwrap"><i style="width:${barWidth}%;background:${barColor}"></i></div>
+    <div class="av-sub2">ໃຊ້ໄປ ~${mb} MB · Records ${records.length} · ເຫຼືອ ~${left} MB</div>${warnHTML}</div></div>`;
 }
 
 function renderAdmin() {
@@ -1481,9 +1510,9 @@ function renderAdmin() {
   const {y:ny, m:nm} = nowYearMonth();
   const thisMonthKey = ny+"-"+nm;
   const monthPickerHTML = (adminTab==="month"||adminTab==="all") ? `
-    <div class="month-row">
-      <span class="month-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg> ເດືອນ:</span>
-      <select class="month-picker" onchange="setFilterMonth(this.value)">
+    <div class="av-mpick">
+      <span class="av-sub2" style="font-size:13px;flex-shrink:0">ເດືອນ:</span>
+      <select onchange="setFilterMonth(this.value)">
         <option value="">ທຸກເດືອນ</option>
         ${months.map(mk => {
           const [my,mm] = mk.split("-").map(Number);
@@ -1494,66 +1523,76 @@ function renderAdmin() {
 
   let deptHTML = "";
   if(byDept.length>0) {
-    deptHTML = `<div class="dept-summary"><div class="section-title">ສະຫຼຸບຕາມພະແນກ</div>
-      ${byDept.map(d=>{
-        const iconHtml = DEPT_IMGS[d.id]
-          ? `<img src="${DEPT_IMGS[d.id]}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px;" alt="">`
-          : (d.icon + " ");
-        return `<div class="dept-sum-row">
-          <span>${iconHtml}${d.name}</span>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-            ${d.lak>0?`<span style="font-weight:700;font-size:13px;color:${d.color}">${fmtKIP(d.lak)}</span>`:""}
-            ${d.thb>0?`<span style="font-weight:700;font-size:13px;color:#2980b9">${fmtTHB(d.thb)}</span>`:""}
-            ${d.usd>0?`<span style="font-weight:700;font-size:13px;color:#27ae60">${fmtUSD(d.usd)}</span>`:""}
-            <span style="font-size:11px;color:#aaa">${d.count} ລາຍການ</span>
-          </div>
-        </div>`;
-      }).join("")}
-    </div>`;
+    deptHTML = `<div class="av-card"><div class="hd"><span>ສະຫຼຸບຕາມພະແນກ</span><span class="c2">${byDept.length} ພະແນກ</span></div>
+      <div class="av-scrollx"><table class="av-tbl zebra"><tbody>
+      ${byDept.map(d=>`<tr>
+          <td><span class="av-dname"><span class="av-dot" style="background:${d.color}"></span>${d.name}</span></td>
+          <td class="r">
+            ${d.lak>0?`<div style="color:${d.color}">${fmtKIP(d.lak)}</div>`:""}
+            ${d.thb>0?`<div style="color:#245bbd">${fmtTHB(d.thb)}</div>`:""}
+            ${d.usd>0?`<div style="color:#0f6b3d">${fmtUSD(d.usd)}</div>`:""}
+          </td>
+          <td class="r av-sub2" style="font-family:'IBM Plex Mono',monospace">${d.count}</td>
+        </tr>`).join("")}
+      </tbody></table></div></div>`;
   }
 
   let tabLabel = adminTab==="today" ? "ຍອດລວມມື້ນີ້"
                : adminTab==="month" ? (filterMonth ? monthName(...filterMonth.split("-").map(Number)) : "ຍອດລວມເດືອນນີ້")
                : filterMonth ? monthName(...filterMonth.split("-").map(Number)) : "ຍອດລວມທັງໝົດ";
 
+  const periodLabel = adminTab==="today" ? "ມື້ນີ້"
+               : adminTab==="month" ? (filterMonth ? monthName(...filterMonth.split("-").map(Number)) : "ເດືອນນີ້")
+               : filterMonth ? monthName(...filterMonth.split("-").map(Number)) : "ທັງໝົດ";
+
   const clearHTML = !isOwner ? `
-    <div class="safety-note">
-      <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6l7-3z"/></svg> <b>ຂໍ້ມູນທຸກເດືອນຈະຖືກເກັບໄວ້ຕະຫຼອດ</b><br>
-      ຖ້າຢາກລ້າງຂໍ້ມູນ ຕ້ອງໃສ່ PIN ຢືນຢັນທຸກຄັ້ງ
-    </div>
-    <div class="backup-row">
-      <button class="backup-btn" onclick="doBackup()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Backup ຂໍ້ຄວາມ</button>
-      <button class="restore-btn" onclick="document.getElementById('restore-file').click()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0l-4 4m4-4l4 4M4 21h16"/></svg> Restore JSON</button>
+    <div class="av-note">🛡 <b>ຂໍ້ມູນທຸກເດືອນຈະຖືກເກັບໄວ້ຕະຫຼອດ</b> — ຖ້າຢາກລ້າງ ຕ້ອງໃສ່ PIN ຫົວໜ້າ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <button class="av-btn ghost" onclick="doBackup()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Backup ຂໍ້ຄວາມ</button>
+      <button class="av-btn ghost" onclick="document.getElementById('restore-file').click()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0l-4 4m4-4l4 4M4 21h16"/></svg> Restore JSON</button>
       <input type="file" id="restore-file" accept=".json" class="hidden" onchange="doRestore(this)">
     </div>
-    <button class="backup-btn" style="width:100%;margin-bottom:10px;background:#1a6a4f" onclick="doBackupJSON()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Export JSON (ສຳຮອງຂໍ້ມູນ)</button>
-    <button class="clear-btn-safe" onclick="confirmClearMonth()"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg> ລ້າງຂໍ້ມູນເດືອນທີ່ເລືອກ (ຕ້ອງ PIN)</button>
-    <button class="clear-btn" onclick="confirmClearAll()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> ລ້າງຂໍ້ມູນທັງໝົດ (ຕ້ອງ PIN)</button>
+    <button class="av-btn green full" style="margin-bottom:10px" onclick="doBackupJSON()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Export JSON (ສຳຮອງຂໍ້ມູນ)</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="av-btn warnb" onclick="confirmClearMonth()"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg> ລ້າງເດືອນ (PIN)</button>
+      <button class="av-btn danger" onclick="confirmClearAll()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg> ລ້າງທັງໝົດ (PIN)</button>
+    </div>
   ` : "";
 
-  const html = `<div class="admin-wrap">
-    <div class="total-card">
-      <div class="total-label">${tabLabel}</div>
-      <div class="total-amount">${totalLAK>0?fmtKIP(totalLAK):""}</div>
-      <div class="total-amount2">${totalTHB>0?fmtTHB(totalTHB):""}</div>
-      <div class="total-amount3">${totalUSD>0?fmtUSD(totalUSD):""}</div>
-      ${totalLAK===0&&totalTHB===0&&totalUSD===0?`<div class="total-amount">${fmtKIP(0)}</div>`:""}
-      <div class="total-count">${filtered.length} ລາຍການ | ທັງໝົດໃນລະບົບ ${adminRecords.length} ລາຍການ</div>
-      ${!isOwner&&pending>0?`<span class="pending-badge">${WAIT_ICON} ລໍຖ້າກວດສອບ ${pending} ລາຍການ</span>`:""}
+  const html = `<div class="av-wrap">
+    <div class="av-hero">
+      <div class="r1">
+        <div class="av-seal">ດ</div>
+        <div><h1>ຮ້ານດາວອນ ພັດທະນາກະສິກຳ</h1><div class="sub">${isOwner?"Financial Report · ຫົວໜ້າ":"Financial Ledger · ໜ້າກວດສອບ"}</div></div>
+        <div class="period"><div class="s">ໄລຍະ</div><div class="b">${periodLabel}</div></div>
+      </div>
+      <div class="av-kpis">
+        <div class="av-kk"><div class="k">ຍອດລວມ (ກີບ)</div><div class="v">${(totalLAK||0).toLocaleString("lo-LA")} <small>ກີບ</small></div></div>
+        ${totalTHB>0?`<div class="av-kk"><div class="k">ສະກຸນບາດ</div><div class="v">${totalTHB.toLocaleString("th-TH")} <small>ບາດ</small></div></div>`:""}
+        ${totalUSD>0?`<div class="av-kk"><div class="k">USD</div><div class="v">${totalUSD.toLocaleString("en-US")} <small>USD</small></div></div>`:""}
+        ${!isOwner?`<div class="av-kk warn"><div class="k">ລໍຖ້າກວດສອບ</div><div class="v">${pending} <small>ລາຍການ</small></div></div>`:""}
+        <div class="av-kk"><div class="k">ລາຍການ / ຮູບ</div><div class="v">${filtered.length} <small>/ ${adminRecords.length}</small></div></div>
+      </div>
     </div>
-    ${storageHTML(adminRecords)}
-    ${bankCashSummaryHTML(adminRecords)}
-    <button class="btn-bank" style="margin-top:10px;background:#1B2A4A;border:1px solid #1B2A4A" onclick="openBankHistoryModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດການມອບເຂົ້າບັນຊີ (${getBankDeposits().length})</button>
-    <div class="tabs">
-      <button class="tab ${adminTab==="today"?"active":""}" data-tab="today" onclick="setTab('today')">ມື້ນີ້</button>
-      <button class="tab ${adminTab==="month"?"active":""}" data-tab="month" onclick="setTab('month')">ເດືອນ</button>
-      <button class="tab ${adminTab==="all"?"active":""}" data-tab="all" onclick="setTab('all')">ທັງໝົດ</button>
+    <div class="av-summary">${bankCashSummaryHTML(adminRecords)}</div>
+
+    <button class="av-btn blue full" style="margin-bottom:16px" onclick="openBankHistoryModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດການມອບເຂົ້າບັນຊີ (${getBankDeposits().length})</button>
+
+    <div class="av-seg">
+      <button class="${adminTab==="today"?"on":""}" onclick="setTab('today')">ມື້ນີ້</button>
+      <button class="${adminTab==="month"?"on":""}" onclick="setTab('month')">ເດືອນ</button>
+      <button class="${adminTab==="all"?"on":""}" onclick="setTab('all')">ທັງໝົດ</button>
     </div>
     ${monthPickerHTML}
+
+    <div class="av-card">
+      <div class="hd"><span>ບັນທຶກລາຍການ</span><span class="c2">${filtered.length} ລາຍການ</span></div>
+      <div id="rec-list">${recordsHTML(filtered, isOwner)}</div>
+    </div>
+
     ${deptHTML}
+    ${storageHTML(adminRecords)}
     ${clearHTML}
-    <div class="section-title">ລາຍການ</div>
-    <div id="rec-list">${recordsHTML(filtered, isOwner)}</div>
   </div>`;
 
   const existing = app.querySelector(".admin-scroll");
@@ -1565,11 +1604,11 @@ function renderAdmin() {
     return;
   }
 
-  const oldContent = app.querySelector(".admin-wrap,.loading");
+  const oldContent = app.querySelector(".av-wrap,.admin-wrap,.loading");
   if(oldContent) oldContent.remove();
   const scrollDiv = document.createElement("div");
   scrollDiv.className = "admin-scroll";
-  scrollDiv.style = "overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - 52px);background:#1a1a2e";
+  scrollDiv.style = "overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - 52px);background:#eceff4";
   scrollDiv.innerHTML = html;
   app.appendChild(scrollDiv);
 }
@@ -1922,71 +1961,27 @@ function calcCashBalance(records, currency) {
 }
 
 function bankCashSummaryHTML(records) {
-  const lakBal = calcCashBalance(records, "LAK");
-  const thbBal = calcCashBalance(records, "THB");
-  const usdBal = calcCashBalance(records, "USD");
-  const deposits = getBankDeposits();
-
-  let rowsHTML = "";
-  if (lakBal.cashRecords > 0 || lakBal.toBoss > 0) {
-    rowsHTML += `
-      <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ເງິນສົດຄ້າງ (ກີບ) <span style="font-size:10px;color:#a89f88">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
-        <span class="cash-row-value gold">${fmtKIP(lakBal.withAdmin)}</span>
-      </div>
-      <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ເຂົ້າບັນຊີຫົວໜ້າ (ກີບ)</span>
-        <span class="cash-row-value blue">${fmtKIP(lakBal.toBoss)}</span>
-      </div>
-      <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg> ຍອດລວມທັງໝົດ (ກີບ)</span>
-        <span class="cash-row-value green">${fmtKIP(lakBal.grand)}</span>
-      </div>`;
+  const bal = { LAK:calcCashBalance(records,"LAK"), THB:calcCashBalance(records,"THB"), USD:calcCashBalance(records,"USD") };
+  const fmtN = { LAK:n=>(n||0).toLocaleString("lo-LA"), THB:n=>(n||0).toLocaleString("th-TH"), USD:n=>(n||0).toLocaleString("en-US") };
+  const label = { LAK:"ກີບ", THB:"ບາດ", USD:"USD" };
+  const active = ["LAK","THB","USD"].filter(c => bal[c].cashRecords>0 || bal[c].toBoss>0);
+  let inner;
+  if (!active.length) {
+    inner = `<div class="av-empty">ຍັງບໍ່ມີລາຍການ</div>`;
+  } else {
+    const head = `<td>ລາຍການ</td>` + active.map(c=>`<td class="r">${label[c]}</td>`).join("");
+    const rowCash = `<td>ເງິນສົດຄ້າງ <span class="av-sub2">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></td>` + active.map(c=>`<td class="r" style="color:#a67c1a">${fmtN[c](bal[c].withAdmin)}</td>`).join("");
+    const rowBank = `<td>ເຂົ້າບັນຊີຫົວໜ້າ</td>` + active.map(c=>`<td class="r" style="color:#245bbd">${fmtN[c](bal[c].toBoss)}</td>`).join("");
+    const rowTot = `<td>ຍອດລວມທັງໝົດ</td>` + active.map(c=>`<td class="r">${fmtN[c](bal[c].grand)}</td>`).join("");
+    inner = `<div class="av-scrollx"><table class="av-tbl">
+      <thead><tr>${head}</tr></thead>
+      <tbody><tr>${rowCash}</tr><tr>${rowBank}</tr><tr class="tot">${rowTot}</tr></tbody>
+    </table></div>`;
   }
-  if (thbBal.cashRecords > 0 || thbBal.toBoss > 0) {
-    rowsHTML += `
-      <div class="cash-row" style="margin-top:14px">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ເງິນສົດຄ້າງ (ບາດ) <span style="font-size:10px;color:#a89f88">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
-        <span class="cash-row-value gold">${fmtTHB(thbBal.withAdmin)}</span>
-      </div>
-      <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ເຂົ້າບັນຊີຫົວໜ້າ (ບາດ)</span>
-        <span class="cash-row-value blue">${fmtTHB(thbBal.toBoss)}</span>
-      </div>
-      <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg> ຍອດລວມທັງໝົດ (ບາດ)</span>
-        <span class="cash-row-value green">${fmtTHB(thbBal.grand)}</span>
-      </div>`;
-  }
-  if (usdBal.cashRecords > 0 || usdBal.toBoss > 0) {
-    rowsHTML += `
-      <div class="cash-row" style="margin-top:14px">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ເງິນສົດຄ້າງ (USD) <span style="font-size:10px;color:#a89f88">· ຍັງບໍ່ເຂົ້າທະນາຄານ</span></span>
-        <span class="cash-row-value gold">${fmtUSD(usdBal.withAdmin)}</span>
-      </div>
-      <div class="cash-row">
-        <span class="cash-row-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ເຂົ້າບັນຊີຫົວໜ້າ (USD)</span>
-        <span class="cash-row-value blue">${fmtUSD(usdBal.toBoss)}</span>
-      </div>
-      <div class="cash-row">
-        <span class="cash-row-label" style="font-weight:700;color:#232323"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg> ຍອດລວມທັງໝົດ (USD)</span>
-        <span class="cash-row-value green">${fmtUSD(usdBal.grand)}</span>
-      </div>`;
-  }
-  if (!rowsHTML) {
-    rowsHTML = `<div style="text-align:center;color:#888;padding:10px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`;
-  }
-
-  return `<div class="cash-summary-card">
-    <div class="cash-summary-title"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ສະຫຼຸບເງິນ (ຄ້າງ / ເຂົ້າທະນາຄານ)</div>
-    ${rowsHTML}
-    <button class="btn-bank" style="margin-top:16px" onclick="openBankModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ບັນທຶກມອບທະນາຄານ (ຂອງຜູ້ຮັບ)</button>
-  </div>`;
+  return `${inner}
+    <button class="av-btn blue full" style="margin-top:12px" onclick="openBankModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ບັນທຶກມອບທະນາຄານ (ຂອງຜູ້ຮັບ)</button>`;
 }
 
-// Two separate, independently-scrollable cards — one for money staff handed straight
-// to the boss's account, one for money the receiver banked themself. Kept apart so
-// the two sources never blur together.
 function bankHistoryItemHTML(dep) {
   const note = depDisplayNote(dep);
   return `
