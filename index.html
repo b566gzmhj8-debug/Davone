@@ -646,6 +646,12 @@ async function dbSave(rec) {
   if (error) throw error;
 }
 
+async function notifyLine(payload) {
+  // Fire-and-forget: never block or break the submit if LINE fails
+  try { await getSupa().functions.invoke("dynamic-responder", { body: payload }); }
+  catch (e) { console.warn("LINE notify failed", e); }
+}
+
 async function dbUpdate(id, patch) {
   await getSupa().from("records").update(patch).eq("id", id);
 }
@@ -1062,6 +1068,11 @@ async function submitRecord() {
     if(numLAK>0) { await dbSave({id:ts,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numLAK,currency:"LAK",note:staffState.name,image:staffState.img}); imgUsed = true; }
     if(numTHB>0) { await dbSave({id:ts+1,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numTHB,currency:"THB",note:staffState.name,image:imgUsed?null:staffState.img}); imgUsed = true; }
     if(numUSD>0) { await dbSave({id:ts+2,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numUSD,currency:"USD",note:staffState.name,image:imgUsed?null:staffState.img}); imgUsed = true; }
+    const lineItems=[];
+    if(numLAK>0) lineItems.push({amount:numLAK,currency:"LAK"});
+    if(numTHB>0) lineItems.push({amount:numTHB,currency:"THB"});
+    if(numUSD>0) lineItems.push({amount:numUSD,currency:"USD"});
+    notifyLine({name:staffState.name,dept:staffState.dept.name,items:lineItems,time:ts});
     showDone(numLAK,numTHB,numUSD);
   } catch(e) {
     console.error(e);
