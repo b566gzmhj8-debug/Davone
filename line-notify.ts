@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { name, dept, items, time } = await req.json();
+    const { name, dept, items, time, method } = await req.json();
 
     const amounts = (items ?? []).map((it: any) => "• " + fmt(it.amount, it.currency)).join("\n");
     const t = time ? new Date(Number(time)) : new Date();
@@ -38,11 +38,14 @@ Deno.serve(async (req) => {
     }).formatToParts(t).map((x) => [x.type, x.value]));
     const timeStr = `${p.day}/${p.month}/${p.year} ${p.hour}.${p.minute}`;
 
+    const isBank = method === "bank";
+    const title = isBank ? "🏦 ມີການໂອນເຂົ້າທະນາຄານ" : "💰 ມີການມອບເງິນສົດ";
+    const who = name ? (isBank ? `ໝາຍເຫດ: ${name}\n` : `ພະນັກງານ: ${name}\n`) : "";
     const text =
-      `💰 ມີການມອບເງິນສົດ\n` +
+      `${title}\n` +
       `━━━━━━━━━━━━\n` +
       `ພະແນກ: ${dept || "-"}\n` +
-      `ພະນັກງານ: ${name || "-"}\n` +
+      who +
       `ຈຳນວນ:\n${amounts || "-"}\n` +
       `ເວລາ: ${timeStr}`;
 
