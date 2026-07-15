@@ -29,7 +29,7 @@
   --gold:#e8c874;--gold-lt:#f0d68a;--gold-dim:rgba(232,200,116,0.12);
   --admin:#5f9de8;--admin-dim:rgba(95,157,232,0.14);
   --goods:#45c99a;--goods-dim:rgba(69,201,154,0.14);
-  --text:#f2f5fc;--text2:#b3bdd4;--muted:#8f9ab5;
+  --text:#ffffff;--text2:#ffffff;--muted:#e2e8f5;
   --danger:#e06666;
   --font:'Lao MN','Lao Sangam MN',system-ui,sans-serif;
   --mono:'Menlo','Monaco',monospace;
@@ -136,13 +136,13 @@ input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 
 textarea{resize:vertical;min-height:60px;line-height:1.55}
 
 .tag-row{display:flex;gap:6px;flex-wrap:wrap}
-.tag{padding:5px 14px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.03);color:#b0b0b0;cursor:pointer;transition:all .15s;user-select:none}
+.tag{padding:5px 14px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.03);color:#ffffff;cursor:pointer;transition:all .15s;user-select:none}
 .tag:hover{border-color:rgba(255,255,255,0.25);color:var(--text2)}
 .tag.active-admin{border-color:var(--admin);background:var(--admin-dim);color:var(--admin)}
 .tag.active-goods{border-color:var(--goods);background:var(--goods-dim);color:var(--goods)}
 
 .cur-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px}
-.cur-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);color:#9aa6bd;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 6px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;border-radius:8px}
+.cur-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);color:#ffffff;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 6px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;border-radius:8px}
 .cur-btn:hover{border-color:rgba(255,255,255,0.22);color:var(--text2)}
 .cur-btn .csym{font-size:16px;font-weight:800}
 .cur-btn .cname{font-size:10px;opacity:.7;font-family:var(--font)}
@@ -321,7 +321,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .cfg-title{font-size:17px;font-weight:800;color:var(--gold-lt)}
 .cfg-desc{font-size:12px;color:var(--muted);line-height:1.6}
 .cfg-field{display:flex;flex-direction:column;gap:6px}
-.cfg-field label{font-size:11px;font-weight:700;color:#b0b0b0;letter-spacing:.04em}
+.cfg-field label{font-size:11px;font-weight:700;color:#ffffff;letter-spacing:.04em}
 .cfg-field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 12px;outline:none}
 .cfg-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
 .btn-cfg-save{width:100%;padding:12px;background:var(--gold-dim);color:var(--gold-lt);border:1px solid var(--border-gold);border-radius:8px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
