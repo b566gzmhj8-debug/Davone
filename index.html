@@ -816,7 +816,7 @@ function goBack() {
   }
   // Staff: method choice → back to dept list
   if (state.mode==="staff" && staffState.step==="method") {
-    staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
+    staffState = { step:"dept", dept:null, cur:"LAK", raw:"", name:"", img:null, saving:false };
     const app = document.getElementById("app");
     const header = app.querySelector(".header");
     app.innerHTML = "";
@@ -904,7 +904,7 @@ function updateDots(error) {
 }
 
 // ── STAFF ─────────────────────────────────────────────────
-let staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
+let staffState = { step:"dept", dept:null, cur:"LAK", raw:"", name:"", img:null, saving:false };
 
 function deptIconHTML(d) {
   if (DEPT_IMGS[d.id]) {
@@ -970,7 +970,7 @@ function deptGridHTML() {
 }
 
 function selectDept(id) {
-  staffState = { step:"method", dept:DEPTS.find(d=>d.id===id), rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
+  staffState = { step:"method", dept:DEPTS.find(d=>d.id===id), cur:"LAK", raw:"", name:"", img:null, saving:false };
   renderMethodChoice();
 }
 
@@ -1018,12 +1018,19 @@ function staffChooseBank() {
   renderStaffBankForm();
 }
 
+function curBadgeStyle(cur) {
+  if (cur==="THB") return "background:rgba(41,128,185,0.12);color:#2980b9";
+  if (cur==="USD") return "background:rgba(39,174,96,0.12);color:#27ae60";
+  return "background:rgba(230,126,34,0.12);color:#e67e22";
+}
+function curWrapClass(cur) { return cur==="THB" ? "thb" : cur==="USD" ? "usd" : "lak"; }
+function curLabel(cur) { return cur==="THB" ? "ບາດ" : cur==="USD" ? "USD" : "ກີບ"; }
+
 function formBodyHTML() {
   const d = staffState.dept;
-  const numLAK = staffState.rawLAK ? parseInt(staffState.rawLAK,10) : 0;
-  const numTHB = staffState.rawTHB ? parseInt(staffState.rawTHB,10) : 0;
-  const numUSD = staffState.rawUSD ? parseInt(staffState.rawUSD,10) : 0;
-  const canSubmit = (numLAK>0||numTHB>0||numUSD>0) && !staffState.saving;
+  const cur = staffState.cur || "LAK";
+  const num = staffState.raw ? parseInt(staffState.raw,10) : 0;
+  const canSubmit = num>0 && !staffState.saving;
   const rgb = hexToRgb(d.color);
   const tag = deptTagMap(d.id);
   const chipImg = DEPT_IMGS[d.id]
@@ -1050,28 +1057,18 @@ function formBodyHTML() {
       + '<div class="chip-dot" style="background:'+d.color+';color:'+d.color+'"></div>'
     + '</div>'
     + '<div class="field-group-pro">'
-      + '<div class="field-label-pro"><span>🇱🇦</span> ຈຳນວນເງິນກີບ</div>'
-      + '<div class="input-wrap-pro lak">'
-        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-lak" value="'+fmtNum(staffState.rawLAK)+'" oninput="onAmtInput(this,\'LAK\')">'
-        + '<span class="input-currency-badge" style="background:rgba(230,126,34,0.12);color:#e67e22">ກີບ</span>'
+      + '<div class="field-label-pro">ເລືອກສະກຸນເງິນ</div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:14px">'
+        + '<button type="button" id="fcur-lak" class="cur-btn'+(cur==="LAK"?" cur-active":"")+'" onclick="setStaffCur(\'LAK\')">ກີບ</button>'
+        + '<button type="button" id="fcur-thb" class="cur-btn'+(cur==="THB"?" cur-active":"")+'" onclick="setStaffCur(\'THB\')">ບາດ</button>'
+        + '<button type="button" id="fcur-usd" class="cur-btn'+(cur==="USD"?" cur-active":"")+'" onclick="setStaffCur(\'USD\')">USD</button>'
       + '</div>'
-      + '<div id="preview-lak" class="amount-preview" style="display:'+( staffState.rawLAK?'block':'none')+'">'+fmtKIP(numLAK)+'</div>'
-    + '</div>'
-    + '<div class="field-group-pro">'
-      + '<div class="field-label-pro"><span>🇹🇭</span> ຈຳນວນເງິນບາດ</div>'
-      + '<div class="input-wrap-pro thb">'
-        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-thb" value="'+fmtNum(staffState.rawTHB)+'" oninput="onAmtInput(this,\'THB\')">'
-        + '<span class="input-currency-badge" style="background:rgba(41,128,185,0.12);color:#2980b9">ບາດ</span>'
+      + '<div class="field-label-pro"><span>💰</span> ຈຳນວນເງິນ</div>'
+      + '<div class="input-wrap-pro '+curWrapClass(cur)+'" id="inp-wrap">'
+        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-amt" value="'+fmtNum(staffState.raw)+'" oninput="onAmtInput(this)">'
+        + '<span class="input-currency-badge" id="inp-badge" style="'+curBadgeStyle(cur)+'">'+curLabel(cur)+'</span>'
       + '</div>'
-      + '<div id="preview-thb" class="amount-preview thb" style="display:'+(staffState.rawTHB?'block':'none')+'">'+fmtTHB(numTHB)+'</div>'
-    + '</div>'
-    + '<div class="field-group-pro">'
-      + '<div class="field-label-pro"><span>🇺🇸</span> ຈຳນວນເງິນໂດລາ</div>'
-      + '<div class="input-wrap-pro usd">'
-        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-usd" value="'+fmtNum(staffState.rawUSD)+'" oninput="onAmtInput(this,\'USD\')">'
-        + '<span class="input-currency-badge" style="background:rgba(39,174,96,0.12);color:#27ae60">USD</span>'
-      + '</div>'
-      + '<div id="preview-usd" class="amount-preview usd" style="display:'+(staffState.rawUSD?'block':'none')+'">'+fmtUSD(numUSD)+'</div>'
+      + '<div id="preview-amt" class="amount-preview '+curWrapClass(cur)+'" style="display:'+(staffState.raw?'block':'none')+'">'+fmtAmt(num,cur)+'</div>'
     + '</div>'
     + '<div class="form-divider"></div>'
     + '<div class="field-group-pro">'
@@ -1093,7 +1090,7 @@ function formBodyHTML() {
 }
 
 function backToDept() {
-  staffState = { step:"dept", dept:null, rawLAK:"", rawTHB:"", rawUSD:"", name:"", img:null, saving:false };
+  staffState = { step:"dept", dept:null, cur:"LAK", raw:"", name:"", img:null, saving:false };
   const app = document.getElementById("app");
   const header = app.querySelector(".header");
   app.innerHTML = "";
@@ -1101,28 +1098,31 @@ function backToDept() {
   app.insertAdjacentHTML("beforeend", deptGridHTML());
 }
 
-function onAmtInput(el, cur) {
+function onAmtInput(el) {
+  const cur = staffState.cur || "LAK";
   const digits = el.value.replace(/\D/g,"");
-  if (cur==="LAK") staffState.rawLAK=digits;
-  else if (cur==="THB") staffState.rawTHB=digits;
-  else staffState.rawUSD=digits;
+  staffState.raw = digits;
   el.value = fmtNum(digits);
   const num = digits ? parseInt(digits,10) : 0;
-  if (cur==="LAK") {
-    const p=document.getElementById("preview-lak");
-    if(p){p.textContent=fmtKIP(num);p.style.display=digits?"block":"none";}
-  } else if (cur==="THB") {
-    const p=document.getElementById("preview-thb");
-    if(p){p.textContent=fmtTHB(num);p.style.display=digits?"block":"none";}
-  } else {
-    const p=document.getElementById("preview-usd");
-    if(p){p.textContent=fmtUSD(num);p.style.display=digits?"block":"none";}
-  }
-  const numLAK = staffState.rawLAK?parseInt(staffState.rawLAK,10):0;
-  const numTHB = staffState.rawTHB?parseInt(staffState.rawTHB,10):0;
-  const numUSD = staffState.rawUSD?parseInt(staffState.rawUSD,10):0;
-  const btn=document.getElementById("submit-btn");
-  if(btn){btn.disabled=!(numLAK>0||numTHB>0||numUSD>0);}
+  const p = document.getElementById("preview-amt");
+  if(p){ p.textContent = fmtAmt(num,cur); p.style.display = digits?"block":"none"; }
+  const btn = document.getElementById("submit-btn");
+  if(btn){ btn.disabled = !(num>0); }
+}
+
+function setStaffCur(cur) {
+  staffState.cur = cur;
+  ["lak","thb","usd"].forEach(c=>{
+    const b=document.getElementById("fcur-"+c);
+    if(b) b.className = "cur-btn" + (c===cur.toLowerCase()?" cur-active":"");
+  });
+  const badge = document.getElementById("inp-badge");
+  if(badge){ badge.style.cssText = curBadgeStyle(cur); badge.textContent = curLabel(cur); }
+  const wrap = document.getElementById("inp-wrap");
+  if(wrap) wrap.className = "input-wrap-pro " + curWrapClass(cur);
+  const num = staffState.raw ? parseInt(staffState.raw,10) : 0;
+  const p = document.getElementById("preview-amt");
+  if(p){ p.className = "amount-preview " + curWrapClass(cur); p.textContent = fmtAmt(num,cur); }
 }
 
 function onFileChange(el) {
@@ -1139,25 +1139,17 @@ function onFileChange(el) {
 
 async function submitRecord() {
   if (staffState.saving) return;               // block double-submit
-  const numLAK=staffState.rawLAK?parseInt(staffState.rawLAK,10):0;
-  const numTHB=staffState.rawTHB?parseInt(staffState.rawTHB,10):0;
-  const numUSD=staffState.rawUSD?parseInt(staffState.rawUSD,10):0;
-  if(numLAK<=0&&numTHB<=0&&numUSD<=0) return;
+  const cur = staffState.cur || "LAK";
+  const num = staffState.raw ? parseInt(staffState.raw,10) : 0;
+  if(num<=0) return;
   staffState.saving=true;
   const btn=document.getElementById("submit-btn");
   if(btn){btn.disabled=true;btn.textContent="ກຳລັງສົ່ງ...";}
   try {
     const ts = Date.now();
-    let imgUsed = false;
-    if(numLAK>0) { await dbSave({id:ts,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numLAK,currency:"LAK",note:staffState.name,image:staffState.img}); imgUsed = true; }
-    if(numTHB>0) { await dbSave({id:ts+1,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numTHB,currency:"THB",note:staffState.name,image:imgUsed?null:staffState.img}); imgUsed = true; }
-    if(numUSD>0) { await dbSave({id:ts+2,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:numUSD,currency:"USD",note:staffState.name,image:imgUsed?null:staffState.img}); imgUsed = true; }
-    const lineItems=[];
-    if(numLAK>0) lineItems.push({amount:numLAK,currency:"LAK"});
-    if(numTHB>0) lineItems.push({amount:numTHB,currency:"THB"});
-    if(numUSD>0) lineItems.push({amount:numUSD,currency:"USD"});
-    notifyLine({name:staffState.name,dept:staffState.dept.name,items:lineItems,time:ts,method:"cash"});
-    showDone(numLAK,numTHB,numUSD);
+    await dbSave({id:ts,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:num,currency:cur,note:staffState.name,image:staffState.img});
+    notifyLine({name:staffState.name,dept:staffState.dept.name,items:[{amount:num,currency:cur}],time:ts,method:"cash"});
+    showDone(num,cur);
   } catch(e) {
     console.error(e);
     alert("ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່: "+e.message);
@@ -1167,8 +1159,32 @@ async function submitRecord() {
   }
 }
 
-function showDone(numLAK,numTHB,numUSD) {
+// Pleasant two-tone success chime + vibration, played on a confirmed submit.
+function playSuccessSound() {
+  if (navigator.vibrate) navigator.vibrate([80, 40, 120]);
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    const notes = [ [880, 0], [1174.66, 0.14] ];   // A5 → D6, a rising "ding-dong"
+    notes.forEach(([freq, at]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + at);
+      gain.gain.setValueAtTime(0.0001, now + at);
+      gain.gain.exponentialRampToValueAtTime(0.35, now + at + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + at + 0.35);
+      osc.start(now + at); osc.stop(now + at + 0.4);
+    });
+    setTimeout(() => ctx.close(), 900);
+  } catch {}
+}
+
+function showDone(num,cur) {
+  playSuccessSound();
   const d=staffState.dept;
+  const clsMap={LAK:"",THB:"thb",USD:"usd"};
   const app=document.getElementById("app");
   const header=app.querySelector(".header");
   app.innerHTML="";
@@ -1177,9 +1193,7 @@ function showDone(numLAK,numTHB,numUSD) {
     <div class="done-check">✓</div>
     <div class="done-title">ສົ່ງຂໍ້ມູນສຳເລັດ!</div>
     <div class="done-sub">ພະແນກ: ${d.name}</div>
-    ${numLAK>0?`<div class="done-amount">${fmtKIP(numLAK)}</div>`:""}
-    ${numTHB>0?`<div class="done-amount thb">${fmtTHB(numTHB)}</div>`:""}
-    ${numUSD>0?`<div class="done-amount usd">${fmtUSD(numUSD)}</div>`:""}
+    <div class="done-amount ${clsMap[cur]||""}">${fmtAmt(num,cur)}</div>
     <button class="btn-green" onclick="backToDept()" style="margin-bottom:0">ສົ່ງລາຍການໃໝ່</button>
   </div></div>`);
 }
