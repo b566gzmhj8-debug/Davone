@@ -1805,10 +1805,14 @@ async function openReceiptDetail(receiptId, receipt){
           ${canSeeCost ? `<span class="mono">${fmtMoney(it.amount)}</span>` : ''}
         </div>`).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
       ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receipt.total_amount)}</div>` : ''}
-      ${currentRole==='admin' ? `<button class="btn danger" id="rcvDeleteBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການຮັບເຂົ້ານີ້ (ຄືນສະຕັອກ)</button>` : ''}
+      ${currentRole==='admin' ? `<button class="btn" id="rcvEditCostBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ໃສ່/ແກ້ໄຂຕົ້ນທຶນ</button>` : ''}
+      ${currentRole==='admin' ? `<button class="btn danger" id="rcvDeleteBtn" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການຮັບເຂົ້ານີ້ (ຄືນສະຕັອກ)</button>` : ''}
       <button class="btn secondary" id="rcvDetailClose">ປິດ</button>
     `;
     if(currentRole==='admin'){
+      bg.querySelector('#rcvEditCostBtn').addEventListener('click', ()=>{
+        openReceiptCostEditor(bg, receiptId, receipt, items);
+      });
       bg.querySelector('#rcvDeleteBtn').addEventListener('click', async ()=>{
         if(!confirm(`ລົບການຮັບເຂົ້າ ${receipt.receipt_no || ''} ? ສະຕັອກທີ່ຮັບເຂົ້າຄັ້ງນີ້ຈະຖືກຫັກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
         try{
@@ -1826,6 +1830,124 @@ async function openReceiptDetail(receiptId, receipt){
     bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="rcvDetailClose2">ປິດ</button>`;
     bg.querySelector('#rcvDetailClose2').addEventListener('click', ()=> bg.remove());
   }
+}
+/* ໃສ່/ແກ້ໄຂຕົ້ນທຶນຫຼັງຮັບເຂົ້າ (ສຳລັບກໍລະນີພະນັກງານຮັບເຂົ້າມາໂດຍຍັງບໍ່ໃສ່ຕົ້ນທຶນ ແອດມິນມາໃສ່ທີ່ຫຼັງ)
+   ອັບເດດ: 1) ລາຍການຮັບເຂົ້າ (unit_cost/amount/ສະກຸນ) 2) ຕົ້ນທຶນ cost_lak ຂອງໜ່ວຍທີ່ມີເລກເຄື່ອງ
+   3) ຍອດລວມຂອງໃບຮັບເຂົ້າ 4) ຕົ້ນທຶນອ້າງອິງຂອງຮຸ່ນສິນຄ້າ (ໃຫ້ຄັ້ງໜ້າດຶງມາເຕີມ) */
+async function openReceiptCostEditor(bg, receiptId, receipt, items){
+  bg.querySelector('.modal').innerHTML = `
+    <h3><svg class="dv-icon"><use href="#i-pencil"></use></svg>ໃສ່/ແກ້ໄຂຕົ້ນທຶນ · <span class="mono">${receipt.receipt_no||''}</span></h3>
+    <div class="muted" style="font-size:12px;margin-bottom:8px;">ໃສ່ຕົ້ນທຶນຕໍ່ໜ່ວຍຂອງແຕ່ລະລາຍການ. ຖ້າຊື້ເປັນເງິນບາດ ໃຫ້ປ່ຽນສະກຸນເປັນ ບາດ ແລ້ວໃສ່ອັດຕາແລກປ່ຽນ.</div>
+    <hr class="sep">
+    ${items.map((it, idx)=> {
+      const isThb = it.cost_currency === 'THB';
+      const initCost = isThb ? (it.unit_cost_thb||0) : (it.unit_cost||0);
+      const label = (it.stock_product_models ? it.stock_product_models.name : '-') + (it.serial_no ? (' · '+it.serial_no) : (' × '+it.quantity));
+      return `
+      <div style="padding:8px 0;border-bottom:1px solid var(--line);">
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px;">${idx+1}. ${label}</div>
+        <div class="grid2">
+          <div>
+            <label style="font-size:11px;" id="ec_cost_lbl_${idx}">ຕົ້ນທຶນ/ໜ່ວຍ (${isThb?'ບາດ':'ກີບ'})</label>
+            <input id="ec_cost_${idx}" type="text" value="${Number(initCost).toLocaleString('en-US').replace(/,/g,'.')}">
+          </div>
+          <div>
+            <label style="font-size:11px;">ສະກຸນ</label>
+            <select id="ec_cur_${idx}">
+              <option value="LAK" ${isThb?'':'selected'}>ກີບ (LAK)</option>
+              <option value="THB" ${isThb?'selected':''}>ບາດ (THB)</option>
+            </select>
+          </div>
+        </div>
+        <div id="ec_rateBlock_${idx}" style="display:${isThb?'block':'none'};margin-top:6px;">
+          <label style="font-size:11px;">ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)</label>
+          <input id="ec_rate_${idx}" type="text" value="${it.exchange_rate||''}">
+          <div class="muted" id="ec_preview_${idx}" style="font-size:11px;margin-top:3px;"></div>
+        </div>
+      </div>`;
+    }).join('')}
+    <button class="btn" id="ec_save" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກຕົ້ນທຶນ</button>
+    <button class="btn secondary" id="ec_cancel">ຍົກເລີກ</button>
+  `;
+  items.forEach((it, idx)=>{
+    attachMoneyInput('ec_cost_'+idx, undefined);
+    const curSel = document.getElementById('ec_cur_'+idx);
+    const rateBlock = document.getElementById('ec_rateBlock_'+idx);
+    const costLbl = document.getElementById('ec_cost_lbl_'+idx);
+    const preview = ()=>{
+      const p = document.getElementById('ec_preview_'+idx);
+      if(!p) return;
+      const cost = moneyValue('ec_cost_'+idx);
+      const rate = Number((document.getElementById('ec_rate_'+idx).value||'').replace(/[^\d.]/g,''));
+      if(cost && rate) p.textContent = `≈ ${fmtMoney(cost*rate)} ກີບ/ໜ່ວຍ (ລ໋ອກຕົ້ນທຶນນີ້ໄວ້)`;
+      else p.textContent = 'ໃສ່ອັດຕາແລກປ່ຽນເພື່ອລ໋ອກຕົ້ນທຶນເປັນກີບ';
+    };
+    curSel.addEventListener('change', ()=>{
+      const thb = curSel.value === 'THB';
+      rateBlock.style.display = thb ? 'block' : 'none';
+      costLbl.textContent = thb ? 'ຕົ້ນທຶນ/ໜ່ວຍ (ບາດ)' : 'ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)';
+      preview();
+    });
+    document.getElementById('ec_cost_'+idx).addEventListener('input', preview);
+    document.getElementById('ec_rate_'+idx).addEventListener('input', preview);
+  });
+  document.getElementById('ec_cancel').addEventListener('click', ()=>{ bg.remove(); openReceiptDetail(receiptId, receipt); });
+  document.getElementById('ec_save').addEventListener('click', async ()=>{
+    const saveBtn = document.getElementById('ec_save');
+    /* ຄິດຄ່າແຕ່ລະລາຍການກ່ອນ (ກວດອັດຕາແລກປ່ຽນ) — ຖ້າຜິດ ໃຫ້ຢຸດ ບໍ່ບັນທຶກຄ້າງໆ */
+    const computed = [];
+    for(let idx=0; idx<items.length; idx++){
+      const it = items[idx];
+      const currency = document.getElementById('ec_cur_'+idx).value;
+      const input = moneyValue('ec_cost_'+idx);
+      let unitCost = input, unitCostThb = null, exchangeRate = null;
+      if(currency === 'THB'){
+        exchangeRate = Number((document.getElementById('ec_rate_'+idx).value||'').replace(/[^\d.]/g,''));
+        if(!exchangeRate){ toast(`ລາຍການທີ ${idx+1}: ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)`); return; }
+        unitCostThb = input;
+        unitCost = Math.round(input * exchangeRate); /* ລ໋ອກເປັນກີບ */
+      }
+      computed.push({ it, currency, unitCost, unitCostThb, exchangeRate, amount: unitCost * Number(it.quantity||1) });
+    }
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'ກຳລັງບັນທຶກ...';
+    try{
+      const reqs = [];
+      const costPatchByModel = {};
+      const totalAmount = computed.reduce((s,c)=> s + c.amount, 0);
+      for(const c of computed){
+        reqs.push(sb(`stock_purchase_receipt_items?id=eq.${c.it.id}`, { method:'PATCH', body:{
+          unit_cost: c.unitCost, amount: c.amount, cost_currency: c.currency,
+          unit_cost_thb: c.unitCostThb, exchange_rate: c.exchangeRate
+        }}));
+        /* ໜ່ວຍທີ່ມີເລກເຄື່ອງ: ອັບເດດ cost_lak ໃຫ້ກົງ (ໃຊ້ໃນການຄິດກຳໄລ) */
+        if(c.it.serial_no){
+          reqs.push(sb(`stock_product_units?serial_no=eq.${encodeURIComponent(c.it.serial_no)}&model_id=eq.${c.it.model_id}`, {
+            method:'PATCH', body:{ cost_lak: c.unitCost }
+          }));
+        }
+        /* ຕົ້ນທຶນອ້າງອິງຂອງຮຸ່ນ (ໜຶ່ງຄຳຂໍຕໍ່ 1 ຮຸ່ນ) */
+        const patch = costPatchByModel[c.it.model_id] || (costPatchByModel[c.it.model_id] = {});
+        patch.cost_price = c.unitCost;
+        if(c.currency === 'THB' && c.unitCostThb) patch.cost_price_thb = c.unitCostThb;
+      }
+      reqs.push(sb(`stock_purchase_receipts?id=eq.${receiptId}`, { method:'PATCH', body:{ total_amount: totalAmount } }));
+      for(const [modelId, patch] of Object.entries(costPatchByModel)){
+        reqs.push(sb(`stock_product_models?id=eq.${modelId}`, { method:'PATCH', body: patch }));
+      }
+      await Promise.all(reqs);
+      receipt.total_amount = totalAmount;
+      toast('ບັນທຶກຕົ້ນທຶນສຳເລັດ');
+      bg.remove();
+      openReceiptDetail(receiptId, receipt);
+      const monthEl = document.getElementById('rcv_month');
+      if(monthEl) loadReceiveHistory(monthEl.value);
+    }catch(err){
+      toast('ບັນທຶກບໍ່ໄດ້: ' + err.message);
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'ບັນທຶກຕົ້ນທຶນ';
+    }
+  });
 }
 /* ລົບການຮັບເຂົ້າ: ຖ້າມີເລກເຄື່ອງທີ່ຂາຍໄປແລ້ວຈາກຄັ້ງນີ້ ຈະລົບບໍ່ໄດ້ (unit ຈະຕິດ FK ກັບບິນຂາຍ) */
 async function voidReceipt(receiptId){
