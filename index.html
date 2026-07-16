@@ -182,6 +182,9 @@
   .amount-preview { font-size:13px; color:#2d6a4f; font-weight:700; margin-top:2px; }
   .amount-preview.thb { color:#2980b9; }
   .amount-preview.usd { color:#27ae60; }
+  .multi-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+  .multi-preview-chip { font-size:13px; font-weight:700; padding:4px 12px; border-radius:8px; background:rgba(255,255,255,0.06); }
+  body.light .multi-preview-chip { background:rgba(0,0,0,0.05); }
   .photo-btn { padding:16px; border-radius:10px; border:2px dashed #555; background:#16213e; font-size:14px; cursor:pointer; font-family:inherit; color:#aaa; width:100%; }
   .img-preview-wrap { position:relative; border-radius:12px; overflow:hidden; }
   .img-preview { width:100%; display:block; }
@@ -816,7 +819,7 @@ function goBack() {
   }
   // Staff: method choice → back to dept list
   if (state.mode==="staff" && staffState.step==="method") {
-    staffState = { step:"dept", dept:null, cur:"LAK", raw:"", name:"", img:null, saving:false };
+    staffState = { step:"dept", dept:null, amounts:{LAK:"",THB:"",USD:""}, name:"", img:null, saving:false };
     const app = document.getElementById("app");
     const header = app.querySelector(".header");
     app.innerHTML = "";
@@ -904,7 +907,7 @@ function updateDots(error) {
 }
 
 // ── STAFF ─────────────────────────────────────────────────
-let staffState = { step:"dept", dept:null, cur:"LAK", raw:"", name:"", img:null, saving:false };
+let staffState = { step:"dept", dept:null, amounts:{LAK:"",THB:"",USD:""}, name:"", img:null, saving:false };
 
 function deptIconHTML(d) {
   if (DEPT_IMGS[d.id]) {
@@ -970,7 +973,7 @@ function deptGridHTML() {
 }
 
 function selectDept(id) {
-  staffState = { step:"method", dept:DEPTS.find(d=>d.id===id), cur:"LAK", raw:"", name:"", img:null, saving:false };
+  staffState = { step:"method", dept:DEPTS.find(d=>d.id===id), amounts:{LAK:"",THB:"",USD:""}, name:"", img:null, saving:false };
   renderMethodChoice();
 }
 
@@ -1028,9 +1031,7 @@ function curLabel(cur) { return cur==="THB" ? "ບາດ" : cur==="USD" ? "USD" 
 
 function formBodyHTML() {
   const d = staffState.dept;
-  const cur = staffState.cur || "LAK";
-  const num = staffState.raw ? parseInt(staffState.raw,10) : 0;
-  const canSubmit = num>0 && !staffState.saving;
+  const canSubmit = anyAmount() && !staffState.saving;
   const rgb = hexToRgb(d.color);
   const tag = deptTagMap(d.id);
   const chipImg = DEPT_IMGS[d.id]
@@ -1057,18 +1058,9 @@ function formBodyHTML() {
       + '<div class="chip-dot" style="background:'+d.color+';color:'+d.color+'"></div>'
     + '</div>'
     + '<div class="field-group-pro">'
-      + '<div class="field-label-pro">ເລືອກສະກຸນເງິນ</div>'
-      + '<div style="display:flex;gap:8px;margin-bottom:14px">'
-        + '<button type="button" id="fcur-lak" class="cur-btn'+(cur==="LAK"?" cur-active":"")+'" onclick="setStaffCur(\'LAK\')">ກີບ</button>'
-        + '<button type="button" id="fcur-thb" class="cur-btn'+(cur==="THB"?" cur-active":"")+'" onclick="setStaffCur(\'THB\')">ບາດ</button>'
-        + '<button type="button" id="fcur-usd" class="cur-btn'+(cur==="USD"?" cur-active":"")+'" onclick="setStaffCur(\'USD\')">USD</button>'
-      + '</div>'
-      + '<div class="field-label-pro"><span>💰</span> ຈຳນວນເງິນ</div>'
-      + '<div class="input-wrap-pro '+curWrapClass(cur)+'" id="inp-wrap">'
-        + '<input type="text" inputmode="numeric" placeholder="0" id="inp-amt" value="'+fmtNum(staffState.raw)+'" oninput="onAmtInput(this)">'
-        + '<span class="input-currency-badge" id="inp-badge" style="'+curBadgeStyle(cur)+'">'+curLabel(cur)+'</span>'
-      + '</div>'
-      + '<div id="preview-amt" class="amount-preview '+curWrapClass(cur)+'" style="display:'+(staffState.raw?'block':'none')+'">'+fmtAmt(num,cur)+'</div>'
+      + '<div class="field-label-pro"><span>💰</span> ຈຳນວນເງິນ <span style="font-weight:500;color:#8a94a3;font-size:11px">(ໃສ່ໄດ້ຫຼາຍສະກຸນໃນບິນດຽວ)</span></div>'
+      + CUR_ORDER.map(curAmtRowHTML).join("")
+      + '<div id="preview-multi" class="multi-preview" style="display:'+(anyAmount()?'flex':'none')+'">'+multiPreviewInner()+'</div>'
     + '</div>'
     + '<div class="form-divider"></div>'
     + '<div class="field-group-pro">'
@@ -1090,7 +1082,7 @@ function formBodyHTML() {
 }
 
 function backToDept() {
-  staffState = { step:"dept", dept:null, cur:"LAK", raw:"", name:"", img:null, saving:false };
+  staffState = { step:"dept", dept:null, amounts:{LAK:"",THB:"",USD:""}, name:"", img:null, saving:false };
   const app = document.getElementById("app");
   const header = app.querySelector(".header");
   app.innerHTML = "";
@@ -1098,31 +1090,33 @@ function backToDept() {
   app.insertAdjacentHTML("beforeend", deptGridHTML());
 }
 
-function onAmtInput(el) {
-  const cur = staffState.cur || "LAK";
-  const digits = el.value.replace(/\D/g,"");
-  staffState.raw = digits;
-  el.value = fmtNum(digits);
-  const num = digits ? parseInt(digits,10) : 0;
-  const p = document.getElementById("preview-amt");
-  if(p){ p.textContent = fmtAmt(num,cur); p.style.display = digits?"block":"none"; }
-  const btn = document.getElementById("submit-btn");
-  if(btn){ btn.disabled = !(num>0); }
+// One amount input row per currency — staff can fill any combination.
+function curAmtRowHTML(c) {
+  const raw = staffState.amounts[c] || "";
+  return '<div class="input-wrap-pro '+curWrapClass(c)+'" style="margin-bottom:10px">'
+    + '<input type="text" inputmode="numeric" placeholder="0" id="inp-'+c+'" value="'+fmtNum(raw)+'" oninput="onCurInput(this,\''+c+'\')">'
+    + '<span class="input-currency-badge" style="'+curBadgeStyle(c)+'">'+curLabel(c)+'</span>'
+    + '</div>';
 }
 
-function setStaffCur(cur) {
-  staffState.cur = cur;
-  ["lak","thb","usd"].forEach(c=>{
-    const b=document.getElementById("fcur-"+c);
-    if(b) b.className = "cur-btn" + (c===cur.toLowerCase()?" cur-active":"");
-  });
-  const badge = document.getElementById("inp-badge");
-  if(badge){ badge.style.cssText = curBadgeStyle(cur); badge.textContent = curLabel(cur); }
-  const wrap = document.getElementById("inp-wrap");
-  if(wrap) wrap.className = "input-wrap-pro " + curWrapClass(cur);
-  const num = staffState.raw ? parseInt(staffState.raw,10) : 0;
-  const p = document.getElementById("preview-amt");
-  if(p){ p.className = "amount-preview " + curWrapClass(cur); p.textContent = fmtAmt(num,cur); }
+function curNum(c) { const r = staffState.amounts[c]; return r ? parseInt(r,10) : 0; }
+function anyAmount() { return CUR_ORDER.some(c => curNum(c) > 0); }
+
+function multiPreviewInner() {
+  return CUR_ORDER.filter(c => curNum(c) > 0).map(c => {
+    const cInfo = CUR_DISPLAY[c] || {};
+    return '<span class="multi-preview-chip" style="color:'+(cInfo.color||"#2d6a4f")+'">'+fmtAmt(curNum(c),c)+'</span>';
+  }).join("");
+}
+
+function onCurInput(el, c) {
+  const digits = el.value.replace(/\D/g,"");
+  staffState.amounts[c] = digits;
+  el.value = fmtNum(digits);
+  const p = document.getElementById("preview-multi");
+  if(p){ p.innerHTML = multiPreviewInner(); p.style.display = anyAmount()?"flex":"none"; }
+  const btn = document.getElementById("submit-btn");
+  if(btn){ btn.disabled = !anyAmount(); }
 }
 
 function onFileChange(el) {
@@ -1139,17 +1133,28 @@ function onFileChange(el) {
 
 async function submitRecord() {
   if (staffState.saving) return;               // block double-submit
-  const cur = staffState.cur || "LAK";
-  const num = staffState.raw ? parseInt(staffState.raw,10) : 0;
-  if(num<=0) return;
+  // Collect every currency the staff filled in — one bill, many currencies.
+  const entries = CUR_ORDER.filter(c => curNum(c) > 0).map(c => ({currency:c, amount:curNum(c)}));
+  if(entries.length===0) return;
   staffState.saving=true;
   const btn=document.getElementById("submit-btn");
   if(btn){btn.disabled=true;btn.textContent="ກຳລັງສົ່ງ...";}
   try {
     const ts = Date.now();
-    await dbSave({id:ts,timestamp:ts,department:staffState.dept.id,departmentName:staffState.dept.name,amount:num,currency:cur,note:staffState.name,image:staffState.img});
-    notifyLine({name:staffState.name,dept:staffState.dept.name,items:[{amount:num,currency:cur}],time:ts,method:"cash"});
-    showDone(num,cur);
+    // Save one record per currency, staggered by 1ms so the admin groups them
+    // into a single bill. Only the first record carries the photo, so a
+    // multi-currency bill never stores its receipt image more than once.
+    for(let i=0;i<entries.length;i++){
+      const e = entries[i];
+      await dbSave({
+        id: ts+i, timestamp: ts+i,
+        department: staffState.dept.id, departmentName: staffState.dept.name,
+        amount: e.amount, currency: e.currency,
+        note: staffState.name, image: i===0 ? staffState.img : null,
+      });
+    }
+    notifyLine({name:staffState.name,dept:staffState.dept.name,items:entries,time:ts,method:"cash"});
+    showDone(entries);
   } catch(e) {
     console.error(e);
     alert("ເກີດຂໍ້ຜິດພາດ ກະລຸນາລອງໃໝ່: "+e.message);
@@ -1181,7 +1186,7 @@ function playSuccessSound() {
   } catch {}
 }
 
-function showDone(num,cur) {
+function showDone(entries) {
   playSuccessSound();
   const d=staffState.dept;
   const clsMap={LAK:"",THB:"thb",USD:"usd"};
@@ -1189,11 +1194,14 @@ function showDone(num,cur) {
   const header=app.querySelector(".header");
   app.innerHTML="";
   app.appendChild(header);
+  const amtHTML = entries.map(e =>
+    `<div class="done-amount ${clsMap[e.currency]||""}">${fmtAmt(e.amount,e.currency)}</div>`
+  ).join("");
   app.insertAdjacentHTML("beforeend",`<div class="center"><div class="done-box">
     <div class="done-check">✓</div>
     <div class="done-title">ສົ່ງຂໍ້ມູນສຳເລັດ!</div>
     <div class="done-sub">ພະແນກ: ${d.name}</div>
-    <div class="done-amount ${clsMap[cur]||""}">${fmtAmt(num,cur)}</div>
+    ${amtHTML}
     <button class="btn-green" onclick="backToDept()" style="margin-bottom:0">ສົ່ງລາຍການໃໝ່</button>
   </div></div>`);
 }
