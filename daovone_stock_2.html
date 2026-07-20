@@ -446,6 +446,54 @@ function toast(msg){
   setTimeout(()=> t.remove(), 2200);
 }
 
+/* ระบบกันลบพลาด: ถามยืนยัน 2 รอบเสมอ ก่อนจะลบอะไรก็ตาม (บิลขาย/โอนสาขา/รับเข้า/สินค้า/เลขเครื่อง)
+   รอบที่ 1 = ถามว่าจะลบไหม, รอบที่ 2 = เตือนว่ากู้คืนไม่ได้ + ปุ่มยืนยันจะกดไม่ได้ 3 วินาทีแรก (กันกดรัวทะลุ)
+   คืนค่า true เฉพาะตอนผู้ใช้ยืนยันครบทั้งสองรอบเท่านั้น */
+function confirmDelete(what, detail){
+  const step = (title, body, okText, danger, holdSec)=> new Promise(resolve=>{
+    const bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.style.zIndex = 90;
+    bg.innerHTML = `
+      <div class="modal" style="max-width:440px;">
+        <h3><svg class="dv-icon"><use href="#i-alert"></use></svg>${title}</h3>
+        <div style="font-size:14px;line-height:1.6;margin:6px 0 4px;white-space:pre-line;"></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn secondary" data-no>ຍົກເລີກ</button>
+          <button class="btn ${danger ? 'danger' : ''}" data-yes></button>
+        </div>
+      </div>`;
+    bg.querySelector('div[style*="line-height"]').textContent = body;
+    const yes = bg.querySelector('[data-yes]');
+    const done = (v)=>{ bg.remove(); document.removeEventListener('keydown', onKey); resolve(v); };
+    const onKey = (e)=>{ if(e.key === 'Escape') done(false); };
+    bg.querySelector('[data-no]').addEventListener('click', ()=> done(false));
+    yes.addEventListener('click', ()=>{ if(!yes.disabled) done(true); });
+    bg.addEventListener('click', (e)=>{ if(e.target === bg) done(false); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(bg);
+    if(holdSec){
+      let left = holdSec;
+      yes.disabled = true;
+      yes.style.opacity = '.55';
+      yes.textContent = `${okText} (${left})`;
+      const tm = setInterval(()=>{
+        left--;
+        if(left > 0){ yes.textContent = `${okText} (${left})`; return; }
+        clearInterval(tm);
+        yes.disabled = false;
+        yes.style.opacity = '';
+        yes.textContent = okText;
+      }, 1000);
+    } else {
+      yes.textContent = okText;
+    }
+  });
+
+  return step('ຢືນຢັນການລົບ', what, 'ສືບຕໍ່', false, 0)
+    .then(ok1 => ok1 ? step('ແນ່ໃຈບໍ່? (ຄັ້ງສຸດທ້າຍ)', (detail ? detail + '\n\n' : '') + 'ລົບແລ້ວກູ້ຄືນບໍ່ໄດ້ ກົດ "ຢືນຢັນລົບ" ເພື່ອລົບຖາວອນ', 'ຢືນຢັນລົບ', true, 3) : false);
+}
+
 /* กด Enter/Return ในช่องพวกนี้ = กดปุ่มเดียวกับปุ่มที่ระบุ (สะดวกเวลาพิมพ์ด้วยคีย์บอร์ด MacBook) */
 function bindEnterKey(inputIds, buttonId){
   inputIds.forEach(id=>{
@@ -1007,7 +1055,7 @@ async function renderProducts(main){
           e.stopPropagation();
           const model = models.find(m=> m.id === btn.dataset.del);
           if(!model) return;
-          if(!confirm(`ລົບ "${model.name}" ອອກຈາກລາຍການສິນຄ້າ? ຖ້າສິນຄ້ານີ້ມີປະຫວັດຮັບເຂົ້າ/ຂາຍໄປແລ້ວ ຈະລົບບໍ່ໄດ້ (ໃຫ້ໃຊ້ "ແກ້ໄຂ" ແລ້ວປິດການໃຊ້ງານແທນ)`)) return;
+          if(!await confirmDelete(`ລົບ "${model.name}" ອອກຈາກລາຍການສິນຄ້າ?`, `ຖ້າສິນຄ້ານີ້ມີປະຫວັດຮັບເຂົ້າ/ຂາຍໄປແລ້ວ ຈະລົບບໍ່ໄດ້ (ໃຫ້ໃຊ້ "ແກ້ໄຂ" ແລ້ວປິດການໃຊ້ງານແທນ)`)) return;
           try{
             await sb(`stock_product_models?id=eq.${model.id}`, { method:'DELETE' });
             toast('ລົບສຳເລັດ');
@@ -1227,7 +1275,7 @@ async function openUnitsModal(model){
         btn.addEventListener('click', async ()=>{
           const u = units[Number(btn.dataset.rm)];
           if(!u) return;
-          if(!confirm(`ລົບເລກເຄື່ອງ ${u.serial_no} ອອກຈາກສະຕັອກ? ໃຊ້ເມື່ອເພີ່ມ/ພິມຜິດ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+          if(!await confirmDelete(`ລົບເລກເຄື່ອງ ${u.serial_no} ອອກຈາກສະຕັອກ?`, 'ໃຊ້ເມື່ອເພີ່ມ/ພິມຜິດເທົ່ານັ້ນ')) return;
           btn.disabled = true;
           try{
             await adjustRemoveUnit(u);
@@ -1766,7 +1814,7 @@ async function loadReceiveHistory(month){
       deleteBtn.addEventListener('click', async ()=>{
         const ids = checks().filter(c=> c.checked).map(c=> c.value);
         if(!ids.length) return;
-        if(!confirm(`ລົບການຮັບເຂົ້າ ${ids.length} ໃບທີ່ເລືອກ? ສະຕັອກທີ່ຮັບເຂົ້າຈະຖືກຫັກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        if(!await confirmDelete(`ລົບການຮັບເຂົ້າ ${ids.length} ໃບທີ່ເລືອກ?`, 'ສະຕັອກທີ່ຮັບເຂົ້າຈະຖືກຫັກຄືນທັງໝົດ')) return;
         if(deleteBtn.disabled) return;
         deleteBtn.disabled = true;
         try{
@@ -1814,7 +1862,7 @@ async function openReceiptDetail(receiptId, receipt){
         openReceiptCostEditor(bg, receiptId, receipt, items);
       });
       bg.querySelector('#rcvDeleteBtn').addEventListener('click', async ()=>{
-        if(!confirm(`ລົບການຮັບເຂົ້າ ${receipt.receipt_no || ''} ? ສະຕັອກທີ່ຮັບເຂົ້າຄັ້ງນີ້ຈະຖືກຫັກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        if(!await confirmDelete(`ລົບການຮັບເຂົ້າ ${receipt.receipt_no || ''} ?`, 'ສະຕັອກທີ່ຮັບເຂົ້າຄັ້ງນີ້ຈະຖືກຫັກຄືນ')) return;
         try{
           await voidReceipt(receiptId);
           toast('ລົບການຮັບເຂົ້າສຳເລັດ ຄືນສະຕັອກແລ້ວ');
@@ -2627,7 +2675,7 @@ async function loadTransferHistory(month){
       deleteBtn.addEventListener('click', async ()=>{
         const keys = checks().filter(c=> c.checked).map(c=> c.value);
         if(!keys.length) return;
-        if(!confirm(`ລົບການໂອນສາຂາ ${keys.length} ລາຍການທີ່ເລືອກ? ສະຕັອກຈະຖືກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        if(!await confirmDelete(`ລົບການໂອນສາຂາ ${keys.length} ລາຍການທີ່ເລືອກ?`, 'ສະຕັອກທີ່ໂອນອອກໄປຈະຖືກຄືນກັບມາ')) return;
         if(deleteBtn.disabled) return;
         deleteBtn.disabled = true;
         try{
@@ -2693,7 +2741,7 @@ function openTransferDetail(group){
   if(currentRole==='admin'){
     const delBtn = bg.querySelector('#trDeleteBtn');
     delBtn.addEventListener('click', async ()=>{
-      if(!confirm('ລົບການໂອນສາຂານີ້? ສິນຄ້າທີ່ມີເລກເຄື່ອງຈະຄືນເປັນສະຕັອກຄົງເຫຼືອຄືນ')) return;
+      if(!await confirmDelete('ລົບການໂອນສາຂານີ້?', 'ສິນຄ້າທີ່ມີເລກເຄື່ອງຈະຄືນເປັນສະຕັອກຄົງເຫຼືອ')) return;
       if(delBtn.disabled) return;
       delBtn.disabled = true;
       try{
@@ -2809,7 +2857,7 @@ async function renderReport(main){
     deleteBtn.addEventListener('click', async ()=>{
       const ids = checks().filter(c=> c.checked).map(c=> c.value);
       if(!ids.length) return;
-      if(!confirm(`ລົບບິນຂາຍ ${ids.length} ໃບທີ່ເລືອກ? ສະຕັອກຈະຖືກຄືນ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+      if(!await confirmDelete(`ລົບບິນຂາຍ ${ids.length} ໃບທີ່ເລືອກ?`, 'ສະຕັອກທີ່ຫັກໄປຈະຄືນທັງໝົດ')) return;
       if(deleteBtn.disabled) return;
       deleteBtn.disabled = true;
       try{
@@ -2985,7 +3033,7 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
     }
     if(currentRole==='admin'){
       bg.querySelector('#invDeleteBtn').addEventListener('click', async ()=>{
-        if(!confirm(`ລົບບິນ ${inv.invoice_no || ''} ? ສະຕັອກທີ່ຫັກໄປຈະຄືນທັງໝົດ ແລະ ຈະລົບຖາວອນ (ກູ້ຄືນບໍ່ໄດ້)`)) return;
+        if(!await confirmDelete(`ລົບບິນຂາຍ ${inv.invoice_no || ''} ?`, 'ສະຕັອກທີ່ຫັກໄປຈະຄືນທັງໝົດ')) return;
         try{
           await voidInvoice(invoiceId, items);
           toast('ລົບບິນສຳເລັດ ຄືນສະຕັອກແລ້ວ');
