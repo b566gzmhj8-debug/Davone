@@ -97,6 +97,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 
 /* ── MAIN CONTENT ── */
 .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+#viewExpense{flex:1;min-height:0;display:flex;flex-direction:column}
 
 .content-header{
   padding:24px 32px 0;
@@ -326,6 +327,107 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .cfg-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
 .btn-cfg-save{width:100%;padding:12px;background:var(--gold-dim);color:var(--gold-lt);border:1px solid var(--border-gold);border-radius:8px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-cfg-save:hover{background:rgba(196,156,60,0.2)}
+
+/* ── SUMMARY VIEW ── */
+.summary-wrap{padding:20px 32px;max-width:1100px}
+.summary-wrap .mtabs{margin-bottom:16px}
+@media(max-width:640px){.summary-wrap{padding:12px}}
+
+/* ── BALANCE / BUDGET ── */
+.budget-wrap{display:grid;grid-template-columns:400px 1fr;gap:24px;padding:20px 32px;align-items:start}
+.budget-wrap .dep-form{position:sticky;top:20px}
+@media(max-width:900px){.budget-wrap{grid-template-columns:1fr;padding:16px}.budget-wrap .dep-form{position:static}}
+@media(max-width:640px){.budget-wrap{padding:12px;gap:16px}}
+#balBody .mtabs{margin-top:0!important}
+.kind-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kind-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.14);color:#ffffff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;border-radius:8px;transition:all .15s}
+.kind-btn:hover{border-color:rgba(255,255,255,0.28)}
+.kind-btn.active-in{border-color:var(--gold);background:var(--gold-dim);color:var(--gold-lt)}
+.kind-btn.active-out{border-color:var(--danger);background:rgba(224,102,102,0.12);color:#ff9a9a}
+
+/* business icons (ແທນ emoji) */
+.bic{width:16px;height:16px;flex-shrink:0;vertical-align:-3px}
+.dep-form-title{display:flex;align-items:center;gap:9px}
+.dep-form-title .bic{width:18px;height:18px;color:var(--gold-lt)}
+.kind-btn .bic{width:17px;height:17px}
+#depSaveBtn{display:flex;align-items:center;justify-content:center;gap:8px}
+#depSaveBtn .bic{width:16px;height:16px}
+
+/* ── STATEMENT (ໃບຍອດເງິນ · ຄົງສີເດີມ) ── */
+.stmt{background:var(--card);border:1px solid var(--border-gold);border-radius:8px;overflow:hidden}
+.stmt-hd{display:flex;align-items:center;gap:11px;padding:15px 22px;border-bottom:2px solid var(--gold)}
+.stmt-hd .bic{width:21px;height:21px;color:var(--gold-lt)}
+.stmt-hd h3{font-size:14px;font-weight:800;color:var(--gold-lt);letter-spacing:.02em;flex:1}
+.stmt-hd .per{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right}
+.stmt-hd .per b{display:block;font-family:var(--font);font-size:14px;color:var(--text);letter-spacing:.02em;text-transform:none;margin-top:2px}
+.stmt-rows{padding:2px 22px}
+.stmt-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--border)}
+.stmt-row:last-child{border-bottom:none}
+.stmt-row .l{display:flex;align-items:center;gap:12px;font-size:14.5px;color:var(--text2)}
+.stmt-row .l .bic{color:var(--muted);width:18px;height:18px}
+.stmt-row .a{font-family:var(--font);font-size:18px;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.stmt-cr{color:var(--goods)}
+.stmt-db{color:#ff9a9a}
+.stmt-net{display:flex;justify-content:space-between;align-items:baseline;padding:17px 22px;border-top:2px solid var(--gold);background:rgba(232,200,116,0.05)}
+.stmt-net .l{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stmt-net .a{font-family:var(--font);font-size:27px;font-weight:600;color:var(--gold-lt);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.stmt-net .a.neg{color:var(--danger)}
+.stmt-bar{height:5px;background:rgba(255,255,255,0.07)}
+.stmt-bar i{display:block;height:100%;background:var(--gold);transition:width .5s cubic-bezier(.34,1,.64,1)}
+.stmt-bar i.warn{background:var(--gold-lt)}
+.stmt-bar i.over{background:var(--danger)}
+.stmt-barlab{display:flex;justify-content:space-between;padding:10px 22px 14px;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+.stmt-barlab b{font-family:var(--font);color:var(--gold-lt);font-weight:600;font-variant-numeric:tabular-nums}
+.stmt-warn{padding:0 22px 14px;font-size:12px;color:var(--danger)}
+.stmt-txhd{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin:22px 0 0;padding-bottom:9px;border-bottom:2px solid var(--border)}
+.stmt-tx{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid var(--border)}
+.stmt-tx:last-child{border-bottom:none}
+.stmt-tx .tic{width:18px;height:18px;flex-shrink:0}
+.stmt-tx .m{flex:1;min-width:0}
+.stmt-tx .d{font-family:var(--font);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.03em}
+.stmt-tx .n{font-size:13.5px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stmt-tx .v{font-family:var(--font);font-size:15px;font-variant-numeric:tabular-nums}
+.stmt-tx .x{background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:13px;padding:2px 4px;transition:color .12s;line-height:1}
+.stmt-tx .x:hover{color:var(--danger)}
+.stmt-empty{padding:20px 2px;color:var(--muted);font-size:13px}
+.dep-form{background:var(--surface);border:1px solid var(--border-gold);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.dep-form-title{font-size:13px;font-weight:800;color:var(--gold-lt);letter-spacing:.02em}
+.dep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dep-inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:14px;padding:9px 12px;outline:none}
+.dep-inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.dep-inp::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.5);cursor:pointer}
+.bal-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.bal-c{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.bal-c.in{border-top:2px solid var(--gold)}
+.bal-c.out{border-top:2px solid var(--admin)}
+.bal-c.left{border-top:2px solid var(--goods)}
+.bal-c-lbl{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.03em}
+.bal-c-val{font-family:var(--mono);font-size:19px;font-weight:400;line-height:1.1}
+.bal-c.in .bal-c-val{color:var(--gold-lt)}
+.bal-c.out .bal-c-val{color:var(--admin)}
+.bal-c.left .bal-c-val{color:var(--goods)}
+.bal-c.left .bal-c-val.neg{color:var(--danger)}
+.bal-c-cur{font-size:12px;opacity:.5;margin-left:2px}
+.bal-bar-wrap{margin-top:2px}
+.bal-bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.bal-bar-lbl{font-size:12px;color:var(--text2)}
+.bal-bar-pct{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold-lt)}
+.bal-bar{height:12px;background:rgba(255,255,255,0.06);border-radius:50px;overflow:hidden;border:1px solid var(--border)}
+.bal-bar-fill{height:100%;background:linear-gradient(90deg,var(--goods),var(--gold));border-radius:50px;transition:width .5s cubic-bezier(.34,1,.64,1)}
+.bal-bar-fill.warn{background:linear-gradient(90deg,var(--gold),#e0985f)}
+.bal-bar-fill.over{background:linear-gradient(90deg,#e0985f,var(--danger))}
+.bal-note-cur{font-size:11px;color:var(--muted);margin-top:8px}
+.bal-note-cur b{color:var(--admin)}
+.dep-list-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-top:14px;margin-bottom:6px}
+.dep-item{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dep-item:last-child{border-bottom:none}
+.dep-item-l{display:flex;flex-direction:column;gap:2px}
+.dep-item-date{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.dep-item-note{font-size:12px;color:var(--text2)}
+.dep-item-r{display:flex;align-items:center;gap:10px}
+.dep-item-amt{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--gold-lt)}
+.dep-del{background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:13px;padding:2px 4px;transition:color .12s}
+.dep-del:hover{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -364,7 +466,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
   </div>
   <div class="topbar-right">
     <span class="sync-badge loading" id="syncBadge">⏳ ກຳລັງເຊື່ອມ…</span>
-    <button class="btn-summary" onclick="openModal()">
+    <button class="btn-summary" onclick="showView('summary')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <rect x="1" y="10" width="3" height="5" rx="0.5"/><rect x="6" y="6" width="3" height="9" rx="0.5"/><rect x="11" y="2" width="3" height="13" rx="0.5"/>
       </svg>
@@ -385,13 +487,17 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
   <!-- SIDEBAR -->
   <aside class="sidebar" id="mainSidebar">
     <div class="sidebar-section">ເມນູ</div>
-    <div class="nav-item active">
+    <div class="nav-item active" id="nav-expense" onclick="showView('expense')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 8H3L2 3z"/><path d="M6 3V2a2 2 0 0 1 4 0v1"/></svg>
       ລົງລາຍຈ່າຍ
     </div>
-    <div class="nav-item" onclick="openModal()">
+    <div class="nav-item" id="nav-budget" onclick="showView('budget')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="3" width="13" height="10" rx="1.5"/><path d="M1.5 6.5h13"/><circle cx="11.5" cy="9.5" r="1"/></svg>
+      ຍອດເງິນ · ງົບປະມານ
+    </div>
+    <div class="nav-item" id="nav-summary" onclick="showView('summary')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="10" width="3" height="5" rx="0.5"/><rect x="6" y="6" width="3" height="9" rx="0.5"/><rect x="11" y="2" width="3" height="13" rx="0.5"/></svg>
-      ສະຫຼຸບ
+      ສະຫຼຸບລາຍຈ່າຍ
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">ສະຫຼຸບມື້ນີ້</div>
@@ -406,6 +512,9 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 
   <!-- MAIN CONTENT -->
   <div class="content">
+
+   <!-- ═══════════ VIEW: ລົງລາຍຈ່າຍ ═══════════ -->
+   <div id="viewExpense">
     <div class="content-header">
       <div>
         <div class="page-title">ລົງລາຍຈ່າຍ</div>
@@ -521,19 +630,60 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
         </div>
       </div>
     </div>
+   </div><!-- /viewExpense -->
+
+   <!-- ═══════════ VIEW: ຍອດເງິນ · ງົບປະມານ ═══════════ -->
+   <div id="viewBudget" style="display:none">
+    <div class="content-header">
+      <div>
+        <div class="page-title">ຍອດເງິນ · ງົບປະມານ</div>
+        <div class="page-sub">ເງິນໂອນແມ່ໄຫວໃຊ້ຈ່າຍບໍລິຫານ</div>
+      </div>
+    </div>
+    <div class="budget-wrap">
+      <!-- ຟອມ ບັນທຶກ ເງິນເຂົ້າ / ເງິນອອກ -->
+      <div class="dep-form">
+        <div class="dep-form-title"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10.5M9.5 21V10.5M14.5 21V10.5M19 21V10.5"/><path d="M4 10.5h16"/><path d="M12 3 4 7.5h16L12 3Z"/></svg>ບັນທຶກ (ກີບ ₭ ເທົ່ານັ້ນ)</div>
+        <div class="kind-group">
+          <button class="kind-btn active-in" id="depKind-in" onclick="pickKind('in')"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ເງິນເຂົ້າ</button>
+          <button class="kind-btn" id="depKind-out" onclick="pickKind('out')"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="m7 13 5-5 5 5"/><path d="M5 3h14"/></svg>ເງິນອອກ</button>
+        </div>
+        <div class="dep-grid">
+          <div class="field">
+            <label>ວັນທີ</label>
+            <input type="date" id="depDate" class="dep-inp">
+          </div>
+          <div class="field">
+            <label>ຈຳນວນເງິນ (ກີບ)</label>
+            <div class="amt-wrap">
+              <input type="text" id="depAmount" inputmode="decimal" placeholder="0" oninput="fmtInput(this)" style="font-size:16px">
+              <span class="cbadge" style="color:var(--gold-lt)">₭</span>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="depCurrency" value="LAK">
+        <div class="field"><label>ໝາຍເຫດ</label><input type="text" id="depNote" placeholder="ເຊັ່ນ: ໂອນປະຈຳເດືອນ…"></div>
+        <button class="btn-cfg-save" id="depSaveBtn" onclick="addDeposit()" style="margin-top:4px"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ບັນທຶກເງິນເຂົ້າ</button>
+      </div>
+      <!-- ສະຫຼຸບ ຍອດເງິນ -->
+      <div id="balBody"></div>
+    </div>
+   </div><!-- /viewBudget -->
+
+   <!-- ═══════════ VIEW: ສະຫຼຸບລາຍຈ່າຍ ═══════════ -->
+   <div id="viewSummary" style="display:none">
+    <div class="content-header">
+      <div>
+        <div class="page-title">ສະຫຼຸບລາຍຈ່າຍ</div>
+        <div class="page-sub">ສະຫຼຸບຕາມເດືອນ · ທຸກສະກຸນເງິນ</div>
+      </div>
+    </div>
+    <div class="summary-wrap" id="summaryBody"></div>
+   </div><!-- /viewSummary -->
+
   </div>
 </div>
 
-<!-- SUMMARY MODAL -->
-<div class="overlay" id="overlay" onclick="closeOut(event)">
-  <div class="msheet">
-    <div class="mhead">
-      <span class="mtitle">ສະຫຼຸບປະຈຳເດືອນ</span>
-      <button class="mclose" onclick="closeModal()">✕</button>
-    </div>
-    <div class="mbody" id="modalBody"></div>
-  </div>
-</div>
 <div id="toast"></div>
 
 <!-- ── SUPABASE JS ── -->
@@ -545,11 +695,27 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 // ═══════════════════════════════════════════════
 const CFG_KEY = 'dv_supabase_cfg';
 const TABLE   = 'expenses_laijai'; // ຊື່ table ໃນ Supabase
+const DEP_TABLE = 'deposits_laijai'; // ຕາຕະລາງ ເງິນໂອນເຂົ້າ
 
 let sb = null; // Supabase client
 let records = []; // cache
+let deposits = []; // cache ກະເປົາເງິນ (ເງິນເຂົ້າ/ອອກ) — ແຍກຕ່າງຫາກຈາກລາຍຈ່າຍຫຼັກ
+let depKind = 'in'; // 'in' = ເງິນເຂົ້າ, 'out' = ເງິນອອກ
+let currentView = 'expense'; // ໜ້າທີ່ກຳລັງເປີດ: expense / budget / summary
+
+// ── ສິດເຂົ້າເມນູ ຍອດເງິນ · ງົບປະມານ (ສະເພາະ HaiNam ເທົ່ານັ້ນ) ──
+const BUDGET_OWNER = 'HaiNam';
+function hubUser(){ try{ return JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null'); }catch(e){ return null; } }
+function isBudgetOwner(){ const u=hubUser(); return !!(u && (u.username===BUDGET_OWNER || u.name===BUDGET_OWNER)); }
 
 const SYM = {LAK:'₭', THB:'฿', USD:'$'};
+
+// ── business icons (ແທນ emoji) ──
+const IC = {
+  bank:'<svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10.5M9.5 21V10.5M14.5 21V10.5M19 21V10.5"/><path d="M4 10.5h16"/><path d="M12 3 4 7.5h16L12 3Z"/></svg>',
+  in:'<svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>',
+  out:'<svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="m7 13 5-5 5 5"/><path d="M5 3h14"/></svg>'
+};
 const state = {adminTag:'', goodsTag:'', selMode:false, selected:new Set()};
 
 // ═══════════════════════════════════════════════
@@ -567,11 +733,19 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cfgOverlay').style.display = 'none';
   initSupabase(SUPABASE_URL, SUPABASE_KEY);
 
+  // ເມນູ ຍອດເງິນ · ງົບປະມານ — ເຊື່ອງຖ້າບໍ່ແມ່ນ HaiNam
+  if (!isBudgetOwner()) {
+    const nb = document.getElementById('nav-budget');
+    if (nb) nb.style.display = 'none';
+  }
+
   document.addEventListener('keydown', e => {
     if (e.key==='Enter' && !e.isComposing) {
       if (document.activeElement.tagName.toLowerCase()==='textarea') return;
       e.preventDefault();
-      saveExpense();
+      if (currentView === 'budget') addDeposit();      // ໜ້າ ຍອດເງິນ → ບັນທຶກເງິນເຂົ້າ/ອອກ
+      else if (currentView === 'summary') return;       // ໜ້າ ສະຫຼຸບ → ບໍ່ເຮັດຫຍັງ
+      else saveExpense();                               // ໜ້າ ລົງລາຍຈ່າຍ
     }
   });
 });
@@ -633,6 +807,7 @@ async function reloadHistory() {
       .limit(200);
     if (error) throw error;
     records = data || [];
+    await loadDeposits();
     setSyncBadge('ok', '✅ ເຊື່ອມແລ້ວ');
     renderHistory();
     updateSidebar();
@@ -757,12 +932,8 @@ function updateSidebar() {
 // ═══════════════════════════════════════════════
 //  SUMMARY MODAL
 // ═══════════════════════════════════════════════
-function openModal() { buildM(); document.getElementById('overlay').classList.add('open'); closeSidebarMobile(); }
-function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-function closeOut(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
-
 function buildM() {
-  const body = document.getElementById('modalBody');
+  const body = document.getElementById('summaryBody');
   if (!records.length) { body.innerHTML='<div class="nodata">ຍັງບໍ່ມີຂໍ້ມູນ</div>'; return; }
   const months = {};
   records.forEach(r => { const m=r.date.slice(0,7); if(!months[m]) months[m]=[]; months[m].push(r); });
@@ -797,6 +968,161 @@ function renderDet(m, months) {
   recs.forEach(r => { h+=`<div class="hi"><div class="hi-top"><span class="hi-date">${r.date}</span><span class="hi-badge ${r.type}">${r.category}</span></div><div class="hi-mid"><span class="hi-desc">${escHtml(r.description)}</span><span class="hi-amt ${r.type}">${fmt(r.amount)} ${SYM[r.currency]}</span></div>${r.note?`<span class="hi-note">${escHtml(r.note)}</span>`:''}</div>`; });
   h += '</div>';
   document.getElementById('mdet').innerHTML = h;
+}
+
+// ═══════════════════════════════════════════════
+//  ຍອດເງິນ · ງົບປະມານ (BALANCE / BUDGET)
+// ═══════════════════════════════════════════════
+async function loadDeposits() {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb
+      .from(DEP_TABLE)
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    deposits = data || [];
+  } catch(e) {
+    deposits = [];
+    console.warn('ໂຫຼດເງິນໂອນເຂົ້າບໍ່ໄດ້:', e.message||e);
+  }
+}
+
+function pickKind(k) {
+  depKind = k;
+  document.getElementById('depKind-in').className = 'kind-btn' + (k==='in'?' active-in':'');
+  document.getElementById('depKind-out').className = 'kind-btn' + (k==='out'?' active-out':'');
+  const btn = document.getElementById('depSaveBtn');
+  btn.innerHTML = k==='in' ? IC.in + 'ບັນທຶກເງິນເຂົ້າ' : IC.out + 'ບັນທຶກເງິນອອກ';
+}
+
+async function addDeposit() {
+  if (!sb) { toast('ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ Supabase', true); return; }
+  const date = document.getElementById('depDate').value;
+  const amount = rawVal('depAmount');
+  const note = document.getElementById('depNote').value.trim();
+  const kind = depKind;
+  if (!date) { toast('ກະລຸນາເລືອກວັນທີ', true); return; }
+  if (!amount || amount <= 0) { toast('ໃສ່ຈຳນວນເງິນ', true); return; }
+  try {
+    // ກີບ ເທົ່ານັ້ນ · ບໍ່ກ່ຽວກັບຕາຕະລາງລາຍຈ່າຍຫຼັກ
+    const { error } = await sb.from(DEP_TABLE).insert([{date, amount, currency:'LAK', note, kind}]);
+    if (error) throw error;
+    toast(kind==='in' ? 'ບັນທຶກເງິນເຂົ້າສຳເລັດ ✅' : 'ບັນທຶກເງິນອອກສຳເລັດ ✅');
+    document.getElementById('depAmount').value='';
+    document.getElementById('depNote').value='';
+    await loadDeposits();
+    buildBalance();
+  } catch(e) {
+    toast('ບັນທຶກບໍ່ໄດ້: ' + (e.message||''), true);
+  }
+}
+
+async function delDeposit(id) {
+  if (!sb) return;
+  if (!confirm('ລຶບລາຍການເງິນໂອນເຂົ້ານີ້?')) return;
+  try {
+    const { error } = await sb.from(DEP_TABLE).delete().eq('id', id);
+    if (error) throw error;
+    deposits = deposits.filter(x => x.id !== id);
+    buildBalance();
+    toast('ລຶບແລ້ວ');
+  } catch(e) {
+    toast('ລຶບບໍ່ໄດ້: ' + (e.message||''), true);
+  }
+}
+
+// ── ສະຫຼັບ VIEW: ລົງລາຍຈ່າຍ ⇆ ຍອດເງິນ ⇆ ສະຫຼຸບ ──
+function showView(name) {
+  // ປ້ອງກັນ: ເມນູ ຍອດເງິນ · ງົບປະມານ ສະເພາະ HaiNam
+  if (name === 'budget' && !isBudgetOwner()) {
+    toast('ເມນູນີ້ເຂົ້າໄດ້ສະເພາະບັນຊີ HaiNam', true);
+    name = 'expense';
+  }
+  currentView = name;
+  const views = {expense:'viewExpense', budget:'viewBudget', summary:'viewSummary'};
+  Object.keys(views).forEach(k => {
+    document.getElementById(views[k]).style.display = (k===name) ? '' : 'none';
+    const nav = document.getElementById('nav-'+k);
+    if (nav) nav.classList.toggle('active', k===name);
+  });
+  if (name === 'budget') {
+    const d = document.getElementById('depDate');
+    if (!d.value) d.value = new Date().toISOString().slice(0,10);
+    pickKind('in');
+    buildBalance();
+  }
+  if (name === 'summary') buildM();
+  closeSidebarMobile();
+}
+
+function buildBalance() {
+  const body = document.getElementById('balBody');
+  // ໃຊ້ສະເພາະ ກະເປົາເງິນ (deposits) — ບໍ່ກ່ຽວກັບຕາຕະລາງລາຍຈ່າຍຫຼັກ
+  const monthsSet = new Set();
+  deposits.forEach(d => monthsSet.add(d.date.slice(0,7)));
+  const months = [...monthsSet].sort().reverse();
+  if (!months.length) {
+    body.innerHTML = '<div class="nodata" style="margin-top:18px">ຍັງບໍ່ມີຂໍ້ມູນ — ບັນທຶກເງິນເຂົ້າ ຫຼື ເງິນອອກ ຂ້າງເທິງກ່ອນ</div>';
+    return;
+  }
+  const cur = window._balMonth && months.includes(window._balMonth) ? window._balMonth : months[0];
+  window._balMonth = cur;
+  let h = '<div class="mtabs" style="margin-top:16px">';
+  months.forEach(m => {
+    const l = new Date(m+'-01').toLocaleDateString('lo-LA',{year:'numeric',month:'long'});
+    h += `<button class="mtab ${m===cur?'active':''}" onclick="swBal('${m}')">${l}</button>`;
+  });
+  h += '</div><div id="balDet"></div>';
+  body.innerHTML = h;
+  renderBalDet(cur);
+}
+
+function swBal(m) { window._balMonth = m; buildBalance(); }
+
+function renderBalDet(m) {
+  // ກີບ ເທົ່ານັ້ນ · ຄິດໄລ່ຈາກ ກະເປົາເງິນ ຢ່າງດຽວ (ເງິນເຂົ້າ ລົບ ເງິນອອກ)
+  const depM = deposits.filter(d => d.date.slice(0,7)===m);
+  const moneyIn  = depM.filter(d => (d.kind||'in')==='in').reduce((s,d)=>s+Number(d.amount),0);
+  const moneyOut = depM.filter(d => d.kind==='out').reduce((s,d)=>s+Number(d.amount),0);
+  const left = moneyIn - moneyOut;
+  const pct = moneyIn > 0 ? Math.min(100, Math.round(moneyOut/moneyIn*100)) : (moneyOut>0?100:0);
+  const barCls = pct>=100 ? 'over' : (pct>=80 ? 'warn' : '');
+
+  const per = new Date(m+'-01').toLocaleDateString('lo-LA',{year:'numeric',month:'long'});
+
+  // ── ໃບຍອດເງິນ ແບບ Statement (ຄົງສີເດີມ) ──
+  let h = '<div class="stmt">';
+  h += `<div class="stmt-hd">${IC.bank}<h3>ໃບຍອດເງິນ</h3><div class="per">ຮອບເດືອນ<b>${per}</b></div></div>`;
+  h += '<div class="stmt-rows">';
+  h += `<div class="stmt-row"><span class="l">${IC.in}ເງິນເຂົ້າ</span><span class="a stmt-cr">+${fmt(moneyIn)} ₭</span></div>`;
+  h += `<div class="stmt-row"><span class="l">${IC.out}ເງິນອອກ</span><span class="a stmt-db">−${fmt(moneyOut)} ₭</span></div>`;
+  h += '</div>';
+  h += `<div class="stmt-net"><span class="l">ຍອດເຫຼືອ · Balance</span><span class="a ${left<0?'neg':''}">${fmt(left)} ₭</span></div>`;
+  h += `<div class="stmt-bar"><i class="${barCls}" style="width:${pct}%"></i></div>`;
+  h += `<div class="stmt-barlab"><span>ໃຊ້ໄປ ${pct}% ຂອງເງິນເຂົ້າ</span><b>${fmt(moneyOut)} / ${fmt(moneyIn)} ₭</b></div>`;
+  if (left < 0) h += `<div class="stmt-warn">ໃຊ້ເກີນເງິນເຂົ້າ ${fmt(-left)} ₭</div>`;
+  h += '</div>';
+
+  // ── ລາຍການ ໃນເດືອນນີ້ ──
+  h += `<div class="stmt-txhd">ລາຍການ · ${depM.length} ລາຍການ</div>`;
+  if (depM.length) {
+    depM.forEach(d => {
+      const isOut = d.kind==='out';
+      const col = isOut ? '#ff9a9a' : 'var(--goods)';
+      h += `<div class="stmt-tx">
+        <span class="tic" style="color:${col}">${isOut?IC.out:IC.in}</span>
+        <div class="m"><div class="d">${d.date} · ${isOut?'ເງິນອອກ':'ເງິນເຂົ້າ'}</div>${d.note?`<div class="n">${escHtml(d.note)}</div>`:''}</div>
+        <span class="v" style="color:${col}">${isOut?'−':'+'}${fmt(d.amount)} ₭</span>
+        <button class="x" onclick="delDeposit('${d.id}')">✕</button>
+      </div>`;
+    });
+  } else {
+    h += '<div class="stmt-empty">ຍັງບໍ່ມີລາຍການໃນເດືອນນີ້</div>';
+  }
+
+  document.getElementById('balDet').innerHTML = h;
 }
 
 // ═══════════════════════════════════════════════
