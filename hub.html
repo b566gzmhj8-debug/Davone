@@ -46,6 +46,22 @@
   .pw-toggle:hover,.pw-toggle:active{color:var(--gold);}
   .pw-toggle svg{width:19px;height:19px;}
 
+  /* ---------- FACE ID ---------- */
+  .faceid-btn{width:100%;padding:13px;border:1px solid rgba(233,221,196,.35);border-radius:3px;
+    background:transparent;color:#f3ead2;font-weight:600;font-size:.78rem;letter-spacing:.06em;
+    font-family:'Lao MN',-apple-system,sans-serif;display:none;align-items:center;justify-content:center;
+    gap:9px;cursor:pointer;transition:.15s;}
+  .faceid-btn:active{background:rgba(233,221,196,.08);}
+  .faceid-btn svg{width:20px;height:20px;color:var(--gold);}
+  .login-divider{display:none;align-items:center;gap:12px;color:rgba(233,221,196,.35);
+    font-size:.68rem;letter-spacing:.1em;margin:2px 0;}
+  .login-divider::before,.login-divider::after{content:"";flex:1;height:1px;background:rgba(233,221,196,.18);}
+  .faceid-setup{display:none;margin-top:12px;padding:8px 13px;border:1px solid rgba(233,221,196,.28);
+    border-radius:20px;background:transparent;color:rgba(243,234,210,.85);font-size:.72rem;letter-spacing:.03em;
+    font-family:'Lao MN',-apple-system,sans-serif;cursor:pointer;align-items:center;gap:7px;transition:.15s;}
+  .faceid-setup:active{background:rgba(233,221,196,.08);}
+  .faceid-setup svg{width:15px;height:15px;color:var(--gold);}
+
   /* ---------- MENU (statement style) ---------- */
   #menu-wrap{display:none;min-height:100vh;background:var(--ivory);}
   .menu-header{background:var(--navy);color:#f3ead2;padding:28px 28px 22px;position:relative;}
@@ -129,6 +145,11 @@
     </div>
     <div class="login-err" id="loginErr">&nbsp;</div>
     <button class="login-btn" onclick="tryLogin()">ເຂົ້າສູ່ລະບົບ</button>
+    <div class="login-divider" id="faceDivider">ຫຼື</div>
+    <button class="faceid-btn" id="faceBtn" type="button" onclick="loginFaceId()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
+      <span id="faceBtnLabel">ເຂົ້າດ້ວຍ Face ID</span>
+    </button>
   </div>
 </div>
 
@@ -138,6 +159,10 @@
     <div class="eyebrow">ບໍລິສັດ ດາວອນ ພັດທະນາກະສິກຳ ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ</div>
     <div class="name" id="userName">-</div>
     <button class="logout-btn" onclick="logout()">ອອກ</button>
+    <button class="faceid-setup" id="faceSetup" type="button" onclick="toggleFaceId()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
+      <span id="faceSetupLabel">ເປີດໃຊ້ Face ID ໃນເຄື່ອງນີ້</span>
+    </button>
   </div>
   <div class="statement">
     <div class="statement-title"><span>ວັນ.ເດືອນ.ປີ</span><span id="dateStr"></span></div>
@@ -200,6 +225,123 @@ function togglePw(){
     eye.innerHTML='<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>';
   }
 }
+/* ================= FACE ID (WebAuthn / passkey) ================= */
+// ໝາຍເຫດ: Face ID ຕ້ອງເປີດຜ່ານ HTTPS (ຫຼື localhost) ເທົ່ານັ້ນ, ເປີດແບບ file:// ຈະໃຊ້ບໍ່ໄດ້.
+// ອັນນີ້ເປັນ "ຕົວປົດລັອກໃນເຄື່ອງ" ເພື່ອຄວາມສະດວກ (ບໍ່ໄດ້ເກັບລະຫັດຜ່ານ), ຜູກກັບເຄື່ອງນີ້ເທົ່ານັ້ນ.
+const FACE_KEY = 'dv_faceid';
+
+function _b64ToBuf(b64){
+  b64 = b64.replace(/-/g,'+').replace(/_/g,'/');
+  const pad = b64.length % 4; if(pad) b64 += '='.repeat(4-pad);
+  const bin = atob(b64); const buf = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) buf[i] = bin.charCodeAt(i);
+  return buf.buffer;
+}
+function _bufToB64(buf){
+  const bytes = new Uint8Array(buf); let bin = '';
+  for(let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function _rand(n){ const a = new Uint8Array(n); crypto.getRandomValues(a); return a.buffer; }
+function _getFace(){ try{ return JSON.parse(localStorage.getItem(FACE_KEY)||'null'); }catch(e){ return null; } }
+
+// ກວດວ່າເຄື່ອງນີ້ຮອງຮັບ Face ID / ລາຍນິ້ວມື ຫຼືບໍ່
+async function faceAvailable(){
+  if(!window.PublicKeyCredential || !window.isSecureContext) return false;
+  try{ return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+  catch(e){ return false; }
+}
+
+// ສະແດງ/ເຊື່ອງ ປຸ່ມ Face ID ໃນໜ້າ login (ຖ້າເຄື່ອງນີ້ເຄີຍຕັ້ງໄວ້ແລ້ວ)
+async function initFaceLogin(){
+  const rec = _getFace();
+  const btn = document.getElementById('faceBtn');
+  const div = document.getElementById('faceDivider');
+  if(rec && rec.credId && await faceAvailable()){
+    document.getElementById('faceBtnLabel').textContent = `ເຂົ້າດ້ວຍ Face ID (${rec.name||rec.username})`;
+    btn.style.display = 'flex'; div.style.display = 'flex';
+  } else {
+    btn.style.display = 'none'; div.style.display = 'none';
+  }
+}
+
+// ເຂົ້າສູ່ລະບົບດ້ວຍ Face ID
+async function loginFaceId(){
+  const rec = _getFace();
+  const errEl = document.getElementById('loginErr');
+  if(!rec || !rec.credId){ errEl.textContent = "ຍັງບໍ່ໄດ້ຕັ້ງ Face ID ໃນເຄື່ອງນີ້"; return; }
+  try{
+    await navigator.credentials.get({ publicKey: {
+      challenge: _rand(32),
+      allowCredentials: [{ type:'public-key', id: _b64ToBuf(rec.credId), transports:['internal'] }],
+      userVerification: 'required',
+      rpId: location.hostname,
+      timeout: 60000
+    }});
+    // ຜ່ານ Face ID ແລ້ວ → ດຶງບັນຊີຫຼ້າສຸດຈາກ Supabase (ຢືນຢັນວ່າຍັງ active)
+    const res = await fetch(`${SUPA_URL}/rest/v1/hub_accounts?username=eq.${encodeURIComponent(rec.username)}&active=eq.true&select=*`, { headers: HEADERS });
+    const rows = await res.json();
+    if(rows && rows.length){
+      currentUser = rows[0];
+      sessionStorage.setItem('daovone_hub_user', JSON.stringify(currentUser));
+      syncStockSession(currentUser);
+      showMenu();
+    } else {
+      errEl.textContent = "ບັນຊີນີ້ຖືກປິດ ຫຼື ບໍ່ພົບ ກະລຸນາເຂົ້າດ້ວຍລະຫັດຜ່ານ";
+    }
+  }catch(e){
+    if(e && e.name === 'NotAllowedError') errEl.textContent = "ຍົກເລີກ ຫຼື Face ID ບໍ່ຜ່ານ";
+    else errEl.textContent = "ໃຊ້ Face ID ບໍ່ໄດ້ ລອງເຂົ້າດ້ວຍລະຫັດຜ່ານ";
+  }
+}
+
+// ອັບເດດປຸ່ມຕັ້ງຄ່າ Face ID ໃນໜ້າ menu
+async function refreshFaceSetup(){
+  const btn = document.getElementById('faceSetup');
+  const label = document.getElementById('faceSetupLabel');
+  if(!currentUser || !(await faceAvailable())){ btn.style.display='none'; return; }
+  const rec = _getFace();
+  const onForThis = rec && rec.credId && rec.username === currentUser.username;
+  label.textContent = onForThis ? 'ປິດ Face ID ໃນເຄື່ອງນີ້' : 'ເປີດໃຊ້ Face ID ໃນເຄື່ອງນີ້';
+  btn.style.display = 'inline-flex';
+}
+
+// ເປີດ/ປິດ Face ID ໃນເຄື່ອງນີ້ (ຈາກໜ້າ menu)
+async function toggleFaceId(){
+  if(!currentUser) return;
+  const rec = _getFace();
+  const onForThis = rec && rec.credId && rec.username === currentUser.username;
+  if(onForThis){
+    localStorage.removeItem(FACE_KEY);
+    await refreshFaceSetup();
+    alert('ປິດ Face ID ໃນເຄື່ອງນີ້ແລ້ວ');
+    return;
+  }
+  try{
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: _rand(32),
+      rp: { name: 'Daovone Shop', id: location.hostname },
+      user: {
+        id: new TextEncoder().encode(currentUser.username),
+        name: currentUser.username,
+        displayName: currentUser.name || currentUser.username
+      },
+      pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required', residentKey:'preferred' },
+      timeout: 60000,
+      attestation: 'none'
+    }});
+    localStorage.setItem(FACE_KEY, JSON.stringify({
+      credId: _bufToB64(cred.rawId), username: currentUser.username, name: currentUser.name || currentUser.username
+    }));
+    await refreshFaceSetup();
+    alert('ເປີດ Face ID ສຳເລັດ! ຄັ້ງໜ້າກົດ "ເຂົ້າດ້ວຍ Face ID" ໄດ້ເລີຍ');
+  }catch(e){
+    if(e && e.name === 'NotAllowedError') alert('ຍົກເລີກ ຫຼື Face ID ບໍ່ຜ່ານ');
+    else alert('ຕັ້ງ Face ID ບໍ່ໄດ້ (ຕ້ອງເປີດຜ່ານ HTTPS ແລະ ເຄື່ອງຮອງຮັບ Face ID)');
+  }
+}
+
 async function tryLogin(){
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
@@ -253,6 +395,7 @@ function showMenu(){
       </div>`;
   });
   document.getElementById('emptyNote').style.display = count? 'none':'block';
+  refreshFaceSetup();
 }
 
 function openModule(key){
@@ -275,12 +418,15 @@ function logout(){
   document.getElementById('username').value = "";
   document.getElementById('password').value = "";
   document.getElementById('loginErr').innerHTML = "&nbsp;";
+  initFaceLogin();
 }
 
 /* ================= INIT ================= */
 const saved = sessionStorage.getItem('daovone_hub_user');
 if(saved){
   try{ currentUser = JSON.parse(saved); syncStockSession(currentUser); showMenu(); }catch(e){}
+} else {
+  initFaceLogin();
 }
 </script>
 </body>
