@@ -2045,10 +2045,55 @@ function findBundleForModel(model){
 
 let sellCart = [];
 let sellPayments = [];
+/* ບໍ່ null = ກຳລັງແກ້ໄຂບິນເກົ່າ (ບໍ່ແມ່ນອອກບິນໃໝ່): { id, inv, originalItems } */
+let editingInvoice = null;
+/* ແປງລາຍການສິນຄ້າຈາກ DB ໃຫ້ຢູ່ໃນຮູບແບບຂອງ sellCart ເພື່ອໃສ່ຄືນຕອນແກ້ໄຂ */
+function invoiceItemsToCart(items){
+  return (items||[]).map(it=> ({
+    model_id: it.model_id,
+    model_name: it.stock_product_models ? it.stock_product_models.name : '-',
+    unit_id: it.unit_id,
+    variant_note: it.variant_note,
+    quantity: it.quantity,
+    unit_price: it.unit_price,
+    amount: it.amount,
+    groupId: null, bundleParent: false,
+    bundleComponent: it.variant_note === BUNDLE_TAG
+  }));
+}
+/* ເລີ່ມແກ້ໄຂບິນເກົ່າ: ໃສ່ຂໍ້ມູນລູກຄ້າ/ລາຍການ/ການຈ່າຍ ຄືນເຂົ້າຟອມອອກບິນ ແລ້ວໄປແທັບ "ອອກບິນຂາຍ" */
+function startInvoiceEdit(invoiceId, inv, items, payments){
+  editingInvoice = { id: invoiceId, inv, originalItems: items || [] };
+  sellCart = invoiceItemsToCart(items);
+  sellPayments = (payments||[]).map(p=> ({
+    method: p.method, currency: p.currency, amount: Number(p.amount)||0,
+    exchange_rate: p.exchange_rate, converted_amount: Number(p.converted_amount)||0
+  }));
+  tabDrafts.sell = {};
+  activeTab = 'sell';
+  buildNav();
+  renderTab();
+}
+/* ຍົກເລີກການແກ້ໄຂ ກັບໄປໜ້າລາຍງານ */
+function cancelInvoiceEdit(){
+  editingInvoice = null;
+  sellCart = []; sellPayments = []; tabDrafts.sell = {};
+  activeTab = 'report';
+  buildNav();
+  renderTab();
+}
 async function renderSell(main){
   const models = await getModels();
-  sellPayments = [];
+  if(!editingInvoice) sellPayments = [];
   main.innerHTML = `
+    ${editingInvoice ? `
+    <div class="card" style="border:2px solid var(--orange-soft);">
+      <div class="row" style="align-items:center;">
+        <span style="font-weight:700;color:var(--orange-soft);"><svg class="dv-icon"><use href="#i-pencil"></use></svg> ກຳລັງແກ້ໄຂບິນ <span class="mono">${editingInvoice.inv.invoice_no || ''}</span></span>
+        <button class="btn danger" id="s_cancelEdit" style="width:auto;padding:6px 14px;margin:0;">ຍົກເລີກ</button>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:6px;">ແກ້ໄດ້ທັງລູກຄ້າ ລາຍການ ຈຳນວນ ແລະ ການຈ່າຍ · ບັນທຶກແລ້ວ ສະຕັອກຈະຄິດໃໝ່ໃຫ້ອັດຕະໂນມັດ</div>
+    </div>` : ''}
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-users"></use></svg>ຂໍ້ມູນລູກຄ້າ</h3>
       <label>ຊື່ລູກຄ້າ</label>
@@ -2124,7 +2169,7 @@ async function renderSell(main){
       <div class="row"><span>ຍອດບິນ</span><span class="mono" id="s_sumTotal">0</span></div>
       <div class="row"><span>ຈ່າຍແລ້ວ</span><span class="mono" id="s_sumPaid">0</span></div>
       <div class="row"><span class="gold">ຄ້າງຊຳລະ</span><span class="gold mono" id="s_sumRemain">0</span></div>
-      <button class="btn" id="s_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ຢືນຢັນອອກບິນ (ຫັກສະຕັອກທັນທີ)</button>
+      <button class="btn" id="s_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>${editingInvoice ? 'ບັນທຶກການແກ້ໄຂບິນ' : 'ຢືນຢັນອອກບິນ (ຫັກສະຕັອກທັນທີ)'}</button>
     </div>
   `;
   attachMoneyInput('s_price', 0);
@@ -2285,6 +2330,22 @@ async function renderSell(main){
     if(moneyValue('s_pay_amount')){ document.getElementById('s_addPayment').click(); }
     else { document.getElementById('s_submit').click(); }
   });
+  /* ໂໝດແກ້ໄຂ: ໃສ່ຂໍ້ມູນລູກຄ້າ/ສະກຸນເງິນ/ສ່ວນຫຼຸດຄືນ (ລາຍການ & ການຈ່າຍ ໃສ່ຈາກ sellCart/sellPayments ແລ້ວ) */
+  if(editingInvoice){
+    const ei = editingInvoice.inv;
+    document.getElementById('s_name').value = ei.customer_name || '';
+    document.getElementById('s_phone').value = ei.customer_phone || '';
+    document.getElementById('s_village').value = ei.village || '';
+    document.getElementById('s_district').value = ei.district || '';
+    document.getElementById('s_province').value = ei.province || '';
+    document.getElementById('s_currency').value = ei.currency || 'LAK';
+    syncPayCurrencyDefault();
+    attachMoneyInput('s_discount', Number(ei.discount_amount||0));
+    document.getElementById('s_cartList').innerHTML = renderSellCart();
+    bindSellCartRemove();
+    const cancelBtn = document.getElementById('s_cancelEdit');
+    if(cancelBtn) cancelBtn.addEventListener('click', cancelInvoiceEdit);
+  }
   renderPaymentList();
   updateSellTotals();
   document.getElementById('s_submit').addEventListener('click', async (e)=>{
@@ -2295,6 +2356,12 @@ async function renderSell(main){
     const btn = e.currentTarget;
     if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
     btn.disabled = true;
+    /* ໂໝດແກ້ໄຂ: ບັນທຶກທັບບິນເກົ່າ (ຄືນສະຕັອກເກົ່າ → ຕັດໃໝ່) ແທນການອອກບິນໃໝ່ */
+    if(editingInvoice){
+      try{ await saveInvoiceEdit(); }
+      catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
+      return;
+    }
     try{
       const invoiceId = uid();
       const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
@@ -2348,6 +2415,67 @@ async function renderSell(main){
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
   });
+}
+
+/* ບັນທຶກການແກ້ໄຂບິນ: ຄືນສະຕັອກ+ລົບລາຍການ/ການຈ່າຍ/ການເຄື່ອນໄຫວເກົ່າ ແລ້ວສ້າງໃໝ່ຕາມ cart/payments ປັດຈຸບັນ
+   ໃຊ້ invoice_id ເກົ່າ (ເລກບິນ/ຜູ້ອອກ/ວັນທີ ຄືເກົ່າ). ໝາຍເຫດ: REST ບໍ່ແມ່ນ transaction ຖ້າຂາດກາງຄັນ
+   ອາດເຫຼືອສະຖານະບໍ່ຄົບ — ແຕ່ລຳດັບ "ຄືນກ່ອນ→ຕັດໃໝ່" ຮັບປະກັນວ່າຈະບໍ່ຕັດສະຕັອກຊ້ຳ */
+async function saveInvoiceEdit(){
+  const ei = editingInvoice;
+  const invoiceId = ei.id;
+  const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
+  const discount = Math.min(moneyValue('s_discount'), subtotal);
+  const total = subtotal - discount;
+  const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
+  const currency = document.getElementById('s_currency').value;
+  const status = paid <= 0 ? 'unpaid' : (paid >= total ? 'paid' : 'partial');
+  const soldAt = ei.inv.invoice_date || todayStr();
+  /* 1) ຄືນສະຕັອກເກົ່າ (ເລກເຄື່ອງກັບເປັນ in_stock) + ລົບ movement/ລາຍການ/ການຈ່າຍ ຂອງບິນນີ້ */
+  const oldUnitIds = [...new Set((ei.originalItems||[]).filter(it=> it.unit_id).map(it=> it.unit_id))];
+  if(oldUnitIds.length){
+    await sb(`stock_product_units?id=in.(${oldUnitIds.join(',')})`, { method:'PATCH', body:{ status:'in_stock', sold_at:null } });
+  }
+  await Promise.all([
+    sb(`stock_movements?ref_type=eq.sale&ref_id=eq.${invoiceId}`, { method:'DELETE' }),
+    sb(`sales_invoice_items?invoice_id=eq.${invoiceId}`, { method:'DELETE' }),
+    sb(`sales_payments?invoice_id=eq.${invoiceId}`, { method:'DELETE' })
+  ]);
+  /* 2) ສ້າງລາຍການ/ການເຄື່ອນໄຫວ/ການຈ່າຍ ໃໝ່ + ຕັດເລກເຄື່ອງທີ່ຂາຍ + ອັບເດດຫົວບິນ */
+  const itemsBody = sellCart.map(item=> ({
+    id: uid(), invoice_id: invoiceId, model_id: item.model_id, unit_id: item.unit_id,
+    variant_note: item.variant_note, quantity: item.quantity, unit_price: item.unit_price, amount: item.amount
+  }));
+  const movementsBody = sellCart.map(item=> ({
+    id: uid(), model_id: item.model_id, unit_id: item.unit_id, movement_type:'out',
+    quantity: item.quantity, ref_type:'sale', ref_id: invoiceId, created_by: currentUsername
+  }));
+  const newUnitIds = sellCart.filter(item=> item.unit_id).map(item=> item.unit_id);
+  const paymentsBody = sellPayments.map(p=> ({
+    id: uid(), invoice_id: invoiceId, payment_date: soldAt,
+    method: p.method, currency: p.currency, amount: p.amount,
+    exchange_rate: p.exchange_rate, converted_amount: p.converted_amount, created_by: currentUsername
+  }));
+  await Promise.all([
+    sb('sales_invoice_items', { method:'POST', body: itemsBody }),
+    sb('stock_movements', { method:'POST', body: movementsBody }),
+    newUnitIds.length ? sb(`stock_product_units?id=in.(${newUnitIds.join(',')})`, { method:'PATCH', body:{ status:'sold', sold_at: soldAt } }) : Promise.resolve(),
+    paymentsBody.length ? sb('sales_payments', { method:'POST', body: paymentsBody }) : Promise.resolve(),
+    sb(`sales_invoices?id=eq.${invoiceId}`, { method:'PATCH', body:{
+      customer_name: document.getElementById('s_name').value.trim(),
+      customer_phone: document.getElementById('s_phone').value.trim(),
+      village: document.getElementById('s_village').value.trim(),
+      district: document.getElementById('s_district').value.trim(),
+      province: document.getElementById('s_province').value.trim(),
+      total_amount: total, discount_amount: discount, currency,
+      paid_amount: paid, payment_status: status
+    }})
+  ]);
+  toast(`ແກ້ໄຂບິນ ${ei.inv.invoice_no || ''} ສຳເລັດ · ${fmtMoney(total)}`);
+  editingInvoice = null;
+  sellCart = []; sellPayments = []; tabDrafts.sell = {};
+  activeTab = 'report';
+  buildNav();
+  renderTab();
 }
 function renderPaymentList(){
   const el = document.getElementById('s_paymentList');
@@ -2991,7 +3119,8 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
         </div>
         <button class="btn secondary" id="pay_submit"><svg class="dv-icon"><use href="#i-wallet"></use></svg>ບັນທຶກການຈ່າຍ</button>
       ` : ''}
-      ${currentRole==='admin' ? `<button class="btn danger" id="invDeleteBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບບິນນີ້ (ຄືນສະຕັອກ)</button>` : ''}
+      ${(currentRole==='admin'||currentRole==='staff') ? `<button class="btn secondary" id="invEditBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂບິນ (ລາຍການ/ຈຳນວນ/ການຈ່າຍ)</button>` : ''}
+      ${currentRole==='admin' ? `<button class="btn danger" id="invDeleteBtn" style="margin-top:8px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບບິນນີ້ (ຄືນສະຕັອກ)</button>` : ''}
       <button class="btn ${remain>0?'secondary':''}" id="invDetailClose">ປິດ</button>
     `;
     if(remain > 0){
@@ -3042,6 +3171,8 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
         }catch(err){ toast('ຜິດພາດ: '+err.message); }
       });
     }
+    const invEditBtn = bg.querySelector('#invEditBtn');
+    if(invEditBtn) invEditBtn.addEventListener('click', ()=>{ bg.remove(); startInvoiceEdit(invoiceId, inv, items, payments); });
     bg.querySelector('#invDetailClose').addEventListener('click', ()=> bg.remove());
   }catch(err){
     bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="invDetailClose2">ປິດ</button>`;
