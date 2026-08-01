@@ -1086,8 +1086,15 @@ function renderBalDet(m) {
   const depM = deposits.filter(d => d.date.slice(0,7)===m);
   const moneyIn  = depM.filter(d => (d.kind||'in')==='in').reduce((s,d)=>s+Number(d.amount),0);
   const moneyOut = depM.filter(d => d.kind==='out').reduce((s,d)=>s+Number(d.amount),0);
-  const left = moneyIn - moneyOut;
-  const pct = moneyIn > 0 ? Math.min(100, Math.round(moneyOut/moneyIn*100)) : (moneyOut>0?100:0);
+
+  // ── ຍອດຍົກມາ: ຍອດເຫຼືອສະສົມຈາກທຸກເດືອນກ່ອນໜ້າ (ເງິນເຂົ້າ ລົບ ເງິນອອກ) ──
+  const carry = deposits
+    .filter(d => d.date.slice(0,7) < m)
+    .reduce((s,d) => s + ((d.kind||'in')==='in' ? Number(d.amount) : -Number(d.amount)), 0);
+
+  const avail = carry + moneyIn;   // ເງິນທີ່ໃຊ້ໄດ້ = ຍອດຍົກມາ + ເງິນເຂົ້າເດືອນນີ້
+  const left  = avail - moneyOut;  // ຍອດເຫຼືອສິ້ນເດືອນ (ຈະຍົກໄປເດືອນຕໍ່ໄປ)
+  const pct = avail > 0 ? Math.min(100, Math.round(moneyOut/avail*100)) : (moneyOut>0?100:0);
   const barCls = pct>=100 ? 'over' : (pct>=80 ? 'warn' : '');
 
   const per = new Date(m+'-01').toLocaleDateString('lo-LA',{year:'numeric',month:'long'});
@@ -1096,13 +1103,14 @@ function renderBalDet(m) {
   let h = '<div class="stmt">';
   h += `<div class="stmt-hd">${IC.bank}<h3>ໃບຍອດເງິນ</h3><div class="per">ຮອບເດືອນ<b>${per}</b></div></div>`;
   h += '<div class="stmt-rows">';
+  if (carry !== 0) h += `<div class="stmt-row"><span class="l">${IC.bank}ຍອດຍົກມາ</span><span class="a ${carry<0?'stmt-db':'stmt-cr'}">${carry<0?'−':'+'}${fmt(Math.abs(carry))} ₭</span></div>`;
   h += `<div class="stmt-row"><span class="l">${IC.in}ເງິນເຂົ້າ</span><span class="a stmt-cr">+${fmt(moneyIn)} ₭</span></div>`;
   h += `<div class="stmt-row"><span class="l">${IC.out}ເງິນອອກ</span><span class="a stmt-db">−${fmt(moneyOut)} ₭</span></div>`;
   h += '</div>';
   h += `<div class="stmt-net"><span class="l">ຍອດເຫຼືອ · Balance</span><span class="a ${left<0?'neg':''}">${fmt(left)} ₭</span></div>`;
   h += `<div class="stmt-bar"><i class="${barCls}" style="width:${pct}%"></i></div>`;
-  h += `<div class="stmt-barlab"><span>ໃຊ້ໄປ ${pct}% ຂອງເງິນເຂົ້າ</span><b>${fmt(moneyOut)} / ${fmt(moneyIn)} ₭</b></div>`;
-  if (left < 0) h += `<div class="stmt-warn">ໃຊ້ເກີນເງິນເຂົ້າ ${fmt(-left)} ₭</div>`;
+  h += `<div class="stmt-barlab"><span>ໃຊ້ໄປ ${pct}% ຂອງເງິນທີ່ໃຊ້ໄດ້</span><b>${fmt(moneyOut)} / ${fmt(avail)} ₭</b></div>`;
+  if (left < 0) h += `<div class="stmt-warn">ໃຊ້ເກີນເງິນທີ່ໃຊ້ໄດ້ ${fmt(-left)} ₭</div>`;
   h += '</div>';
 
   // ── ລາຍການ ໃນເດືອນນີ້ ──
