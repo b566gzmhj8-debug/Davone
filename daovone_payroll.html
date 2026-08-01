@@ -724,7 +724,7 @@
       </div>
       <div class="slip-info-item">
         <div class="icon"><svg class="ico" aria-hidden="true"><use href="#i-cal"/></svg></div>
-        <div><div class="lbl">ປະຈຳເດືອນ</div><div class="val" id="slip-month">—</div></div>
+        <div><div class="lbl">ເງິນເດືອນ</div><div class="val" id="slip-month">—</div></div>
       </div>
       <div class="slip-info-item">
         <div class="icon"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></div>
@@ -856,7 +856,9 @@ async function cloudLoad(silent = false) {
       paid: false, bankAccount: '', bankName: '', qrImage: '',
       ...e, qrImage: qrMap[e.id] || ''
     }));
-    if (parsed.month) {
+    if (parsed.month && !silent) {
+      // ໂຫລດ Cloud ດ້ວຍມື → ຄືນຄ່າເດືອນທີ່ບັນທຶກໄວ້
+      // sync ເບື້ອງຫຼັງ (silent) → ຄົງ auto-lock ເດືອນຍ້ອນຫຼັງໄວ້
       const mp = document.getElementById('month-picker');
       if (mp) mp.value = parsed.month;
     }
@@ -1701,8 +1703,10 @@ async function exportSelectedPDFs() {
 
 // ── INIT ──
 (function init() {
-  // auto ເດືອນປັດຈຸບັນທຸກຄັ້ງ
+  // auto ລັອກຍ້ອນຫຼັງ 1 ເດືອນ (ໂອນເດືອນໃໝ່ ແຕ່ເປັນເງິນເດືອນຂອງເດືອນກ່ອນ)
   const now = new Date();
+  now.setDate(1);
+  now.setMonth(now.getMonth() - 1);
   document.getElementById('month-picker').value =
     now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
 
@@ -1826,7 +1830,7 @@ function buildSlipHTML(emp, docNum) {
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         
-        <div><div style="font-size:0.72rem;color:#6b7770;">ປະຈຳເດືອນ</div><div style="font-weight:700;">${monthLabel}</div></div>
+        <div><div style="font-size:0.72rem;color:#6b7770;">ເງິນເດືອນ</div><div style="font-weight:700;">${monthLabel}</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         
