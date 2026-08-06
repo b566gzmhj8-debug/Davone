@@ -2126,10 +2126,10 @@ async function renderSell(main){
     <div class="card">
       <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການໃນບິນ</h3>
       <div id="s_cartList">${renderSellCart()}</div>
-      <div class="row"><span>ລວມຍ່ອຍ</span><span class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))}</span></div>
+      <div class="row"><span>ລວມຍ່ອຍ</span><span class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</span></div>
       <label>ຫຼຸດລາຄາ (ຖ້າມີ)</label>
       <input id="s_discount" type="text" value="0">
-      <div class="invoice-total mono" id="s_totalDisplay">ລວມ: ${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))}</div>
+      <div class="invoice-total mono" id="s_totalDisplay">ລວມ: ${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</div>
       <!-- ສະກຸນເງິນບິນເລືອກອັດຕະໂນມັດຕາມສິນຄ້າ (ສິນຄ້າແຕ່ລະລາຍການຕັ້ງລາຄາສະກຸນດຽວ) ຈຶ່ງເຊື່ອງ dropdown ໄວ້ ບໍ່ໃຫ້ຜູ້ໃຊ້ເລືອກເອງ -->
       <select id="s_currency" style="display:none;">
         <option value="LAK">ກີບ (LAK)</option>
@@ -2202,6 +2202,10 @@ async function renderSell(main){
     }
     syncPayCurrencyDefault();
     fillSellPrice();
+    /* ສະກຸນເງິນຫາກໍປ່ຽນຕາມສິນຄ້າ → render ລາຍການ+ຍອດຄືນ ໃຫ້ປ້າຍ ກີບ/ບາດ ອັບເດດທັນທີ */
+    const cartEl = document.getElementById('s_cartList');
+    if(cartEl){ cartEl.innerHTML = renderSellCart(); bindSellCartRemove(); }
+    updateSellTotals();
     document.getElementById('s_unitBlock').style.display = isSerial ? 'block' : 'none';
     document.getElementById('s_qtyPriceBlock').style.display = isSerial ? 'none' : 'grid';
     if(isSerial){
@@ -2483,7 +2487,7 @@ function renderPaymentList(){
   el.innerHTML = sellPayments.length ? sellPayments.map((p,idx)=> `
     <div class="cart-item">
       <span>${p.method==='cash'?'ເງິນສົດ':'ໂອນ'} · ${p.currency}</span>
-      <span>${fmtMoney(p.amount)}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''} <span class="x" data-pidx="${idx}">✕</span></span>
+      <span>${fmtMoney(p.amount)} ${p.currency==='THB'?'ບາດ':'ກີບ'}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''} <span class="x" data-pidx="${idx}">✕</span></span>
     </div>`).join('') : '<div class="empty">ຍັງບໍ່ໄດ້ບັນທຶກການຈ່າຍ (ຄ້າງໝົດ)</div>';
   el.querySelectorAll('.x').forEach(x=>{
     x.addEventListener('click', ()=>{
@@ -2493,19 +2497,25 @@ function renderPaymentList(){
     });
   });
 }
+/* ໜ່ວຍເງິນຂອງບິນປັດຈຸບັນ (ຕາມສະກຸນທີ່ລະບົບເລືອກໃຫ້ອັດຕະໂນມັດຕາມສິນຄ້າ) — ໃຊ້ຕໍ່ທ້າຍຍອດທຸກຈຸດ ໃຫ້ຮູ້ວ່າ ກີບ ຫຼື ບາດ */
+function sellCurUnit(){
+  const el = document.getElementById('s_currency');
+  return (el && el.value === 'THB') ? 'ບາດ' : 'ກີບ';
+}
 function updateSellTotals(){
   const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
   const discount = Math.min(moneyValue('s_discount'), subtotal);
   const total = subtotal - discount;
   const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
   const remain = total - paid;
+  const unit = sellCurUnit();
   const subtotalDisplay = document.getElementById('s_subtotalDisplay');
-  if(subtotalDisplay) subtotalDisplay.textContent = fmtMoney(subtotal);
+  if(subtotalDisplay) subtotalDisplay.textContent = fmtMoney(subtotal) + ' ' + unit;
   const totalDisplay = document.getElementById('s_totalDisplay');
-  if(totalDisplay) totalDisplay.textContent = 'ລວມ: ' + fmtMoney(total);
-  const st = document.getElementById('s_sumTotal'); if(st) st.textContent = fmtMoney(total);
-  const sp = document.getElementById('s_sumPaid'); if(sp) sp.textContent = fmtMoney(paid);
-  const sr = document.getElementById('s_sumRemain'); if(sr) sr.textContent = fmtMoney(remain > 0 ? remain : 0);
+  if(totalDisplay) totalDisplay.textContent = 'ລວມ: ' + fmtMoney(total) + ' ' + unit;
+  const st = document.getElementById('s_sumTotal'); if(st) st.textContent = fmtMoney(total) + ' ' + unit;
+  const sp = document.getElementById('s_sumPaid'); if(sp) sp.textContent = fmtMoney(paid) + ' ' + unit;
+  const sr = document.getElementById('s_sumRemain'); if(sr) sr.textContent = fmtMoney(remain > 0 ? remain : 0) + ' ' + unit;
 }
 function renderSellCart(){
   if(!sellCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
@@ -2515,13 +2525,13 @@ function renderSellCart(){
       return `
     <div class="cart-item" style="margin-left:16px;opacity:.8;">
       <span>↳ ${it.model_name} × ${it.quantity} <span class="muted" style="font-size:11px;">(${BUNDLE_TAG})</span></span>
-      <span class="muted">${fmtMoney(it.unit_price)} <span class="x" data-idx="${idx}">✕</span></span>
+      <span class="muted">${fmtMoney(it.unit_price)} ${sellCurUnit()} <span class="x" data-idx="${idx}">✕</span></span>
     </div>`;
     }
     return `
     <div class="cart-item">
       <span>${it.model_name}${it.variant_note?(' · '+it.variant_note):(' × '+it.quantity)}</span>
-      <span>${fmtMoney(it.amount)} <span class="x" data-idx="${idx}">✕</span></span>
+      <span>${fmtMoney(it.amount)} ${sellCurUnit()} <span class="x" data-idx="${idx}">✕</span></span>
     </div>`;
   }).join('');
 }
