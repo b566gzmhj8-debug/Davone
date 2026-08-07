@@ -1241,6 +1241,17 @@ async function adjustRemoveUnit(unit){
   await sb(`stock_movements?unit_id=eq.${unit.id}`, { method:'DELETE' });
   await sb(`stock_product_units?id=eq.${unit.id}`, { method:'DELETE' });
 }
+/* ແກ້ໄຂເລກເຄື່ອງ (serial) ທີ່ພິມຜິດ — ສະເພາະແອດມິນ ແລະ ສະເພາະເຄື່ອງທີ່ຍັງຄົງຄັງ (in_stock, ຍັງບໍ່ຂາຍ)
+   ກັນເລກຊ້ຳກ່ອນບັນທຶກ. ໜ່ວຍ (unit) ຄືອັນດຽວກັນ ບໍ່ໄດ້ສ້າງໃໝ່ → ປະຫວັດ movement/receipt ອ້າງດ້ວຍ unit_id ຈຶ່ງຕິດຕາມກັນຄືເກົ່າ */
+async function editUnitSerial(unit, newSerial){
+  const clean = (newSerial||'').trim();
+  if(!clean) throw new Error('ເລກເຄື່ອງວ່າງບໍ່ໄດ້');
+  if(clean === unit.serial_no) return false; /* ບໍ່ໄດ້ປ່ຽນ */
+  const dup = await sb(`stock_product_units?select=id&serial_no=eq.${encodeURIComponent(clean)}`);
+  if(dup.length) throw new Error(`ເລກເຄື່ອງ ${clean} ມີໃນລະບົບແລ້ວ`);
+  await sb(`stock_product_units?id=eq.${unit.id}`, { method:'PATCH', body:{ serial_no: clean } });
+  return true;
+}
 /* ເບິ່ງລາຍລະອຽດເລກເຄື່ອງ (serial) ຂອງສິນຄ້າທີ່ຕ້ອງເກັບເລກແຍກແຕ່ລະໜ່ວຍ */
 async function openUnitsModal(model){
   const bg = document.createElement('div');
@@ -1254,7 +1265,7 @@ async function openUnitsModal(model){
     const units = await getInStockUnits(model.id);
     bg.querySelector('.modal').innerHTML = `
       <h3><svg class="dv-icon"><use href="#i-box"></use></svg>${model.name}</h3>
-      <div class="muted" style="font-size:12px;margin-bottom:8px;">ເລກເຄື່ອງທີ່ຍັງຄົງເຫຼືອໃນສະຕັອກ (${units.length} ${model.unit||'ໜ່ວຍ'})${isAdmin ? ' · ກົດ ✕ ເພື່ອລົບເລກເຄື່ອງທີ່ເພີ່ມຜິດ' : ''}</div>
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">ເລກເຄື່ອງທີ່ຍັງຄົງເຫຼືອໃນສະຕັອກ (${units.length} ${model.unit||'ໜ່ວຍ'})${isAdmin ? ' · ກົດ ✎ ເພື່ອແກ້ເລກເຄື່ອງ · ກົດ ✕ ເພື່ອລົບເລກເຄື່ອງທີ່ເພີ່ມຜິດ' : ''}</div>
       <hr class="sep">
       ${units.length ? units.map((u,idx)=> `
         <div class="row">
@@ -1264,6 +1275,7 @@ async function openUnitsModal(model){
               <div class="muted" style="font-size:11px;">${fmtDateDMY(u.received_at)}</div>
               ${isAdmin ? `<div class="gold mono" style="font-size:12px;">${u.cost_lak!=null ? fmtMoney(u.cost_lak)+' ກີບ' : '-'}</div>` : ''}
             </span>
+            ${isAdmin ? `<button class="icon-btn" data-edit="${idx}" style="color:var(--orange);border-color:var(--orange);">✎</button>` : ''}
             ${isAdmin ? `<button class="icon-btn" data-rm="${idx}" style="color:var(--danger);border-color:var(--danger);">✕</button>` : ''}
           </span>
         </div>`).join('') : '<div class="empty">ບໍ່ມີເຄື່ອງເຫຼືອໃນສະຕັອກ</div>'}
@@ -1271,6 +1283,23 @@ async function openUnitsModal(model){
     `;
     bg.querySelector('#unitsClose').addEventListener('click', ()=>{ bg.remove(); if(stockChanged) renderTab(); });
     if(isAdmin){
+      bg.querySelectorAll('[data-edit]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const u = units[Number(btn.dataset.edit)];
+          if(!u) return;
+          const nv = prompt(`ແກ້ເລກເຄື່ອງ (serial)\nເລກເກົ່າ: ${u.serial_no}\n\nປ້ອນເລກເຄື່ອງໃໝ່:`, u.serial_no);
+          if(nv === null) return; /* ກົດຍົກເລີກ */
+          btn.disabled = true;
+          try{
+            const changed = await editUnitSerial(u, nv);
+            if(changed){
+              stockChanged = true;
+              toast(`ແກ້ເລກເຄື່ອງເປັນ ${nv.trim()} ແລ້ວ`);
+              await paint();
+            } else { btn.disabled = false; }
+          }catch(err){ toast('ຜິດພາດ: ' + err.message); btn.disabled = false; }
+        });
+      });
       bg.querySelectorAll('[data-rm]').forEach(btn=>{
         btn.addEventListener('click', async ()=>{
           const u = units[Number(btn.dataset.rm)];
