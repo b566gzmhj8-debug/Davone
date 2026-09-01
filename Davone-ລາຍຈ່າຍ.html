@@ -858,6 +858,17 @@ async function saveExpense() {
 
 async function delRecord(id) {
   if (!sb) return;
+  const r = records.find(x => x.id === id);
+  let msg = 'ຢືນຢັນການລຶບລາຍການນີ້?';
+  if (r) {
+    msg = 'ຢືນຢັນການລຶບລາຍການນີ້?\n\n'
+        + '📅 ' + r.date + '\n'
+        + '🏷️ ' + r.category + '\n'
+        + '💰 ' + fmt(r.amount) + ' ' + (SYM[r.currency]||r.currency) + '\n'
+        + '📝 ' + (r.description || '-') + '\n\n'
+        + '⚠️ ລຶບແລ້ວກູ້ຄືນບໍ່ໄດ້';
+  }
+  if (!confirm(msg)) return;
   try {
     const { error } = await sb.from(TABLE).delete().eq('id', id);
     if (error) throw error;
