@@ -109,6 +109,17 @@
   .yr-item.zero .nm{color:var(--muted);}
   .yr-sub{font-size:11px;color:var(--muted);margin-top:2px;}
   .yr-split{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin:10px 0 2px;padding-top:8px;border-top:1px dashed var(--border);}
+  /* ກ່ອງສະຖິຕິທີ່ກົດໄດ້ → ເປີດລາຍການ ແລ້ວເລື່ອນລົງໄປຫາ */
+  button.stat{font:inherit;color:inherit;border:1px solid transparent;width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s;}
+  button.stat:hover{border-color:var(--orange);}
+  button.stat.active{border-color:var(--orange);background:#F6E3D6;}
+  button.stat .go{display:block;font-size:10px;color:var(--orange-soft);margin-top:3px;opacity:.8;}
+  #yr_panel .card, #yr_cats{scroll-margin-top:70px;}
+  .yr-flash{animation:yrFlash 1.2s ease-out;}
+  @keyframes yrFlash{0%{box-shadow:0 0 0 3px var(--orange);}100%{box-shadow:0 0 0 3px transparent;}}
+  .yr-item.link{cursor:pointer;}
+  .yr-item.link:hover .nm{color:var(--orange-soft);}
+  .yr-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;line-height:1;padding:0 4px;cursor:pointer;}
   .cart-item{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px;}
   .cart-item .x{color:var(--danger);font-size:16px;padding:0 6px;}
   .rcv-seq{color:var(--muted);font-weight:600;margin-right:2px;font-variant-numeric:tabular-nums;}
@@ -170,6 +181,10 @@
     .stat{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:10px 12px;}
     .stat .lbl{order:-1;margin-top:0;font-size:12px;flex:0 0 auto;}
     .stat .num{text-align:right;min-width:0;}
+    /* ກ່ອງທີ່ກົດໄດ້ເທິງມືຖື: ຊ່ອນຂໍ້ຄວາມ "ເບິ່ງ..." ໃສ່ລູກສອນ › ທາງຂວາແທນ */
+    button.stat .go{display:none;}
+    button.stat .num{margin-left:auto;}
+    button.stat::after{content:'›';color:var(--orange-soft);font-size:18px;line-height:1;flex:none;}
     /* ຈຳນວນເງິນຊິດຂວາ ໜ່ວຍ (ກີບ/ບາດ) ກວ້າງເທົ່າກັນ ຈຶ່ງຕົງເປັນຖັນ ບໍ່ວ່າຕົວເລກຈະຍາວເທົ່າໃດ */
     .cur-stack{display:block;}
     .cur-line{display:flex;justify-content:flex-end;align-items:baseline;gap:6px;}
@@ -3068,9 +3083,15 @@ const NO_CATEGORY = 'ບໍ່ລະບຸປະເພດ';
 async function getYearSoldQty(year){
   const start = `${year}-01-01`;
   const end = `${year+1}-01-01`;
-  const invoices = await sb(`sales_invoices?select=id&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed`);
+  const invoices = await sb(`sales_invoices?select=id,invoice_date&invoice_date=gte.${start}&invoice_date=lt.${end}&status=eq.confirmed`);
   const qtyByModel = {};
-  if(!invoices.length) return { qtyByModel, invoiceCount: 0 };
+  /* ຈຳນວນບິນແຍກຕາມເດືອນ (index 0 = ມັງກອນ) — ໃຊ້ຕອນກົດກ່ອງ "ຈຳນວນບິນທັງປີ" */
+  const invoiceByMonth = new Array(12).fill(0);
+  invoices.forEach(inv=>{
+    const mo = Number(String(inv.invoice_date||'').slice(5,7));
+    if(mo >= 1 && mo <= 12) invoiceByMonth[mo-1]++;
+  });
+  if(!invoices.length) return { qtyByModel, invoiceCount: 0, invoiceByMonth };
   const ids = invoices.map(i=> i.id);
   const CHUNK = 120;
   for(let i=0; i<ids.length; i+=CHUNK){
@@ -3080,7 +3101,7 @@ async function getYearSoldQty(year){
       qtyByModel[it.model_id] = (qtyByModel[it.model_id]||0) + (Number(it.quantity)||0);
     });
   }
-  return { qtyByModel, invoiceCount: invoices.length };
+  return { qtyByModel, invoiceCount: invoices.length, invoiceByMonth };
 }
 
 /* ປີທີ່ເລືອກໄດ້: ແຕ່ປີຂອງບິນທຳອິດທີ່ມີໃນລະບົບ ຫາ ປີປັດຈຸບັນ */
@@ -3101,7 +3122,7 @@ async function getInvoiceYears(){
 
 async function renderYearly(main){
   const year = Number(main.dataset.year) || new Date().getFullYear();
-  const [years, models, { qtyByModel, invoiceCount }] = await Promise.all([
+  const [years, models, { qtyByModel, invoiceCount, invoiceByMonth }] = await Promise.all([
     getInvoiceYears(),
     /* ເອົາທຸກລຸ້ນ (ລວມທີ່ປິດການໃຊ້ງານ) ເພື່ອບໍ່ໃຫ້ຍອດຂາຍເກົ່າຫາຍໄປ ແຕ່ຈະບອກໄວ້ວ່າ "ປິດແລ້ວ" */
     sb('stock_product_models?select=id,name,code,category,unit,active&order=name.asc'),
@@ -3165,10 +3186,40 @@ async function renderYearly(main){
       <select id="yr_year">${years.map(y=> `<option value="${y}" ${y===year?'selected':''}>ປີ ${y}</option>`).join('')}</select>
     </div>
     <div class="stats-row">
-      <div class="stat"><div class="num mono">${totalQty}</div><div class="lbl">ຂາຍອອກລວມ (ໜ່ວຍ)</div></div>
-      <div class="stat"><div class="num mono">${invoiceCount}</div><div class="lbl">ຈຳນວນບິນທັງປີ</div></div>
-      <div class="stat"><div class="num mono">${soldRows.length}</div><div class="lbl">ລຸ້ນທີ່ຂາຍໄດ້</div></div>
-      <div class="stat"><div class="num mono">${deadRows.length}</div><div class="lbl">ລຸ້ນທີ່ບໍ່ໄດ້ຂາຍ</div></div>
+      <button type="button" class="stat" data-yr-go="cats"><div class="num mono">${totalQty}</div><div class="lbl">ຂາຍອອກລວມ (ໜ່ວຍ)</div><span class="go">ເບິ່ງແຍກປະເພດ ›</span></button>
+      <button type="button" class="stat" data-yr-go="bills"><div class="num mono">${invoiceCount}</div><div class="lbl">ຈຳນວນບິນທັງປີ</div><span class="go">ເບິ່ງແຍກເດືອນ ›</span></button>
+      <button type="button" class="stat" data-yr-go="sold"><div class="num mono">${soldRows.length}</div><div class="lbl">ລຸ້ນທີ່ຂາຍໄດ້</div><span class="go">ເບິ່ງລາຍການ ›</span></button>
+      <button type="button" class="stat" data-yr-go="dead"><div class="num mono">${deadRows.length}</div><div class="lbl">ລຸ້ນທີ່ບໍ່ໄດ້ຂາຍ</div><span class="go">ເບິ່ງລາຍການ ›</span></button>
+    </div>
+
+    <!-- ລາຍການທີ່ເປີດຈາກກ່ອງສະຖິຕິ (ເປີດເທື່ອລະອັນ) -->
+    <div id="yr_panel">
+      <div class="card" id="yr_p_bills" hidden>
+        <h3><svg class="dv-icon"><use href="#i-chart"></use></svg>ຈຳນວນບິນແຍກຕາມເດືອນ · ປີ ${year} <button type="button" class="yr-close" aria-label="ປິດ">✕</button></h3>
+        <div class="muted" style="font-size:11px;margin:-4px 0 4px;">ກົດເດືອນເພື່ອເປີດລາຍງານບິນຂອງເດືອນນັ້ນ</div>
+        ${(()=>{
+          const mx = Math.max(...invoiceByMonth, 1);
+          return invoiceByMonth.map((c,i)=> `
+          <div class="yr-item link ${c ? '' : 'zero'}" data-yr-month="${year}-${String(i+1).padStart(2,'0')}">
+            <div class="yr-top">
+              <span class="nm">ເດືອນ ${i+1}/${year}</span>
+              <span class="qt">${c ? c + ' ບິນ' : 'ບໍ່ມີບິນ'}</span>
+            </div>
+            ${c ? `<div class="yr-bar"><i style="width:${Math.max(2, Math.round(c / mx * 100))}%"></i></div>` : ''}
+          </div>`).join('');
+        })()}
+      </div>
+      <div class="card" id="yr_p_sold" hidden>
+        <h3><svg class="dv-icon"><use href="#i-chart"></use></svg>ລຸ້ນທີ່ຂາຍໄດ້ທັງໝົດ (${soldRows.length}) · ປີ ${year} <button type="button" class="yr-close" aria-label="ປິດ">✕</button></h3>
+        ${soldRows.length ? [...soldRows].sort((a,b)=> b.qty - a.qty).map((r,i)=> itemHtml(r, i+1, topMax)).join('') : '<div class="empty">ບໍ່ມີການຂາຍໃນປີນີ້</div>'}
+      </div>
+      <div class="card" id="yr_p_dead" hidden>
+        <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ລຸ້ນທີ່ບໍ່ໄດ້ຂາຍເລີຍ (${deadRows.length}) · ປີ ${year} <button type="button" class="yr-close" aria-label="ປິດ">✕</button></h3>
+        ${deadRows.length ? cats.filter(cat=> groups[cat].some(r=> r.qty <= 0)).map(cat=>{
+          const dead = groups[cat].filter(r=> r.qty <= 0);
+          return `<div class="yr-split">${cat} (${dead.length} ລຸ້ນ)</div>` + dead.map(r=> itemHtml(r, 0, 0)).join('');
+        }).join('') : '<div class="empty">ທຸກລຸ້ນຂາຍໄດ້ໝົດ 👍</div>'}
+      </div>
     </div>
 
     <div class="card">
@@ -3176,7 +3227,7 @@ async function renderYearly(main){
       ${topRows.length ? topRows.map((r,i)=> itemHtml(r, i+1, topMax)).join('') : '<div class="empty">ບໍ່ມີການຂາຍໃນປີນີ້</div>'}
     </div>
 
-    <div class="card">
+    <div class="card" id="yr_cats">
       <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ຍອດຂາຍລວມ ແຍກຕາມປະເພດ</h3>
       ${cats.length ? cats.map(cat=>{
         const max = Math.max(...cats.map(c=> catTotals[c]), 1);
@@ -3212,6 +3263,41 @@ async function renderYearly(main){
     main.dataset.year = e.target.value;
     renderTab();
   });
+
+  /* ກົດກ່ອງສະຖິຕິ → ເປີດລາຍການທີ່ກ່ຽວຂ້ອງ ແລ້ວເລື່ອນລົງໄປຫາ; ກົດກ່ອງເດີມອີກເທື່ອ = ປິດ */
+  const statBtns = [...main.querySelectorAll('[data-yr-go]')];
+  const panels = [...main.querySelectorAll('#yr_panel > .card')];
+  const goTo = (el)=>{
+    el.scrollIntoView({ behavior:'smooth', block:'start' });
+    el.classList.remove('yr-flash'); void el.offsetWidth; el.classList.add('yr-flash');
+  };
+  const closePanels = ()=>{
+    panels.forEach(p=> p.hidden = true);
+    statBtns.forEach(b=> b.classList.remove('active'));
+  };
+  statBtns.forEach(btn=> btn.addEventListener('click', ()=>{
+    const key = btn.dataset.yrGo;
+    if(key === 'cats'){ closePanels(); goTo(document.getElementById('yr_cats')); return; }
+    const panel = document.getElementById('yr_p_' + key);
+    const wasOpen = !panel.hidden;
+    closePanels();
+    if(wasOpen) return;
+    panel.hidden = false;
+    btn.classList.add('active');
+    goTo(panel);
+  }));
+  main.querySelectorAll('#yr_panel .yr-close').forEach(x=> x.addEventListener('click', ()=>{
+    closePanels();
+    main.querySelector('.stats-row').scrollIntoView({ behavior:'smooth', block:'center' });
+  }));
+  /* ກົດເດືອນ → ໄປແທັບລາຍງານຂອງເດືອນນັ້ນ */
+  main.querySelectorAll('[data-yr-month]').forEach(row=> row.addEventListener('click', ()=>{
+    main.dataset.month = row.dataset.yrMonth;
+    activeTab = 'report';
+    buildNav();
+    renderTab();
+    window.scrollTo(0, 0);
+  }));
 
   document.getElementById('yr_export').addEventListener('click', ()=>{
     const header = ['ລຳດັບ','ປະເພດ','ລະຫັດ','ຊື່ສິນຄ້າ','ຈຳນວນທີ່ຂາຍໄດ້','ໜ່ວຍ','ສະຖານະ'];
