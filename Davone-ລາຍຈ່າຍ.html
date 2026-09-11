@@ -396,6 +396,30 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .dep-inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:14px;padding:9px 12px;outline:none}
 .dep-inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
 .dep-inp::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.5);cursor:pointer}
+
+/* FIX-MOBILE-DEPGRID */
+.dep-form{min-width:0}
+.dep-grid{min-width:0}
+.dep-grid>*{min-width:0}
+.dep-grid .field{min-width:0}
+.dep-grid .amt-wrap{min-width:0}
+input[type=date].dep-inp{
+  -webkit-appearance:none;appearance:none;
+  display:block;box-sizing:border-box;
+  width:100%;max-width:100%;min-width:0;
+  height:42px;line-height:1.2;
+  font-size:15px;padding:9px 12px;text-align:left;
+}
+input[type=date].dep-inp::-webkit-date-and-time-value{text-align:left}
+.dep-grid .amt-wrap input{box-sizing:border-box;height:42px;min-width:0;width:100%}
+.dep-form>.field>input[type=text]{box-sizing:border-box;width:100%;min-width:0}
+
+@media(max-width:640px){
+  .dep-grid{grid-template-columns:1fr;gap:12px}
+  .dep-form{padding:14px}
+  input[type=date].dep-inp{height:44px;font-size:16px}
+  .dep-grid .amt-wrap input{height:44px;font-size:16px!important}
+}
 .bal-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .bal-c{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 .bal-c.in{border-top:2px solid var(--gold)}
