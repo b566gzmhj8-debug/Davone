@@ -552,6 +552,7 @@
   /* vehicle-only fields, shown when the category is ລົດໃຫຍ່ */
   .stock-form .veh-field{display:none;}
   .stock-form.is-vehicle .veh-field{display:block;}
+  .stock-form.is-vehicle .part-field{display:none;}
   .stock-form.is-vehicle .veh-field input{border-color:var(--brown);}
   .row-meta.veh-line{color:var(--ink-soft);}
   .stock-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
@@ -798,6 +799,14 @@
           <div class="sf">
             <label for="newStockUnit"><em>3</em> ຫົວໜ່ວຍ</label>
             <input type="text" id="newStockUnit" placeholder="ອັນ, ຄັນ, ແກັດ">
+          </div>
+          <div class="sf part-field">
+            <label for="newStockFits"><em>•</em> ໃຊ້ກັບລົດ</label>
+            <input type="text" id="newStockFits" placeholder="ເຊັ່ນ ຈັກ, ໂຄງ, ລົດຊິ່ງ">
+          </div>
+          <div class="sf part-field">
+            <label for="newStockLoc"><em>•</em> ບ່ອນເກັບ</label>
+            <input type="text" id="newStockLoc" placeholder="ເຊັ່ນ A0101, ຢູ່ແກັດ">
           </div>
           <div class="sf veh-field">
             <label for="newStockBrand"><em>•</em> ຍີ່ຫໍ້ລົດ</label>
@@ -1860,6 +1869,7 @@
           '<p class="row-name">'+escapeHtml(item.name)+'</p>'+
           (meta ? '<p class="row-meta">'+meta+'</p>' : '')+
           (vehInfo(item) ? '<p class="row-meta veh-line">'+escapeHtml(vehInfo(item))+'</p>' : '')+
+          (partInfo(item) ? '<p class="row-meta veh-line">'+escapeHtml(partInfo(item))+'</p>' : '')+
         '</div>'+
         '<span class="stock-col">'+((hideVehMoney() && item.category === "vehicle") ? "—" : (item.costPrice != null ? money(item.costPrice, curOf(item)) : "-"))+'</span>'+
         '<span class="stock-col sell">'+(item.sellPrice != null ? money(item.sellPrice, curOf(item)) : "-")+'</span>'+
@@ -1897,6 +1907,10 @@
     if(!name){ alert("ກະລຸນາໃສ່ຊື່ສິນຄ້າ ຫຼື ລຸ້ນລົດກ່ອນ"); return; }
     var entry = { id: uid(), name: name, code: code, category: cat, unit: unit, qty: qty, min: min, costPrice: cost, sellPrice: sell,
                   currency: document.getElementById("newStockCur").value };
+    if(cat === "part"){
+      entry.fitsWith = document.getElementById("newStockFits").value.trim();
+      entry.location = document.getElementById("newStockLoc").value.trim();
+    }
     if(cat === "vehicle"){
       entry.brand = document.getElementById("newStockBrand").value.trim();
       entry.engineNo = document.getElementById("newStockEngine").value.trim();
@@ -1927,9 +1941,17 @@
 
   // search by name or code, and for vehicles also by brand, engine no. or chassis no.
   function stockMatches(s, q){
-    return [s.name, s.code, s.brand, s.engineNo, s.chassisNo].some(function(v){
+    return [s.name, s.code, s.brand, s.engineNo, s.chassisNo, s.location, s.fitsWith].some(function(v){
       return v && v.toLowerCase().indexOf(q) >= 0;
     });
+  }
+  // "ໃຊ້ກັບ … · ບ່ອນເກັບ …" for a part; empty for vehicles — the shelf code is what staff hunt by
+  function partInfo(item){
+    if(item.category === "vehicle") return "";
+    return [
+      item.fitsWith ? "ໃຊ້ກັບ "+item.fitsWith : "",
+      item.location ? "ບ່ອນເກັບ "+item.location : ""
+    ].filter(Boolean).join(" · ");
   }
   // "ຍີ່ຫໍ້ … · ເລກຈັກ … · ເລກຖັງ …" for a vehicle; empty for parts
   function vehInfo(item){
@@ -1972,7 +1994,7 @@
   });
   document.getElementById("btnClearStockForm").addEventListener("click", function(){
     ["newStockName","newStockCode","newStockUnit","newStockCost","newStockSell","newStockQty","newStockMin",
-     "newStockBrand","newStockEngine","newStockChassis"].forEach(function(id){ document.getElementById(id).value = ""; });
+     "newStockBrand","newStockEngine","newStockChassis","newStockFits","newStockLoc"].forEach(function(id){ document.getElementById(id).value = ""; });
     applyStockCategory();
     updateStockPreview();
     if(isDesktop()){ document.getElementById("newStockName").focus(); }
@@ -1998,11 +2020,14 @@
     var dash = "—";
     $("pvName").textContent = name || "ຍັງບໍ່ໄດ້ໃສ່ຊື່";
     $("pvMeta").textContent = [$("newStockCode").value.trim() || dash, isVehicle ? "ລົດໃຫຍ່" : "ອາໄຫຼ່", unit].join(" · ");
-    $("pvVeh").textContent = !isVehicle ? "" : [
+    $("pvVeh").textContent = (isVehicle ? [
       $("newStockBrand").value.trim() ? "ຍີ່ຫໍ້ "+$("newStockBrand").value.trim() : "",
       $("newStockEngine").value.trim() ? "ເລກຈັກ "+$("newStockEngine").value.trim() : "",
       $("newStockChassis").value.trim() ? "ເລກຖັງ "+$("newStockChassis").value.trim() : ""
-    ].filter(Boolean).join(" · ");
+    ] : [
+      $("newStockFits").value.trim() ? "ໃຊ້ກັບ "+$("newStockFits").value.trim() : "",
+      $("newStockLoc").value.trim() ? "ບ່ອນເກັບ "+$("newStockLoc").value.trim() : ""
+    ]).filter(Boolean).join(" · ");
     $("pvCost").textContent = isNaN(cost) ? dash : money(cost, cur);
     $("pvSell").textContent = isNaN(sell) ? dash : money(sell, cur);
     $("pvMargin").textContent = (isNaN(cost) || isNaN(sell)) ? dash : money(sell - cost, cur);
@@ -2010,7 +2035,7 @@
     $("pvQty").textContent = isNaN(qty) ? dash : numFmt(qty)+" "+unit;
   }
   ["newStockName","newStockCode","newStockUnit","newStockCost","newStockSell","newStockQty",
-   "newStockBrand","newStockEngine","newStockChassis"].forEach(function(id){
+   "newStockBrand","newStockEngine","newStockChassis","newStockFits","newStockLoc"].forEach(function(id){
     document.getElementById(id).addEventListener("input", updateStockPreview);
   });
   document.getElementById("newStockCur").addEventListener("change", updateStockPreview);
