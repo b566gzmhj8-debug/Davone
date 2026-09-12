@@ -169,6 +169,43 @@
   .doc-total-band{background:var(--orange);color:#fff;border-radius:9px;padding:10px 14px;display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:10px;font-size:16px;font-weight:700;margin:6px 0 14px;}
   .doc-total-band span:last-child{white-space:nowrap;flex:none;}
   .doc-footer{padding:12px 18px;border-top:1px solid var(--border);background:var(--panel2);text-align:center;font-size:11px;color:var(--muted);}
+  /* ---- ກະດາດຕົວຢ່າງໃນແອັບ: ໜ້າຕາອັນດຽວກັນກັບໃບ A5 ທີ່ພິມອອກມາ (ເຫັນແນວໃດ ພິມແນວນັ້ນ) ---- */
+  .paper{background:#E6DFD0;padding:12px;border-radius:14px;margin:-16px -16px 14px;}
+  .paper-sheet{background:#FFFFFF;color:#0E0E0E;border-radius:6px;padding:18px 18px 22px;overflow-x:auto;
+    font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif;font-size:13px;line-height:1.5;
+    box-shadow:0 10px 26px -14px rgba(0,0,0,.6);}
+  .paper .shop-header{margin:0 0 10px;padding-bottom:10px;border-bottom:2px solid #0E0E0E;}
+  .paper .shop-name{font-size:16px;font-weight:700;margin:0 0 2px;line-height:1.4;color:#0E0E0E;}
+  .paper .shop-branch{font-size:13.5px;font-weight:700;margin:0 0 5px;color:#0E0E0E;}
+  .paper .shop-meta{font-size:11.5px;color:#3A382F;line-height:1.6;margin:0;}
+  .paper h1{font-size:16px;margin:0 0 2px;text-align:center;color:#0E0E0E;font-family:inherit;display:block;}
+  .paper .sub{font-size:11px;color:#3A382F;margin:0 0 14px;text-align:center;}
+  .paper table{width:100%;border-collapse:collapse;margin-top:8px;}
+  .paper th,.paper td{padding:5px 4px;border-bottom:1px solid #C6BCA8;text-align:left;font-size:12.5px;color:#0E0E0E;font-weight:500;}
+  .paper th:first-child,.paper td:first-child{width:1%;white-space:nowrap;font-weight:600;}
+  .paper th{font-size:11.5px;font-weight:700;}
+  .paper th.num,.paper td.num{white-space:nowrap;width:1%;padding-left:12px;text-align:right;}
+  .paper .cust{margin:14px 0;padding:10px;background:#F7F4EC;border-radius:6px;font-size:12.5px;line-height:1.8;color:#0E0E0E;}
+  .paper .cust-split{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
+  .paper .cust-info{flex:1;min-width:0;}
+  .paper .cust-pay{font-size:12px;font-weight:600;color:#3A382F;text-align:right;max-width:55%;}
+  .paper .meta-row{text-align:left;}
+  .paper .meta-row b{margin-right:6px;color:#0E0E0E;}
+  .paper .sub-total{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;}
+  .paper table + .sub-total{margin-top:10px;}
+  .paper .grand{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:2px solid #0E0E0E;font-size:16px;font-weight:700;}
+  .paper .signs{display:flex;gap:28px;margin-top:40px;}
+  .paper .sign{flex:1;text-align:center;}
+  .paper .sign-line{height:42px;border-bottom:1px dotted #0E0E0E;margin-bottom:6px;}
+  .paper .sign-label{font-size:12.5px;font-weight:600;margin:0;color:#0E0E0E;}
+  .paper .sign-sub{font-size:11.5px;color:#3A382F;margin:2px 0 0;}
+  .paper .thanks{text-align:center;margin-top:22px;font-size:12px;color:#3A382F;}
+  .paper .c{color:#8B8677;font-size:11px;}
+  .paper .note{font-size:11.5px;color:#3A382F;margin:8px 0 0;}
+  @media (min-width:860px){
+    .paper{margin:-28px -32px 16px;}
+    .paper-sheet{max-width:640px;margin:0 auto;padding:24px 26px 28px;}
+  }
   @media (min-width:860px){
     .doc-card{margin:-28px -32px 16px;border-radius:16px;}
   }
@@ -458,15 +495,16 @@ function fmtDateDMY(dateStr){
 }
 
 /* ============================================================
-   ພິມເອກະສານ A5 — ບິນຂາຍ ແລະ ໃບໂອນສາຂາ
-   ຮູບແບບດຽວກັນກັບເອກະສານຂອງສາຂາ (ຫົວກະດາດຮ້ານ → ຫົວເລື່ອງ → ກ່ອງຂໍ້ມູນ → ຕາຕະລາງ → ຍອດລວມ → ບ່ອນເຊັນ)
+   ເອກະສານ A5 — ບິນຂາຍ ແລະ ໃບໂອນສາຂາ (ຮູບແບບດຽວກັນກັບເອກະສານຂອງສາຂາ)
+   ໃຊ້ໂຄງດຽວກັນທັງ "ໜ້າຈໍ" ແລະ "ໜ້າພິມ": ສ້າງເນື້ອໃນເທື່ອດຽວ (invoiceDocBody / transferDocBody)
+   ແລ້ວເອົາໄປວາງໃນກະດາດຕົວຢ່າງເທິງໜ້າຈໍ ຫຼື ສົ່ງເຂົ້າໜ້າຕ່າງພິມ — ເຫັນແນວໃດ ພິມອອກມາແນວນັ້ນ
    ຊື່ຮ້ານ / ສາຂາ / ເບີໂທ / ທີ່ຢູ່ ແກ້ບ່ອນນີ້ບ່ອນດຽວ ແລ້ວປ່ຽນທຸກໃບ
    ============================================================ */
 const SHOP_INFO = {
   name:    'ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ ຜູ້ດຽວ',
   branch:  'ສາຂາຫຼັກ ເມືອງໄຊ',
-  tel:     'Tel: 030 9975155, 020 5693 9546, 020 5659 3242',
-  address: 'ເມືອງໄຊ, ແຂວງອຸດົມໄຊ'
+  tel:     'Tel: 030 4949927, 020 5693 9546, 020 5659 3242',
+  address: 'ບ້ານນາເລົາ, ເມືອງໄຊ, ແຂວງອຸດົມໄຊ'
 };
 const PRINT_FROM_BRANCH = 'ສາຂາຫຼັກ'; /* ຊື່ສາຂາຕົ້ນທາງໃນໃບໂອນ (ຄືກັບ from_branch ທີ່ບັນທຶກລົງ DB) */
 
@@ -476,6 +514,20 @@ function escHtml(v){
 }
 function curLabel(c){ return c === 'THB' ? 'ບາດ' : 'ກີບ'; }
 function moneyCur(n, c){ return fmtMoney(n) + ' ' + curLabel(c); }
+
+/* ຫົວກະດາດ (ຊື່ຮ້ານ + ສາຂາ + ເບີໂທ + ທີ່ຢູ່) ໃຊ້ຮ່ວມກັນທັງໜ້າຈໍ ແລະ ໜ້າພິມ */
+function shopHeaderHtml(){
+  return '<div class="shop-header">' +
+      '<p class="shop-name">' + escHtml(SHOP_INFO.name) + '</p>' +
+      '<p class="shop-branch">(' + escHtml(SHOP_INFO.branch) + ')</p>' +
+      '<p class="shop-meta">' + escHtml(SHOP_INFO.tel) + '</p>' +
+      '<p class="shop-meta">' + escHtml(SHOP_INFO.address) + '</p>' +
+    '</div>';
+}
+/* ກະດາດຕົວຢ່າງເທິງໜ້າຈໍ — ໜ້າຕາຄືກັບໃບທີ່ຈະພິມອອກມາ */
+function paperHtml(bodyHtml){
+  return '<div class="paper"><div class="paper-sheet">' + shopHeaderHtml() + bodyHtml + '</div></div>';
+}
 
 /* ຕ້ອງເປີດໜ້າຕ່າງພິມທັນທີຕອນຜູ້ໃຊ້ກົດປຸ່ມ ແລ້ວຄ່ອຍຂຽນເນື້ອໃນລົງໄປຫຼັງໂຫລດຂໍ້ມູນເສັດ
    ຖ້າໄປເປີດຫຼັງ await ບຣາວເຊີຈະຖືວ່າບໍ່ໄດ້ມາຈາກການກົດ ແລ້ວບລັອກປັອບອັບຖິ້ມ */
@@ -530,12 +582,7 @@ function printDoc(title, bodyHtml, opts){
     '<!DOCTYPE html><html lang="lo"><head><meta charset="UTF-8"><title>' + escHtml(title) + '</title>' +
     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&display=swap" rel="stylesheet">' +
     '<style>' + css + '</style></head><body>' +
-    '<div class="shop-header">' +
-      '<p class="shop-name">' + escHtml(SHOP_INFO.name) + '</p>' +
-      '<p class="shop-branch">(' + escHtml(SHOP_INFO.branch) + ')</p>' +
-      '<p class="shop-meta">' + escHtml(SHOP_INFO.tel) + '</p>' +
-      '<p class="shop-meta">' + escHtml(SHOP_INFO.address) + '</p>' +
-    '</div>' +
+    shopHeaderHtml() +
     bodyHtml +
     '<' + 'script>window.onload=function(){ var go=function(){ setTimeout(function(){ window.print(); }, 250); }; if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(go, go); } else { go(); } };<\/' + 'script>' +
     '</body></html>';
@@ -553,7 +600,7 @@ function printSigns(left, leftSub, right, rightSub){
 }
 
 /* ---------- ບິນຂາຍ ---------- */
-function printInvoiceDoc(inv, items, payments, opts){
+function invoiceDocBody(inv, items, payments){
   const cur = inv.currency || 'LAK';
   const unitOf = (it)=> (it.stock_product_models && it.stock_product_models.unit) || '';
   const nameOf = (it)=> (it.stock_product_models && it.stock_product_models.name) || '-';
@@ -579,8 +626,7 @@ function printInvoiceDoc(inv, items, payments, opts){
   const howLabel = (m)=> m === 'transfer' ? 'ເງິນໂອນ' : 'ເງິນສົດ';
   const ways = [...new Set((payments || []).map(p=> howLabel(p.method) + ' (' + curLabel(p.currency || cur) + ')'))];
   const payText = ways.length ? 'ຊຳລະດ້ວຍ' + ways.join(' + ') : 'ຍັງບໍ່ໄດ້ຊຳລະ';
-  printDoc('ບິນ ' + (inv.invoice_no || ''),
-    '<h1>ໃບຮັບເງິນ / ບິນຂາຍ</h1>' +
+  return '<h1>ໃບຮັບເງິນ / ບິນຂາຍ</h1>' +
     '<p class="sub">ເລກທີ ' + escHtml(inv.invoice_no || '-') + ' · ' + escHtml(fmtDateDMY(inv.invoice_date)) + '</p>' +
     '<div class="cust cust-split">' +
       '<div class="cust-info">' +
@@ -600,8 +646,10 @@ function printInvoiceDoc(inv, items, payments, opts){
     (remain > 0.5 ? '<div class="sub-total"><span>ຈ່າຍແລ້ວ</span><span>' + moneyCur(inv.paid_amount, cur) + '</span></div>' +
                     '<div class="sub-total"><b>ຍັງຄ້າງຊຳລະ</b><b>' + moneyCur(remain, cur) + '</b></div>' : '') +
     printSigns('ຜູ້ຈ່າຍເງິນ ແລະ ຮັບເຄື່ອງ', '(ໄດ້ຮັບເຄື່ອງຄົບແລ້ວ)', 'ຜູ້ຈ່າຍເຄື່ອງ ແລະ ຮັບເງິນ', '') +
-    '<p class="thanks">ຂອບໃຈທີ່ມາອຸດໜູນ</p>',
-    opts);
+    '<p class="thanks">ຂອບໃຈທີ່ມາອຸດໜູນ</p>';
+}
+function printInvoiceDoc(inv, items, payments, opts){
+  printDoc('ບິນ ' + (inv.invoice_no || ''), invoiceDocBody(inv, items, payments), opts);
 }
 
 /* ດຶງຂໍ້ມູນບິນຈາກ DB ແລ້ວພິມ — ໃຊ້ຕອນພິມຈາກໜ້າອື່ນທີ່ຍັງບໍ່ມີລາຍລະອຽດຢູ່ໃນມື */
@@ -621,7 +669,7 @@ async function printInvoiceById(invoiceId, win){
 }
 
 /* ---------- ໃບໂອນສາຂາ ---------- */
-function printTransferDoc(t, items, opts){
+function transferDocBody(t, items){
   const rows = items.map((it, i)=>
     '<tr><td>' + (i+1) + '</td>' +
     '<td>' + escHtml(it.code || '-') + '</td>' +
@@ -632,8 +680,7 @@ function printTransferDoc(t, items, opts){
   const totalQty = items.reduce((s, it)=> s + (Number(it.quantity) || 0), 0);
   const from = t.from_branch || PRINT_FROM_BRANCH;
   const to = t.to_branch || '-';
-  printDoc('ໃບໂອນ ' + (t.transfer_no || ''),
-    '<h1>ໃບໂອນສິນຄ້າລະຫວ່າງສາຂາ</h1>' +
+  return '<h1>ໃບໂອນສິນຄ້າລະຫວ່າງສາຂາ</h1>' +
     '<p class="sub">ເລກທີ ' + escHtml(t.transfer_no || '-') + ' · ' + escHtml(fmtDateDMY(t.date)) + '</p>' +
     '<div class="cust">' +
       '<div class="meta-row"><b>ຈາກສາຂາ:</b>' + escHtml(from) + '</div>' +
@@ -645,43 +692,49 @@ function printTransferDoc(t, items, opts){
     '<tbody>' + rows + '</tbody></table>' +
     '<div class="grand"><span>ລວມຈຳນວນ</span><span>' + fmtMoney(totalQty) + '</span></div>' +
     printSigns('ຜູ້ສົ່ງເຄື່ອງ', '(' + from + ')', 'ຜູ້ຮັບເຄື່ອງ', '(' + to + ') ໄດ້ຮັບເຄື່ອງຄົບແລ້ວ') +
-    '<p class="note">ໝາຍເຫດ: ໃບນີ້ໃຊ້ຄູ່ກັບການໂອນໃນລະບົບ — ສາຂາປາຍທາງກົດ “ຢືນຢັນຮັບເຂົ້າ” ໃນລະບົບຂອງຕົນເອງ</p>',
-    opts);
+    '<p class="note">ໝາຍເຫດ: ໃບນີ້ໃຊ້ຄູ່ກັບການໂອນໃນລະບົບ — ສາຂາປາຍທາງກົດ “ຢືນຢັນຮັບເຂົ້າ” ໃນລະບົບຂອງຕົນເອງ</p>';
+}
+function printTransferDoc(t, items, opts){
+  printDoc('ໃບໂອນ ' + (t.transfer_no || ''), transferDocBody(t, items), opts);
 }
 
-/* ພິມໃບໂອນຈາກກຸ່ມການເຄື່ອນໄຫວໃນປະຫວັດ: ດຶງໃບໂອນຈິງ (ມີເລກທີ/ສາຂາປາຍທາງ/ລະຫັດສິນຄ້າ) ກ່ອນ
+/* ປະກອບຂໍ້ມູນໃບໂອນຈາກກຸ່ມການເຄື່ອນໄຫວໃນປະຫວັດ: ດຶງໃບໂອນຈິງ (ມີເລກທີ/ສາຂາປາຍທາງ/ລະຫັດສິນຄ້າ) ກ່ອນ
    ຖ້າເປັນການໂອນເກົ່າທີ່ຍັງບໍ່ມີໃນຕາຕະລາງໃບໂອນ ຄ່ອຍຖອຍມາໃຊ້ຂໍ້ມູນຈາກ movement ແທນ */
+async function loadTransferDoc(group){
+  let doc = null, docItems = null;
+  try{
+    const [docs, rows] = await Promise.all([
+      sb(`stock_branch_transfers?select=*&id=eq.${group.key}`),
+      sb(`stock_branch_transfer_items?select=*&transfer_id=eq.${group.key}`)
+    ]);
+    if(docs && docs.length){ doc = docs[0]; docItems = rows || []; }
+  }catch(e){ /* ດຶງບໍ່ໄດ້ ໃຊ້ຂໍ້ມູນຈາກປະຫວັດແທນ */ }
+  /* ໝາຍເຫດທີ່ບັນທຶກໄວ້ໃນ movement ມີຮູບແບບ "ໂອນໄປ: ສາຂາ - ໝາຍເຫດ" */
+  const noteStr = group.note || '';
+  const m = /^ໂອນໄປ:\s*([^-]+?)(?:\s*-\s*([\s\S]*))?$/.exec(noteStr);
+  const t = {
+    transfer_no: (doc && doc.transfer_no) || '',
+    from_branch: (doc && doc.from_branch) || PRINT_FROM_BRANCH,
+    to_branch:   (doc && doc.to_branch) || (m ? m[1].trim() : ''),
+    note:        (doc && doc.note) || (m ? (m[2] || '').trim() : noteStr),
+    created_by:  group.created_by || (doc && doc.created_by) || '',
+    date:        (group.date || '').slice(0,10) || ((doc && doc.created_at) || '').slice(0,10)
+  };
+  const items = (docItems && docItems.length) ? docItems.map(it=> ({
+    code: it.code, name: it.name, unit: it.unit, serial_no: it.serial_no, quantity: it.quantity
+  })) : (group.items || []).map(it=> ({
+    code: (it.stock_product_models && it.stock_product_models.code) || '',
+    name: (it.stock_product_models && it.stock_product_models.name) || '-',
+    unit: (it.stock_product_models && it.stock_product_models.unit) || '',
+    serial_no: (it.stock_product_units && it.stock_product_units.serial_no) || '',
+    quantity: it.quantity
+  }));
+  return { t, items };
+}
 async function printTransferByGroup(group, win){
   try{
-    let doc = null, items = null;
-    try{
-      const [docs, docItems] = await Promise.all([
-        sb(`stock_branch_transfers?select=*&id=eq.${group.key}`),
-        sb(`stock_branch_transfer_items?select=*&transfer_id=eq.${group.key}`)
-      ]);
-      if(docs && docs.length){ doc = docs[0]; items = docItems || []; }
-    }catch(e){ /* ດຶງບໍ່ໄດ້ ໃຊ້ຂໍ້ມູນຈາກປະຫວັດແທນ */ }
-    /* ໝາຍເຫດທີ່ບັນທຶກໄວ້ໃນ movement ມີຮູບແບບ "ໂອນໄປ: ສາຂາ - ໝາຍເຫດ" */
-    const noteStr = group.note || '';
-    const m = /^ໂອນໄປ:\s*([^-]+?)(?:\s*-\s*([\s\S]*))?$/.exec(noteStr);
-    const t = {
-      transfer_no: (doc && doc.transfer_no) || '',
-      from_branch: (doc && doc.from_branch) || PRINT_FROM_BRANCH,
-      to_branch:   (doc && doc.to_branch) || (m ? m[1].trim() : ''),
-      note:        (doc && doc.note) || (m ? (m[2] || '').trim() : noteStr),
-      created_by:  group.created_by || (doc && doc.created_by) || '',
-      date:        (group.date || '').slice(0,10) || (doc && doc.created_at || '').slice(0,10)
-    };
-    const list = (items && items.length) ? items.map(it=> ({
-      code: it.code, name: it.name, unit: it.unit, serial_no: it.serial_no, quantity: it.quantity
-    })) : (group.items || []).map(it=> ({
-      code: (it.stock_product_models && it.stock_product_models.code) || '',
-      name: (it.stock_product_models && it.stock_product_models.name) || '-',
-      unit: (it.stock_product_models && it.stock_product_models.unit) || '',
-      serial_no: (it.stock_product_units && it.stock_product_units.serial_no) || '',
-      quantity: it.quantity
-    }));
-    printTransferDoc(t, list, { win });
+    const { t, items } = await loadTransferDoc(group);
+    printTransferDoc(t, items, { win });
   }catch(err){
     closePrintWindow(win);
     toast('ພິມບໍ່ໄດ້: ' + err.message);
@@ -3188,55 +3241,31 @@ async function loadTransferHistory(month){
     el.innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div>`;
   }
 }
-function openTransferDetail(group){
+/* ລາຍລະອຽດການໂອນ: ໂຊວ໌ເປັນ "ໃບໂອນ A5" ແບບດຽວກັນກັບທີ່ພິມອອກມາ (ດຶງເລກທີ່ໃບໂອນ/ສາຂາປາຍທາງຈາກ DB ກ່ອນ) */
+async function openTransferDetail(group){
   if(!group) return;
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
-  bg.innerHTML = `
-    <div class="modal">
-      <div class="doc-card">
-        <div class="doc-head">
-          <div class="doc-head-row">
-            <div class="doc-brand">
-              <div class="seal-mark"><svg class="dv-icon"><use href="#i-gear"></use></svg></div>
-              <div class="doc-brand-name">DAVONE SHOP</div>
-            </div>
-            <div class="doc-head-title">
-              <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ໃບເບີກໂອນສາຂາ</h3>
-            </div>
-          </div>
-          <div class="doc-head-meta"><span class="doc-tag solid">${fmtDateDMY((group.date||'').slice(0,10))}</span></div>
-        </div>
-        <div class="doc-body">
-          <div class="doc-box">
-            <div class="doc-avatar"><svg class="dv-icon"><use href="#i-truck"></use></svg></div>
-            <div class="doc-box-info">
-              <div class="doc-line" style="margin-top:0;">${group.note || 'ໂອນສາຂາ'}</div>
-            </div>
-          </div>
-          <div class="doc-section-label">ລາຍການສິນຄ້າ</div>
-          <div class="doc-table-head"><span>ລາຍການສິນຄ້າ</span></div>
-          <div class="doc-table-body">
-            ${group.items.map(it=> `
-              <div class="row">
-                <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.stock_product_units && it.stock_product_units.serial_no ? (' · <span class="mono">'+it.stock_product_units.serial_no+'</span>') : (' × '+it.quantity)}</span>
-              </div>`).join('')}
-          </div>
-          <hr class="sep">
-          <div class="doc-line" style="font-size:12px;"><svg class="dv-icon"><use href="#i-users"></use></svg>ອອກໃບໂອນໂດຍ: <span style="color:var(--ink);font-weight:600;">${group.created_by || '-'}</span></div>
-        </div>
-        <div class="doc-footer">ຂອບໃຈທີ່ໃຊ້ບໍລິການ · DAVONE SHOP</div>
-      </div>
-      <button class="btn secondary" id="trPrintBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-printer"></use></svg>ພິມໃບໂອນ (A5)</button>
-      ${currentRole==='admin' ? `<button class="btn danger" id="trDeleteBtn" style="margin-top:8px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການໂອນນີ້ (ຄືນສະຕັອກ)</button>` : ''}
-      <button class="btn secondary" id="trDetailClose">ປິດ</button>
-    </div>
-  `;
+  bg.innerHTML = `<div class="modal"><div class="empty">ກຳລັງໂຫລດ...</div></div>`;
   document.body.appendChild(bg);
   bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  let doc;
+  try{
+    doc = await loadTransferDoc(group);
+  }catch(err){
+    bg.querySelector('.modal').innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div><button class="btn secondary" id="trErrClose">ປິດ</button>`;
+    bg.querySelector('#trErrClose').addEventListener('click', ()=> bg.remove());
+    return;
+  }
+  bg.querySelector('.modal').innerHTML = `
+    ${paperHtml(transferDocBody(doc.t, doc.items))}
+    <button class="btn secondary" id="trPrintBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-printer"></use></svg>ພິມໃບໂອນ (A5)</button>
+    ${currentRole==='admin' ? `<button class="btn danger" id="trDeleteBtn" style="margin-top:8px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການໂອນນີ້ (ຄືນສະຕັອກ)</button>` : ''}
+    <button class="btn secondary" id="trDetailClose">ປິດ</button>
+  `;
   bg.querySelector('#trPrintBtn').addEventListener('click', ()=>{
     const w = openPrintWindow();
-    if(w) printTransferByGroup(group, w);
+    if(w) printTransferDoc(doc.t, doc.items, { win: w });
   });
   bg.querySelector('#trDetailClose').addEventListener('click', ()=> bg.remove());
   if(currentRole==='admin'){
@@ -3672,70 +3701,18 @@ async function refreshInvoiceDetail(bg, invoiceId, inv){
     const subtotal = Number(inv.total_amount||0) + discount;
     const address = [inv.village, inv.district, inv.province].filter(Boolean).join(' · ');
     bg.querySelector('.modal').innerHTML = `
-      <div class="doc-card">
-        <div class="doc-head">
-          <div class="doc-head-row">
-            <div class="doc-brand">
-              <div class="seal-mark"><svg class="dv-icon"><use href="#i-gear"></use></svg></div>
-              <div class="doc-brand-name">DAVONE SHOP</div>
-            </div>
-            <div class="doc-head-title">
-              <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg><span class="mono">${inv.invoice_no || 'ບິນຂາຍ'}</span></h3>
-            </div>
-          </div>
-          <div class="doc-head-meta">
-            <span class="doc-tag">${invCurrency}</span>
-            ${paidCurrencies.map(c=> `<span class="doc-tag solid">ຮັບຈິງ: ${c==='THB'?'ບາດ':'ກີບ'}</span>`).join('')}
-            <span class="doc-tag solid">${fmtDateDMY(inv.invoice_date)}</span>
-            <span class="doc-tag solid">${statusTag(inv)}</span>
-          </div>
-        </div>
-        <div class="doc-body">
-          <div class="doc-box">
-            <div class="doc-avatar"><svg class="dv-icon"><use href="#i-users"></use></svg></div>
-            <div class="doc-box-info">
-              <div style="font-size:17px;font-weight:700;color:var(--ink);line-height:1.3;">${inv.customer_name || '-'}</div>
-              ${inv.customer_phone ? `<div class="doc-line"><svg class="dv-icon"><use href="#i-phone"></use></svg>${inv.customer_phone}</div>` : ''}
-              ${address ? `<div class="doc-line"><svg class="dv-icon"><use href="#i-pin"></use></svg>${address}</div>` : ''}
-            </div>
-          </div>
-          <div class="doc-section-label">ລາຍການສິນຄ້າ</div>
-          <div class="doc-table-head"><span>ລາຍການ</span><span>ຈຳນວນເງິນ</span></div>
-          <div class="doc-table-body">
-            ${items.length ? items.map(it=> {
-              const nm = it.stock_product_models ? it.stock_product_models.name : '-';
-              if(it.variant_note === BUNDLE_TAG){
-                /* ອຸປະກອນທີ່ມາພ້ອມໃນຊຸດ: ໂຊວ໌ຊື່ + ລາຄາປົກກະຕິ ແຕ່ບໍ່ບວກເຂົ້າຍອດບິນ */
-                return `
-              <div class="row" style="margin-left:14px;">
-                <span class="muted">↳ ${nm} × ${it.quantity} <span style="font-size:11px;">(${BUNDLE_TAG})</span></span>
-                <span class="mono muted">${fmtMoney(it.unit_price)}</span>
-              </div>`;
-              }
-              return `
-              <div class="row">
-                <span>${nm}${it.variant_note ? (' · <span class="mono">'+it.variant_note+'</span>') : (' × '+it.quantity)}</span>
-                <span class="mono">${fmtMoney(it.amount)}</span>
-              </div>`;
-            }).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
-            <div class="row"><span class="muted">ລວມຍ່ອຍ</span><span class="mono muted">${fmtMoney(subtotal)}</span></div>
-            ${discount > 0 ? `<div class="row"><span class="muted">ຫຼຸດລາຄາ</span><span class="mono muted">-${fmtMoney(discount)}</span></div>` : ''}
-          </div>
-          <div class="doc-total-band mono"><span style="font-family:var(--font-body);font-weight:600;">ລວມ</span><span>${fmtMoney(inv.total_amount)}</span></div>
-          ${currentRole==='admin' ? `<div class="row" style="font-size:12px;"><span class="gold">ກຳໄລບິນນີ້ (ແອດມິນ)${unknownCostCount ? ' *' : ''}</span><span class="gold mono">${fmtByCurrency(profitByPaid)}</span></div>` : ''}
-          ${currentRole==='admin' && unknownCostCount ? `<div class="muted" style="font-size:11px;margin-top:-4px;">* ບໍ່ນັບລວມ ${unknownCostCount} ລາຍການທີ່ຍັງບໍ່ໄດ້ຕັ້ງຕົ້ນທຶນສະກຸນບາດໄວ້ (ໄປຕັ້ງທີ່ໜ້າສິນຄ້າ)</div>` : ''}
-          <hr class="sep">
-          <div class="doc-section-label">ການຈ່າຍເງິນ</div>
-          ${payments.length ? payments.map(p=> `
-            <div class="row" style="font-size:12px;">
-              <span>${p.method==='cash'?'ເງິນສົດ':'ໂອນ'} · ${p.currency||inv.currency||'LAK'} · ${fmtDateDMY(p.payment_date)}</span>
-              <span class="mono">${fmtMoney(p.amount)}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''}</span>
-            </div>`).join('') : '<div class="empty">ຍັງບໍ່ມີການຈ່າຍບັນທຶກໄວ້</div>'}
-          <hr class="sep">
-          <div class="doc-line" style="font-size:12px;"><svg class="dv-icon"><use href="#i-users"></use></svg>ອອກບິນໂດຍ: <span style="color:var(--ink);font-weight:600;">${inv.created_by || '-'}</span></div>
-        </div>
-        <div class="doc-footer">ຂອບໃຈທີ່ໃຊ້ບໍລິການ · DAVONE SHOP</div>
-      </div>
+      ${paperHtml(invoiceDocBody(inv, items, payments))}
+      <!-- ຂໍ້ມູນພາຍໃນຮ້ານ (ກຳໄລ / ປະຫວັດການຈ່າຍ) — ບໍ່ຂຶ້ນເທິງໃບທີ່ພິມໃຫ້ລູກຄ້າ -->
+      ${currentRole==='admin' ? `<div class="row" style="font-size:12px;"><span class="gold">ກຳໄລບິນນີ້ (ແອດມິນ)${unknownCostCount ? ' *' : ''}</span><span class="gold mono">${fmtByCurrency(profitByPaid)}</span></div>` : ''}
+      ${currentRole==='admin' && unknownCostCount ? `<div class="muted" style="font-size:11px;margin-top:-4px;">* ບໍ່ນັບລວມ ${unknownCostCount} ລາຍການທີ່ຍັງບໍ່ໄດ້ຕັ້ງຕົ້ນທຶນສະກຸນບາດໄວ້ (ໄປຕັ້ງທີ່ໜ້າສິນຄ້າ)</div>` : ''}
+      <div class="doc-section-label" style="margin-top:10px;">ການຈ່າຍເງິນ</div>
+      ${payments.length ? payments.map(p=> `
+        <div class="row" style="font-size:12px;">
+          <span>${p.method==='cash'?'ເງິນສົດ':'ໂອນ'} · ${p.currency||inv.currency||'LAK'} · ${fmtDateDMY(p.payment_date)}</span>
+          <span class="mono">${fmtMoney(p.amount)}${p.exchange_rate ? ' <span class="muted" style="font-size:11px;">(@'+p.exchange_rate+')</span>' : ''}</span>
+        </div>`).join('') : '<div class="empty">ຍັງບໍ່ມີການຈ່າຍບັນທຶກໄວ້</div>'}
+      <div class="doc-line" style="font-size:12px;"><svg class="dv-icon"><use href="#i-users"></use></svg>ອອກບິນໂດຍ: <span style="color:var(--ink);font-weight:600;">${inv.created_by || '-'}</span></div>
+      <hr class="sep">
       ${remain > 0 ? `
         <div class="row" style="font-size:12px;"><span class="gold">ຍັງຄ້າງ (${inv.currency||'LAK'})</span><span class="gold mono">${fmtMoney(remain)}</span></div>
         <hr class="sep">
