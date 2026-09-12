@@ -3,19 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<!-- ══ HUB AUTH GUARD — ຕ້ອງ login ຜ່ານ hub.html ແລະ ບັນຊີຕ້ອງມີສິດ module "cash" ══ -->
-<script>
-(function(){
-  var MODULE='cash';
-  var u=null;
-  try{ u=JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null'); }catch(e){}
-  var ok = u && Array.isArray(u.modules) && u.modules.indexOf(MODULE)!==-1;
-  if(!ok){
-    try{ (window.top||window).location.replace('hub.html'); }
-    catch(e){ location.replace('hub.html'); }
-  }
-})();
-</script>
 <title>ລະບົບການເງິນຮ້ານດາວອນ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Lao:wght@600;700&display=swap" rel="stylesheet">
