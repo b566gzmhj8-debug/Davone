@@ -4247,11 +4247,13 @@
              transferCounter: DATA.transferCounter, expenseCounter: DATA.expenseCounter,
              depositCounter: DATA.depositCounter, rates: DATA.rates };
   }
+  // the sheet stays quiet while the sync is healthy; it only speaks up when something needs attention
   function setSyncNote(text, cls){
     var el = document.getElementById("syncNote");
     if(!el) return;
-    el.textContent = text;
-    el.className = "storage-note" + (cls ? " "+cls : "");
+    var speak = cls === "warn";
+    el.textContent = speak ? text : "";
+    el.className = "storage-note" + (speak ? " warn" : "");
   }
   // one row per record; the app's own shape is kept untouched inside data
   function rowOf(kind, rec){
