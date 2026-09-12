@@ -4103,8 +4103,7 @@
     document.getElementById("heroNote").textContent = [
       sumRange === "day" ? "" : fmtDMY(from)+" – "+fmtDMY(to),
       (Object.keys(net).some(function(c){ return c !== "LAK"; }) && !netLak.missing ? "ລວມ ≈ "+money(netLak.lak, "LAK")+" ຕາມອັດຕາມື້ນີ້" : ""),
-      (missing ? "⚠ "+missing+" ລາຍການບໍ່ມີລາຄາທຶນ ກຳໄລອາດສູງກວ່າຄວາມຈິງ" : ""),
-      (hideVehMoney() ? "ຕົ້ນທຶນ ແລະ ກຳໄລນັບສະເພາະອາໄຫຼ່ (ຍອດຂາຍລວມລົດໃຫຍ່ຄົບ)" : "")
+      (missing ? "⚠ "+missing+" ລາຍການບໍ່ມີລາຄາທຶນ ກຳໄລອາດສູງກວ່າຄວາມຈິງ" : "")
     ].filter(Boolean).join(" · ");
     document.getElementById("heroCount").textContent = dayBills.length;
 
