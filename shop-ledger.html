@@ -2082,7 +2082,18 @@
       item.innerHTML =
         '<div class="ssi-name">'+(s.code? '<span class="row-code">'+escapeHtml(s.code)+'</span> ':"")+escapeHtml(s.name)+'</div>'+
         '<div class="ssi-meta">ເຫຼືອ '+numFmt(s.qty)+' '+escapeHtml(s.unit||"")+(s.sellPrice!=null? " · ຂາຍ "+money(s.sellPrice, curOf(s)):"")+(vehInfo(s)? " · "+escapeHtml(vehInfo(s)):"")+'</div>';
-      item.addEventListener("click", function(){ selectItemForSale(s); });
+      // picking from the list drops the item straight into the bill — no second press on "+ ເພີ່ມ"
+      item.addEventListener("click", function(){
+        selectItemForSale(s);
+        document.getElementById("btnAddToCart").click();
+        // a product with no sell price would land at 0, so ask for the price right away
+        if(s.sellPrice == null){
+          var last = document.querySelectorAll("#cartList .price-in");
+          if(last.length){ var box = last[last.length-1]; box.focus(); box.select(); }
+        } else {
+          searchInput.focus();
+        }
+      });
       suggestBox.appendChild(item);
     });
     suggestBox.style.display = "block";
