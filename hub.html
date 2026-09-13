@@ -171,71 +171,103 @@
   .lg-welcome.on h2{opacity:1;transform:none;}
   #lgConfetti{position:fixed;inset:0;z-index:61;pointer-events:none;}
 
-  .faceid-setup{display:none;margin-top:12px;padding:8px 13px;border:1px solid rgba(233,221,196,.28);
-    border-radius:20px;background:transparent;color:rgba(243,234,210,.85);font-size:.72rem;letter-spacing:.03em;
-    font-family:'Lao MN',-apple-system,sans-serif;cursor:pointer;align-items:center;gap:7px;transition:.15s;}
-  .faceid-setup:active{background:rgba(233,221,196,.08);}
-  .faceid-setup svg{width:15px;height:15px;color:var(--gold);}
+  /* ---------- MENU (ธีมเดียวกับหน้า login: พื้นหลังรูป + กระจก + ทอง) ---------- */
+  #menu-wrap{display:none;position:relative;min-height:100vh;min-height:100dvh;background:#0b1a3d;color:#f3ead2;
+    font-family:'Lao MN','Noto Sans Lao',-apple-system,sans-serif;overflow-x:hidden;}
+  .mn-bg{position:fixed;inset:0;z-index:0;background:#0b1a3d url(login-bg.jpg) center/cover no-repeat;}
+  .mn-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,12,30,.55),rgba(6,12,30,.35) 40%,rgba(6,12,30,.65));}
+  @media (max-aspect-ratio:1/1){ .mn-bg{background-position:8% center;} }
+  .mn-inner{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 22px 26px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;}
+  @keyframes mnUp{from{opacity:0;transform:translateY(18px)}}
 
-  /* ---------- MENU (statement style) ---------- */
-  #menu-wrap{display:none;min-height:100vh;background:var(--ivory);}
-  .menu-header{background:var(--navy);color:#f3ead2;padding:28px 28px 22px;position:relative;}
-  .menu-header .eyebrow{font-size:1rem;font-weight:600;letter-spacing:.02em;color:var(--gold-light);
-    opacity:1;margin-bottom:10px;line-height:1.35;max-width:520px;}
-  .menu-header .name{font-family:'Lao MN',-apple-system,sans-serif;font-size:1.4rem;font-weight:600;}
-  .logout-btn{position:absolute;top:26px;right:26px;background:transparent;border:1px solid rgba(233,221,196,.4);
-    color:#f3ead2;border-radius:2px;padding:8px 16px;font-size:.72rem;letter-spacing:.08em;
-    text-transform:uppercase;font-family:'Lao MN',-apple-system,sans-serif;}
-  .statement{max-width:640px;margin:0 auto;padding:0 24px;}
-  .statement-title{display:flex;justify-content:space-between;align-items:baseline;
-    padding:22px 0 10px;border-bottom:1px solid var(--hair);margin-top:20px;}
-  .statement-title span{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
-  .rows{}
-  .row{display:flex;align-items:center;gap:18px;padding:20px 4px;border-bottom:1px solid var(--hair);cursor:pointer;}
-  .row:active{background:rgba(169,131,75,.06);}
-  .row .num{font-family:'Lao MN',-apple-system,sans-serif;font-size:.85rem;color:var(--gold);width:22px;}
-  .row .ic{width:40px;height:40px;border:1px solid var(--hair);border-radius:2px;display:flex;
-    align-items:center;justify-content:center;color:var(--navy);flex-shrink:0;}
-  .row .ic svg{width:19px;height:19px;}
-  .row .txt{flex:1;}
-  .row .txt b{display:block;font-family:'Lao MN',-apple-system,sans-serif;font-weight:600;font-size:1.02rem;color:var(--navy-2);}
-  .row .txt span{font-size:.75rem;color:var(--muted);}
-  .row .chev{color:var(--gold);font-size:1.1rem;}
-  .empty-note{text-align:center;color:var(--muted);margin-top:60px;padding:0 24px;font-size:.9rem;}
+  /* แถบบน */
+  .mn-top{display:flex;align-items:center;gap:14px;padding:18px 0 16px;border-bottom:1px solid rgba(243,217,155,.16);animation:mnUp .6s both;}
+  .mn-logo{position:relative;width:54px;height:54px;flex:none;border-radius:50%;}
+  .mn-logo::before{content:"";position:absolute;inset:-45%;border-radius:50%;background:radial-gradient(circle,rgba(255,200,110,.4) 0 30%,transparent 68%);animation:lgBreathe 3.6s ease-in-out infinite;}
+  .mn-logo span{position:relative;display:block;width:100%;height:100%;border-radius:50%;overflow:hidden;background:#000;
+    box-shadow:0 0 0 2px #e9c27a,0 0 16px 3px rgba(255,190,90,.5);}
+  .mn-logo img{width:100%;height:100%;display:block;transform:scale(1.15);}
+  .mn-co{flex:1;min-width:0;line-height:1.35;}
+  .mn-co b{display:block;font-size:1.05rem;font-weight:800;
+    background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 55%,#b8893f 75%,#f6dc9c);background-size:250% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:lgGoldShine 6s linear infinite;}
+  .mn-co small{display:block;font-size:.8rem;color:rgba(243,234,210,.75);}
+  .logout-btn{display:flex;align-items:center;gap:7px;padding:10px 16px;border-radius:12px;cursor:pointer;flex:none;
+    border:1px solid rgba(243,217,155,.4);background:rgba(18,28,52,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    color:#f3ead2;font-family:inherit;font-size:.9rem;transition:.2s;}
+  .logout-btn svg{width:17px;height:17px;color:#f3d99b;}
+
+  /* ทักทาย */
+  .mn-hello{padding:30px 0 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .mn-hello .greet{font-size:.92rem;color:#f3d99b;letter-spacing:.03em;animation:mnUp .6s .1s both;}
+  .mn-hello .name{margin:4px 0 0;font-size:clamp(1.6rem,5vw,2.3rem);font-weight:800;color:#fff;animation:mnUp .6s .18s both;}
+  .mn-hello .name em{font-style:normal;background:linear-gradient(100deg,#f6dc9c,#e2b466);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .mn-date{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:12px;background:rgba(18,28,52,.45);border:1px solid rgba(243,217,155,.18);
+    font-size:.88rem;color:rgba(243,234,210,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);animation:mnUp .6s .26s both;}
+  .mn-date svg{width:17px;height:17px;color:#f3d99b;}
+  .faceid-setup{display:none;margin-top:12px;padding:8px 14px;border:1px dashed rgba(243,217,155,.35);border-radius:20px;background:rgba(18,28,52,.35);
+    color:rgba(243,234,210,.9);font-size:.8rem;font-family:inherit;cursor:pointer;align-items:center;gap:7px;transition:.15s;animation:mnUp .6s .3s both;}
+  .faceid-setup:active{background:rgba(233,221,196,.1);}
+  .faceid-setup svg{width:16px;height:16px;color:#f3d99b;}
+
+  /* หัวข้อ */
+  .mn-sec{display:flex;align-items:center;gap:12px;margin:6px 0 16px;color:rgba(243,234,210,.85);font-size:.95rem;font-weight:600;}
+  .mn-sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(243,217,155,.45),transparent);}
+  .mn-sec i{width:7px;height:7px;border-radius:50%;background:#f3d99b;box-shadow:0 0 8px #d4a85a;}
+
+  /* การ์ดระบบ */
+  .rows{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;}
+  .mn-card{position:relative;display:flex;align-items:center;gap:16px;padding:20px 18px 20px 20px;border-radius:20px;cursor:pointer;overflow:hidden;
+    background:rgba(18,28,52,.5);border:1px solid rgba(243,217,155,.18);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+    box-shadow:0 14px 40px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform .25s cubic-bezier(.2,.9,.3,1),border-color .25s,box-shadow .25s;animation:mnUp .6s calc(.3s + var(--i)*.08s) both;}
+  .mn-card::before{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(243,217,155,.12),transparent);transform:skewX(-20deg);transition:left .7s;}
+  .mn-card:active{transform:scale(.98);}
+  .mn-card .ic{position:relative;width:58px;height:58px;flex:none;border-radius:16px;display:grid;place-items:center;color:#1a1405;
+    background:linear-gradient(135deg,#f6dc9c,#d4a85a 60%,#a57a36);box-shadow:0 6px 18px rgba(212,168,90,.35),inset 0 1px 0 rgba(255,255,255,.5);}
+  .mn-card .ic svg{width:27px;height:27px;stroke-width:1.7;}
+  .mn-card .txt{flex:1;min-width:0;}
+  .mn-card .txt b{display:block;font-size:1.12rem;font-weight:700;color:#fff;}
+  .mn-card .txt span{font-size:.82rem;color:rgba(243,234,210,.65);}
+  .mn-card .num{position:absolute;top:10px;right:16px;font-size:.72rem;letter-spacing:.1em;color:rgba(243,217,155,.55);}
+  .mn-card .chev{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(243,217,155,.35);
+    color:#f3d99b;font-size:1.05rem;transition:.25s;}
+  .empty-note{position:relative;z-index:1;text-align:center;color:rgba(243,234,210,.75);margin:40px auto 0;padding:18px 22px;max-width:520px;font-size:.92rem;
+    border-radius:16px;background:rgba(18,28,52,.5);border:1px dashed rgba(243,217,155,.3);}
+  .mn-foot{margin-top:auto;padding-top:30px;text-align:center;font-size:.76rem;color:rgba(233,221,196,.55);}
 
   /* ---------- MODULE VIEW ---------- */
   #module-wrap{display:none;position:fixed;inset:0;background:#000;z-index:50;}
-  .module-bar{height:50px;background:var(--navy);display:flex;align-items:center;
-    padding:0 14px;gap:12px;border-bottom:2px solid var(--gold);}
-  .back-btn{background:var(--gold);color:var(--navy);border:none;border-radius:2px;
+  .module-bar{height:50px;background:linear-gradient(90deg,#0b1a3d,#16284f);display:flex;align-items:center;
+    padding:0 14px;gap:12px;border-bottom:1.5px solid #d4a85a;box-shadow:0 2px 14px rgba(212,168,90,.25);}
+  .back-btn{background:linear-gradient(135deg,#f6dc9c,#d4a85a 60%,#a57a36);color:#1a1405;border:none;border-radius:10px;
     padding:8px 16px;font-weight:600;font-size:.78rem;font-family:'Lao MN',-apple-system,sans-serif;letter-spacing:.02em;}
   .module-bar .mtitle{color:#f3ead2;font-size:.85rem;opacity:.9;font-family:'Lao MN',-apple-system,sans-serif;}
   #module-frame{width:100%;height:calc(100% - 50px);border:none;background:#fff;}
 
   /* ---------- DESKTOP / MacBook (mouse & trackpad) ---------- */
-  .login-btn,.logout-btn,.back-btn{cursor:pointer;}
+  .logout-btn,.back-btn{cursor:pointer;}
   @media (hover:hover) and (pointer:fine){
-    .login-btn:hover{filter:brightness(1.06);}
-    .row:hover{background:rgba(169,131,75,.05);}
-    .logout-btn:hover{background:rgba(233,221,196,.08);}
+    .logout-btn:hover{background:rgba(243,217,155,.14);border-color:#d4a85a;}
+    .mn-card:hover{transform:translateY(-4px);border-color:rgba(243,217,155,.55);box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 24px rgba(212,168,90,.18);}
+    .mn-card:hover::before{left:130%;}
+    .mn-card:hover .chev{background:linear-gradient(135deg,#f6dc9c,#d4a85a);color:#1a1405;border-color:transparent;transform:translateX(3px);}
     .back-btn:hover{filter:brightness(1.08);}
   }
 
-  /* ---------- MOBILE ONLY (phones) — MacBook design untouched ---------- */
+  /* ---------- MOBILE (phones) ---------- */
   @media (max-width:640px){
-    .menu-header{padding:22px 18px 18px;}
-    .menu-header .eyebrow{
-      font-size:1.02rem;
-      font-weight:700;
-      letter-spacing:0;
-      line-height:1.4;
-      max-width:none;
-      padding-right:66px;          /* reserve room for the ອອກ button */
-      word-break:keep-all;         /* don't split Lao words */
-      overflow-wrap:break-word;
-    }
-    .menu-header .name{font-size:1.2rem;font-weight:700;}
-    .logout-btn{top:20px;right:18px;padding:7px 13px;}
+    .mn-inner{padding:0 16px 20px;}
+    .mn-top{padding:14px 0 12px;gap:11px;}
+    .mn-logo{width:44px;height:44px;}
+    .mn-co b{font-size:.95rem;} .mn-co small{font-size:.72rem;}
+    .logout-btn{padding:9px 12px;font-size:.85rem;}
+    .logout-btn span{display:none;}
+    .mn-hello{padding:22px 0 16px;}
+    .rows{grid-template-columns:1fr;gap:12px;}
+    .mn-card{padding:16px 14px 16px 16px;}
+    .mn-card .ic{width:52px;height:52px;border-radius:14px;}
   }
 </style>
 </head>
@@ -297,20 +329,33 @@
 
 <!-- ================= MENU ================= -->
 <div id="menu-wrap">
-  <div class="menu-header">
-    <div class="eyebrow">ບໍລິສັດ ດາວອນ ພັດທະນາກະສິກຳ ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ</div>
-    <div class="name" id="userName">-</div>
-    <button class="logout-btn" onclick="logout()">ອອກ</button>
-    <button class="faceid-setup" id="faceSetup" type="button" onclick="toggleFaceId()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
-      <span id="faceSetupLabel">ເປີດໃຊ້ Face ID ໃນເຄື່ອງນີ້</span>
-    </button>
-  </div>
-  <div class="statement">
-    <div class="statement-title"><span>ວັນ.ເດືອນ.ປີ</span><span id="dateStr"></span></div>
+  <div class="mn-bg"></div>
+  <div class="mn-inner">
+    <div class="mn-top">
+      <div class="mn-logo"><span><img src="icon-512.png" alt="Davone"></span></div>
+      <div class="mn-co"><b>ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ</b><small>ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ ຜູ້ດຽວ</small></div>
+      <button class="logout-btn" onclick="logout()" aria-label="ອອກຈາກລະບົບ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>ອອກຈາກລະບົບ</span>
+      </button>
+    </div>
+
+    <div class="mn-hello">
+      <div>
+        <div class="greet" id="mnGreet">ສະບາຍດີ</div>
+        <h2 class="name" id="userName">-</h2>
+        <button class="faceid-setup" id="faceSetup" type="button" onclick="toggleFaceId()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
+          <span id="faceSetupLabel">ເປີດໃຊ້ Face ID ໃນເຄື່ອງນີ້</span>
+        </button>
+      </div>
+      <div class="mn-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="dateStr"></span></div>
+    </div>
+
+    <div class="mn-sec"><i></i>ເລືອກລະບົບທີ່ຕ້ອງການ</div>
     <div class="rows" id="cards"></div>
+    <div class="empty-note" id="emptyNote" style="display:none;">ບັນຊີນີ້ຍັງບໍ່ໄດ້ຮັບສິດເຂົ້າໃຊ້ລະບົບໃດເລີຍ ກະລຸນາຕິດຕໍ່ຜູ້ອານຸມັດ</div>
+    <div class="mn-foot">© 2005 ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ ຂາອອກ-ຂາເຂົ້າ ຈຳກັດຜູ້ດຽວ</div>
   </div>
-  <div class="empty-note" id="emptyNote" style="display:none;">ບັນຊີນີ້ຍັງບໍ່ໄດ້ຮັບສິດເຂົ້າໃຊ້ລະບົບໃດເລີຍ ກະລຸນາຕິດຕໍ່ຜູ້ອານຸມັດ</div>
 </div>
 
 <!-- ================= MODULE (iframe) ================= -->
@@ -653,11 +698,14 @@ function lgConfetti(){
 function showMenu(){
   document.getElementById('login-wrap').style.display='none';
   document.getElementById('menu-wrap').style.display='block';
-  document.getElementById('userName').textContent = `ສະບາຍດີ, ${currentUser.name}`;
+  document.getElementById('userName').innerHTML = `ສະບາຍດີ, <em></em>`;
+  document.getElementById('userName').querySelector('em').textContent = currentUser.name || '';
   const now = new Date();
   const dd = String(now.getDate()).padStart(2,'0');
   const mm = String(now.getMonth()+1).padStart(2,'0');
   document.getElementById('dateStr').textContent = `${dd}.${mm}.${now.getFullYear()}`;
+  const hr = now.getHours();
+  document.getElementById('mnGreet').textContent = hr<11 ? '☀️ ສະບາຍດີຕອນເຊົ້າ' : hr<17 ? '🌤 ສະບາຍດີຕອນສວາຍ' : '🌙 ສະບາຍດີຕອນແລງ';
 
   const allowed = Array.isArray(currentUser.modules) ? currentUser.modules : [];
   const cardsEl = document.getElementById('cards');
@@ -669,14 +717,15 @@ function showMenu(){
     i++; count++;
     const m = MODULES[key];
     cardsEl.innerHTML += `
-      <div class="row" onclick="openModule('${key}')">
+      <div class="mn-card" style="--i:${i}" onclick="openModule('${key}')">
         <div class="num">${String(i).padStart(2,'0')}</div>
         <div class="ic">${ICONS[key]}</div>
         <div class="txt"><b>${m.label}</b><span>ກົດເພື່ອເຂົ້າລະບົບ</span></div>
-        <div class="chev">›</div>
+        <div class="chev">→</div>
       </div>`;
   });
   document.getElementById('emptyNote').style.display = count? 'none':'block';
+  document.getElementById('cards').style.display = count? '':'none';
   refreshFaceSetup();
 }
 
