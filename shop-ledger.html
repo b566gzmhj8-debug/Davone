@@ -469,6 +469,16 @@
   .seg.pay-method{margin:0;flex:none;}
   .pay-method button{flex:none;padding:0 10px;font-size:13.5px;}
   .pay-cur-row .btn{width:auto;margin:0;padding:0 12px;font-size:14px;white-space:nowrap;}
+  /* one currency can come in part cash and part transfer, so each has its own box */
+  .pay-box{flex:1;min-width:0;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--surface-alt);padding:0 8px;}
+  .pay-box .pay-lab{flex:none;font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .pay-cur-row .pay-box input{flex:1;min-width:0;border:none;background:transparent;font-size:19px;padding:10px 0;}
+  .pay-box .pay-qr{flex:none;border:none;border-radius:8px;background:var(--brown);color:#fff;font-size:12px;font-weight:600;padding:5px 8px;cursor:pointer;font-family:inherit;}
+  @media (max-width:599px){
+    .pay-cur-row{flex-wrap:wrap;}
+    .pay-cur-tag{width:100%;}
+    .pay-box{flex:1 1 42%;}
+  }
   .seg button:disabled{opacity:.35;cursor:not-allowed;}
   .row-val{text-align:right;}
   .pay-field{margin-bottom:14px;}
@@ -1342,20 +1352,20 @@
     <p class="pay-sec">ຮັບເງິນ (ໃສ່ໄດ້ຫຼາຍສະກຸນ · ທອນເປັນກີບ)</p>
     <div class="pay-cur-row">
       <span class="pay-cur-tag">₭ ກີບ</span>
-      <input type="text" inputmode="decimal" id="payLAK" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນກີບ">
-      <div class="seg pay-method" data-cur="LAK"><button data-m="cash" class="active">ສົດ</button><button data-m="transfer" title="ໂອນ · ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">ໂອນ</button></div>
+      <div class="pay-box"><span class="pay-lab">ສົດ</span><input type="text" inputmode="decimal" id="payLAK" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນສົດກີບ"></div>
+      <div class="pay-box"><span class="pay-lab">ໂອນ</span><input type="text" inputmode="decimal" id="payLAKTr" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນໂອນກີບ"><button type="button" class="pay-qr" data-qr="LAK" title="ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">QR</button></div>
       <button class="btn btn-outline pay-fill" data-fill="LAK">ເຕັມ</button>
     </div>
     <div class="pay-cur-row">
       <span class="pay-cur-tag">฿ ບາດ</span>
-      <input type="text" inputmode="decimal" id="payTHB" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນບາດ">
-      <div class="seg pay-method" data-cur="THB"><button data-m="cash" class="active">ສົດ</button><button data-m="transfer" title="ໂອນ · ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">ໂອນ</button></div>
+      <div class="pay-box"><span class="pay-lab">ສົດ</span><input type="text" inputmode="decimal" id="payTHB" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນສົດບາດ"></div>
+      <div class="pay-box"><span class="pay-lab">ໂອນ</span><input type="text" inputmode="decimal" id="payTHBTr" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນໂອນບາດ"><button type="button" class="pay-qr" data-qr="THB" title="ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">QR</button></div>
       <button class="btn btn-outline pay-fill" data-fill="THB">ເຕັມ</button>
     </div>
     <div class="pay-cur-row">
       <span class="pay-cur-tag">$ ໂດລາ</span>
-      <input type="text" inputmode="decimal" id="payUSD" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນໂດລາ">
-      <div class="seg pay-method" data-cur="USD"><button data-m="cash" class="active">ສົດ</button><button data-m="transfer" title="ໂອນ · ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">ໂອນ</button></div>
+      <div class="pay-box"><span class="pay-lab">ສົດ</span><input type="text" inputmode="decimal" id="payUSD" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນສົດໂດລາ"></div>
+      <div class="pay-box"><span class="pay-lab">ໂອນ</span><input type="text" inputmode="decimal" id="payUSDTr" placeholder="0" autocomplete="off" aria-label="ຮັບເງິນໂອນໂດລາ"><button type="button" class="pay-qr" data-qr="USD" title="ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">QR</button></div>
       <button class="btn btn-outline pay-fill" data-fill="USD">ເຕັມ</button>
     </div>
     <div class="pay-calc">
@@ -2299,8 +2309,8 @@
   var payConfirm = document.getElementById("payConfirm");
   var rateUsdEl = document.getElementById("rateUSD");
   var rateThbEl = document.getElementById("rateTHB");
-  var payInputs = { LAK: document.getElementById("payLAK"), THB: document.getElementById("payTHB"), USD: document.getElementById("payUSD") };
-  var payMethods = { LAK: "cash", THB: "cash", USD: "cash" };
+  var payInputs   = { LAK: document.getElementById("payLAK"),   THB: document.getElementById("payTHB"),   USD: document.getElementById("payUSD") };
+  var payTrInputs = { LAK: document.getElementById("payLAKTr"), THB: document.getElementById("payTHBTr"), USD: document.getElementById("payUSDTr") };
   var payDueMap = {};      // what the customer has to pay after discount, per currency
   var paySubMap = {};      // goods total before discount, per currency
 
@@ -2340,9 +2350,18 @@
   function payRates(){
     return { LAK: 1, USD: parseNum(rateUsdEl.value) || 0, THB: parseNum(rateThbEl.value) || 0 };
   }
-  function readPaid(){
+  function readBoxes(boxes){
     var m = {};
-    CURS.forEach(function(c){ var v = parseNum(payInputs[c].value) || 0; if(v > 0){ m[c] = v; } });
+    CURS.forEach(function(c){ var v = parseNum(boxes[c].value) || 0; if(v > 0){ m[c] = v; } });
+    return m;
+  }
+  function readPaidCash(){ return readBoxes(payInputs); }
+  function readPaidTr(){ return readBoxes(payTrInputs); }
+  // what came in altogether per currency, however it was paid
+  function readPaid(){
+    var m = readPaidCash();
+    var t = readPaidTr();
+    Object.keys(t).forEach(function(c){ m[c] = (m[c] || 0) + t[c]; });
     return m;
   }
   // the rate field that still has to be filled before these amounts can be compared in kip
@@ -2384,14 +2403,14 @@
     }
     var dueCurs = Object.keys(payDueMap);
     var paidCurs = Object.keys(paid);
-    var cashPaid = {};
-    paidCurs.forEach(function(c){ if(payMethods[c] === "cash"){ cashPaid[c] = paid[c]; } });
+    var cashPaid = readPaidCash();   // change can only be handed back out of cash actually taken in
 
     // one currency both ways: compare it as is
     if(dueCurs.length <= 1 && paidCurs.length === 1 && (dueCurs.length === 0 || dueCurs[0] === paidCurs[0])){
       var c = paidCurs[0], over = diff[c] || 0;
       if(over < 0){ st.text = money(-over, c); return st; }
-      if(payMethods[c] === "transfer"){ st.label = "ເງິນໂອນເກີນຍອດບິນ"; st.text = money(over, c); return st; }
+      // a transfer that overshoots cannot be given back, only cash can
+      if(over > (cashPaid[c] || 0) + 0.0001){ st.label = "ເງິນໂອນເກີນຍອດບິນ"; st.text = money(over - (cashPaid[c] || 0), c); return st; }
       if(c !== "LAK"){
         if(!(rates[c] > 0)){ st.label = "ໃສ່ອັດຕາ "+CUR[c].sym+" ເພື່ອທອນເປັນກີບ"; st.text = money(over, c); return st; }
         st.rates = rates;
@@ -2506,20 +2525,13 @@
     payConfirm.disabled = !st.ok || !!disc.err;
   }
 
-  function setPayMethod(cur, m){
-    payMethods[cur] = m;
-    document.querySelectorAll('#payModal .pay-method[data-cur="'+cur+'"] button').forEach(function(b){
-      b.classList.toggle("active", b.dataset.m === m);
-    });
-  }
-
   function openPayModal(){
     if(cart.length === 0 || readDiscount().err){ return; }
     paySubMap = cartTotals();
     var r = dayRates();
     rateUsdEl.value = r.USD ? formatNumStr(String(r.USD)) : "";
     rateThbEl.value = r.THB ? formatNumStr(String(r.THB)) : "";
-    CURS.forEach(function(c){ payInputs[c].value = ""; setPayMethod(c, "cash"); });
+    CURS.forEach(function(c){ payInputs[c].value = ""; payTrInputs[c].value = ""; });
     document.getElementById("btnSaveRates").textContent = "ຕັ້ງເປັນອັດຕາມື້ນີ້";
     updatePayCalc();
     payModal.style.display = "flex";
@@ -2539,8 +2551,8 @@
   });
   // pressing ໂອນ shows that currency's QR for the customer to scan; an empty amount is filled with what is left first
   function showPayQr(cur){
-    if(!(parseNum(payInputs[cur].value) > 0)){ fillPay(cur); }
-    var amt = parseNum(payInputs[cur].value);
+    if(!(parseNum(payTrInputs[cur].value) > 0)){ fillPayInto(cur, "transfer"); }
+    var amt = parseNum(payTrInputs[cur].value);
     document.getElementById("qrTitle").textContent = "ສະແກນເພື່ອໂອນເງິນ" + CUR[cur].name;
     document.getElementById("qrAmount").textContent = amt > 0 ? money(amt, cur) : "-";
     document.getElementById("qrMissing").style.display = "none";
@@ -2553,9 +2565,13 @@
   document.getElementById("qrClose").addEventListener("click", closePayQr);
 
   // "ເຕັມ" puts in that currency whatever the other fields don't cover yet (rounded up)
-  function fillPay(cur){
+  function fillPay(cur){ fillPayInto(cur, "cash"); }
+  function fillPayInto(cur, which){
+    var boxes = which === "transfer" ? payTrInputs : payInputs;
     var others = readPaid();
-    delete others[cur];
+    // keep what the other box of this same currency already holds
+    var same = (which === "transfer" ? readPaidCash() : readPaidTr())[cur] || 0;
+    if(same > 0){ others[cur] = same; } else { delete others[cur]; }
     var rest = subMap(payDueMap, others);
     var restCurs = Object.keys(rest);
     var v = 0;
@@ -2569,23 +2585,20 @@
       // kip in whole thousands, baht and dollars in whole notes
       v = cur === "LAK" ? ceilK(left) : Math.ceil(left / rates[cur] - 1e-6);
     }
-    payInputs[cur].value = v > 0 ? formatNumStr(String(v)) : "";
+    boxes[cur].value = v > 0 ? formatNumStr(String(v)) : "";
     updatePayCalc();
-    payInputs[cur].focus();
+    boxes[cur].focus();
   }
 
   document.querySelectorAll("#payModal .pay-fill").forEach(function(b){
     b.addEventListener("click", function(){ fillPay(b.dataset.fill); });
   });
-  document.querySelectorAll("#payModal .pay-method button").forEach(function(b){
-    b.addEventListener("click", function(){
-      var cur = b.parentNode.dataset.cur;
-      setPayMethod(cur, b.dataset.m);
-      updatePayCalc();
-      if(b.dataset.m === "transfer"){ showPayQr(cur); }
-    });
+  document.querySelectorAll("#payModal .pay-qr").forEach(function(b){
+    b.addEventListener("click", function(){ showPayQr(b.dataset.qr); });
   });
-  CURS.map(function(c){ return payInputs[c]; }).concat([rateUsdEl, rateThbEl]).forEach(function(el){
+  CURS.map(function(c){ return payInputs[c]; })
+      .concat(CURS.map(function(c){ return payTrInputs[c]; }))
+      .concat([rateUsdEl, rateThbEl]).forEach(function(el){
     el.addEventListener("input", function(){
       if(el === rateUsdEl || el === rateThbEl){ document.getElementById("btnSaveRates").textContent = "ຕັ້ງເປັນອັດຕາມື້ນີ້"; }
       updatePayCalc();
@@ -2631,8 +2644,12 @@
     if(payConfirm.disabled){ return; }
     var disc = readDiscount();
     var st = readPayment();
-    var parts = CURS.filter(function(c){ return st.paid[c] > 0; })
-                    .map(function(c){ return { cur: c, amount: st.paid[c], method: payMethods[c] }; });
+    var cashIn = readPaidCash(), trIn = readPaidTr();
+    var parts = [];
+    CURS.forEach(function(c){
+      if(cashIn[c] > 0){ parts.push({ cur: c, amount: cashIn[c], method: "cash" }); }
+      if(trIn[c] > 0){ parts.push({ cur: c, amount: trIn[c], method: "transfer" }); }
+    });
     closePayModal();
     // rates are kept only when the bill needed them (paid in another currency, or change in kip)
     commitSale({ parts: parts, change: st.change, rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
