@@ -621,6 +621,23 @@ const SUPA_URL = "https://snyyhmeprngskneaaubb.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNueXlobWVwcm5nc2tuZWFhdWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIyMTgsImV4cCI6MjA5NTEzODIxOH0.3ltbo2EDzbHuMIC-TkoRew7asII0rIGNF0qoz2DkWHs";
 const ADMIN_PIN = "2003";
 const OWNER_PIN  = "8899";
+// ເປີດຜ່ານ Hub (iframe) ດ້ວຍບັນຊີ owner/admin → ບໍ່ຕ້ອງໃສ່ PIN ອີກ (login Hub ແລ້ວ)
+// ເປີດລິ້ງກົງ (ພະນັກງານມອບເງິນສົດ) → ເໝືອນເດີມ ຕ້ອງໃສ່ PIN
+const HUB_SKIP_PIN = (function(){
+  try{
+    if (window.self === window.top) return {};
+    const u = JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null');
+    if (!u || !Array.isArray(u.modules) || u.modules.indexOf('cash')===-1) return {};
+    if (u.role==='owner') return { admin:true, owner:true };
+    if (u.role==='admin') return { admin:true };
+  }catch(e){}
+  return {};
+})();
+function openRole(target){
+  if (HUB_SKIP_PIN[target]) { state.pin=null; state.mode=target; }
+  else { state.pin=target; }
+  render();
+}
 const CLEAR_CONFIRM_PIN = "8899";
 
 
@@ -853,14 +870,14 @@ function homeHTML() {
         <div class="hc-text"><div class="card-title">ພະນັກງານ</div><div class="card-sub">ສົ່ງຍອດ & ຖ່າຍຮູບບິນ</div></div>
         <div class="hc-arrow">${arrowGold}</div>
       </button>
-      <button class="home-card hc-blue" onclick="state.pin='admin';render()">
+      <button class="home-card hc-blue" onclick="openRole('admin')">
         <div class="hc-icon-box">${iconAdmin}</div>
-        <div class="hc-text"><div class="card-title">ຜູ້ອານຸມັດ</div><div class="card-sub">ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
+        <div class="hc-text"><div class="card-title">ຜູ້ອານຸມັດ</div><div class="card-sub">${HUB_SKIP_PIN.admin?"ເຂົ້າຜ່ານ Hub · ບໍ່ຕ້ອງໃສ່ PIN":"ຕ້ອງໃສ່ລະຫັດ PIN"}</div></div>
         <div class="hc-arrow">${arrowBlue}</div>
       </button>
-      <button class="home-card hc-ruby" onclick="state.pin='owner';render()">
+      <button class="home-card hc-ruby" onclick="openRole('owner')">
         <div class="hc-icon-box">${iconOwner}</div>
-        <div class="hc-text"><div class="card-title">ຫົວໜ້າ</div><div class="card-sub">ຕ້ອງໃສ່ລະຫັດ PIN</div></div>
+        <div class="hc-text"><div class="card-title">ຫົວໜ້າ</div><div class="card-sub">${HUB_SKIP_PIN.owner?"ເຂົ້າຜ່ານ Hub · ບໍ່ຕ້ອງໃສ່ PIN":"ຕ້ອງໃສ່ລະຫັດ PIN"}</div></div>
         <div class="hc-arrow">${arrowRuby}</div>
       </button>
     </div>
