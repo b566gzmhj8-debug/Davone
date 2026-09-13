@@ -341,13 +341,17 @@
     .cash-tab th,.cash-tab td{padding:4px;}
   }
 
-  .modal.pay-modal{max-width:580px;padding:26px 30px;max-height:calc(100vh - 40px);overflow-y:auto;}
-  .pay-modal .modal-title{font-size:22px;margin-bottom:12px;}
-  .pay-due-box{margin:0 0 10px;padding:14px 18px;background:var(--surface-alt);border-radius:10px;}
+  /* the sheet is built to fit a laptop screen: the amount owed stays on top, what is still short
+     and the save button stay at the bottom, and only the middle ever scrolls */
+  .modal.pay-modal{max-width:580px;padding:16px 22px;max-height:calc(100vh - 20px);
+    display:flex;flex-direction:column;overflow:hidden;}
+  .pay-mid{flex:1 1 auto;min-height:0;overflow-y:auto;}
+  .pay-modal .modal-title{font-size:18px;margin-bottom:8px;}
+  .pay-due-box{margin:0 0 8px;padding:9px 14px;background:var(--surface-alt);border-radius:10px;}
   .pay-sub{display:flex;justify-content:space-between;padding:2px 0;font-size:15px;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
   .pay-sub.disc{color:var(--red);}
   .pay-due{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:15px;color:var(--ink-soft);}
-  .pay-due b{font-size:40px;color:var(--ink);font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao',sans-serif;font-variant-numeric:tabular-nums;}
+  .pay-due b{font-size:31px;color:var(--ink);font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao',sans-serif;font-variant-numeric:tabular-nums;}
   /* sale page: one sheet — customer, item entry, item table, totals */
   .card.pos-sheet{padding:0;}
   .pos-head{
@@ -420,7 +424,7 @@
   .pos-big-amount span{white-space:nowrap;}
   .pos-big-amount.multi{font-size:36px;}
   .pay-due b span{text-align:right;}
-  .pay-due b.multi{font-size:28px;}
+  .pay-due b.multi{font-size:23px;}
   .pos-big-eq{margin:4px 0 0;font-size:14px;opacity:.85;}
   .pay-eq{margin:4px 0 0;text-align:right;font-size:14px;color:var(--ink-soft);}
   .pos-big-eq:empty,.pay-eq:empty{display:none;}
@@ -460,17 +464,17 @@
   .pay-rates-title{font-weight:600;margin-right:4px;}
   .rate-pair{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
   .pay-rates label{margin:0;font-size:14px;}
-  .pay-rates input{width:110px;padding:7px 8px;font-size:15px;text-align:right;}
+  .pay-rates input{width:100px;padding:5px 8px;font-size:14.5px;text-align:right;}
   .pay-rates .link-btn{margin-left:auto;padding:0;}
   .pay-sec{margin:0 0 8px;font-size:14px;font-weight:600;color:var(--ink-soft);}
-  .pay-cur-row{display:flex;align-items:stretch;gap:8px;margin-bottom:10px;}
+  .pay-cur-row{display:flex;align-items:stretch;gap:8px;margin-bottom:7px;}
   .pay-cur-tag{flex:none;width:72px;display:flex;align-items:center;font-size:15px;font-weight:600;}
-  .pay-cur-row input{flex:1;min-width:0;font-size:22px;padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;}
+  .pay-cur-row input{flex:1;min-width:0;font-size:19px;padding:8px 12px;text-align:right;font-variant-numeric:tabular-nums;}
   .seg.pay-method{margin:0;flex:none;}
   .pay-method button{flex:none;padding:0 10px;font-size:13.5px;}
   .pay-cur-row .btn{width:auto;margin:0;padding:0 12px;font-size:14px;white-space:nowrap;}
   /* amounts already taken in on this bill, each one added with Enter */
-  .pay-lines{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;}
+  .pay-lines{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px;}
   .pay-line{display:inline-flex;align-items:center;gap:6px;background:var(--surface-alt);border:1px solid var(--line);
     border-radius:999px;padding:5px 6px 5px 12px;font-size:13.5px;font-variant-numeric:tabular-nums;}
   .pay-line b{font-weight:700;color:var(--brown);}
@@ -487,30 +491,31 @@
   .pay-unit button{flex:none;min-width:56px;padding:0 12px;font-size:18px;}
   .pay-err{font-size:13.5px;color:var(--red);margin:6px 0 0;}
   .pay-err:empty{display:none;}
-  .pay-calc{margin:4px 0 18px;padding-top:12px;border-top:1px dashed var(--line);}
-  .pay-calc div{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:16px;}
-  .pay-calc b{font-size:22px;font-variant-numeric:tabular-nums;}
+  .pay-calc{flex:none;margin:2px 0 10px;padding-top:8px;border-top:1px dashed var(--line);}
+  .pay-calc div{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;font-size:15px;}
+  .pay-calc b{font-size:20px;font-variant-numeric:tabular-nums;}
   .pay-calc .good b{color:var(--green);}
   .pay-calc .bad span,.pay-calc .bad b{color:var(--red);}
-  .pay-modal .modal-actions .btn{padding:16px 14px;font-size:17px;}
-  /* keep the buttons in view when the step is taller than a laptop screen and scrolls */
+  .pay-modal .modal-actions{flex:none;}
+  .pay-modal .modal-actions .btn{padding:12px 14px;font-size:16px;}
+  /* the buttons sit in the sheet's own footer, always on screen */
   .pay-modal .modal-actions{
-    position:sticky;bottom:-26px;margin:0 -30px -26px;padding:12px 30px 26px;
+    margin:0 -22px -16px;padding:10px 22px 16px;
     background:var(--surface);border-top:1px solid var(--line);
   }
   @media (max-width:599px){
     .pay-modal .modal-actions{
-      bottom:calc(-24px - env(safe-area-inset-bottom));
-      margin:0 calc(-1 * max(16px, env(safe-area-inset-right))) calc(-24px - env(safe-area-inset-bottom)) calc(-1 * max(16px, env(safe-area-inset-left)));
-      padding:12px max(16px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      margin:0 calc(-1 * max(16px, env(safe-area-inset-right))) calc(-14px - env(safe-area-inset-bottom)) calc(-1 * max(16px, env(safe-area-inset-left)));
+      padding:10px max(16px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     }
   }
   @media (max-width:599px){
     /* phones: the payment step takes the whole screen */
     #payModal{padding:0;align-items:stretch;}
     .modal.pay-modal{
-      max-width:none;max-height:none;border-radius:0;overflow-y:auto;
-      padding:24px max(16px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      max-width:none;border-radius:0;overflow:hidden;
+      height:100vh;height:100dvh;max-height:none;
+      padding:14px max(16px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     }
   }
   .link-btn.danger{color:var(--red);}
@@ -1340,13 +1345,13 @@
       <div class="pay-due"><span>ຍອດທີ່ຕ້ອງຊຳລະ</span><b id="payDue">0</b></div>
       <p class="pay-eq" id="payDueEq"></p>
     </div>
+    <div class="pay-mid">
     <div class="pay-rates">
       <span class="pay-rates-title">ອັດຕາແລກປ່ຽນ</span>
       <span class="rate-pair"><label for="rateUSD">1 $ =</label><input type="text" inputmode="decimal" id="rateUSD" placeholder="0" autocomplete="off"><span>₭</span></span>
       <span class="rate-pair"><label for="rateTHB">1 ฿ =</label><input type="text" inputmode="decimal" id="rateTHB" placeholder="0" autocomplete="off"><span>₭</span></span>
       <button class="link-btn" id="btnSaveRates">ຕັ້ງເປັນອັດຕາມື້ນີ້</button>
     </div>
-    <p class="pay-sec">ຮັບເງິນ (ໃສ່ໄດ້ຫຼາຍສະກຸນ · ທອນເປັນກີບ · ກົດ Enter ເພື່ອຮັບໄວ້ ແລ້ວຮັບເພີ່ມຕໍ່ໄດ້)</p>
     <div class="pay-lines" id="payLines" style="display:none;"></div>
     <div class="pay-cur-row">
       <span class="pay-cur-tag">₭ ກີບ</span>
@@ -1366,6 +1371,7 @@
       <div class="seg pay-method" data-cur="USD"><button data-m="cash" class="active">ສົດ</button><button data-m="transfer" title="ໂອນ · ເປີດ QR ໃຫ້ລູກຄ້າສະແກນ">ໂອນ</button></div>
       <button class="btn btn-outline pay-fill" data-fill="USD">ເຕັມ</button>
     </div>
+    </div><!-- /pay-mid -->
     <div class="pay-calc">
       <div><span>ຮັບທັງໝົດ</span><b id="payReceived">0</b></div>
       <div id="payResultRow"><span id="payResultLabel">ຍັງຂາດ</span><b id="payResult">0</b></div>
