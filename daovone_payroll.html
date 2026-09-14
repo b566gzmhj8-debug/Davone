@@ -1854,7 +1854,9 @@ function waPhone(raw) {
 }
 
 function waMessage(emp) {
-  return `ສະບາຍດີ ${emp.name}\nໃບຮັບເງິນເດືອນ ${getMonthLabel()}\nຍອດຮັບສຸດທິ: ${fmt(computeNet(emp))} ກີບ\n— ຮ້ານດາວອນ`;
+  const [y, m] = (document.getElementById('month-picker').value || '').split('-');
+  const month = y ? `${parseInt(m)} ${y}` : getMonthLabel();
+  return `ໃບລາຍງານເງິນເດືອນ ${emp.name} ${month}\nຍອດຮັບສຸດທິ: ${fmt(computeNet(emp))} ກີບ\n— ບໍລິສັດ ດາວອນ`;
 }
 
 function waToast(msg, ms = 6000) {
