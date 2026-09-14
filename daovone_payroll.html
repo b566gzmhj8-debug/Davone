@@ -1893,7 +1893,7 @@ function refreshWAButtons() {
   if (document.getElementById('wa-modal').classList.contains('open')) renderWAList();
   const b = document.getElementById('slip-wa-btn');
   if (b && _slipIdx >= 0) {
-    b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${waIsCopied(employees[_slipIdx]) ? '② ເປີດແຊັດ' : 'ສົ່ງ WhatsApp'}`;
+    b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${waIsCopied(employees[_slipIdx]) ? '② ເປີດແຊັດ → ⌘V' : 'ສົ່ງ WhatsApp'}`;
   }
 }
 
@@ -1927,7 +1927,7 @@ async function sendWA(i) {
   }
   _waCopied = { id: emp.id, at: Date.now() };
   refreshWAButtons();
-  waToast(`① ກ໊ອບປີ້ຮູບໃບຂອງ <b>${emp.name}</b> ແລ້ວ ✓ — ກົດປຸ່ມ <b>② ເປີດແຊັດ</b>`, 8000);
+  waToast(`① ກ໊ອບປີ້ຮູບໃບຂອງ <b>${emp.name}</b> ແລ້ວ ✓<br>ກົດ <b>② ເປີດແຊັດ</b> → ໃນ WhatsApp ຄລິກຊ່ອງພິມ ແລ້ວກົດ <b>⌘V</b> (Windows: Ctrl+V) ຮູບຈຶ່ງຈະຂຶ້ນ`, 15000);
 }
 
 // ແຊຣ໌ = ເມນູແຊຣ໌ຂອງເຄື່ອງ (ເລືອກ WhatsApp → ເລືອກຊື່) ຫຼື ດາວໂຫລດຮູບ ຖ້າເຄື່ອງບໍ່ຮອງຮັບ
@@ -1998,7 +1998,7 @@ function renderWAList() {
         <div style="font-size:0.78rem;color:var(--muted);">ສຸດທິ: <b style="color:var(--green-dark);">${fmt(computeNet(emp))} ກີບ</b></div>
       </div>
       <input class="wa-phone" type="tel" inputmode="tel" placeholder="ເບີ WhatsApp" value="${esc(emp.phone)}" onchange="setWAPhone(${i}, this.value)">
-      <button class="btn btn-wa btn-sm" ${ready ? '' : 'disabled'} onclick="sendWA(${i})" title="${hasPhone ? 'ກົດ 1 ຄັ້ງ ກ໊ອບປີ້ຮູບ, ກົດອີກຄັ້ງ ເປີດແຊັດ' : 'ບໍ່ມີເບີ — ຈະເປີດເມນູແຊຣ໌'}"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${!ready ? '...' : waIsCopied(emp) ? '② ເປີດແຊັດ' : (hasPhone ? '① ກ໊ອບປີ້ຮູບ' : 'ສົ່ງ')}</button>
+      <button class="btn btn-wa btn-sm" ${ready ? '' : 'disabled'} onclick="sendWA(${i})" title="${hasPhone ? 'ກົດ 1 ຄັ້ງ ກ໊ອບປີ້ຮູບ, ກົດອີກຄັ້ງ ເປີດແຊັດ' : 'ບໍ່ມີເບີ — ຈະເປີດເມນູແຊຣ໌'}"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${!ready ? '...' : waIsCopied(emp) ? '② ເປີດແຊັດ → ⌘V' : (hasPhone ? '① ກ໊ອບປີ້ຮູບ' : 'ສົ່ງ')}</button>
       <button class="btn btn-gold btn-sm" ${ready ? '' : 'disabled'} onclick="shareWA(${i})"><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg> ແຊຣ໌</button>
     </div>`;
   }).join('');
