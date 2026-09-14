@@ -307,9 +307,18 @@
   .slip-footer { background: var(--green-dark); height: 10px; border-radius: 0 0 12px 12px; }
 
   .slip-close-row {
-    display: flex; justify-content: flex-end; gap: 10px;
+    display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;
     padding: 12px 20px; background: #f5f5f5; border-radius: 12px 12px 0 0;
   }
+
+  /* ── WhatsApp ── */
+  .btn-wa { background: #1f8f4e; color: white; }
+  .btn-wa:disabled { opacity: .55; cursor: wait; }
+  .wa-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; margin-bottom:6px; background:#f7f7f7; border:1.5px solid #e2e2e2; flex-wrap:wrap; }
+  .wa-row.sent { background:#eef6f0; border-color:#9cc9ab; }
+  .wa-row .wa-info { flex:1; min-width:150px; }
+  .wa-row .wa-phone { width:130px; padding:6px 8px; border:1px solid #ccc; border-radius:6px; font-family:inherit; font-size:0.82rem; }
+  #wa-toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:10000; background:#14432f; color:#fff; padding:12px 18px; border-radius:10px; font-size:0.88rem; max-width:90vw; box-shadow:0 6px 24px rgba(0,0,0,.25); text-align:center; }
 
   @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -466,6 +475,7 @@
 <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
 <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></symbol>
+<symbol id="i-wa" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
 <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
 </svg>
 
@@ -561,6 +571,7 @@
       <button class="btn btn-primary" onclick="addEmployee()"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg> ເພີ່ມພະນັກງານ</button>
       <button class="btn btn-danger" onclick="promptDeleteEmployee()"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg> ລົບພະນັກງານ</button>
       <button class="btn btn-gold" id="all-pdf-btn" onclick="openSelectPDF()"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg> ດາວໂຫລດ PDF</button>
+      <button class="btn btn-wa" onclick="openWAModal()"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ສົ່ງໃບ WhatsApp</button>
       <button class="btn btn-gray" onclick="exportJSON()"><svg class="ico" aria-hidden="true"><use href="#i-save"/></svg> Export ຂໍ້ມູນ</button>
       <label class="btn btn-gray" style="cursor:pointer;margin:0;">
         <svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg> Import ຂໍ້ມູນ
@@ -619,6 +630,28 @@
   </div>
 </div>
 
+<!-- ========== WHATSAPP SEND MODAL ========== -->
+<div id="wa-modal" class="modal-backdrop">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-head">
+      <h3><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ສົ່ງໃບຮັບເງິນທາງ WhatsApp — <span id="wa-month"></span></h3>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeWAModal()">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;line-height:1.6;">
+        <b>ສົ່ງ</b> = ກ໊ອບປີ້ຮູບໃບ ແລ້ວເປີດແຊັດຂອງຄົນນັ້ນ → ກົດຄ້າງຊ່ອງພິມ ເລືອກ <b>Paste/ວາງ</b> ແລ້ວສົ່ງ<br>
+        <b>ແຊຣ໌</b> = ເປີດເມນູແຊຣ໌ ເລືອກ WhatsApp ແລ້ວເລືອກຊື່ຄົນ (ໃຊ້ໄດ້ເຖິງບໍ່ມີເບີ) · ບັນທຶກຮູບໄວ້ໃນເຄື່ອງກໍໄດ້
+      </p>
+      <div id="wa-progress" style="font-size:0.8rem;color:#94701f;margin-bottom:8px;"></div>
+      <div id="wa-list"></div>
+    </div>
+    <div class="modal-foot">
+      <div style="flex:1;font-size:0.85rem;color:var(--muted);">ສົ່ງແລ້ວ: <span id="wa-sent-count" style="color:var(--green-dark);font-weight:700;">0</span> ຄົນ</div>
+      <button class="btn btn-gray" onclick="closeWAModal()">ປິດ</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========== BANK / QR MODAL ========== -->
 <div id="bank-modal" class="modal-backdrop">
   <div class="modal-box" style="max-width:420px;">
@@ -631,6 +664,11 @@
         <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:4px;">ຊື່ທະນາຄານ</label>
         <input id="bank-name-input" class="cell-input" style="width:100%;min-width:unset;text-align:left;padding:8px 10px;font-size:0.9rem;"
           placeholder="ເຊັ່ນ: BCEL, LDB, JDB...">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:4px;">ເບີ WhatsApp</label>
+        <input id="bank-phone-input" class="cell-input" type="tel" inputmode="tel" style="width:100%;min-width:unset;text-align:left;padding:8px 10px;font-size:0.9rem;"
+          placeholder="ເຊັ່ນ: 020 5555 1234">
       </div>
       <div style="margin-bottom:16px;">
         <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:4px;">ເລກບັນຊີ</label>
@@ -695,6 +733,7 @@
 <div id="slip-modal">
   <div class="slip-container">
     <div class="slip-close-row">
+      <button class="btn btn-wa btn-sm" id="slip-wa-btn" onclick="sendWA(_slipIdx)"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ສົ່ງ WhatsApp</button>
       <button class="btn btn-gold btn-sm" id="pdf-btn" onclick="exportPDF()"><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg> ສ້າງ PDF / ແຊຣ໌</button>
       <button class="btn btn-primary btn-sm" onclick="window.print()"><svg class="ico" aria-hidden="true"><use href="#i-printer"/></svg> ພິມ</button>
       <button class="btn btn-danger btn-sm" onclick="closeSlip()">✕ ປິດ</button>
@@ -1359,6 +1398,13 @@ function showSlip(i) {
   document.getElementById('slip-total-amount').textContent = fmt(net) + ' ກີບ';
   document.getElementById('slip-modal').classList.add('open');
 
+  // ກຽມຮູບໃບໄວ້ລ່ວງໜ້າ — ປຸ່ມ WhatsApp ຕ້ອງມີຮູບພ້ອມຕອນກົດ (Safari ບໍ່ໃຫ້ແຊຣ໌/ກ໊ອບປີ້ ຫຼັງລໍຖ້າດົນ)
+  _slipIdx = i;
+  const waBtn = document.getElementById('slip-wa-btn');
+  waBtn.disabled = true;
+  prepareWAImage(i).then(() => { if (_slipIdx === i) waBtn.disabled = false; })
+                   .catch(() => { if (_slipIdx === i) waBtn.disabled = false; });
+
   // Show QR image in modal — ສຳລັບ Hainam ດຽວ (ບໍ່ໄປໃນ PDF/ພິມ)
   const qrArea = document.getElementById('slip-bank-qr');
   if (qrArea) {
@@ -1435,6 +1481,7 @@ function openBankModal(i) {
   document.getElementById('bank-emp-name').textContent = emp.name;
   document.getElementById('bank-name-input').value = emp.bankName || '';
   document.getElementById('bank-acc-input').value  = emp.bankAccount || '';
+  document.getElementById('bank-phone-input').value = emp.phone || '';
   // Show existing QR image if any
   const preview = document.getElementById('qr-img-preview');
   if (emp.qrImage) {
@@ -1524,6 +1571,7 @@ function saveBankModal() {
   if (editingBankIdx < 0) return;
   employees[editingBankIdx].bankName    = document.getElementById('bank-name-input').value.trim();
   employees[editingBankIdx].bankAccount = document.getElementById('bank-acc-input').value.trim();
+  employees[editingBankIdx].phone       = document.getElementById('bank-phone-input').value.trim();
   const b64 = document.getElementById('qr-img-preview').dataset.b64;
   // Keep existing image if no new upload (b64 empty = unchanged unless cleared)
   if (b64 !== undefined) employees[editingBankIdx].qrImage = b64;
@@ -1758,6 +1806,177 @@ document.getElementById('select-pdf-modal').addEventListener('click', e => {
 document.getElementById('bank-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('bank-modal')) closeBankModal();
 });
+document.getElementById('wa-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('wa-modal')) closeWAModal();
+});
+
+// ══════════ WhatsApp — ສົ່ງໃບຮັບເງິນໃຫ້ພະນັກງານແຕ່ລະຄົນ ══════════
+// ຮູບ PNG ຖືກກຽມໄວ້ລ່ວງໜ້າ (key = ຂໍ້ມູນທີ່ສະແດງໃນໃບ) ເພື່ອໃຫ້ຕອນກົດປຸ່ມ ແຊຣ໌/ກ໊ອບປີ້ ໄດ້ທັນທີ
+let _slipIdx = -1;
+const _waImgCache = new Map(); // emp.id → { key, file }
+
+function waSlipKey(emp) {
+  return JSON.stringify([getMonthLabel(), emp.name, emp.baseSalary, emp.workDays, emp.bonusItems, emp.advance, emp.advanceBalance]);
+}
+
+function waDocNum(i) { return 'DVP-' + String(i + 1).padStart(3, '0'); }
+
+async function prepareWAImage(i) {
+  const emp = employees[i];
+  const key = waSlipKey(emp);
+  const hit = _waImgCache.get(emp.id);
+  if (hit && hit.key === key) return hit.file;
+  const canvas = await slipToCanvas(emp, waDocNum(i));
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const filename = `ໃບເງິນເດືອນ_${emp.name}_${getMonthLabel()}.png`.replace(/\s+/g, '_');
+  const file = new File([blob], filename, { type: 'image/png' });
+  _waImgCache.set(emp.id, { key, file });
+  return file;
+}
+
+function getReadyWAImage(i) {
+  const emp = employees[i];
+  const hit = emp && _waImgCache.get(emp.id);
+  return hit && hit.key === waSlipKey(emp) ? hit.file : null;
+}
+
+// ເບີລາວ: 020xxxxxxxx / 20xxxxxxxx / 030xxxxxxx → 856...; ມີ + ຫຼື 00 ນຳໜ້າ = ເບີສາກົນ ໃຊ້ຕາມນັ້ນ
+function waPhone(raw) {
+  let s = String(raw || '').trim();
+  if (!s) return '';
+  const intl = s.startsWith('+') || s.startsWith('00');
+  let d = s.replace(/\D/g, '');
+  if (intl) return d.replace(/^00/, '');
+  if (d.startsWith('856')) return d;
+  if (d.startsWith('0')) d = d.slice(1);
+  return d.length >= 8 ? '856' + d : '';
+}
+
+function waMessage(emp) {
+  return `ສະບາຍດີ ${emp.name}\nໃບຮັບເງິນເດືອນ ${getMonthLabel()}\nຍອດຮັບສຸດທິ: ${fmt(computeNet(emp))} ກີບ\n— ຮ້ານດາວອນ`;
+}
+
+function waToast(msg, ms = 6000) {
+  let t = document.getElementById('wa-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'wa-toast'; document.body.appendChild(t); }
+  t.innerHTML = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, ms);
+}
+
+function markWASent(i) {
+  const emp = employees[i];
+  if (!emp) return;
+  emp.waSent = document.getElementById('month-picker').value;
+  autoSave();
+  if (document.getElementById('wa-modal').classList.contains('open')) renderWAList();
+}
+
+// ສົ່ງ = ກ໊ອບປີ້ຮູບ + ເປີດແຊັດຂອງຄົນນັ້ນໂດຍກົງ; ຖ້າບໍ່ມີເບີ → ເປີດເມນູແຊຣ໌ແທນ
+// ຕ້ອງເອີ້ນ clipboard/window.open ທັນທີໃນການກົດ (ບໍ່ await ກ່ອນ) ບໍ່ດັ່ງນັ້ນ Safari ຈະບລັອກ
+function sendWA(i) {
+  const emp = employees[i];
+  if (!emp) return;
+  const phone = waPhone(emp.phone);
+  if (!phone) return shareWA(i);
+  const file = getReadyWAImage(i);
+  if (!file) { waToast('ກຳລັງກຽມຮູບໃບ... ລໍຖ້າບຶດໜຶ່ງແລ້ວກົດອີກຄັ້ງ'); prepareWAImage(i); return; }
+
+  let copying = null;
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      copying = navigator.clipboard.write([new ClipboardItem({ 'image/png': file })]);
+    }
+  } catch (e) { copying = null; }
+
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waMessage(emp))}`, '_blank', 'noopener');
+  markWASent(i);
+
+  if (!copying) {
+    waToast('ເປີດແຊັດແລ້ວ ແຕ່ເຄື່ອງນີ້ກ໊ອບປີ້ຮູບບໍ່ໄດ້ — ໃຊ້ປຸ່ມ <b>ແຊຣ໌</b> ແທນເພື່ອແນບຮູບ', 8000);
+    return;
+  }
+  copying.then(
+    () => waToast(`ກ໊ອບປີ້ຮູບໃບຂອງ <b>${emp.name}</b> ແລ້ວ — ໃນ WhatsApp ກົດຄ້າງຊ່ອງພິມ → <b>Paste / ວາງ</b> → ສົ່ງ`, 9000),
+    () => waToast('ກ໊ອບປີ້ຮູບບໍ່ສຳເລັດ — ກັບມາກົດປຸ່ມ <b>ແຊຣ໌</b> ເພື່ອແນບຮູບແທນ', 8000)
+  );
+}
+
+// ແຊຣ໌ = ເມນູແຊຣ໌ຂອງເຄື່ອງ (ເລືອກ WhatsApp → ເລືອກຊື່) ຫຼື ດາວໂຫລດຮູບ ຖ້າເຄື່ອງບໍ່ຮອງຮັບ
+async function shareWA(i) {
+  const emp = employees[i];
+  if (!emp) return;
+  const file = getReadyWAImage(i);
+  if (!file) { waToast('ກຳລັງກຽມຮູບໃບ... ລໍຖ້າບຶດໜຶ່ງແລ້ວກົດອີກຄັ້ງ'); prepareWAImage(i); return; }
+  let canShare = false;
+  try { canShare = !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+  if (canShare) {
+    try {
+      await navigator.share({ files: [file], text: waMessage(emp) });
+      markWASent(i);
+    } catch (err) {
+      if (err && err.name !== 'AbortError') waToast('ແຊຣ໌ບໍ່ສຳເລັດ: ' + err.message);
+    }
+    return;
+  }
+  await shareOrDownload(file, file.name, 'image/png');
+  waToast('ບັນທຶກຮູບໃບແລ້ວ — ເປີດ WhatsApp ແລ້ວແນບຮູບສົ່ງໃຫ້ ' + emp.name);
+}
+
+let _waPrepRun = 0;
+async function openWAModal() {
+  if (!employees.length) { alert('ບໍ່ມີພະນັກງານ'); return; }
+  document.getElementById('wa-month').textContent = getMonthLabel();
+  document.getElementById('wa-modal').classList.add('open');
+  renderWAList();
+
+  const run = ++_waPrepRun;
+  const prog = document.getElementById('wa-progress');
+  for (let i = 0; i < employees.length; i++) {
+    if (run !== _waPrepRun || !document.getElementById('wa-modal').classList.contains('open')) return;
+    if (getReadyWAImage(i)) continue;
+    prog.textContent = `ກຳລັງກຽມຮູບໃບ ${i + 1}/${employees.length} — ${employees[i].name}`;
+    try { await prepareWAImage(i); } catch (e) { console.error(e); }
+    renderWAList();
+  }
+  if (run === _waPrepRun) prog.textContent = '';
+}
+
+function closeWAModal() {
+  _waPrepRun++;
+  document.getElementById('wa-modal').classList.remove('open');
+  renderTable();
+}
+
+function setWAPhone(i, val) {
+  employees[i].phone = String(val).trim();
+  autoSave();
+  renderWAList();
+}
+
+function renderWAList() {
+  const month = document.getElementById('month-picker').value;
+  const list = document.getElementById('wa-list');
+  const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  let sent = 0;
+  list.innerHTML = employees.map((emp, i) => {
+    const isSent = emp.waSent === month;
+    if (isSent) sent++;
+    const ready = !!getReadyWAImage(i);
+    const hasPhone = !!waPhone(emp.phone);
+    return `<div class="wa-row ${isSent ? 'sent' : ''}">
+      <div class="wa-info">
+        <div style="font-weight:600;font-size:0.9rem;">${i + 1}. ${esc(emp.name)} ${isSent ? '<span style="color:#1f8f4e;font-size:0.75rem;">✓ ສົ່ງແລ້ວ</span>' : ''}</div>
+        <div style="font-size:0.78rem;color:var(--muted);">ສຸດທິ: <b style="color:var(--green-dark);">${fmt(computeNet(emp))} ກີບ</b></div>
+      </div>
+      <input class="wa-phone" type="tel" inputmode="tel" placeholder="ເບີ WhatsApp" value="${esc(emp.phone)}" onchange="setWAPhone(${i}, this.value)">
+      <button class="btn btn-wa btn-sm" ${ready ? '' : 'disabled'} onclick="sendWA(${i})" title="${hasPhone ? 'ກ໊ອບປີ້ຮູບ + ເປີດແຊັດ' : 'ບໍ່ມີເບີ — ຈະເປີດເມນູແຊຣ໌'}"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${ready ? 'ສົ່ງ' : '...'}</button>
+      <button class="btn btn-gold btn-sm" ${ready ? '' : 'disabled'} onclick="shareWA(${i})"><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg> ແຊຣ໌</button>
+    </div>`;
+  }).join('');
+  document.getElementById('wa-sent-count').textContent = sent;
+}
 
 // ── Build standalone slip HTML for one employee (no modal needed) ──
 function buildSlipHTML(emp, docNum) {
