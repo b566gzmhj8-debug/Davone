@@ -1617,6 +1617,7 @@
     if(d.transferCounter == null) d.transferCounter = d.transfers.length;
     if(d.expenseCounter == null) d.expenseCounter = 0;   // vouchers are only numbered from here on
     if(!d.deposits) d.deposits = [];
+    if(!d.opening) d.opening = [];     // cash already on hand when the branch started using the system
     if(d.depositCounter == null) d.depositCounter = 0;
     if(!d.rates) d.rates = { USD: null, THB: null, date: null };   // kip per dollar / per baht
     return d;
@@ -3865,6 +3866,11 @@
   // that money is already in the boss's account, so it is never part of the cash and cannot be drawn.
   function cashFlow(from, to){
     var f = { opening:{}, cash:{}, transfer:{}, unknown:{}, dep:{}, exp:{}, closing:{} };
+    // money the staff already held before the system was used: it is carried into every period from its date on
+    (DATA.opening || []).forEach(function(o){
+      if(o.date && o.date > to){ return; }
+      CURS.forEach(function(c){ if(Number(o[c])){ addTo(f.opening, c, Number(o[c])); } });
+    });
     DATA.bills.forEach(function(b){
       if(b.date > to){ return; }
       var r = billReceipts(b);
@@ -4347,7 +4353,7 @@
   // ---------- CLOUD SYNC ----------
   // Supabase holds the real books; the browser copy is only a cache so the shop keeps working when the line drops.
   // Every record is its own row, so two devices editing different bills never overwrite each other.
-  var SYNC_KINDS = ["stock","bills","purchases","expenses","deposits","transfers"];
+  var SYNC_KINDS = ["stock","bills","purchases","expenses","deposits","transfers","opening"];
   var SYNC_BRANCH = "hun";
   var synced = {};            // kind -> id -> the JSON we last agreed on with the server
   var syncedSettings = null;
