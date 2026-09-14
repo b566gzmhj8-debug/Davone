@@ -917,6 +917,8 @@ async function saveExpense() {
     }
     toast(msg, isErr);
     clearForm();
+    // ບັນທຶກແລ້ວ → ຍົກເລີກຕິກອັດຕະໂນມັດ ກັນຕັດງົບຊ້ຳ
+    if (link) { document.getElementById('budgetLink').checked = false; saveLinkPref(); }
     await reloadHistory();
   } catch(e) {
     toast('ບັນທຶກບໍ່ໄດ້: ' + (e.message||''), true);
