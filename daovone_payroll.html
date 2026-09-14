@@ -639,7 +639,7 @@
     </div>
     <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
       <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;line-height:1.6;">
-        <b>ສົ່ງ</b> = ກ໊ອບປີ້ຮູບໃບ ແລ້ວເປີດແຊັດຂອງຄົນນັ້ນ → ກົດຄ້າງຊ່ອງພິມ ເລືອກ <b>Paste/ວາງ</b> ແລ້ວສົ່ງ<br>
+        <b>① ກ໊ອບປີ້ຮູບ</b> → ປຸ່ມຈະປ່ຽນເປັນ <b>② ເປີດແຊັດ</b> → ກົດອີກຄັ້ງ → ໃນ WhatsApp ກົດຊ່ອງພິມ ເລືອກ <b>Paste/ວາງ</b> (⌘V) ແລ້ວສົ່ງ<br>
         <b>ແຊຣ໌</b> = ເປີດເມນູແຊຣ໌ ເລືອກ WhatsApp ແລ້ວເລືອກຊື່ຄົນ (ໃຊ້ໄດ້ເຖິງບໍ່ມີເບີ) · ບັນທຶກຮູບໄວ້ໃນເຄື່ອງກໍໄດ້
       </p>
       <div id="wa-progress" style="font-size:0.8rem;color:#94701f;margin-bottom:8px;"></div>
@@ -1400,6 +1400,7 @@ function showSlip(i) {
 
   // ກຽມຮູບໃບໄວ້ລ່ວງໜ້າ — ປຸ່ມ WhatsApp ຕ້ອງມີຮູບພ້ອມຕອນກົດ (Safari ບໍ່ໃຫ້ແຊຣ໌/ກ໊ອບປີ້ ຫຼັງລໍຖ້າດົນ)
   _slipIdx = i;
+  refreshWAButtons();
   const waBtn = document.getElementById('slip-wa-btn');
   waBtn.disabled = true;
   prepareWAImage(i).then(() => { if (_slipIdx === i) waBtn.disabled = false; })
@@ -1873,34 +1874,60 @@ function markWASent(i) {
   if (document.getElementById('wa-modal').classList.contains('open')) renderWAList();
 }
 
-// ສົ່ງ = ກ໊ອບປີ້ຮູບ + ເປີດແຊັດຂອງຄົນນັ້ນໂດຍກົງ; ຖ້າບໍ່ມີເບີ → ເປີດເມນູແຊຣ໌ແທນ
-// ຕ້ອງເອີ້ນ clipboard/window.open ທັນທີໃນການກົດ (ບໍ່ await ກ່ອນ) ບໍ່ດັ່ງນັ້ນ Safari ຈະບລັອກ
-function sendWA(i) {
+// ສົ່ງ ແບ່ງເປັນ 2 ກົດ: ① ກ໊ອບປີ້ຮູບໃບ → ② ເປີດແຊັດຂອງຄົນນັ້ນ (ແລ້ວ Paste)
+// ເຫດຜົນ: ຖ້າເປີດແຊັດທັນທີໃນກົດດຽວກັນ Safari ຈະຍົກເລີກການກ໊ອບປີ້ຮູບ (ໜ້າເສຍ focus) → ໄປແຕ່ຂໍ້ຄວາມ ບໍ່ມີຮູບ
+// ຖ້າບໍ່ມີເບີ → ເປີດເມນູແຊຣ໌ແທນ
+let _waCopied = null; // { id: emp.id, at: ms }
+
+function waIsCopied(emp) {
+  return !!(emp && _waCopied && _waCopied.id === emp.id && Date.now() - _waCopied.at < 5 * 60 * 1000);
+}
+
+function waChatUrl(phone, text) {
+  const q = `phone=${phone}&text=${encodeURIComponent(text)}`;
+  // ມືຖື → ແອັບ WhatsApp; iPad/ຄອມ → WhatsApp Web ໂດຍກົງ (ບໍ່ຜ່ານໜ້າ wa.me)
+  return /iPhone|Android/i.test(navigator.userAgent) ? `https://api.whatsapp.com/send?${q}` : `https://web.whatsapp.com/send?${q}`;
+}
+
+function refreshWAButtons() {
+  if (document.getElementById('wa-modal').classList.contains('open')) renderWAList();
+  const b = document.getElementById('slip-wa-btn');
+  if (b && _slipIdx >= 0) {
+    b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${waIsCopied(employees[_slipIdx]) ? '② ເປີດແຊັດ' : 'ສົ່ງ WhatsApp'}`;
+  }
+}
+
+async function sendWA(i) {
   const emp = employees[i];
   if (!emp) return;
   const phone = waPhone(emp.phone);
   if (!phone) return shareWA(i);
-  const file = getReadyWAImage(i);
-  if (!file) { waToast('ກຳລັງກຽມຮູບໃບ... ລໍຖ້າບຶດໜຶ່ງແລ້ວກົດອີກຄັ້ງ'); prepareWAImage(i); return; }
 
-  let copying = null;
-  try {
-    if (navigator.clipboard && window.ClipboardItem) {
-      copying = navigator.clipboard.write([new ClipboardItem({ 'image/png': file })]);
-    }
-  } catch (e) { copying = null; }
-
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waMessage(emp))}`, '_blank', 'noopener');
-  markWASent(i);
-
-  if (!copying) {
-    waToast('ເປີດແຊັດແລ້ວ ແຕ່ເຄື່ອງນີ້ກ໊ອບປີ້ຮູບບໍ່ໄດ້ — ໃຊ້ປຸ່ມ <b>ແຊຣ໌</b> ແທນເພື່ອແນບຮູບ', 8000);
+  // ② ກ໊ອບປີ້ແລ້ວ → ເປີດແຊັດ (ໃຊ້ແທັບ WhatsApp ດຽວກັນທຸກຄັ້ງ ບໍ່ເປີດແທັບໃໝ່ຊ້ຳໆ)
+  if (waIsCopied(emp)) {
+    const w = window.open(waChatUrl(phone, waMessage(emp)), 'davone-whatsapp');
+    try { if (w) w.opener = null; } catch (e) {}
+    _waCopied = null;
+    markWASent(i);
+    refreshWAButtons();
+    waToast(`ໃນແຊັດຂອງ <b>${emp.name}</b>: ກົດຊ່ອງພິມ → <b>Paste / ວາງ</b> (ຫຼື ⌘V) ເພື່ອແນບຮູບ → ສົ່ງ`, 10000);
     return;
   }
-  copying.then(
-    () => waToast(`ກ໊ອບປີ້ຮູບໃບຂອງ <b>${emp.name}</b> ແລ້ວ — ໃນ WhatsApp ກົດຄ້າງຊ່ອງພິມ → <b>Paste / ວາງ</b> → ສົ່ງ`, 9000),
-    () => waToast('ກ໊ອບປີ້ຮູບບໍ່ສຳເລັດ — ກັບມາກົດປຸ່ມ <b>ແຊຣ໌</b> ເພື່ອແນບຮູບແທນ', 8000)
-  );
+
+  // ① ກ໊ອບປີ້ຮູບໃບ
+  const file = getReadyWAImage(i);
+  if (!file) { waToast('ກຳລັງກຽມຮູບໃບ... ລໍຖ້າບຶດໜຶ່ງແລ້ວກົດອີກຄັ້ງ'); prepareWAImage(i); return; }
+  try {
+    if (!navigator.clipboard || !window.ClipboardItem) throw new Error('no clipboard');
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': file })]);
+  } catch (e) {
+    console.error(e);
+    waToast('ເຄື່ອງນີ້ກ໊ອບປີ້ຮູບບໍ່ໄດ້ — ໃຊ້ປຸ່ມ <b>ແຊຣ໌</b> (ບັນທຶກຮູບ) ແທນ', 8000);
+    return;
+  }
+  _waCopied = { id: emp.id, at: Date.now() };
+  refreshWAButtons();
+  waToast(`① ກ໊ອບປີ້ຮູບໃບຂອງ <b>${emp.name}</b> ແລ້ວ ✓ — ກົດປຸ່ມ <b>② ເປີດແຊັດ</b>`, 8000);
 }
 
 // ແຊຣ໌ = ເມນູແຊຣ໌ຂອງເຄື່ອງ (ເລືອກ WhatsApp → ເລືອກຊື່) ຫຼື ດາວໂຫລດຮູບ ຖ້າເຄື່ອງບໍ່ຮອງຮັບ
@@ -1971,7 +1998,7 @@ function renderWAList() {
         <div style="font-size:0.78rem;color:var(--muted);">ສຸດທິ: <b style="color:var(--green-dark);">${fmt(computeNet(emp))} ກີບ</b></div>
       </div>
       <input class="wa-phone" type="tel" inputmode="tel" placeholder="ເບີ WhatsApp" value="${esc(emp.phone)}" onchange="setWAPhone(${i}, this.value)">
-      <button class="btn btn-wa btn-sm" ${ready ? '' : 'disabled'} onclick="sendWA(${i})" title="${hasPhone ? 'ກ໊ອບປີ້ຮູບ + ເປີດແຊັດ' : 'ບໍ່ມີເບີ — ຈະເປີດເມນູແຊຣ໌'}"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${ready ? 'ສົ່ງ' : '...'}</button>
+      <button class="btn btn-wa btn-sm" ${ready ? '' : 'disabled'} onclick="sendWA(${i})" title="${hasPhone ? 'ກົດ 1 ຄັ້ງ ກ໊ອບປີ້ຮູບ, ກົດອີກຄັ້ງ ເປີດແຊັດ' : 'ບໍ່ມີເບີ — ຈະເປີດເມນູແຊຣ໌'}"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg> ${!ready ? '...' : waIsCopied(emp) ? '② ເປີດແຊັດ' : (hasPhone ? '① ກ໊ອບປີ້ຮູບ' : 'ສົ່ງ')}</button>
       <button class="btn btn-gold btn-sm" ${ready ? '' : 'disabled'} onclick="shareWA(${i})"><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg> ແຊຣ໌</button>
     </div>`;
   }).join('');
