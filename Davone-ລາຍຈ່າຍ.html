@@ -176,6 +176,19 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .btn-save:hover{background:var(--gold-dim);box-shadow:0 0 24px rgba(196,156,60,0.15)}
 .btn-save:active{transform:scale(.99)}
 .btn-save:disabled{opacity:.4;cursor:not-allowed}
+.blink{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;user-select:none}
+.blink:hover{border-color:var(--border-gold)}
+.blink input{position:absolute;opacity:0;pointer-events:none}
+.blink-box{width:18px;height:18px;flex-shrink:0;margin-top:1px;border:1.5px solid rgba(255,255,255,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.blink:has(input:checked){border-color:var(--gold);background:var(--gold-dim)}
+.blink input:checked+.blink-box{background:var(--gold);border-color:var(--gold)}
+.blink input:checked+.blink-box::after{content:'✓';font-size:12px;font-weight:800;color:var(--bg)}
+.blink-txt{display:flex;flex-direction:column;gap:3px;line-height:1.4}
+.blink-txt b{font-size:13px;color:var(--gold-lt)}
+.blink-txt small{font-size:11px;color:var(--muted)}
+.blink-txt em{font-style:normal;font-family:var(--mono);color:var(--goods)}
+.blink-txt em.neg{color:var(--danger)}
+.hi-link{font-size:10px;padding:1px 8px;border-radius:50px;border:1px solid var(--border-gold);color:var(--gold-lt);background:var(--gold-dim)}
 .btn-reset{width:100%;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;cursor:pointer;transition:all .15s;margin-top:4px}
 .btn-reset:hover{border-color:var(--danger);color:var(--danger)}
 
@@ -633,6 +646,15 @@ input[type=date].dep-inp::-webkit-date-and-time-value{text-align:left}
               <div class="tc-row"><span class="tc-label" style="font-weight:700;color:var(--text)">ລວມທັງໝົດ</span><span class="tc-val grand" id="totalGrand">—</span></div>
             </div>
           </div>
+          <!-- ຕັດ ຍອດເງິນ · ງົບປະມານ ນຳ (ສະເພາະ HaiNam) -->
+          <label class="blink" id="budgetLinkRow" hidden>
+            <input type="checkbox" id="budgetLink" onchange="saveLinkPref()">
+            <span class="blink-box"></span>
+            <span class="blink-txt">
+              <b>ຕັດ ຍອດເງິນ · ງົບປະມານ ນຳ</b>
+              <small>ບັນທຶກເງິນອອກໃຫ້ອັດຕະໂນມັດ (ກີບ ₭ ເທົ່ານັ້ນ)<br>ຍອດເຫຼືອ: <em id="budgetLeft">—</em></small>
+            </span>
+          </label>
           <button class="btn-save" id="btnSave" onclick="saveExpense()">ບັນທຶກລາຍຈ່າຍ</button>
           <button class="btn-reset" onclick="clearForm()">ລ້າງຟອມ</button>
         </div>
@@ -732,6 +754,10 @@ const BUDGET_OWNER = 'HaiNam';
 function hubUser(){ try{ return JSON.parse(sessionStorage.getItem('daovone_hub_user')||'null'); }catch(e){ return null; } }
 function isBudgetOwner(){ const u=hubUser(); return !!(u && (u.username===BUDGET_OWNER || u.name===BUDGET_OWNER)); }
 
+const LINK_PREF_KEY = 'dv_expense_budget_link';
+function saveLinkPref(){ try{ localStorage.setItem(LINK_PREF_KEY, document.getElementById('budgetLink').checked ? '1' : '0'); }catch(e){} }
+function linkOn(){ return isBudgetOwner() && document.getElementById('budgetLink').checked; }
+
 const SYM = {LAK:'₭', THB:'฿', USD:'$'};
 
 // ── business icons (ແທນ emoji) ──
@@ -761,6 +787,10 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!isBudgetOwner()) {
     const nb = document.getElementById('nav-budget');
     if (nb) nb.style.display = 'none';
+  } else {
+    // ປຸ່ມ ຕັດງົບປະມານນຳ — ຈື່ຄ່າທີ່ເລືອກລ່າສຸດໄວ້
+    document.getElementById('budgetLinkRow').hidden = false;
+    try { document.getElementById('budgetLink').checked = localStorage.getItem(LINK_PREF_KEY) === '1'; } catch(e) {}
   }
 
   document.addEventListener('keydown', e => {
@@ -866,10 +896,26 @@ async function saveExpense() {
   if (aD && aA > 0) rows.push({date, type:'admin', category: state.adminTag||'ບໍລິຫານ', description:aD, amount:aA, currency:aC, note:aN});
   if (gD && gA > 0) rows.push({date, type:'goods', category: state.goodsTag||'ຄ່າສິນຄ້າ', description:gD, amount:gA, currency:gC, note:gN});
 
+  const link = linkOn();
   try {
-    const { error } = await sb.from(TABLE).insert(rows);
+    const { data: saved, error } = await sb.from(TABLE).insert(rows).select('id,date,type,description,amount,currency');
     if (error) throw error;
-    toast('ບັນທຶກສຳເລັດ ✅');
+
+    // ── ຕັດ ຍອດເງິນ · ງົບປະມານ ນຳ (ເງິນອອກ, ກີບເທົ່ານັ້ນ) ──
+    let msg = 'ບັນທຶກສຳເລັດ ✅', isErr = false;
+    if (link && saved && saved.length) {
+      const lak = saved.filter(r => r.currency === 'LAK');
+      const skipped = saved.length - lak.length;
+      if (lak.length) {
+        const { error: dErr } = await sb.from(DEP_TABLE).insert(lak.map(r => ({
+          date: r.date, amount: r.amount, currency: 'LAK', kind: 'out', note: r.description, expense_id: r.id
+        })));
+        if (dErr) { msg = 'ບັນທຶກລາຍຈ່າຍແລ້ວ ແຕ່ຕັດງົບປະມານບໍ່ໄດ້: ' + (dErr.message||''); isErr = true; }
+        else msg = 'ບັນທຶກ + ຕັດງົບປະມານແລ້ວ ✅';
+      }
+      if (skipped && !isErr) { msg = (lak.length ? msg + ' · ' : 'ບັນທຶກແລ້ວ · ') + 'ບາດ/ໂດລາ ບໍ່ໄດ້ຕັດງົບ'; isErr = !lak.length; }
+    }
+    toast(msg, isErr);
     clearForm();
     await reloadHistory();
   } catch(e) {
@@ -890,6 +936,7 @@ async function delRecord(id) {
         + '🏷️ ' + r.category + '\n'
         + '💰 ' + fmt(r.amount) + ' ' + (SYM[r.currency]||r.currency) + '\n'
         + '📝 ' + (r.description || '-') + '\n\n'
+        + (linkedDep(id) ? '💳 ເງິນອອກໃນ ງົບປະມານ ທີ່ຜູກໄວ້ຈະຖືກລຶບນຳ (ຄືນຍອດ)\n' : '')
         + '⚠️ ລຶບແລ້ວກູ້ຄືນບໍ່ໄດ້';
   }
   if (!confirm(msg)) return;
@@ -897,6 +944,7 @@ async function delRecord(id) {
     const { error } = await sb.from(TABLE).delete().eq('id', id);
     if (error) throw error;
     records = records.filter(x => x.id !== id);
+    deposits = deposits.filter(d => d.expense_id !== id); // DB ລຶບໃຫ້ແລ້ວ (on delete cascade)
     renderHistory(); updateSidebar();
   } catch(e) {
     toast('ລຶບບໍ່ໄດ້: ' + (e.message||''), true);
@@ -905,13 +953,15 @@ async function delRecord(id) {
 
 async function delSelected() {
   if (!state.selected.size) { toast('ຍັງບໍ່ໄດ້ເລືອກລາຍການ', true); return; }
-  if (!confirm('ລຶບ ' + state.selected.size + ' ລາຍການທີ່ເລືອກ?')) return;
   const ids = [...state.selected];
+  const nLinked = ids.filter(linkedDep).length;
+  if (!confirm('ລຶບ ' + ids.length + ' ລາຍການທີ່ເລືອກ?' + (nLinked ? '\n\n💳 ມີ ' + nLinked + ' ລາຍການທີ່ຕັດງົບປະມານ — ເງິນອອກໃນງົບປະມານຈະຖືກລຶບນຳ (ຄືນຍອດ)' : ''))) return;
   try {
     const { error } = await sb.from(TABLE).delete().in('id', ids);
     if (error) throw error;
     const n = ids.length;
     records = records.filter(x => !ids.includes(x.id));
+    deposits = deposits.filter(d => !ids.includes(d.expense_id));
     state.selected.clear();
     state.selMode = false;
     document.getElementById('btnMulti').classList.remove('active');
@@ -940,6 +990,7 @@ function renderHistory() {
         <div class="hi-cb"></div>
         <span class="hi-date">${r.date}</span>
         <span class="hi-badge ${r.type}">${r.category}</span>
+        ${linkedDep(r.id)?'<span class="hi-link">ຕັດງົບແລ້ວ</span>':''}
       </div>
       <div class="hi-mid">
         <span class="hi-desc">${escHtml(r.description)}</span>
@@ -962,7 +1013,16 @@ function updateSidebar() {
   document.getElementById('sbAdmin').textContent = fmt(aLAK) + ' ₭';
   document.getElementById('sbGoods').textContent = fmt(gLAK) + ' ₭';
   document.getElementById('sbTotal').textContent = aLAK+gLAK > 0 ? fmt(aLAK+gLAK)+' ₭' : '—';
+  if (isBudgetOwner()) {
+    const left = deposits.reduce((s,d) => s + ((d.kind||'in')==='in' ? Number(d.amount) : -Number(d.amount)), 0);
+    const el = document.getElementById('budgetLeft');
+    el.textContent = fmt(Math.abs(left)) + ' ₭';
+    if (left < 0) el.textContent = '−' + el.textContent;
+    el.classList.toggle('neg', left < 0);
+  }
 }
+
+function linkedDep(expenseId) { return deposits.find(d => d.expense_id === expenseId); }
 
 // ═══════════════════════════════════════════════
 //  SUMMARY MODAL
@@ -1048,7 +1108,7 @@ async function addDeposit() {
     document.getElementById('depAmount').value='';
     document.getElementById('depNote').value='';
     await loadDeposits();
-    buildBalance();
+    buildBalance(); renderHistory(); updateSidebar();
   } catch(e) {
     toast('ບັນທຶກບໍ່ໄດ້: ' + (e.message||''), true);
   }
@@ -1061,7 +1121,7 @@ async function delDeposit(id) {
     const { error } = await sb.from(DEP_TABLE).delete().eq('id', id);
     if (error) throw error;
     deposits = deposits.filter(x => x.id !== id);
-    buildBalance();
+    buildBalance(); renderHistory(); updateSidebar();
     toast('ລຶບແລ້ວ');
   } catch(e) {
     toast('ລຶບບໍ່ໄດ້: ' + (e.message||''), true);
