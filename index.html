@@ -1937,6 +1937,11 @@ function bentoDashHTML(o){
   let active = CURS.filter(c => bal[c].cashRecords>0 || bal[c].toBoss>0 || bal[c].withdrawn>0 || bal[c].adjust!==0);
   if (!active.length) active = ["LAK"];
   const P = active[0], b = bal[P];
+  // ປັບຍອດ: ໂຊແຍກສະເພາະມື້ທີ່ປັບ (ວັນຖັດໄປບໍ່ໂຊ) — ຍອດປັບເກົ່າ/ຍົກຍອດ (carry-*) ລວມເຂົ້າ "ຮັບເງິນເຂົ້າ"
+  const _td = new Date();
+  const isTodayTs = ts => { const d = new Date(Number(ts) || ts); return d.getFullYear()===_td.getFullYear() && d.getMonth()===_td.getMonth() && d.getDate()===_td.getDate(); };
+  const adjToday = getAdjustments().filter(a => (a.currency||"LAK") === P && isTodayTs(a.ts)).reduce((t,a) => t + a.amount, 0);
+  const received = b.cashRecords + (b.adjust - adjToday);
   const tabIdx = adminTab==="today"?0:adminTab==="month"?1:2;
   const icon = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
   const I = {
@@ -1977,12 +1982,14 @@ function bentoDashHTML(o){
           <linearGradient id="bnGO" x1="0" x2="1"><stop offset="0" stop-color="#f3d99b"/><stop offset="1" stop-color="#ff8f80"/></linearGradient>
           <linearGradient id="bnGA" x1="0" x2="1"><stop offset="0" stop-color="#6fd49c"/><stop offset="1" stop-color="#f3d99b"/></linearGradient>
         </defs>
-        <path class="bn-pipe" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/><path class="bn-dash${on(b.cashRecords)}" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/>
-        <path class="bn-pipe" stroke="url(#bnGA)" d="M150 205 C 230 205, 230 125, 290 125"/><path class="bn-dash${on(b.adjust)}" stroke="#6fd49c" d="M150 205 C 230 205, 230 125, 290 125"/>
+        ${adjToday ? `<path class="bn-pipe" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/><path class="bn-dash${on(received)}" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/>
+        <path class="bn-pipe" stroke="url(#bnGA)" d="M150 205 C 230 205, 230 125, 290 125"/><path class="bn-dash" stroke="#6fd49c" d="M150 205 C 230 205, 230 125, 290 125"/>`
+        : `<path class="bn-pipe" stroke="#f3d99b" d="M150 125 L 290 125"/><path class="bn-dash${on(received)}" stroke="#f3d99b" d="M150 125 L 290 125"/>`}
         <path class="bn-pipe" stroke="url(#bnGC)" d="M410 110 C 465 110, 465 60, 515 60"/><path class="bn-dash${on(b.adminDep)}" stroke="#7fb2ff" style="animation-duration:.8s" d="M410 110 C 465 110, 465 60, 515 60"/>
         <path class="bn-pipe" stroke="url(#bnGO)" d="M410 140 C 465 140, 465 190, 515 190"/><path class="bn-dash${on(b.withdrawn)}" stroke="#ff8f80" style="animation-duration:1.6s" d="M410 140 C 465 140, 465 190, 515 190"/>
-        <g class="bn-node"><rect x="8" y="30" width="142" height="60" rx="14" stroke="#f3d99b"/><text x="22" y="54">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="76" style="fill:#f3d99b">+${FMT[P](b.cashRecords)}</text></g>
-        <g class="bn-node"><rect x="8" y="175" width="142" height="60" rx="14" stroke="#6fd49c"/><text x="22" y="199">ປັບຍອດ</text><text class="v" x="22" y="221" style="fill:${b.adjust<0?"#ff8f80":"#6fd49c"}">${b.adjust>0?"+":b.adjust<0?"−":""}${FMT[P](Math.abs(b.adjust))}</text></g>
+        ${adjToday ? `<g class="bn-node"><rect x="8" y="30" width="142" height="60" rx="14" stroke="#f3d99b"/><text x="22" y="54">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="76" style="fill:#f3d99b">+${FMT[P](received)}</text></g>
+        <g class="bn-node"><rect x="8" y="175" width="142" height="60" rx="14" stroke="#6fd49c"/><text x="22" y="199">ປັບຍອດມື້ນີ້</text><text class="v" x="22" y="221" style="fill:${adjToday<0?"#ff8f80":"#6fd49c"}">${adjToday>0?"+":"−"}${FMT[P](Math.abs(adjToday))}</text></g>`
+        : `<g class="bn-node"><rect x="8" y="95" width="142" height="60" rx="14" stroke="#f3d99b"/><text x="22" y="119">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="141" style="fill:#f3d99b">+${FMT[P](received)}</text></g>`}
         <g class="bn-node"><rect x="290" y="88" width="120" height="74" rx="16" stroke="#d4a85a" stroke-width="2"/><text x="304" y="114">ເງິນສົດຄ້າງ</text><text class="v" x="304" y="140" style="fill:#f3d99b">${FMT[P](b.withAdmin)}</text></g>
         <g class="bn-node"><rect x="515" y="30" width="120" height="60" rx="14" stroke="#7fb2ff"/><text x="527" y="54">ເຂົ້າທະນາຄານ</text><text class="v" x="527" y="76" style="fill:#7fb2ff">${FMT[P](b.toBoss)}</text></g>
         <g class="bn-node"><rect x="515" y="160" width="120" height="60" rx="14" stroke="#ff8f80"/><text x="527" y="184">ເບີກ/ຈ່າຍ</text><text class="v" x="527" y="206" style="fill:#ff8f80">${b.withdrawn?"−":""}${FMT[P](b.withdrawn)}</text></g>
@@ -2020,10 +2027,10 @@ function bentoDashHTML(o){
     </div>`;
 
   // ── ທີ່ມາຂອງຍອດລວມ (waterfall) ──
-  const steps = [["ຮັບເງິນເຂົ້າ", b.cashRecords, "#f3d99b"]];
+  const steps = [["ຮັບເງິນເຂົ້າ", received, "#f3d99b"]];
   if (b.staffDep) steps.push(["+ ມອບກົງ", b.staffDep, "#7fb2ff"]);
   steps.push(["− ເບີກ/ຈ່າຍ", -b.withdrawn, "#ff8f80"]);
-  steps.push([b.adjust<0 ? "− ປັບຍອດ" : "+ ປັບຍອດ", b.adjust, b.adjust<0 ? "#ff8f80" : "#6fd49c"]);
+  if (adjToday) steps.push([adjToday<0 ? "− ປັບຍອດມື້ນີ້" : "+ ປັບຍອດມື້ນີ້", adjToday, adjToday<0 ? "#ff8f80" : "#6fd49c"]);
   let run = 0; const segs = steps.map(s => { const from = run; run += s[1]; return { lbl:s[0], col:s[2], from, to:run, v:s[1] }; });
   segs.push({ lbl:"= ຍອດລວມ", col:"gold", from:0, to:b.grand, v:b.grand, total:true });
   const lo = Math.min(0, ...segs.map(s => Math.min(s.from, s.to))), hi = Math.max(1, ...segs.map(s => Math.max(s.from, s.to)));
