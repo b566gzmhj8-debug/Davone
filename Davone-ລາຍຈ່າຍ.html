@@ -465,6 +465,120 @@ input[type=date].dep-inp::-webkit-date-and-time-value{text-align:left}
 .dep-item-amt{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--gold-lt)}
 .dep-del{background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:13px;padding:2px 4px;transition:color .12s}
 .dep-del:hover{color:var(--danger)}
+
+/* ══════════ HUB THEME — ໃຫ້ເຂົ້າກັບໜ້າ hub.html (ພື້ນຫຼັງຮູບ · ແກ້ວ · ທອງ) ══════════ */
+:root{
+  --bg:#0b1a3d;
+  --surface:rgba(10,20,44,.62);
+  --card:rgba(18,30,58,.55);
+  --card2:#1a2a52;
+  --border:rgba(243,217,155,.13);
+  --border-gold:rgba(243,217,155,.38);
+  --gold:#d4a85a;--gold-lt:#f3d99b;--gold-dim:rgba(212,168,90,.15);
+  --glass:blur(18px) saturate(1.3);
+  --gold-grad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
+  --font:'Lao MN','Noto Sans Lao','Lao Sangam MN',system-ui,sans-serif;
+}
+html{background:#0b1a3d}
+body{background:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:#0b1a3d url(login-bg.jpg) center/cover no-repeat}
+body::after{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(6,12,30,.5),rgba(6,12,30,.3) 45%,rgba(6,12,30,.55))}
+@media (max-aspect-ratio:1/1){ body::before{background-position:8% center} }
+
+/* แถบบน */
+.topbar{height:60px;background:rgba(10,20,44,.72);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);
+  border-bottom:1px solid rgba(243,217,155,.3);box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.layout{height:calc(100vh - 60px)}
+.sidebar{top:60px;height:calc(100vh - 60px)}
+.brand{gap:11px}
+.brand-logo{position:relative;width:38px;height:38px;flex:none;border-radius:50%;overflow:hidden;background:#000;
+  box-shadow:0 0 0 2px #e9c27a,0 0 14px 2px rgba(255,190,90,.45)}
+.brand-logo img{width:100%;height:100%;display:block;transform:scale(1.15)}
+.brand-txt{display:flex;flex-direction:column;line-height:1.25}
+.brand-name{font-style:normal;font-size:16px;font-weight:800;letter-spacing:.01em;
+  background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 55%,#b8893f 75%,#f6dc9c);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:hubShine 6s linear infinite}
+@keyframes hubShine{to{background-position:-250% 0}}
+.brand-sub{font-size:11px;color:rgba(243,234,210,.7)}
+.btn-summary{border-radius:10px;padding:8px 16px;background:rgba(18,30,58,.55);border-color:rgba(243,217,155,.35)}
+.btn-summary:hover{background:rgba(243,217,155,.14);border-color:var(--gold)}
+.sync-badge{padding:4px 12px}
+
+/* แถบข้าง */
+.sidebar{background:rgba(10,20,44,.55);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border-right:1px solid rgba(243,217,155,.14)}
+.nav-item{margin:3px 10px;padding:11px 14px;border-left:0;border-radius:12px;font-size:14px;color:rgba(243,234,210,.8)}
+.nav-item:hover{background:rgba(243,217,155,.07);color:#fff}
+.nav-item.active{background:linear-gradient(90deg,rgba(212,168,90,.24),rgba(212,168,90,.06));color:var(--gold-lt);box-shadow:inset 3px 0 0 var(--gold)}
+.sidebar-stats{border-radius:16px;background:rgba(18,30,58,.6);border-color:rgba(243,217,155,.2)}
+
+/* หัวข้อหน้า */
+.page-title{font-size:24px;
+  background:linear-gradient(100deg,#fff 0%,#fff 40%,#f3d99b 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.date-pill{border-radius:14px;background:rgba(18,30,58,.6);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}
+
+/* การ์ด */
+.scard,.total-card,.hist-card,.stmt,.dep-form,.bal-c,.sblk,.gblk{border-radius:20px;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);
+  box-shadow:0 14px 40px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07)}
+.scard{border:1px solid rgba(243,217,155,.16)}
+.scard.admin{border-top:2px solid var(--admin);box-shadow:0 14px 40px rgba(0,0,0,.28),0 -6px 24px -12px var(--admin)}
+.scard.goods{border-top:2px solid var(--goods);box-shadow:0 14px 40px rgba(0,0,0,.28),0 -6px 24px -12px var(--goods)}
+.scard-head{padding:16px 20px}
+.snum{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--gold-grad);color:#1a1405;font-weight:800;font-size:11px}
+.stitle h2{font-size:16px}
+.sbody{padding:18px 20px;gap:16px}
+.field>label{font-size:12.5px;color:#f3ead2}
+
+/* ช่องกรอก */
+input[type=text],textarea{background:rgba(6,14,34,.55);border:1px solid rgba(243,217,155,.2);border-radius:12px;padding:11px 14px;font-size:15px}
+input[type=text]::placeholder,textarea::placeholder{color:rgba(243,234,210,.42)}
+input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,168,90,.16),0 0 18px rgba(212,168,90,.15)}
+.amt-wrap input{padding:12px 36px 12px 14px;font-size:22px}
+.tag{padding:7px 15px;border-radius:50px;border-color:rgba(243,217,155,.22);background:rgba(6,14,34,.35)}
+.tag:hover{border-color:rgba(243,217,155,.5)}
+.cur-btn{border-radius:12px;border-color:rgba(243,217,155,.18);background:rgba(6,14,34,.35);padding:11px 6px}
+.cur-btn:hover{border-color:rgba(243,217,155,.45)}
+.cur-btn.active-lak{background:rgba(212,168,90,.18);border-color:var(--gold);box-shadow:0 0 16px rgba(212,168,90,.2)}
+
+/* ปุ่มบันทึก = ปุ่มทองแบบหน้า login */
+.btn-save{padding:15px;border:0;border-radius:14px;background:var(--gold-grad);color:#1a1405;font-size:15px;
+  box-shadow:0 10px 26px rgba(212,168,90,.3)}
+.btn-save::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:hubBtnShine 3.2s infinite}
+@keyframes hubBtnShine{0%,60%{left:-60%}100%{left:130%}}
+.btn-save:hover{background:var(--gold-grad);filter:brightness(1.06);box-shadow:0 12px 30px rgba(212,168,90,.4)}
+.btn-reset{border-radius:12px}
+.blink{border-radius:14px;background:rgba(18,30,58,.55)}
+.btn-cfg-save{border-radius:12px;background:var(--gold-grad);color:#1a1405;border:0}
+
+/* รายการ / สรุป */
+.tc-head,.hist-head{background:rgba(243,217,155,.04)}
+.tc-title,.hist-title{opacity:1;color:var(--gold-lt)}
+.tc-val.grand{font-weight:600}
+.hi{padding:13px 18px}
+.hi:hover{background:rgba(243,217,155,.05)}
+.btn-clr,.btn-multi,.btn-sel-cancel{border-radius:8px}
+.mtab{border-color:rgba(243,217,155,.22)}
+.mtab.active{background:var(--gold-grad);color:#1a1405;border-color:transparent}
+.kind-btn{border-radius:12px;border-color:rgba(243,217,155,.2)}
+.dep-inp{background:rgba(6,14,34,.55);border-color:rgba(243,217,155,.2);border-radius:12px}
+.bal-bar{background:rgba(6,14,34,.5)}
+
+/* หน้าต่าง / แจ้งเตือน */
+.overlay,.cfg-overlay{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.msheet,.cfg-sheet{background:rgba(16,28,56,.88);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.mclose{background:rgba(255,255,255,.08);border:1px solid rgba(243,217,155,.3);box-shadow:none;color:#f3ead2}
+.mclose:hover{background:#c0392b;border-color:#c0392b}
+#toast{border-radius:14px;background:rgba(16,28,56,.95);box-shadow:0 10px 36px rgba(0,0,0,.5),0 0 20px rgba(212,168,90,.2)}
+.szero{color:rgba(243,234,210,.3)!important}
+
+@media(max-width:640px){
+  .topbar{height:56px}
+  .layout{height:auto}
+  .sidebar{top:0;height:100vh;padding-top:56px;background:rgba(10,20,44,.92)}
+  .brand-logo{width:32px;height:32px}
+  .brand-sub{display:none}
+  .scard,.total-card,.hist-card{border-radius:18px}
+}
 </style>
 </head>
 <body>
@@ -496,10 +610,11 @@ input[type=date].dep-inp::-webkit-date-and-time-value{text-align:left}
     <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="6" x2="19" y2="6"/><line x1="3" y1="11" x2="19" y2="11"/><line x1="3" y1="16" x2="19" y2="16"/></svg>
   </button>
   <div class="brand">
-    <div class="brand-line"></div>
-    <span class="brand-name">Davone</span>
-    <div class="brand-dot"></div>
-    <span class="brand-sub">ລາຍຈ່າຍ</span>
+    <div class="brand-logo"><img src="icon-512.png" alt="Davone"></div>
+    <div class="brand-txt">
+      <span class="brand-name">ລາຍຈ່າຍ</span>
+      <span class="brand-sub">ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ</span>
+    </div>
   </div>
   <div class="topbar-right">
     <span class="sync-badge loading" id="syncBadge">⏳ ກຳລັງເຊື່ອມ…</span>
