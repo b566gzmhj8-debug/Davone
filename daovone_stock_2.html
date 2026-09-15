@@ -308,6 +308,86 @@
   .model-search-meta{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:2px;}
   .model-search-item:hover,.model-search-item.active{background:var(--panel2);}
   .model-search-empty{padding:10px 12px;font-size:13px;color:var(--muted);}
+  /* ══════════ HUB THEME — ໃຫ້ເຂົ້າກັບ hub.html (ພື້ນຫຼັງຮູບ · ແກ້ວ · ທອງ) ══════════
+     ປ່ຽນແຕ່ໜ້າຈໍ; ໃບບິນ/ໃບໂອນ ຕົວຢ່າງກະດາດ (.paper-sheet) ແລະ ຕອນພິມ ຍັງເປັນເຈ້ຍຂາວຄືເກົ່າ */
+  @media screen{
+  :root{
+    --bg:rgba(6,14,34,.55); --panel:rgba(12,22,48,.62); --panel2:rgba(243,217,155,.07); --border:rgba(243,217,155,.16);
+    --orange:#d4a85a; --orange-soft:#f3d99b; --ink:#f3ead2; --muted:rgba(243,234,210,.62);
+    --danger:#ff8f80; --ok:#6fd49c;
+    --font-body:'Lao MN','Noto Sans Lao','Lao Sangam MN',-apple-system,sans-serif;
+    --hub-glass:blur(18px) saturate(1.3);
+    --hub-grad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
+  }
+  html{background:#0b1a3d;}
+  body{background:transparent;}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:#0b1a3d url(login-bg.jpg) center/cover no-repeat;}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(6,12,30,.52),rgba(6,12,30,.32) 45%,rgba(6,12,30,.6));}
+  @media (max-aspect-ratio:1/1){ body::before{background-position:8% center;} }
+  #app{background:transparent;}
+  input,select,textarea{color-scheme:dark;border-radius:10px;}
+  input::placeholder,textarea::placeholder{color:rgba(243,234,210,.4);}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(212,168,90,.16);}
+  select option{background:#16264d;color:#f3ead2;}
+
+  /* หัว + เมนู */
+  header{background:rgba(10,20,44,.72);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);border-bottom:1px solid rgba(243,217,155,.3);}
+  .shop-logo{width:38px;height:38px;flex:none;border-radius:50%;overflow:hidden;background:#000;box-shadow:0 0 0 2px #e9c27a,0 0 14px 2px rgba(255,190,90,.45);}
+  .shop-logo img{width:100%;height:100%;display:block;transform:scale(1.15);}
+  header .title{font-size:16px;font-weight:800;letter-spacing:.02em;
+    background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 55%,#b8893f 75%,#f6dc9c);background-size:250% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:hubShine 6s linear infinite;}
+  @keyframes hubShine{to{background-position:-250% 0;}}
+  header .logout{border-radius:10px;border-color:rgba(243,217,155,.35);color:#f3ead2;background:rgba(18,30,58,.5);}
+  nav{background:rgba(10,20,44,.55);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);border-color:rgba(243,217,155,.14);}
+  nav button{color:rgba(243,234,210,.72);}
+  nav button.active{color:#f3d99b;}
+  .seal-mark{border-color:#d4a85a;color:#f3d99b;}
+  .seal-mark::before{border-color:rgba(243,217,155,.5);}
+  .brand .name{background:linear-gradient(100deg,#f6dc9c,#e2b466);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  /* การ์ด / สถิติ */
+  .card{border-radius:18px;backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);box-shadow:0 14px 40px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);}
+  .card h3{color:#f3d99b;border-bottom-color:rgba(243,217,155,.28);}
+  .stat{border-radius:16px;background:rgba(12,22,48,.6);border:1px solid rgba(243,217,155,.16);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);}
+  button.stat.active{background:rgba(212,168,90,.18);}
+  .yr-bar{background:rgba(6,14,34,.5);}
+  .yr-bar i{background:var(--hub-grad);}
+
+  /* ปุ่ม */
+  .btn,.login-btn{background:var(--hub-grad);color:#1a1405;border-radius:12px;box-shadow:0 8px 20px rgba(212,168,90,.25);}
+  .btn:hover,.login-btn:hover{filter:brightness(1.06);}
+  .btn.secondary{background:rgba(212,168,90,.1);border:1px solid rgba(243,217,155,.5);color:#f3d99b;box-shadow:none;}
+  .btn.danger{background:rgba(255,120,100,.14);border:1px solid rgba(255,140,120,.45);color:#ff9a8c;box-shadow:none;}
+  .icon-btn{border-radius:10px;border-color:rgba(243,217,155,.24);}
+  .pay-chips button{background:rgba(6,14,34,.45);}
+  .pay-chips button[aria-pressed="true"]{background:var(--hub-grad);color:#1a1405;border-color:transparent;}
+  .pay-quick button{background:rgba(6,14,34,.45);}
+  .rcv-count-badge{background:var(--hub-grad);color:#1a1405;}
+  .cart-item{background:rgba(243,217,155,.07);border:1px solid rgba(243,217,155,.12);border-radius:12px;}
+  .tag.ok{background:rgba(111,212,156,.1);}
+  .tag.sold{background:rgba(255,143,128,.1);}
+
+  /* ปັອບອັບ / ແຈ້ງເຕືອນ / ລາຍການເລືອກ */
+  .modal-bg{background:rgba(4,10,26,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  .modal{background:rgba(16,28,56,.94);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);border:1px solid rgba(243,217,155,.3);box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .model-search-dropdown{background:#16264d;}
+  .toast{background:rgba(16,28,56,.95);border:1px solid rgba(243,217,155,.35);color:#f3ead2;}
+
+  /* ການ໌ດເອກະສານ (ໃບໂອນ ຯລຯ) ໃນແອັບ → ນ້ຳເງິນ+ທອງ ຄືໃບຮັບເງິນ */
+  .doc-card{background:rgba(12,22,48,.7);}
+  .doc-head{background:linear-gradient(135deg,#0b1a3d,#1c3264);border-bottom:3px solid #d4a85a;}
+  .doc-head-title h3{color:#f3d99b;}
+  .doc-brand .seal-mark{border-color:#d4a85a;color:#f3d99b;}
+  .doc-tag{border-color:rgba(243,217,155,.7);}
+  .doc-avatar{background:var(--hub-grad);color:#1a1405;}
+  .doc-table-head{background:#0f1f45;color:#f3d99b;border:1px solid rgba(243,217,155,.25);border-bottom:none;}
+  .doc-total-band{background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f3d99b;border:1px solid rgba(243,217,155,.35);}
+  .doc-footer{background:rgba(6,14,34,.4);}
+  /* ຕົວຢ່າງກະດາດ: ພື້ນຮອງເປັນແກ້ວ, ແຜ່ນເຈ້ຍຍັງຂາວ */
+  .paper{background:rgba(6,14,34,.45);border:1px solid rgba(243,217,155,.16);}
+  }
+
 </style>
 </head>
 <body>
@@ -334,7 +414,7 @@
   <div id="mainScreen" style="display:none;flex-direction:column;flex:1;">
     <header>
       <div class="head-left">
-        <div class="seal-mark"><svg class="dv-icon"><use href="#i-gear"></use></svg></div>
+        <div class="shop-logo"><img src="icon-512.png" alt="Davone"></div>
         <div>
           <div class="title">DAVONE SHOP</div>
           <div class="role" id="roleLabel"></div>
