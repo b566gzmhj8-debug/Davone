@@ -617,6 +617,141 @@ button.av-pill{cursor:pointer}
   .av-date-t{font-size:10px}
 }
 
+/* ══════════ HUB THEME — ໃຫ້ເຂົ້າກັບ hub.html (ພື້ນຫຼັງຮູບ · ແກ້ວ · ນ້ຳເງິນ + ທອງ) ══════════
+   ໃຊ້ class "hub" ແທນ "light" (applyTheme). ຫຼາຍໜ້າມີ inline style ສີເຂັ້ມສຳລັບພື້ນຂາວ ຈຶ່ງແກ້ດ້ວຍ [style*=…] ຢູ່ລຸ່ມ */
+body.hub{ --hg:#d4a85a; --hg2:#f3d99b; --hink:#f3ead2; --hmuted:rgba(243,234,210,.62); --hline:rgba(243,217,155,.16);
+  --hglass:rgba(12,22,48,.6); --hblur:blur(18px) saturate(1.3); --hgrad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
+  font-family:'Lao MN','Noto Sans Lao','Phetsarath OT',sans-serif; background:#0b1a3d; color:var(--hink); }
+body.hub::before{content:"";position:fixed;inset:0;z-index:0;background:#0b1a3d url(login-bg.jpg) center/cover no-repeat;pointer-events:none;}
+body.hub::after{content:"";position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,rgba(6,12,30,.55),rgba(6,12,30,.35) 45%,rgba(6,12,30,.62));pointer-events:none;}
+@media (max-aspect-ratio:1/1){ body.hub::before{background-position:8% center;} }
+body.hub .app{position:relative;z-index:1;background:transparent;}
+body.hub .home, body.hub .pin-wrap, body.hub .dept-grid, body.hub .form-scroll, body.hub .admin-wrap, body.hub .admin-scroll{background:transparent;}
+body.hub .home-bg-glow1, body.hub .home-bg-glow2{display:none;}
+
+/* หน้าแรก */
+body.hub .logo-ring{background:none;padding:0;border-radius:50%;box-shadow:0 0 0 3px #e9c27a,0 0 0 5px rgba(90,60,20,.9),0 0 32px 8px rgba(255,190,90,.45);overflow:hidden;}
+body.hub .logo{border:none;transform:scale(1.15);}
+body.hub .app-title{background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 55%,#b8893f 75%,#f6dc9c);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:hubShine 6s linear infinite;}
+@keyframes hubShine{to{background-position:-250% 0;}}
+body.hub .app-sub{color:rgba(243,234,210,.6);}
+body.hub .home-card{background:var(--hglass);border:1px solid var(--hline);backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);box-shadow:0 14px 40px rgba(0,0,0,.3);}
+body.hub .home-card.hc-gold::before{background:var(--hgrad);}
+body.hub .card-title{color:#fff;}
+body.hub .card-sub{color:var(--hmuted);opacity:1;}
+body.hub .sync-note{color:rgba(243,234,210,.4);}
+
+/* หัว */
+body.hub .header{background:rgba(10,20,44,.72);backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);border-bottom:1px solid rgba(243,217,155,.3);}
+body.hub .header-title{color:#f3d99b;}
+body.hub .header-back{color:#f3ead2;width:32px;height:32px;border-radius:50%;border:1px solid rgba(243,217,155,.35);background:rgba(18,30,58,.5);display:inline-flex;align-items:center;justify-content:center;font-size:16px;padding:0;}
+
+/* PIN */
+body.hub .pin-title{color:#f3ead2;}
+body.hub .pin-dot{background:rgba(243,217,155,.2);}
+body.hub .pin-dot.filled{background:#d4a85a;box-shadow:0 0 10px rgba(212,168,90,.6);}
+body.hub .pin-key{border-radius:50%;background:rgba(12,22,48,.6);border:1px solid rgba(243,217,155,.25);color:#f3ead2;backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);}
+body.hub .pin-key:active{background:rgba(212,168,90,.25);}
+body.hub .pin-key.del{background:rgba(255,120,100,.1);color:#ff9a8c;}
+body.hub .pin-key.empty{background:transparent;border:none;backdrop-filter:none;}
+body.hub .pin-input-confirm{background:rgba(6,14,34,.55);border-color:rgba(243,217,155,.3);}
+
+/* รายชื่อแผนก / ฟอร์ม */
+body.hub .dept-header-pro{background:linear-gradient(180deg,rgba(8,16,38,.9) 70%,transparent);}
+body.hub .dh-title{color:#f3d99b;}
+body.hub .dh-sub, body.hub .dept-section-label{color:rgba(243,234,210,.5);}
+body.hub .dept-search{background:rgba(6,14,34,.5);border-color:var(--hline);}
+body.hub .dept-card{background:var(--hglass);border:1px solid var(--hline);backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);}
+body.hub .dept-name{color:#fff;}
+body.hub .dept-card-img{background:rgba(255,255,255,.06);border-color:var(--hline);}
+body.hub .dept-chip{background:var(--hglass);border-color:var(--hline);}
+body.hub .field-label-pro, body.hub .lbl{color:rgba(243,234,210,.72);}
+body.hub .input-wrap-pro{background:rgba(6,14,34,.55);border-color:rgba(243,217,155,.2);}
+body.hub .input-wrap-pro:focus-within{border-color:#d4a85a;box-shadow:0 0 0 3px rgba(212,168,90,.16);}
+body.hub .input-wrap-pro input::placeholder, body.hub .input-wrap-pro textarea::placeholder{color:rgba(243,234,210,.3);}
+body.hub .photo-zone-pro{background:rgba(6,14,34,.4);border-color:rgba(243,217,155,.28);}
+body.hub .photo-text-pro{color:rgba(243,234,210,.7);}
+body.hub .submit-wrap-pro{background:linear-gradient(0deg,rgba(8,16,38,.95) 65%,transparent);}
+body.hub .btn-pro-submit, body.hub .btn-green, body.hub .btn-bank-confirm{background:var(--hgrad);color:#1a1405;box-shadow:0 10px 26px rgba(212,168,90,.3);}
+body.hub .btn-pro-submit svg{stroke:#1a1405;}
+body.hub .btn-pro-submit:disabled{background:rgba(255,255,255,.08);color:rgba(243,234,210,.35);box-shadow:none;}
+body.hub .inp, body.hub .photo-btn, body.hub .month-picker, body.hub .cur-btn, body.hub .view-btn, body.hub .btn-cancel, body.hub .tab, body.hub .restore-btn, body.hub .clear-btn, body.hub .clear-btn-safe{
+  background:rgba(6,14,34,.5);border-color:rgba(243,217,155,.22);color:#f3ead2;}
+body.hub .tab.active, body.hub .cur-active{background:var(--hgrad) !important;color:#1a1405 !important;border-color:transparent !important;}
+body.hub .form-divider{background:linear-gradient(90deg,transparent,rgba(243,217,155,.2),transparent);}
+body.hub .amount-preview{color:#f3d99b;}
+
+/* สำเร็จ / การ์ดสรุป / หน้าต่าง */
+body.hub .done-box, body.hub .dept-summary, body.hub .record-card, body.hub .storage-card, body.hub .modal, body.hub .backup-modal, body.hub .bank-modal, body.hub .bank-history-card, body.hub .cash-summary-card{
+  background:rgba(14,26,54,.78);border:1px solid rgba(243,217,155,.2);backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);color:#f3ead2;box-shadow:0 14px 40px rgba(0,0,0,.3);}
+body.hub .record-card{border-left-width:4px;}
+body.hub .done-box{position:relative;overflow:hidden;}
+body.hub .done-box::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#a57a36,#f3d99b,#a57a36);}
+body.hub .done-title, body.hub .record-dept, body.hub .bank-modal-title{color:#fff;}
+body.hub .done-amount{color:#f3d99b;}
+body.hub .total-card{background:linear-gradient(135deg,#0b1a3d,#1c3264);border:1px solid rgba(243,217,155,.35);}
+body.hub .dept-sum-row{border-color:rgba(243,217,155,.1);color:#f3ead2;}
+body.hub .overlay{background:rgba(4,10,26,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+body.hub .modal-header{background:#0f1f45;color:#f3d99b;}
+body.hub .warn-box{background:rgba(243,156,18,.12);border-color:rgba(243,156,18,.45);color:#ffd27a;}
+body.hub .restore-msg{background:rgba(111,212,156,.1);border-color:rgba(111,212,156,.35);color:#8fe0b3;}
+body.hub .safety-note{background:rgba(41,128,185,.14);color:#a9d0ef;}
+body.hub .status-wait{background:rgba(243,156,18,.15);}
+body.hub .status-done{background:rgba(39,174,96,.16);color:#6fd49c;}
+body.hub .delete-btn{background:rgba(255,120,100,.12);color:#ff9a8c;}
+body.hub .backup-btn{background:var(--hgrad);color:#1a1405;}
+body.hub .btn-bank{background:linear-gradient(135deg,#1c3264,#0b1a3d);border:1px solid rgba(243,217,155,.35);}
+
+/* ผู้อานุมัດ / ຫົວໜ້າ (av-*) */
+body.hub .av-wrap{font-family:inherit;}
+body.hub .av-hero{background:linear-gradient(135deg,rgba(11,26,61,.92),rgba(28,50,100,.9));border:1px solid rgba(243,217,155,.3);border-bottom:none;backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);}
+body.hub .av-hero .av-seal{border-color:#d4a85a;color:#f3d99b;}
+body.hub .av-hero h1{color:#f3d99b;}
+body.hub .av-kk{background:rgba(255,255,255,.06);border-color:rgba(243,217,155,.16);}
+body.hub .av-kk .v small{color:#f3d99b;}
+body.hub .av-summary, body.hub .av-card{background:rgba(12,22,48,.68);border:1px solid rgba(243,217,155,.18);backdrop-filter:var(--hblur);-webkit-backdrop-filter:var(--hblur);color:#f3ead2;}
+body.hub .av-summary{border-top:none;}
+body.hub .av-card .hd{color:#f3d99b;border-bottom-color:rgba(243,217,155,.18);}
+body.hub .av-card .hd .c2, body.hub .av-sub2, body.hub .av-date-t, body.hub .av-empty{color:rgba(243,234,210,.55);}
+body.hub .av-seg{background:rgba(6,14,34,.5);border:1px solid rgba(243,217,155,.16);}
+body.hub .av-seg button{color:rgba(243,234,210,.7);}
+body.hub .av-seg button.on{background:var(--hgrad);color:#1a1405;}
+body.hub .av-tbl thead td{color:rgba(243,217,155,.8);border-bottom-color:rgba(243,217,155,.25);}
+body.hub .av-tbl tbody td, body.hub .av-date-d{color:#f3ead2;}
+body.hub .av-tbl tbody td{border-bottom-color:rgba(243,217,155,.08);}
+body.hub .av-tbl tr.tot td{border-top-color:#d4a85a;}
+body.hub .av-tbl tr.tot td.r{color:#6fd49c;}
+body.hub .av-tbl.zebra tbody tr:nth-child(even){background:rgba(243,217,155,.04);}
+body.hub .av-pill.wait{color:#ffd27a;background:rgba(243,156,18,.15);}
+body.hub .av-pill.ok{color:#6fd49c;background:rgba(39,174,96,.16);}
+body.hub .av-act{background:rgba(6,14,34,.5);border-color:rgba(243,217,155,.22);color:#f3ead2;}
+body.hub .av-act.del{background:rgba(255,120,100,.12);border-color:rgba(255,140,120,.4);color:#ff9a8c;}
+body.hub .av-barwrap{background:rgba(6,14,34,.5);}
+body.hub .av-btn.blue{background:linear-gradient(135deg,#1c3264,#0b1a3d);border:1px solid rgba(243,217,155,.35);color:#f3ead2;}
+body.hub .av-btn.green{background:var(--hgrad);color:#1a1405;}
+body.hub .av-btn.ghost{background:rgba(6,14,34,.45);color:#f3ead2;border-color:rgba(243,217,155,.3);}
+body.hub .av-btn.danger{background:rgba(255,120,100,.1);color:#ff9a8c;border-color:rgba(255,140,120,.4);}
+body.hub .av-note{background:rgba(243,156,18,.12);color:#ffd27a;}
+body.hub .av-mpick select{background:rgba(6,14,34,.55);color:#f3ead2;border-color:rgba(243,217,155,.3);color-scheme:dark;}
+body.hub select option{background:#16264d;color:#f3ead2;}
+body.hub input, body.hub select, body.hub textarea{color-scheme:dark;}
+
+/* inline style ທີ່ຂຽນໄວ້ສຳລັບພື້ນຂາວ → ປັບໃຫ້ອ່ານໄດ້ເທິງພື້ນເຂັ້ມ */
+body.hub [style*="color:#232323"]{color:#f3ead2 !important;}
+body.hub [style*="color:#1B2A4A"]{color:#f3d99b !important;}
+body.hub [style*="color:#0f6b3d"], body.hub [style*="color:#1e8449"]{color:#6fd49c !important;}
+body.hub [style*="color:#8a2a20"]{color:#ff9a8c !important;}
+body.hub [style*="color:#245bbd"]{color:#8fbcff !important;}
+body.hub [style*="color:#a8791a"], body.hub [style*="color:#a67c1a"]{color:#f3d99b !important;}
+body.hub [style*="background:#fff;"], body.hub [style*="background:#fff\""]{background:rgba(12,22,48,.6) !important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+body.hub [style*="background:#fff5df"]{background:rgba(243,156,18,.14) !important;color:#ffd27a !important;}
+body.hub [style*="background:#fdecea"]{background:rgba(255,120,100,.12) !important;}
+body.hub [style*="background:#eceff4"]{background:rgba(6,14,34,.5) !important;}
+body.hub .admin-scroll{background:transparent !important;} /* ຕັ້ງສີຜ່ານ JS (scrollDiv.style) ຈຶ່ງຈັບດ້ວຍ [style*=] ບໍ່ໄດ້ */
+body.hub [style*="background:rgba(27,42,74,0.08)"]{background:rgba(243,217,155,.12) !important;}
+body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{background:transparent !important;}
+
 </style>
 </head>
 <body>
@@ -867,7 +1002,7 @@ function homeHTML() {
   return `<div class="home">
     <div class="home-bg-glow1"></div>
     <div class="home-bg-glow2"></div>
-    <div class="logo-ring"><img src="${LOGO_IMG}" class="logo" alt="logo"></div>
+    <div class="logo-ring"><img src="icon-512.png" class="logo" alt="logo"></div>
     <div class="app-title">ລະບົບການເງິນ<br>ຮ້ານດາວອນ</div>
     <p class="app-sub">DAOVONE FINANCIAL SYSTEM</p>
     <div class="home-cards">
@@ -2810,7 +2945,8 @@ function showStaffBankDone(num, cur) {
 
 let isDark = false;
 function applyTheme() {
-  document.body.classList.add("light");
+  // Hub theme (ພື້ນຫຼັງຮູບ ນ້ຳເງິນ+ທອງ) ແທນ Bank Ledger ສີຄີມ — ໃຫ້ເຂົ້າກັບທຸກລະບົບໃນ hub.html
+  document.body.classList.add("hub");
 }
 function toggleTheme() {
   // Bank Ledger is now the only theme; kept as a no-op so old calls don't error.
