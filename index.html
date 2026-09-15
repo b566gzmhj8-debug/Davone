@@ -1900,8 +1900,9 @@ function renderAdmin() {
 
     ${deptHTML}
     ${storageHTML(adminRecords)}
-    ${clearHTML}
   </div>`;
+  // ປຸ່ມ Backup / Restore / Export / ລ້າງເດືອນ / ລ້າງທັງໝົດ ເອົາອອກແລ້ວ (2026-09-15) — ລະບົບລຶບຂໍ້ມູນເກີນ 3 ເດືອນອັດຕະໂນມັດ (pg_cron) ແທນ
+  void clearHTML;
 
   const existing = app.querySelector(".admin-scroll");
   if (existing) {
