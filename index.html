@@ -752,6 +752,134 @@ body.hub .admin-scroll{background:transparent !important;} /* ຕັ້ງສີ
 body.hub [style*="background:rgba(27,42,74,0.08)"]{background:rgba(243,217,155,.12) !important;}
 body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{background:transparent !important;}
 
+/* ══════════ BENTO DASHBOARD (ໜ້າຜູ້ອານຸມັດ / ຫົວໜ້າ) — ແບບ 2 "Bento Flow" ══════════ */
+.av-wrap.bn{max-width:1180px;padding-bottom:130px}
+.bn-top{display:flex;align-items:center;gap:12px;margin:4px 0 14px;flex-wrap:wrap}
+.bn-seal{width:46px;height:46px;border-radius:50%;overflow:hidden;background:#000;flex:none;box-shadow:0 0 0 2px #e9c27a,0 0 16px 3px rgba(255,190,90,.4)}
+.bn-seal img{width:100%;height:100%;display:block;transform:scale(1.15)}
+.bn-top h1{margin:0;font-size:18px;color:#fff;font-weight:800}
+.bn-top small{display:block;font-size:11px;color:rgba(243,234,210,.6);letter-spacing:.5px}
+.bn-seg{margin-left:auto;position:relative;display:grid;grid-template-columns:repeat(3,1fr);padding:4px;border-radius:14px;background:rgba(6,14,34,.55);border:1px solid rgba(243,217,155,.16);min-width:260px}
+.bn-seg button{position:relative;z-index:1;border:0;background:none;color:rgba(243,234,210,.65);font:inherit;font-weight:700;font-size:13px;padding:9px 12px;cursor:pointer;transition:color .3s}
+.bn-seg button.on{color:#1a1405}
+.bn-seg .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:10px;background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);box-shadow:0 4px 14px rgba(212,168,90,.35);transform:translateX(calc(var(--i) * 100%))}
+.bn-anim .bn-seg .pill{animation:bnSlide .5s cubic-bezier(.3,1.35,.5,1) both}
+@keyframes bnSlide{from{transform:translateX(calc(var(--from) * 100%))}}
+.av-wrap.bn .av-mpick{margin-bottom:14px}
+
+.bn-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(100px,auto);gap:14px;margin-bottom:16px}
+.bn-tile{position:relative;border-radius:24px;background:rgba(12,22,48,.62);border:1px solid rgba(243,217,155,.16);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  padding:20px;overflow:hidden;color:#f3ead2;transition:border-color .25s;box-shadow:0 14px 40px rgba(0,0,0,.25)}
+.bn-tile:hover{border-color:rgba(243,217,155,.4)}
+.bn-anim .bn-tile{animation:bnPop .7s cubic-bezier(.2,1.1,.3,1) both}
+@keyframes bnPop{from{opacity:0;transform:scale(.96) translateY(14px)}}
+.bn-tile h4{margin:0 0 10px;font-size:12px;font-weight:600;color:rgba(243,234,210,.62);display:flex;align-items:center;gap:8px}
+.bn-dot{width:7px;height:7px;border-radius:50%;background:#f3d99b;box-shadow:0 0 8px #d4a85a;flex:none}
+.bn-mono{font-family:'IBM Plex Mono','SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+.t-total{grid-column:span 5;grid-row:span 2;background:radial-gradient(120% 90% at 0% 0%,rgba(212,168,90,.35),transparent 55%),radial-gradient(90% 90% at 100% 100%,rgba(80,120,220,.3),transparent 60%),rgba(12,22,48,.7)}
+.t-total::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 0deg,transparent,rgba(243,217,155,.12),transparent 30%);animation:bnRot 9s linear infinite;pointer-events:none}
+@keyframes bnRot{to{transform:rotate(360deg)}}
+.t-total > *{position:relative}
+.t-flow{grid-column:span 7;grid-row:span 2}
+.t-pend{grid-column:span 4;grid-row:span 2}
+.t-curs{grid-column:span 8}
+.t-water{grid-column:span 8;grid-row:span 2}
+.bn-big{font-size:clamp(30px,3.8vw,48px);font-weight:800;line-height:1.08;margin-top:10px;word-break:break-all;background:linear-gradient(100deg,#fff 0%,#fff3cf 40%,#f3d99b 70%,#d4a85a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bn-big-sub{font-size:13px;color:#f3d99b;margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.bn-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.bn-chip{font-size:12px;padding:6px 11px;border-radius:20px;background:rgba(6,14,34,.5);border:1px solid rgba(243,217,155,.16);display:flex;align-items:center;gap:6px}
+.bn-chip.up{color:#6fd49c;border-color:rgba(111,212,156,.4)}
+.bn-live{width:7px;height:7px;border-radius:50%;background:#6fd49c;animation:bnPing 1.6s infinite}
+@keyframes bnPing{0%{box-shadow:0 0 0 0 rgba(111,212,156,.7)}80%{box-shadow:0 0 0 8px rgba(111,212,156,0)}}
+.bn-mini{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.bn-mini div{padding:12px;border-radius:14px;background:rgba(6,14,34,.45);border:1px solid rgba(243,217,155,.16);min-width:0}
+.bn-mini b{display:block;font-size:20px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bn-mini span{font-size:11px;color:rgba(243,234,210,.6)}
+
+.t-flow svg{width:100%;height:auto;display:block}
+.bn-node rect{fill:rgba(6,14,34,.72);stroke-width:1.3}
+.bn-node text{fill:#f3ead2;font-size:12px;font-family:inherit}
+.bn-node text.v{font-family:'IBM Plex Mono','SF Mono',Menlo,monospace;font-weight:700;font-size:12.5px}
+.bn-pipe{fill:none;stroke-width:10;stroke-linecap:round;opacity:.18}
+.bn-dash{fill:none;stroke-width:3;stroke-linecap:round;stroke-dasharray:2 16;animation:bnFlow 1.2s linear infinite}
+.bn-dash.off{animation:none;opacity:.15}
+@keyframes bnFlow{to{stroke-dashoffset:-18}}
+.bn-flow-note{font-size:11px;color:rgba(243,234,210,.5);margin-top:6px}
+
+.bn-pcount{display:flex;align-items:baseline;gap:8px}
+.bn-pcount b{font-size:46px;color:#ffcf6b;text-shadow:0 0 24px rgba(255,207,107,.35)}
+.bn-pcount.zero b{color:#6fd49c;text-shadow:0 0 24px rgba(111,212,156,.3)}
+.bn-plist{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.bn-pi{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:rgba(6,14,34,.45);border:1px solid rgba(243,217,155,.14);font-size:12.5px;min-width:0}
+.bn-anim .bn-pi{animation:bnSlideIn .5s cubic-bezier(.2,1,.3,1) both}
+@keyframes bnSlideIn{from{opacity:0;transform:translateX(18px)}}
+.bn-pi .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#1a1405;flex:none}
+.bn-pi .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bn-pi .nm small{display:block;color:rgba(243,234,210,.55);font-size:10.5px}
+.bn-pi .am{margin-left:auto;font-weight:700;white-space:nowrap}
+.bn-pi .pulse{width:7px;height:7px;border-radius:50%;background:#ffcf6b;animation:bnBlink 1.2s infinite;flex:none}
+@keyframes bnBlink{50%{opacity:.2}}
+.bn-go{margin-top:12px;width:100%;border:0;border-radius:14px;padding:12px;font:inherit;font-weight:700;background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);color:#1a1405;cursor:pointer;box-shadow:0 8px 22px rgba(212,168,90,.3)}
+.bn-empty{font-size:13px;color:rgba(243,234,210,.55);padding:14px 0}
+
+.bn-curs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.bn-cur{padding:4px 2px}
+.bn-cur-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bn-cur-row b{font-size:22px;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.bn-flag{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:800;color:#1a1405;flex:none}
+.bn-stack{display:flex;height:10px;border-radius:6px;overflow:hidden;margin-top:12px;background:rgba(255,255,255,.05)}
+.bn-stack i{height:100%}
+.bn-anim .bn-stack i{animation:bnGrow 1.2s .4s cubic-bezier(.2,.9,.3,1) both}
+@keyframes bnGrow{from{width:0}}
+.bn-stack-l{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:rgba(243,234,210,.6);margin-top:6px;flex-wrap:wrap}
+.bn-stack-l em{font-style:normal;font-family:'IBM Plex Mono',Menlo,monospace}
+
+.t-water{display:flex;flex-direction:column}
+.bn-water{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:12px;flex:1;min-height:230px;margin-top:6px}
+.bn-wcol{position:relative;height:100%}
+.bn-wplot{position:absolute;left:0;right:0;top:22px;bottom:34px}
+.bn-wbar{position:absolute;left:15%;right:15%;border-radius:8px;min-height:4px}
+.bn-wbar::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 45%)}
+.bn-anim .bn-wbar{animation:bnRise 1s cubic-bezier(.2,1.2,.3,1) both;transform-origin:bottom}
+@keyframes bnRise{from{transform:scaleY(0);opacity:.3}}
+.bn-wval{position:absolute;left:-10px;right:-10px;text-align:center;font-size:11px;font-weight:700;white-space:nowrap;transform:translateY(-18px)}
+.bn-wlbl{position:absolute;left:-6px;right:-6px;bottom:0;text-align:center;font-size:11px;color:rgba(243,234,210,.62);line-height:1.25}
+.bn-wcol:hover .bn-wbar{filter:brightness(1.2);box-shadow:0 0 18px currentColor}
+.bn-wline{position:absolute;left:0;right:0;border-top:1px dashed rgba(243,217,155,.18)}
+
+.bn-dock{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;display:flex;gap:6px;padding:8px;border-radius:24px;max-width:calc(100% - 20px);overflow-x:auto;
+  background:rgba(10,20,44,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(243,217,155,.3);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.bn-anim .bn-dock{animation:bnDockIn .7s .5s cubic-bezier(.2,1.2,.3,1) both}
+@keyframes bnDockIn{from{opacity:0;transform:translateX(-50%) translateY(40px)}}
+.bn-dk{position:relative;flex:none;width:62px;height:58px;border-radius:17px;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#f3ead2;background:rgba(255,255,255,.05);
+  font:inherit;transition:transform .25s cubic-bezier(.3,1.6,.5,1),background .2s}
+.bn-dk svg{width:22px;height:22px}
+.bn-dk .lb{font-size:9.5px;line-height:1;white-space:nowrap;opacity:.8;display:none}
+.bn-dk.main{background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);color:#1a1405}
+.bn-dk .tip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%) translateY(6px);white-space:nowrap;font-size:12px;padding:6px 10px;border-radius:9px;
+  background:#16264d;color:#f3ead2;border:1px solid rgba(243,217,155,.35);opacity:0;pointer-events:none;transition:.2s}
+.bn-dk .n{position:absolute;top:3px;right:5px;min-width:18px;height:18px;border-radius:9px;font-size:10px;font-weight:800;display:grid;place-items:center;background:#ff8f80;color:#1a0505;padding:0 4px}
+.bn-sep{width:1px;flex:none;background:rgba(243,217,155,.16);margin:8px 4px}
+@media (hover:hover) and (pointer:fine){
+  .bn-dock{overflow:visible}
+  .bn-dk:hover{transform:translateY(-10px) scale(1.12);background:rgba(243,217,155,.15)}
+  .bn-dk.main:hover{background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36)}
+  .bn-dk:hover .tip{opacity:1;transform:translateX(-50%)}
+}
+@media (max-width:900px){
+  .bn-grid{grid-template-columns:1fr}
+  .bn-tile{grid-column:1/-1 !important;grid-row:auto !important}
+  .bn-seg{margin-left:0;width:100%}
+  .bn-water{min-height:200px;gap:4px}
+  .bn-wval{font-size:9px;letter-spacing:-.2px}
+  .bn-wlbl{font-size:9.5px}
+  .bn-dock{left:10px;right:10px;transform:none;justify-content:flex-start}
+  @keyframes bnDockIn{from{opacity:0;transform:translateY(40px)}}
+  .bn-dk{width:auto;min-width:64px;height:60px;padding:0 10px}
+  .bn-dk .lb{display:block}
+  .bn-dk .tip{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -957,6 +1085,7 @@ function render() {
   if (state.mode==="admin"||state.mode==="owner") {
     // Owner always defaults to "all" tab to see all verified records
     if (state.mode==="owner" && adminTab==="today") adminTab="all";
+    _bnKey = null; // ເຂົ້າໜ້ານີ້ໃໝ່ → ຫຼິ້ນແອນິເມຊັນ bento ອີກຄັ້ງ
     app.innerHTML = headerHTML(state.mode==="owner"?"ຫົວໜ້າ — ເບິ່ງຍອດເງິນ":"ກຳລັງກວດສອບ") + adminLoadingHTML();
     loadAdmin();
     return;
@@ -1758,35 +1887,11 @@ function renderAdmin() {
     </div>
   ` : "";
 
-  const html = `<div class="av-wrap">
-    <div class="av-hero">
-      <div class="r1">
-        <div class="av-seal">ດ</div>
-        <div><h1>ຮ້ານດາວອນ ພັດທະນາກະສິກຳ</h1><div class="sub">${isOwner?"Financial Report · ຫົວໜ້າ":"Financial Ledger · ໜ້າກວດສອບ"}</div></div>
-        <div class="period"><div class="s">ໄລຍະ</div><div class="b">${periodLabel}</div></div>
-      </div>
-      <div class="av-kpis">
-        <div class="av-kk"><div class="k">ຍອດລວມ (ກີບ)</div><div class="v">${(totalLAK||0).toLocaleString("lo-LA")} <small>ກີບ</small></div></div>
-        ${totalTHB>0?`<div class="av-kk"><div class="k">ສະກຸນບາດ</div><div class="v">${totalTHB.toLocaleString("th-TH")} <small>ບາດ</small></div></div>`:""}
-        ${totalUSD>0?`<div class="av-kk"><div class="k">USD</div><div class="v">${totalUSD.toLocaleString("en-US")} <small>USD</small></div></div>`:""}
-        ${!isOwner?`<div class="av-kk warn"><div class="k">ລໍຖ້າກວດສອບ</div><div class="v">${pending} <small>ລາຍການ</small></div></div>`:""}
-        <div class="av-kk"><div class="k">ລາຍການ / ຮູບ</div><div class="v">${filtered.length} <small>/ ${adminRecords.length}</small></div></div>
-      </div>
-    </div>
-    <div class="av-summary">${bankCashSummaryHTML(adminRecords)}</div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <button class="av-btn blue" onclick="openBankHistoryModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດເຂົ້າບັນຊີ (${getBankDeposits().length})</button>
-      <button class="av-btn warnb" onclick="openWithdrawHistoryModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດເບີກ/ຈ່າຍ (${getWithdrawals().length})</button>
-    </div>
-    ${getAdjustments().length ? `<button class="av-btn ghost full" style="margin-bottom:16px" onclick="openAdjustHistoryModal()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດການປັບຍอด (${getAdjustments().length})</button>` : ``}
-
-    <div class="av-seg">
-      <button class="${adminTab==="today"?"on":""}" onclick="setTab('today')">ມື້ນີ້</button>
-      <button class="${adminTab==="month"?"on":""}" onclick="setTab('month')">ເດືອນ</button>
-      <button class="${adminTab==="all"?"on":""}" onclick="setTab('all')">ທັງໝົດ</button>
-    </div>
-    ${monthPickerHTML}
+  const bnKey = state.mode + "|" + adminTab + "|" + (filterMonth || "");
+  const bnAnimate = _bnKey !== bnKey; _bnKey = bnKey;
+  requestAnimationFrame(() => bentoAfterRender(bnAnimate));
+  const html = `<div class="av-wrap bn ${bnAnimate ? "bn-anim" : ""}">
+    ${bentoDashHTML({ filtered, isOwner, pending, totalLAK, totalTHB, totalUSD, periodLabel, monthPickerHTML, animate: bnAnimate })}
 
     <div class="av-card">
       <div class="hd"><span>ບັນທຶກລາຍການ</span><span class="c2">${filtered.length} ລາຍການ</span></div>
@@ -1814,6 +1919,168 @@ function renderAdmin() {
   scrollDiv.style = "overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - 52px);background:#eceff4";
   scrollDiv.innerHTML = html;
   app.appendChild(scrollDiv);
+}
+
+/* ══════════ BENTO DASHBOARD ══════════ */
+let _bnKey = null, _bnPrevTab = 0, _bnClock = null;
+function bnAbbr(n, cur){
+  const a = Math.abs(n);
+  if (cur === "LAK" && a >= 1e6) return (n/1e6).toLocaleString("en-US",{maximumFractionDigits:1}) + " ລ.";
+  return Math.round(n).toLocaleString(cur==="THB"?"th-TH":cur==="USD"?"en-US":"lo-LA");
+}
+function bentoDashHTML(o){
+  const { filtered, isOwner, pending, totalLAK, totalTHB, totalUSD, periodLabel, monthPickerHTML, animate } = o;
+  const CURS = ["LAK","THB","USD"];
+  const LBL = { LAK:"ກີບ", THB:"ບາດ", USD:"USD" }, SYM = { LAK:"₭", THB:"฿", USD:"$" };
+  const FMT = { LAK:n=>(n||0).toLocaleString("lo-LA"), THB:n=>(n||0).toLocaleString("th-TH"), USD:n=>(n||0).toLocaleString("en-US") };
+  const bal = {}; CURS.forEach(c => bal[c] = calcCashBalance(adminRecords, c));
+  let active = CURS.filter(c => bal[c].cashRecords>0 || bal[c].toBoss>0 || bal[c].withdrawn>0 || bal[c].adjust!==0);
+  if (!active.length) active = ["LAK"];
+  const P = active[0], b = bal[P];
+  const tabIdx = adminTab==="today"?0:adminTab==="month"?1:2;
+  const icon = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const I = {
+    bank:'<path d="M3 10 12 4l9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18"/>',
+    out:'<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+    adj:'<path d="M7 7h13l-3-3M17 17H4l3 3"/>',
+    doc:'<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    chart:'<path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/>'
+  };
+
+  // ── ຍອດລວມ ──
+  const others = active.slice(1).map(c => `<span>≈ ${LBL[c]} <b class="bn-mono">${FMT[c](bal[c].grand)}</b></span>`).join("");
+  const periodChips = [
+    totalLAK ? `<span class="bn-chip up">▲ ${periodLabel} +${FMT.LAK(totalLAK)} ກີບ</span>` : `<span class="bn-chip">${periodLabel}: ຍັງບໍ່ມີຍອດ</span>`,
+    totalTHB ? `<span class="bn-chip up">+${FMT.THB(totalTHB)} ບາດ</span>` : "",
+    totalUSD ? `<span class="bn-chip up">+${FMT.USD(totalUSD)} USD</span>` : "",
+    `<span class="bn-chip"><i class="bn-live"></i><span class="bn-mono" id="bn-clock">${new Date().toLocaleTimeString("en-GB")}</span></span>`
+  ].join("");
+  const tTotal = `<div class="bn-tile t-total" style="animation-delay:.05s">
+      <h4><span class="bn-dot"></span>ຍອດລວມທັງໝົດ · ${LBL[P]}</h4>
+      <div class="bn-big bn-mono" data-bn-count="${b.grand}" data-bn-cur="${P}">${FMT[P](b.grand)}</div>
+      ${others ? `<div class="bn-big-sub">${others}</div>` : ""}
+      <div class="bn-chips">${periodChips}</div>
+      <div class="bn-mini">
+        <div><b class="bn-mono">${FMT.LAK(totalLAK)}</b><span>ຍອດລວມ${periodLabel} (ກີບ)</span></div>
+        <div><b class="bn-mono">${filtered.length} <small style="font-size:13px;color:#f3d99b">/ ${adminRecords.length}</small></b><span>ລາຍການ / ຮູບ</span></div>
+      </div>
+    </div>`;
+
+  // ── ແຜນຜັງການໄຫຼ (ສະກຸນຫຼັກ) ──
+  const on = v => v !== 0 ? "" : " off";
+  const tFlow = `<div class="bn-tile t-flow" style="animation-delay:.15s">
+      <h4><span class="bn-dot"></span>ເງິນໄຫຼໄປໃສ · ${LBL[P]} (ທັງໝົດ)</h4>
+      <svg viewBox="0 0 640 250" role="img" aria-label="ແຜນຜັງການໄຫຼຂອງເງິນ">
+        <defs>
+          <linearGradient id="bnGC" x1="0" x2="1"><stop offset="0" stop-color="#f3d99b"/><stop offset="1" stop-color="#7fb2ff"/></linearGradient>
+          <linearGradient id="bnGO" x1="0" x2="1"><stop offset="0" stop-color="#f3d99b"/><stop offset="1" stop-color="#ff8f80"/></linearGradient>
+          <linearGradient id="bnGA" x1="0" x2="1"><stop offset="0" stop-color="#6fd49c"/><stop offset="1" stop-color="#f3d99b"/></linearGradient>
+        </defs>
+        <path class="bn-pipe" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/><path class="bn-dash${on(b.cashRecords)}" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/>
+        <path class="bn-pipe" stroke="url(#bnGA)" d="M150 205 C 230 205, 230 125, 290 125"/><path class="bn-dash${on(b.adjust)}" stroke="#6fd49c" d="M150 205 C 230 205, 230 125, 290 125"/>
+        <path class="bn-pipe" stroke="url(#bnGC)" d="M410 110 C 465 110, 465 60, 515 60"/><path class="bn-dash${on(b.adminDep)}" stroke="#7fb2ff" style="animation-duration:.8s" d="M410 110 C 465 110, 465 60, 515 60"/>
+        <path class="bn-pipe" stroke="url(#bnGO)" d="M410 140 C 465 140, 465 190, 515 190"/><path class="bn-dash${on(b.withdrawn)}" stroke="#ff8f80" style="animation-duration:1.6s" d="M410 140 C 465 140, 465 190, 515 190"/>
+        <g class="bn-node"><rect x="8" y="30" width="142" height="60" rx="14" stroke="#f3d99b"/><text x="22" y="54">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="76" style="fill:#f3d99b">+${FMT[P](b.cashRecords)}</text></g>
+        <g class="bn-node"><rect x="8" y="175" width="142" height="60" rx="14" stroke="#6fd49c"/><text x="22" y="199">ປັບຍອດ</text><text class="v" x="22" y="221" style="fill:${b.adjust<0?"#ff8f80":"#6fd49c"}">${b.adjust>0?"+":b.adjust<0?"−":""}${FMT[P](Math.abs(b.adjust))}</text></g>
+        <g class="bn-node"><rect x="290" y="88" width="120" height="74" rx="16" stroke="#d4a85a" stroke-width="2"/><text x="304" y="114">ເງິນສົດຄ້າງ</text><text class="v" x="304" y="140" style="fill:#f3d99b">${FMT[P](b.withAdmin)}</text></g>
+        <g class="bn-node"><rect x="515" y="30" width="120" height="60" rx="14" stroke="#7fb2ff"/><text x="527" y="54">ເຂົ້າທະນາຄານ</text><text class="v" x="527" y="76" style="fill:#7fb2ff">${FMT[P](b.toBoss)}</text></g>
+        <g class="bn-node"><rect x="515" y="160" width="120" height="60" rx="14" stroke="#ff8f80"/><text x="527" y="184">ເບີກ/ຈ່າຍ</text><text class="v" x="527" y="206" style="fill:#ff8f80">${b.withdrawn?"−":""}${FMT[P](b.withdrawn)}</text></g>
+      </svg>
+      ${b.staffDep ? `<div class="bn-flow-note">* ເຂົ້າທະນາຄານ ລວມ ພະນັກງານມອບກົງ ${FMT[P](b.staffDep)} ${LBL[P]}</div>` : ""}
+    </div>`;
+
+  // ── ລໍຖ້າກວດສອບ ──
+  const DC = ["#f3d99b","#7fb2ff","#6fd49c","#ff8f80","#e2b466"];
+  const waits = adminRecords.filter(r => !r.verified).sort((a,b2) => b2.timestamp - a.timestamp).slice(0,5);
+  const tPend = `<div class="bn-tile t-pend" style="animation-delay:.25s">
+      <h4><span class="bn-dot" style="background:${pending?"#ffcf6b":"#6fd49c"}"></span>${isOwner?"ລໍຖ້າຜູ້ອານຸມັດກວດ":"ລໍຖ້າກວດສອບ"}</h4>
+      <div class="bn-pcount${pending?"":" zero"}"><b class="bn-mono" data-bn-count="${pending}">${pending}</b><span style="color:rgba(243,234,210,.6)">ລາຍການ</span></div>
+      <div class="bn-plist">${waits.length ? waits.map((r,i) => {
+          const d = DEPTS.find(x => x.id === r.department);
+          const col = (d && d.color) || DC[i%5];
+          return `<div class="bn-pi" style="animation-delay:${.45+i*.08}s"><span class="av" style="background:${col}">${String(r.departmentName||"?").trim().charAt(0)}</span>
+            <span class="nm">${r.departmentName||""}<small>${r.note||"—"} · ${fmtShort(r.timestamp)}</small></span>
+            <span class="am bn-mono">${fmtAmt(r.amount, r.currency||"LAK")}</span><span class="pulse"></span></div>`;
+        }).join("") : `<div class="bn-empty">✓ ກວດຄົບທຸກລາຍການແລ້ວ</div>`}</div>
+      ${pending && !isOwner ? `<button class="bn-go" onclick="bnScrollToRecords()">ກວດສອບດຽວນີ້ →</button>` : ""}
+    </div>`;
+
+  // ── ແຍກຕາມສະກຸນ ──
+  const tCurs = `<div class="bn-tile t-curs" style="animation-delay:.32s">
+      <h4><span class="bn-dot"></span>ແຍກຕາມສະກຸນເງິນ · ເງິນສົດ vs ທະນາຄານ</h4>
+      <div class="bn-curs">${active.map(c => {
+        const x = bal[c], base = Math.max(Math.abs(x.withAdmin) + Math.abs(x.toBoss), 1);
+        const flag = c==="LAK" ? "linear-gradient(135deg,#f6dc9c,#d4a85a)" : c==="THB" ? "linear-gradient(135deg,#bcd6ff,#7fb2ff)" : "linear-gradient(135deg,#b6f0cf,#6fd49c)";
+        return `<div class="bn-cur">
+          <div class="bn-cur-row"><b class="bn-mono">${FMT[c](x.grand)}</b><span class="bn-flag" style="background:${flag}">${SYM[c]}</span></div>
+          <div class="bn-stack"><i style="width:${Math.abs(x.withAdmin)/base*100}%;background:#f3d99b"></i><i style="width:${Math.abs(x.toBoss)/base*100}%;background:#7fb2ff"></i></div>
+          <div class="bn-stack-l"><span>ຄ້າງ <em>${FMT[c](x.withAdmin)}</em></span><span>ທະນາຄານ <em>${FMT[c](x.toBoss)}</em></span></div>
+        </div>`;}).join("")}</div>
+    </div>`;
+
+  // ── ທີ່ມາຂອງຍອດລວມ (waterfall) ──
+  const steps = [["ຮັບເງິນເຂົ້າ", b.cashRecords, "#f3d99b"]];
+  if (b.staffDep) steps.push(["+ ມອບກົງ", b.staffDep, "#7fb2ff"]);
+  steps.push(["− ເບີກ/ຈ່າຍ", -b.withdrawn, "#ff8f80"]);
+  steps.push([b.adjust<0 ? "− ປັບຍອດ" : "+ ປັບຍອດ", b.adjust, b.adjust<0 ? "#ff8f80" : "#6fd49c"]);
+  let run = 0; const segs = steps.map(s => { const from = run; run += s[1]; return { lbl:s[0], col:s[2], from, to:run, v:s[1] }; });
+  segs.push({ lbl:"= ຍອດລວມ", col:"gold", from:0, to:b.grand, v:b.grand, total:true });
+  const lo = Math.min(0, ...segs.map(s => Math.min(s.from, s.to))), hi = Math.max(1, ...segs.map(s => Math.max(s.from, s.to)));
+  const pct = v => (v - lo) / (hi - lo) * 100;
+  const tWater = `<div class="bn-tile t-water" style="animation-delay:.4s">
+      <h4><span class="bn-dot"></span>ທີ່ມາຂອງຍອດລວມ · ${P==="LAK"?"ລ້ານກີບ":LBL[P]}</h4>
+      <div class="bn-water">${segs.map((s,i) => {
+        const bottom = pct(Math.min(s.from, s.to)), height = Math.max(pct(Math.max(s.from, s.to)) - bottom, .8);
+        const bg = s.col==="gold" ? "linear-gradient(180deg,#f6dc9c,#a57a36)" : s.col, col = s.col==="gold" ? "#f3d99b" : s.col;
+        const val = s.total ? bnAbbr(s.v, P) : (s.v<0?"−":"+") + bnAbbr(Math.abs(s.v), P);
+        return `<div class="bn-wcol" style="color:${col}"><div class="bn-wplot">
+            ${lo<0 ? `<div class="bn-wline" style="bottom:${pct(0)}%"></div>` : ""}
+            <div class="bn-wbar" style="bottom:${bottom}%;height:${height}%;background:${bg};animation-delay:${.6+i*.13}s"><span class="bn-wval bn-mono">${val}</span></div>
+          </div><div class="bn-wlbl">${s.lbl}</div></div>`;
+      }).join("")}</div>
+    </div>`;
+
+  // ── ແທັບ + ດ໊ອກປຸ່ມ ──
+  const seg = `<div class="bn-seg"><i class="pill" style="--i:${tabIdx};--from:${_bnPrevTab}"></i>
+      <button class="${tabIdx===0?"on":""}" onclick="setTab('today')">ມື້ນີ້</button>
+      <button class="${tabIdx===1?"on":""}" onclick="setTab('month')">ເດືອນ</button>
+      <button class="${tabIdx===2?"on":""}" onclick="setTab('all')">ທັງໝົດ</button></div>`;
+  _bnPrevTab = tabIdx;
+  const nBank = getBankDeposits().length, nWd = getWithdrawals().length, nAdj = getAdjustments().length;
+  const dk = (cls, onclick, ic, label, n) => `<button class="bn-dk ${cls}" onclick="${onclick}">${icon(ic)}${n?`<span class="n">${n}</span>`:""}<span class="lb">${label}</span><span class="tip">${label}</span></button>`;
+  const dock = `<nav class="bn-dock">
+      ${dk("main","openBankModal()",I.bank,"ມອບເຂົ້າທະນາຄານ")}
+      ${dk("","openWithdrawModal()",I.out,"ເບີກ/ຈ່າຍເງິນ")}
+      ${dk("","openAdjustModal()",I.adj,"ປັບຍອດເງິນສົດ")}
+      <span class="bn-sep"></span>
+      ${dk("","openBankHistoryModal()",I.doc,"ປະຫວັດເຂົ້າບັນຊີ",nBank)}
+      ${dk("","openWithdrawHistoryModal()",I.clock,"ປະຫວັດເບີກ/ຈ່າຍ",nWd)}
+      ${nAdj ? dk("","openAdjustHistoryModal()",I.chart,"ປະຫວັດປັບຍອດ",nAdj) : ""}
+    </nav>`;
+
+  return `<div class="bn-top">
+      <div class="bn-seal"><img src="icon-512.png" alt=""></div>
+      <div><h1>${isOwner?"ຫົວໜ້າ — ລາຍງານການເງິນ":"ກຳລັງກວດສອບ"}</h1><small>ຮ້ານດາວອນ ພັດທະນາກະສິກຳ · ${isOwner?"Financial Report":"Financial Ledger"} · ${periodLabel}</small></div>
+      ${seg}
+    </div>
+    ${monthPickerHTML}
+    <div class="bn-grid">${tTotal}${tFlow}${tPend}${tCurs}${tWater}</div>
+    ${dock}`;
+}
+function bnScrollToRecords(){
+  const el = document.getElementById("rec-list"), sc = document.querySelector(".admin-scroll");
+  if (el && sc) sc.scrollTo({ top: el.closest(".av-card").offsetTop - 10, behavior: "smooth" });
+}
+// ນັບຕົວເລກຂຶ້ນ ສະເພາະຕອນເປີດໜ້າ/ປ່ຽນແທັບ (ບໍ່ຫຼິ້ນຊ້ຳທຸກຄັ້ງທີ່ຂໍ້ມູນ refresh)
+function bentoAfterRender(animate){
+  if (!_bnClock) _bnClock = setInterval(() => { const c = document.getElementById("bn-clock"); if (c) c.textContent = new Date().toLocaleTimeString("en-GB"); }, 1000);
+  if (!animate) return;
+  document.querySelectorAll("[data-bn-count]").forEach(el => {
+    const to = +el.dataset.bnCount, cur = el.dataset.bnCur || "LAK", t0 = performance.now();
+    const f = n => Math.round(n).toLocaleString(cur==="THB"?"th-TH":cur==="USD"?"en-US":"lo-LA");
+    (function step(t){ const p = Math.min(1,(t-t0)/1500), e = 1-Math.pow(1-p,4); el.textContent = f(to*e); if (p<1) requestAnimationFrame(step); })(t0);
+  });
 }
 
 function setTab(t) {
