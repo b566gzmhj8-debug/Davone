@@ -1055,6 +1055,321 @@ body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{b
   .env .photo-sub-pro{color:rgba(243,234,210,.4)!important;}
   .env .img-preview-wrap{border:1px solid rgba(243,217,155,.4);border-radius:16px;overflow:hidden;}
   .env .rephoto-btn{background:rgba(7,13,33,.82)!important;color:#f3d99b!important;border-radius:11px!important;}
+
+/* ══════════════════════════════════════════════════════════════════════
+   HUB THEME — ແບບສະຫວ່າງ (ນ້ຳເງິນເຂັ້ມ + ທອງ ເທິງພື້ນຄີມ)
+   ໂທນດຽວກັນກັບ ສາຂາເມືອງຮຸນ · DAVONE SHOP · ລາຍຈ່າຍ · ເງິນເດືອນ
+   ໂຄງສ້າງ/ຟັງຊັນຄືເກົ່າ — ປ່ຽນແຕ່ສີ
+   ══════════════════════════════════════════════════════════════════════ */
+@media screen{
+body.hub{
+  --hg:#a57a36; --hg2:#8a6224; --hink:#1b2437; --hmuted:#57607a; --hline:#e4ddcd;
+  --hglass:#fffdf8; --hblur:none;
+  --hgrad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
+  --hnavy:linear-gradient(170deg,#0b1a3d,#16284f 60%,#0b1a3d);
+  background:#f2eee4; color:#1b2437;
+}
+html{background:#f2eee4;}
+body.hub::before, body.hub::after{content:none!important;display:none!important;}
+body.hub .app{background:transparent;}
+body.hub .app{scrollbar-color:rgba(27,36,55,.2) transparent;}
+body.hub .app::-webkit-scrollbar-thumb{background:rgba(27,36,55,.18);}
+body.hub .home, body.hub .pin-wrap, body.hub .dept-grid, body.hub .form-scroll,
+body.hub .admin-wrap, body.hub .admin-scroll{background:#f2eee4;}
+body.hub input, body.hub select, body.hub textarea{color-scheme:light;}
+
+/* ── ໜ້າຫຼັກ ── */
+body.hub .logo-ring{background:none;padding:0;border-radius:50%;
+  box-shadow:0 0 0 2px #d4a85a,0 0 0 4px rgba(165,122,54,.25),0 10px 28px rgba(27,36,55,.14);overflow:hidden;}
+body.hub .app-title{
+  background:linear-gradient(100deg,#8a6224,#a57a36 35%,#c79a4d 55%,#8a6224);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:none;}
+body.hub .app-sub{color:#8a8fa2;}
+body.hub .home-card{background:#fffdf8;border:1px solid var(--hline);backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:0 4px 16px rgba(27,36,55,.07);color:#1b2437;}
+body.hub .home-card::after{display:none;}
+body.hub .home-card.hc-gold::before{background:linear-gradient(180deg,#d4a85a,#a57a36);}
+body.hub .home-card.hc-blue::before{background:linear-gradient(180deg,#2f5fa8,#0b1a3d);}
+body.hub .home-card.hc-ruby::before{background:linear-gradient(180deg,#b3382a,#7e241a);}
+body.hub .home-card.hc-gold .hc-icon-box{background:rgba(212,168,90,.14);border:1px solid rgba(165,122,54,.28);}
+body.hub .home-card.hc-blue .hc-icon-box{background:rgba(47,95,168,.1);border:1px solid rgba(47,95,168,.24);}
+body.hub .home-card.hc-ruby .hc-icon-box{background:rgba(179,56,42,.1);border:1px solid rgba(179,56,42,.24);}
+body.hub .home-card.hc-gold .hc-arrow{background:rgba(212,168,90,.14);}
+body.hub .home-card.hc-blue .hc-arrow{background:rgba(47,95,168,.1);}
+body.hub .home-card.hc-ruby .hc-arrow{background:rgba(179,56,42,.1);}
+body.hub .card-title{color:#0b1a3d;}
+body.hub .card-sub{color:#8a8fa2;opacity:1;}
+body.hub .sync-note{color:#a9a294;}
+
+/* ── ຫົວເພຈ = ນ້ຳເງິນເຂັ້ມ ຕັດເສັ້ນທອງ ── */
+body.hub .header{background:var(--hnavy);backdrop-filter:none;-webkit-backdrop-filter:none;
+  border-bottom:2px solid #d4a85a;box-shadow:0 3px 14px rgba(11,26,61,.16);}
+body.hub .header-title{color:#f6dc9c;}
+body.hub .header-back{color:#f3ead2;width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(243,217,155,.4);background:rgba(255,255,255,.1);
+  display:inline-flex;align-items:center;justify-content:center;font-size:16px;padding:0;}
+
+/* ── PIN ── */
+body.hub .pin-title{color:#0b1a3d;}
+body.hub .pin-dot{background:#ded6c4;}
+body.hub .pin-dot.filled{background:#a57a36;box-shadow:none;}
+body.hub .pin-dot.error{background:#b3382a;}
+body.hub .pin-error{color:#b3382a;}
+body.hub .pin-key{border-radius:50%;background:#fffdf8;border:1px solid #ded6c4;color:#1b2437;
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 2px 8px rgba(27,36,55,.06);}
+body.hub .pin-key:active{background:rgba(212,168,90,.2);}
+body.hub .pin-key.del{background:#f8eae7;color:#b3382a;}
+body.hub .pin-key.empty{background:transparent;border:none;box-shadow:none;}
+body.hub .pin-input-confirm{background:#fffdf8;border:1.5px solid #ded6c4;color:#1b2437;}
+
+/* ── ລາຍຊື່ແຜນກ ── */
+body.hub .dept-header-pro{background:linear-gradient(180deg,#f2eee4 78%,transparent);}
+body.hub .dh-title{color:#0b1a3d;}
+body.hub .dh-sub, body.hub .dept-section-label{color:#8a8fa2;}
+body.hub .dept-search{background:#fffdf8;border:1px solid var(--hline);box-shadow:0 2px 8px rgba(27,36,55,.05);}
+body.hub .dept-search svg{stroke:#a9a294;}
+body.hub .dept-search span{color:#a9a294;}
+body.hub #dept-search-input{color:#1b2437;}
+body.hub #dept-search-input::placeholder{color:#a9a294;}
+body.hub .dept-card{background:#fffdf8;border:1px solid var(--hline);backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:0 3px 12px rgba(27,36,55,.06);}
+body.hub .dept-card:active{background:#f8f3e9;}
+body.hub .dept-name{color:#1b2437;}
+body.hub .dept-card-img{background:#f8f3e9;border:1px solid var(--hline);}
+
+/* ── ຟອມເກົ່າ (form-pro) ── */
+body.hub .dept-chip{background:#fffdf8;border:1px solid var(--hline);}
+body.hub .dept-chip-tag{color:#8a8fa2;}
+body.hub .field-label-pro, body.hub .lbl{color:#57607a;}
+body.hub .input-wrap-pro{background:#fffdf8;border:1px solid #ded6c4;}
+body.hub .input-wrap-pro:focus-within{border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
+body.hub .input-wrap-pro input, body.hub .input-wrap-pro textarea{color:#1b2437;}
+body.hub .input-wrap-pro input::placeholder, body.hub .input-wrap-pro textarea::placeholder{color:#a9a294;}
+body.hub .form-divider{background:linear-gradient(90deg,transparent,#ded6c4,transparent);}
+body.hub .submit-wrap-pro{background:linear-gradient(0deg,#f2eee4 68%,transparent);}
+body.hub .amount-preview{color:#8a6224;}
+body.hub .multi-preview-chip{background:rgba(212,168,90,.16);color:#8a6224;}
+
+/* ── ຊອງມອບເງິນ (envelope) = ເຈ້ຍຄີມ ຕີຂອບທອງ ── */
+body.hub .form-scroll.env, body.hub .env{background:#f2eee4!important;color:#1b2437;}
+body.hub .env::before{display:none;}
+body.hub .env-steps .t{background:#e4ddcd;}
+body.hub .env-step .l{color:#a9a294;}
+body.hub .env-step.on .l{color:#8a6224;}
+body.hub .env-card{background:#fffdf8;border:1px solid var(--hline);backdrop-filter:none;-webkit-backdrop-filter:none;
+  border-radius:16px;box-shadow:0 4px 16px rgba(27,36,55,.07);}
+body.hub .env-dept{border-bottom:1px solid var(--hline);}
+body.hub .env-dept b{color:#0b1a3d;}
+body.hub .env-dept span{color:#a9a294;}
+body.hub .env-lab{color:#57607a;}
+body.hub .env-lab em{color:#a9a294;}
+body.hub .env-row{background:#f8f3e9;border:1px solid #e4ddcd;}
+body.hub .env-row:focus-within{border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
+body.hub .env-row .cur{color:#8a8fa2;}
+body.hub .env-row:focus-within .cur{color:#8a6224;}
+body.hub .env-row input{color:#1b2437;}
+body.hub .env-row input::placeholder{color:#c4bba6;}
+body.hub .env .multi-preview-chip{background:rgba(212,168,90,.16);color:#8a6224;filter:none;}
+body.hub .env-field{background:#f8f3e9;border:1px solid #e4ddcd;}
+body.hub .env-field:focus-within{border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
+body.hub .env-field textarea{color:#1b2437;}
+body.hub .env-field textarea::placeholder{color:#c4bba6;}
+body.hub .env-shot{background:#f8f3e9;border:1.5px dashed #d0c5ab;}
+body.hub .env-shot:active{background:#f1e9d8;}
+body.hub .env-shot .ic{background:rgba(212,168,90,.16);}
+body.hub .env-shot .ic svg{stroke:#a57a36;}
+body.hub .env-shot b{color:#1b2437;}
+body.hub .env-shot small{color:#a9a294;}
+body.hub .env-photo{border:1px solid #d9cdb0;}
+body.hub .env-rephoto{background:rgba(11,26,61,.82);color:#f6dc9c;}
+body.hub .env-track-wrap{background:linear-gradient(0deg,#f2eee4 64%,rgba(242,238,228,0));}
+body.hub .env-track{background:#fffdf8;border:1px solid #d9cdb0;box-shadow:0 6px 18px rgba(27,36,55,.08);}
+body.hub .env-track .fill{background:linear-gradient(90deg,rgba(212,168,90,.34),rgba(246,220,156,.3));}
+body.hub .env-track .hint{color:#57607a;}
+body.hub .env-done{background:#f2eee4;color:#1b2437;}
+body.hub .env-done h3{color:#0b1a3d;}
+body.hub .env-done .sub{color:#57607a;}
+body.hub .env-done .amt{color:#8a6224;}
+body.hub .env-done .amt.thb{color:#2f5fa8;}
+body.hub .env-done .amt.usd{color:#2f7d57;}
+body.hub .env-curs .env-cur{background:#f8f3e9;border:1px solid #ded6c4;color:#57607a;}
+body.hub .env-curs .env-cur-on{background:var(--hgrad);border-color:transparent;color:#1a1405;}
+body.hub .env-opt{background:#fffdf8;border:1px solid var(--hline);color:#1b2437;
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 4px 16px rgba(27,36,55,.07);}
+body.hub .env-opt .n{color:#0b1a3d;}
+body.hub .env-opt .s{color:#57607a;}
+body.hub .env-opt .ar{color:#a57a36;}
+body.hub .env .cur-btn{background:#f8f3e9!important;border:1px solid #ded6c4!important;color:#57607a!important;}
+body.hub .env .cur-btn.cur-active{background:var(--hgrad)!important;border-color:transparent!important;color:#1a1405!important;}
+body.hub .env .bank-input-wrap, body.hub .env .bank-note-wrap{background:#f8f3e9!important;border:1px solid #e4ddcd!important;}
+body.hub .env .bank-input-wrap:focus-within, body.hub .env .bank-note-wrap:focus-within{
+  border-color:#a57a36!important;box-shadow:0 0 0 3px rgba(165,122,54,.15)!important;}
+body.hub .env .bank-input-wrap input, body.hub .env .bank-note-wrap input{color:#1b2437!important;}
+body.hub .env .bank-input-wrap span{background:rgba(212,168,90,.18)!important;color:#8a6224!important;}
+body.hub .env .photo-zone-pro{background:#f8f3e9!important;border:1.5px dashed #d0c5ab!important;}
+body.hub .env .photo-icon-pro{background:rgba(212,168,90,.16)!important;}
+body.hub .env .photo-icon-pro svg{stroke:#a57a36!important;}
+body.hub .env .photo-text-pro{color:#1b2437!important;}
+body.hub .env .photo-sub-pro{color:#a9a294!important;}
+body.hub .env .img-preview-wrap{border:1px solid #d9cdb0;}
+body.hub .env .rephoto-btn{background:rgba(11,26,61,.82)!important;color:#f6dc9c!important;}
+
+/* ── ປຸ່ມ / ຊ່ອງທົ່ວໄປ ── */
+body.hub .btn-pro-submit, body.hub .btn-green, body.hub .btn-bank-confirm{
+  background:var(--hgrad);color:#1a1405;box-shadow:0 6px 18px rgba(165,122,54,.28);}
+body.hub .btn-pro-submit svg{stroke:#1a1405;}
+body.hub .btn-pro-submit:disabled{background:#e4ddcd;color:#a9a294;box-shadow:none;}
+body.hub .inp, body.hub .photo-btn, body.hub .month-picker, body.hub .cur-btn, body.hub .view-btn,
+body.hub .btn-cancel, body.hub .tab, body.hub .restore-btn, body.hub .clear-btn, body.hub .clear-btn-safe{
+  background:#fffdf8;border:1.5px solid #ded6c4;color:#1b2437;}
+body.hub .tab.active, body.hub .cur-active{background:var(--hgrad)!important;color:#1a1405!important;border-color:transparent!important;}
+body.hub .empty, body.hub .loading{color:#8a8fa2;}
+body.hub .back-btn{color:#8a6224;}
+
+/* ── ໜ້າສຳເລັດ / ກາດສະຫຼຸບ / ໜ້າຕ່າງ ── */
+body.hub .done-box, body.hub .dept-summary, body.hub .record-card, body.hub .storage-card,
+body.hub .modal, body.hub .backup-modal, body.hub .bank-modal, body.hub .bank-history-card, body.hub .cash-summary-card{
+  background:#fffdf8;border:1px solid var(--hline);backdrop-filter:none;-webkit-backdrop-filter:none;
+  color:#1b2437;box-shadow:0 12px 34px rgba(27,36,55,.14);}
+body.hub .done-box::before{background:linear-gradient(90deg,#a57a36,#f6dc9c,#a57a36);}
+body.hub .done-title, body.hub .record-dept, body.hub .bank-modal-title{color:#0b1a3d;}
+body.hub .done-sub{color:#57607a;}
+body.hub .done-amount{color:#8a6224;}
+body.hub .done-check{background:#2f7d57;}
+body.hub .total-card{background:var(--hnavy);border:1px solid #d4a85a;color:#f3ead2;}
+body.hub .dept-sum-row{border-color:var(--hline);color:#1b2437;}
+body.hub .section-title, body.hub .storage-title{color:#8a8fa2;}
+body.hub .record-time{color:#a9a294;}
+body.hub .record-name{color:#57607a;}
+body.hub .overlay{background:rgba(27,36,55,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+body.hub .modal-header{background:#0b1a3d;color:#f6dc9c;}
+body.hub .modal-info{color:#1b2437;}
+body.hub .modal-img-viewport{background:#f0ece1;}
+body.hub .btn-cancel{background:#fffdf8;border:1.5px solid #ded6c4;color:#57607a;}
+body.hub .warn-box{background:#fdf6e3;border-color:#e0c98a;color:#8a6224;}
+body.hub .restore-msg{background:#e8f2ec;border-color:#9cc9ab;color:#2f7d57;}
+body.hub .safety-note{background:#eaf0f8;color:#2f5fa8;}
+body.hub .status-wait{background:#fdf1dd;color:#8a6224;}
+body.hub .status-done{background:#e8f2ec;color:#2f7d57;}
+body.hub .delete-btn{background:#f8eae7;color:#b3382a;}
+body.hub .backup-btn{background:var(--hgrad);color:#1a1405;}
+body.hub .backup-textarea{background:#fffdf8;border-color:#ded6c4;color:#1b2437;}
+body.hub .btn-bank{background:var(--hnavy);border:1px solid #d4a85a;color:#f3ead2;}
+body.hub .storage-bar-wrap{background:#e4ddcd;}
+body.hub .cash-row{border-bottom-color:var(--hline);}
+body.hub .cash-row-label{color:#57607a;}
+body.hub .bank-history-item{background:#f8f3e9;border:1px solid var(--hline);}
+body.hub .bank-history-time, body.hub .bank-history-note{color:#8a8fa2;}
+body.hub .cash-summary-title{color:#8a6224;}
+body.hub .bank-modal-avail{background:#e8f2ec;border:1px solid rgba(47,125,87,.25);color:#57607a;}
+body.hub .bank-modal-avail b{color:#2f7d57;}
+body.hub .bank-input-wrap{background:#f8f3e9;border:1.5px solid #ded6c4;}
+body.hub .bank-input-wrap input{color:#1b2437;}
+body.hub .bank-note-wrap{background:#f8f3e9;border:1px solid var(--hline);}
+body.hub .bank-note-wrap input{color:#1b2437;}
+body.hub .theme-btn.light, body.hub .theme-btn.dark{background:#fffdf8;color:#8a6224;border:1px solid #ded6c4;box-shadow:0 2px 10px rgba(27,36,55,.1);}
+
+/* ── ຜູ້ອານຸມັດ / ຫົວໜ້າ (av-*) : ກັບເປັນເອກະສານສີຂາວ ── */
+body.hub .av-hero{background:var(--hnavy);border:none;border-bottom:2px solid #d4a85a;
+  backdrop-filter:none;-webkit-backdrop-filter:none;color:#fff;}
+body.hub .av-hero .av-seal{border-color:#d4a85a;color:#f6dc9c;}
+body.hub .av-hero h1{color:#fff;}
+body.hub .av-kk{background:rgba(255,255,255,.07);border-color:rgba(243,217,155,.22);}
+body.hub .av-kk .v{color:#fff;}
+body.hub .av-kk .v small{color:#f6dc9c;}
+body.hub .av-summary, body.hub .av-card{background:#fffdf8;border:1px solid var(--hline);
+  backdrop-filter:none;-webkit-backdrop-filter:none;color:#1b2437;}
+body.hub .av-card .hd{color:#0b1a3d;border-bottom-color:var(--hline);}
+body.hub .av-card .hd .c2, body.hub .av-sub2, body.hub .av-date-t, body.hub .av-empty{color:#8a8fa2;}
+body.hub .av-seg{background:#f0e9db;border:1px solid var(--hline);}
+body.hub .av-seg button{color:#57607a;}
+body.hub .av-seg button.on{background:var(--hgrad);color:#1a1405;}
+body.hub .av-tbl thead td{color:#8a8fa2;border-bottom-color:#ded6c4;}
+body.hub .av-tbl tbody td, body.hub .av-date-d{color:#1b2437;}
+body.hub .av-tbl tbody td{border-bottom-color:#f0e9db;}
+body.hub .av-tbl tr.tot td{border-top-color:#a57a36;}
+body.hub .av-tbl tr.tot td.r{color:#2f7d57;}
+body.hub .av-tbl.zebra tbody tr:nth-child(even){background:#faf6ed;}
+body.hub .av-pill.wait{color:#8a6224;background:#fdf1dd;}
+body.hub .av-pill.ok{color:#2f7d57;background:#e8f2ec;}
+body.hub .av-act{background:#f8f3e9;border-color:#ded6c4;color:#57607a;}
+body.hub .av-act.del{background:#f8eae7;border-color:#e6cdc7;color:#b3382a;}
+body.hub .av-barwrap{background:#e7e0d0;}
+body.hub .av-btn.blue{background:var(--hnavy);border:1px solid #d4a85a;color:#f3ead2;}
+body.hub .av-btn.green{background:var(--hgrad);color:#1a1405;}
+body.hub .av-btn.ghost{background:#fffdf8;color:#0b1a3d;border-color:#ded6c4;}
+body.hub .av-btn.danger{background:#fffdf8;color:#b3382a;border-color:#e6cdc7;}
+body.hub .av-btn.warnb{background:#fdf1dd;color:#8a6224;border-color:#e0c98a;}
+body.hub .av-note{background:#fdf1dd;color:#8a6224;}
+body.hub .av-mpick select{background:#fffdf8;color:#1b2437;border-color:#ded6c4;color-scheme:light;}
+body.hub select option{background:#fffdf8;color:#1b2437;}
+
+/* ── inline style ທີ່ຂຽນໄວ້ສຳລັບພື້ນຂາວ → ກັບເປັນຄ່າເດີມ ── */
+body.hub [style*="color:#232323"]{color:#232323!important;}
+body.hub [style*="color:#1B2A4A"]{color:#0b1a3d!important;}
+body.hub [style*="color:#0f6b3d"], body.hub [style*="color:#1e8449"]{color:#2f7d57!important;}
+body.hub [style*="color:#8a2a20"]{color:#b3382a!important;}
+body.hub [style*="color:#245bbd"]{color:#2f5fa8!important;}
+body.hub [style*="color:#a8791a"], body.hub [style*="color:#a67c1a"]{color:#8a6224!important;}
+body.hub [style*="background:#fff;"], body.hub [style*="background:#fff\""]{background:#fffdf8!important;backdrop-filter:none;-webkit-backdrop-filter:none;}
+body.hub [style*="background:#fff5df"]{background:#fdf1dd!important;color:#8a6224!important;}
+body.hub [style*="background:#fdecea"]{background:#f8eae7!important;}
+body.hub [style*="background:#eceff4"]{background:#f2eee4!important;}
+body.hub .admin-scroll{background:#f2eee4!important;}
+body.hub [style*="background:rgba(27,42,74,0.08)"]{background:rgba(165,122,54,.14)!important;}
+body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{background:transparent!important;}
+
+/* ══════════ BENTO DASHBOARD — ແບບສະຫວ່າງ ══════════ */
+body.hub .bn-seal{background:#fff;box-shadow:0 0 0 2px #d4a85a,0 4px 14px rgba(27,36,55,.14);}
+body.hub .bn-top h1{color:#0b1a3d;}
+body.hub .bn-top small{color:#8a8fa2;}
+body.hub .bn-seg{background:#f0e9db;border:1px solid var(--hline);}
+body.hub .bn-seg button{color:#57607a;}
+body.hub .bn-seg button.on{color:#1a1405;}
+body.hub .bn-seg .pill{box-shadow:0 4px 12px rgba(165,122,54,.28);}
+body.hub .bn-tile{background:#fffdf8;border:1px solid var(--hline);backdrop-filter:none;-webkit-backdrop-filter:none;
+  color:#1b2437;box-shadow:0 4px 16px rgba(27,36,55,.07);}
+body.hub .bn-tile:hover{border-color:#d4a85a;}
+body.hub .bn-tile h4{color:#8a8fa2;}
+body.hub .bn-dot{background:#a57a36;box-shadow:none;}
+body.hub .t-total{background:radial-gradient(120% 90% at 0% 0%,rgba(212,168,90,.2),transparent 55%),
+  radial-gradient(90% 90% at 100% 100%,rgba(47,95,168,.1),transparent 60%),#fffdf8;}
+body.hub .t-total::before{display:none;}
+body.hub .bn-big{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#0b1a3d;}
+body.hub .bn-big-sub{color:#8a6224;}
+body.hub .bn-chip{background:#f8f3e9;border:1px solid var(--hline);}
+body.hub .bn-chip.up{color:#2f7d57;border-color:rgba(47,125,87,.4);}
+body.hub .bn-live{background:#2f7d57;}
+body.hub .bn-mini div{background:#f8f3e9;border:1px solid var(--hline);}
+body.hub .bn-mini b{color:#0b1a3d;}
+body.hub .bn-mini span{color:#8a8fa2;}
+body.hub .bn-node rect{fill:#f8f3e9;}
+body.hub .bn-node text{fill:#1b2437;}
+body.hub .bn-flow-note{color:#8a8fa2;}
+body.hub .bn-pcount b{color:#a57a36;text-shadow:none;}
+body.hub .bn-pcount.zero b{color:#2f7d57;text-shadow:none;}
+body.hub .bn-pi{background:#f8f3e9;border:1px solid var(--hline);}
+body.hub .bn-pi .nm small{color:#8a8fa2;}
+body.hub .bn-pi .pulse{background:#d4a85a;}
+body.hub .bn-empty{color:#8a8fa2;}
+body.hub .bn-cur-row b{color:#0b1a3d;}
+body.hub .bn-stack{background:#e7e0d0;}
+body.hub .bn-stack-l{color:#8a8fa2;}
+body.hub .bn-wlbl{color:#8a8fa2;}
+body.hub .bn-wline{border-top-color:#ded6c4;}
+body.hub .bn-wcol:hover .bn-wbar{filter:brightness(1.08);box-shadow:none;}
+body.hub .bn-dock{background:var(--hnavy);backdrop-filter:none;-webkit-backdrop-filter:none;
+  border:1px solid #d4a85a;box-shadow:0 16px 40px rgba(11,26,61,.3);}
+body.hub .bn-dk{color:#f3ead2;background:rgba(255,255,255,.08);}
+body.hub .bn-dk.main{background:var(--hgrad);color:#1a1405;}
+body.hub .bn-dk .tip{background:#0b1a3d;color:#f3ead2;border-color:#d4a85a;}
+body.hub .bn-dk .n{background:#b3382a;color:#fff;}
+body.hub .bn-sep{background:rgba(243,217,155,.25);}
+body.hub .modal-header .bank-modal-title{color:#f6dc9c;}
+body.hub .bn-pipe{opacity:.22;}
+body.hub .bn-wbar::after{background:linear-gradient(180deg,rgba(255,255,255,.45),transparent 45%);}
+body.hub .bn-pi .av{color:#1a1405;}
+}
 </style>
 </head>
 <body>
@@ -1326,7 +1641,7 @@ function homeHTML() {
         <div class="hc-arrow">${arrowRuby}</div>
       </button>
     </div>
-    <div class="sync-note"><span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.15);display:inline-block;margin-right:8px"></span>ຂໍ້ມູນ sync ທຸກເຄື່ອງ real-time<span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.15);display:inline-block;margin-left:8px"></span></div>
+    <div class="sync-note"><span style="width:4px;height:4px;border-radius:50%;background:rgba(27,36,55,0.18);display:inline-block;margin-right:8px"></span>ຂໍ້ມູນ sync ທຸກເຄື່ອງ real-time<span style="width:4px;height:4px;border-radius:50%;background:rgba(27,36,55,0.18);display:inline-block;margin-left:8px"></span></div>
   </div>`;
 }
 
@@ -1395,7 +1710,7 @@ function buildDeptRows(filter) {
     ? DEPTS.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()) || deptTagMap(d.id).toLowerCase().includes(filter.toLowerCase()))
     : DEPTS;
   if (filtered.length === 0) {
-    rows = '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.3);font-size:14px">ບໍ່ພົບພະແນກທີ່ຄົ້ນຫາ</div>';
+    rows = '<div style="text-align:center;padding:40px 20px;color:#8a8fa2;font-size:14px">ບໍ່ພົບພະແນກທີ່ຄົ້ນຫາ</div>';
   } else {
     filtered.forEach(d => {
       const tag = deptTagMap(d.id);
@@ -1410,7 +1725,7 @@ function buildDeptRows(filter) {
       rows += '<button class="dept-card" style="border-left:3px solid '+d.color+';box-shadow:inset 40px 0 40px -30px rgba('+rgb+',0.08)" onclick="selectDept(\''+d.id+'\')">'
         + '<div class="dept-card-img">'+imgHTML+'</div>'
         + '<div class="dept-card-text">'
-          + '<div class="dept-name" style="color:#fff;font-size:15px;font-weight:700">'+d.name+'</div>'
+          + '<div class="dept-name" style="color:#1b2437;font-size:15px;font-weight:700">'+d.name+'</div>'
           + '<div class="dept-tag" style="background:rgba('+rgb+',0.12);color:'+d.color+'">'+tag+'</div>'
         + '</div>'
         + '<div class="dept-card-arrow" style="background:rgba('+rgb+',0.1)">'+arrowSVG(d.color)+'</div>'
@@ -1429,7 +1744,7 @@ function deptGridHTML() {
   return '<div class="dept-grid">'
     + '<div class="dept-header-pro"><div><div class="dh-title">ເລືອກພະແນກ</div><div class="dh-sub">ເລືອກພະແນກກ່ອນ ແລ້ວເລືອກວິທີມອບ</div></div></div>'
     + '<div class="dept-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>'
-    + '<input id="dept-search-input" type="text" placeholder="ຄົ້ນຫາພະແນກ..." oninput="filterDepts()" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:rgba(255,255,255,0.7);font-family:inherit" autocomplete="off" autocorrect="off"></div>'
+    + '<input id="dept-search-input" type="text" placeholder="ຄົ້ນຫາພະແນກ..." oninput="filterDepts()" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#1b2437;font-family:inherit" autocomplete="off" autocorrect="off"></div>'
     + '<div class="dept-list-wrap" id="dept-list-wrap">'+buildDeptRows('')+'</div>'
     + '</div>';
 }
@@ -2013,7 +2328,7 @@ function confirmDeleteGroup(idsStr) {
   overlay.innerHTML = `<div class="modal">
     <div style="font-size:44px"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></div>
     <div style="font-size:18px;font-weight:800">ລຶບລາຍການນີ້?</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r1.departmentName} (${curLabel})</div>
+    <div style="font-size:13px;color:#57607a;margin-bottom:4px">${r1.departmentName} (${curLabel})</div>
     <div style="font-size:12px;color:#f39c12;margin-bottom:8px">ໃສ່ PIN ຫົວໜ້າເພື່ອຢືນຢັນ</div>
     <input type="password" inputmode="numeric" maxlength="4" placeholder="PIN" id="del-pin" class="pin-input-confirm">
     <div id="del-err" style="color:#e74c3c;font-size:12px;min-height:18px;margin-top:4px"></div>
@@ -2241,7 +2556,7 @@ function bentoDashHTML(o){
       <div class="bn-chips">${periodChips}</div>
       <div class="bn-mini">
         <div><b class="bn-mono">${FMT.LAK(totalLAK)}</b><span>ຍອດລວມ${periodLabel} (ກີບ)</span></div>
-        <div><b class="bn-mono">${filtered.length} <small style="font-size:13px;color:#f3d99b">/ ${adminRecords.length}</small></b><span>ລາຍການ / ຮູບ</span></div>
+        <div><b class="bn-mono">${filtered.length} <small style="font-size:13px;color:#8a6224">/ ${adminRecords.length}</small></b><span>ລາຍການ / ຮູບ</span></div>
       </div>
     </div>`;
 
@@ -2255,17 +2570,17 @@ function bentoDashHTML(o){
           <linearGradient id="bnGO" x1="0" x2="1"><stop offset="0" stop-color="#f3d99b"/><stop offset="1" stop-color="#ff8f80"/></linearGradient>
           <linearGradient id="bnGA" x1="0" x2="1"><stop offset="0" stop-color="#6fd49c"/><stop offset="1" stop-color="#f3d99b"/></linearGradient>
         </defs>
-        ${adjToday ? `<path class="bn-pipe" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/><path class="bn-dash${on(received)}" stroke="#f3d99b" d="M150 60 C 230 60, 230 125, 290 125"/>
+        ${adjToday ? `<path class="bn-pipe" stroke="#a57a36" d="M150 60 C 230 60, 230 125, 290 125"/><path class="bn-dash${on(received)}" stroke="#a57a36" d="M150 60 C 230 60, 230 125, 290 125"/>
         <path class="bn-pipe" stroke="url(#bnGA)" d="M150 205 C 230 205, 230 125, 290 125"/><path class="bn-dash" stroke="#6fd49c" d="M150 205 C 230 205, 230 125, 290 125"/>`
-        : `<path class="bn-pipe" stroke="#f3d99b" d="M150 125 L 290 125"/><path class="bn-dash${on(received)}" stroke="#f3d99b" d="M150 125 L 290 125"/>`}
-        <path class="bn-pipe" stroke="url(#bnGC)" d="M410 110 C 465 110, 465 60, 515 60"/><path class="bn-dash${on(b.adminDep)}" stroke="#7fb2ff" style="animation-duration:.8s" d="M410 110 C 465 110, 465 60, 515 60"/>
-        <path class="bn-pipe" stroke="url(#bnGO)" d="M410 140 C 465 140, 465 190, 515 190"/><path class="bn-dash${on(b.withdrawn)}" stroke="#ff8f80" style="animation-duration:1.6s" d="M410 140 C 465 140, 465 190, 515 190"/>
-        ${adjToday ? `<g class="bn-node"><rect x="8" y="30" width="142" height="60" rx="14" stroke="#f3d99b"/><text x="22" y="54">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="76" style="fill:#f3d99b">+${FMT[P](received)}</text></g>
+        : `<path class="bn-pipe" stroke="#a57a36" d="M150 125 L 290 125"/><path class="bn-dash${on(received)}" stroke="#a57a36" d="M150 125 L 290 125"/>`}
+        <path class="bn-pipe" stroke="url(#bnGC)" d="M410 110 C 465 110, 465 60, 515 60"/><path class="bn-dash${on(b.adminDep)}" stroke="#2f5fa8" style="animation-duration:.8s" d="M410 110 C 465 110, 465 60, 515 60"/>
+        <path class="bn-pipe" stroke="url(#bnGO)" d="M410 140 C 465 140, 465 190, 515 190"/><path class="bn-dash${on(b.withdrawn)}" stroke="#b3382a" style="animation-duration:1.6s" d="M410 140 C 465 140, 465 190, 515 190"/>
+        ${adjToday ? `<g class="bn-node"><rect x="8" y="30" width="142" height="60" rx="14" stroke="#a57a36"/><text x="22" y="54">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="76" style="fill:#8a6224">+${FMT[P](received)}</text></g>
         <g class="bn-node"><rect x="8" y="175" width="142" height="60" rx="14" stroke="#6fd49c"/><text x="22" y="199">ປັບຍອດມື້ນີ້</text><text class="v" x="22" y="221" style="fill:${adjToday<0?"#ff8f80":"#6fd49c"}">${adjToday>0?"+":"−"}${FMT[P](Math.abs(adjToday))}</text></g>`
-        : `<g class="bn-node"><rect x="8" y="95" width="142" height="60" rx="14" stroke="#f3d99b"/><text x="22" y="119">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="141" style="fill:#f3d99b">+${FMT[P](received)}</text></g>`}
-        <g class="bn-node"><rect x="290" y="88" width="120" height="74" rx="16" stroke="#d4a85a" stroke-width="2"/><text x="304" y="114">ເງິນສົດຄ້າງ</text><text class="v" x="304" y="140" style="fill:#f3d99b">${FMT[P](b.withAdmin)}</text></g>
-        <g class="bn-node"><rect x="515" y="30" width="120" height="60" rx="14" stroke="#7fb2ff"/><text x="527" y="54">ເຂົ້າທະນາຄານ</text><text class="v" x="527" y="76" style="fill:#7fb2ff">${FMT[P](b.toBoss)}</text></g>
-        <g class="bn-node"><rect x="515" y="160" width="120" height="60" rx="14" stroke="#ff8f80"/><text x="527" y="184">ເບີກ/ຈ່າຍ</text><text class="v" x="527" y="206" style="fill:#ff8f80">${b.withdrawn?"−":""}${FMT[P](b.withdrawn)}</text></g>
+        : `<g class="bn-node"><rect x="8" y="95" width="142" height="60" rx="14" stroke="#a57a36"/><text x="22" y="119">ຮັບເງິນເຂົ້າ</text><text class="v" x="22" y="141" style="fill:#8a6224">+${FMT[P](received)}</text></g>`}
+        <g class="bn-node"><rect x="290" y="88" width="120" height="74" rx="16" stroke="#d4a85a" stroke-width="2"/><text x="304" y="114">ເງິນສົດຄ້າງ</text><text class="v" x="304" y="140" style="fill:#8a6224">${FMT[P](b.withAdmin)}</text></g>
+        <g class="bn-node"><rect x="515" y="30" width="120" height="60" rx="14" stroke="#2f5fa8"/><text x="527" y="54">ເຂົ້າທະນາຄານ</text><text class="v" x="527" y="76" style="fill:#2f5fa8">${FMT[P](b.toBoss)}</text></g>
+        <g class="bn-node"><rect x="515" y="160" width="120" height="60" rx="14" stroke="#b3382a"/><text x="527" y="184">ເບີກ/ຈ່າຍ</text><text class="v" x="527" y="206" style="fill:#b3382a">${b.withdrawn?"−":""}${FMT[P](b.withdrawn)}</text></g>
       </svg>
       ${b.staffDep ? `<div class="bn-flow-note">* ເຂົ້າທະນາຄານ ລວມ ພະນັກງານມອບກົງ ${FMT[P](b.staffDep)} ${LBL[P]}</div>` : ""}
     </div>`;
@@ -2274,8 +2589,8 @@ function bentoDashHTML(o){
   const DC = ["#f3d99b","#7fb2ff","#6fd49c","#ff8f80","#e2b466"];
   const waits = adminRecords.filter(r => !r.verified).sort((a,b2) => b2.timestamp - a.timestamp).slice(0,5);
   const tPend = `<div class="bn-tile t-pend" style="animation-delay:.25s">
-      <h4><span class="bn-dot" style="background:${pending?"#ffcf6b":"#6fd49c"}"></span>${isOwner?"ລໍຖ້າຜູ້ອານຸມັດກວດ":"ລໍຖ້າກວດສອບ"}</h4>
-      <div class="bn-pcount${pending?"":" zero"}"><b class="bn-mono" data-bn-count="${pending}">${pending}</b><span style="color:rgba(243,234,210,.6)">ລາຍການ</span></div>
+      <h4><span class="bn-dot" style="background:${pending?"#d4a85a":"#2f7d57"}"></span>${isOwner?"ລໍຖ້າຜູ້ອານຸມັດກວດ":"ລໍຖ້າກວດສອບ"}</h4>
+      <div class="bn-pcount${pending?"":" zero"}"><b class="bn-mono" data-bn-count="${pending}">${pending}</b><span style="color:#57607a">ລາຍການ</span></div>
       <div class="bn-plist">${waits.length ? waits.map((r,i) => {
           const d = DEPTS.find(x => x.id === r.department);
           const col = (d && d.color) || DC[i%5];
@@ -2294,16 +2609,16 @@ function bentoDashHTML(o){
         const flag = c==="LAK" ? "linear-gradient(135deg,#f6dc9c,#d4a85a)" : c==="THB" ? "linear-gradient(135deg,#bcd6ff,#7fb2ff)" : "linear-gradient(135deg,#b6f0cf,#6fd49c)";
         return `<div class="bn-cur">
           <div class="bn-cur-row"><b class="bn-mono">${FMT[c](x.grand)}</b><span class="bn-flag" style="background:${flag}">${SYM[c]}</span></div>
-          <div class="bn-stack"><i style="width:${Math.abs(x.withAdmin)/base*100}%;background:#f3d99b"></i><i style="width:${Math.abs(x.toBoss)/base*100}%;background:#7fb2ff"></i></div>
+          <div class="bn-stack"><i style="width:${Math.abs(x.withAdmin)/base*100}%;background:#a57a36"></i><i style="width:${Math.abs(x.toBoss)/base*100}%;background:#2f5fa8"></i></div>
           <div class="bn-stack-l"><span>ຄ້າງ <em>${FMT[c](x.withAdmin)}</em></span><span>ທະນາຄານ <em>${FMT[c](x.toBoss)}</em></span></div>
         </div>`;}).join("")}</div>
     </div>`;
 
   // ── ທີ່ມາຂອງຍອດລວມ (waterfall) ──
-  const steps = [["ຮັບເງິນເຂົ້າ", received, "#f3d99b"]];
-  if (b.staffDep) steps.push(["+ ມອບກົງ", b.staffDep, "#7fb2ff"]);
-  steps.push(["− ເບີກ/ຈ່າຍ", -b.withdrawn, "#ff8f80"]);
-  if (adjToday) steps.push([adjToday<0 ? "− ປັບຍອດມື້ນີ້" : "+ ປັບຍອດມື້ນີ້", adjToday, adjToday<0 ? "#ff8f80" : "#6fd49c"]);
+  const steps = [["ຮັບເງິນເຂົ້າ", received, "#a57a36"]];
+  if (b.staffDep) steps.push(["+ ມອບກົງ", b.staffDep, "#2f5fa8"]);
+  steps.push(["− ເບີກ/ຈ່າຍ", -b.withdrawn, "#b3382a"]);
+  if (adjToday) steps.push([adjToday<0 ? "− ປັບຍອດມື້ນີ້" : "+ ປັບຍອດມື້ນີ້", adjToday, adjToday<0 ? "#b3382a" : "#2f7d57"]);
   let run = 0; const segs = steps.map(s => { const from = run; run += s[1]; return { lbl:s[0], col:s[2], from, to:run, v:s[1] }; });
   segs.push({ lbl:"= ຍອດລວມ", col:"gold", from:0, to:b.grand, v:b.grand, total:true });
   const lo = Math.min(0, ...segs.map(s => Math.min(s.from, s.to))), hi = Math.max(1, ...segs.map(s => Math.max(s.from, s.to)));
@@ -2312,7 +2627,7 @@ function bentoDashHTML(o){
       <h4><span class="bn-dot"></span>ທີ່ມາຂອງຍອດລວມ · ${P==="LAK"?"ລ້ານກີບ":LBL[P]}</h4>
       <div class="bn-water">${segs.map((s,i) => {
         const bottom = pct(Math.min(s.from, s.to)), height = Math.max(pct(Math.max(s.from, s.to)) - bottom, .8);
-        const bg = s.col==="gold" ? "linear-gradient(180deg,#f6dc9c,#a57a36)" : s.col, col = s.col==="gold" ? "#f3d99b" : s.col;
+        const bg = s.col==="gold" ? "linear-gradient(180deg,#f6dc9c,#a57a36)" : s.col, col = s.col==="gold" ? "#8a6224" : s.col;
         const val = s.total ? bnAbbr(s.v, P) : (s.v<0?"−":"+") + bnAbbr(Math.abs(s.v), P);
         return `<div class="bn-wcol" style="color:${col}"><div class="bn-wplot">
             ${lo<0 ? `<div class="bn-wline" style="bottom:${pct(0)}%"></div>` : ""}
@@ -2404,7 +2719,7 @@ function confirmDelete(id) {
   overlay.innerHTML = `<div class="modal">
     <div style="font-size:44px"><svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></div>
     <div style="font-size:18px;font-weight:800">ລຶບລາຍການນີ້?</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:4px">${r.departmentName} — ${fmtAmt(r.amount,r.currency||"LAK")}</div>
+    <div style="font-size:13px;color:#57607a;margin-bottom:4px">${r.departmentName} — ${fmtAmt(r.amount,r.currency||"LAK")}</div>
     <div style="font-size:12px;color:#f39c12;margin-bottom:8px">ໃສ່ PIN ຫົວໜ້າເພື່ອຢືນຢັນ</div>
     <input type="password" inputmode="numeric" maxlength="4" placeholder="PIN" id="del-pin" class="pin-input-confirm">
     <div id="del-err" style="color:#e74c3c;font-size:12px;min-height:18px;margin-top:4px"></div>
@@ -2442,8 +2757,8 @@ function confirmClearMonth() {
   overlay.innerHTML = `<div class="modal" style="width:88%;max-width:340px">
     <div style="font-size:40px"><svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></div>
     <div style="font-size:17px;font-weight:800;color:#f39c12">ລ້າງຂໍ້ມູນເດືອນ</div>
-    <div style="font-size:12px;color:#aaa;margin-bottom:10px;text-align:center">ເລືອກເດືອນທີ່ຢາກລ້າງ ແລ້ວໃສ່ PIN ຫົວໜ້າ</div>
-    <select id="del-month-sel" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #444;background:#1a1a2e;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px">
+    <div style="font-size:12px;color:#57607a;margin-bottom:10px;text-align:center">ເລືອກເດືອນທີ່ຢາກລ້າງ ແລ້ວໃສ່ PIN ຫົວໜ້າ</div>
+    <select id="del-month-sel" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #ded6c4;background:#fffdf8;color:#1b2437;font-family:inherit;font-size:14px;margin-bottom:10px">
       ${months.map(mk=>{
         const [my,mm]=mk.split("-").map(Number);
         return `<option value="${mk}">${monthName(my,mm)}</option>`;
@@ -2493,7 +2808,7 @@ function confirmClearAll() {
   overlay.innerHTML = `<div class="modal">
     <div style="font-size:44px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg></div>
     <div style="font-size:18px;font-weight:800;color:#e74c3c">ລ້າງຂໍ້ມູນທັງໝົດ?</div>
-    <div style="font-size:12px;color:#aaa;text-align:center;line-height:1.7;margin-bottom:8px">
+    <div style="font-size:12px;color:#57607a;text-align:center;line-height:1.7;margin-bottom:8px">
       ລາຍການທຸກເດືອນຈະຖືກລຶບຖາວອນ<br>
       <b>ແນະນຳໃຫ້ Export JSON ກ່ອນ!</b>
     </div>
@@ -2545,10 +2860,10 @@ async function viewBill(id) {
       </div>
     </div>
     <div class="modal-img-viewport" id="billImgViewport">
-      <div style="color:#888;font-size:13px;padding:40px 0">${WAIT_ICON} ກຳລັງໂຫຼດຮູບ...</div>
+      <div style="color:#8a8fa2;font-size:13px;padding:40px 0">${WAIT_ICON} ກຳລັງໂຫຼດຮູບ...</div>
     </div>
     <div class="modal-info"><b>ຈຳນວນ:</b> ${fmtAmt(r.amount,r.currency||"LAK")}<br>${r.note?`<b>ຊື່:</b> ${r.note}<br>`:""}<b>ເວລາ:</b> ${fmtDate(r.timestamp)}</div>
-    <div style="font-size:11px;color:#999;text-align:center;padding:0 16px 12px">ແຕະຮູບ 2 ຄັ້ງເພື່ອຊູມ · ລາກເພື່ອເລື່ອນເບິ່ງ</div>
+    <div style="font-size:11px;color:#8a8fa2;text-align:center;padding:0 16px 12px">ແຕະຮູບ 2 ຄັ້ງເພື່ອຊູມ · ລາກເພື່ອເລື່ອນເບິ່ງ</div>
   </div>`;
   overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
   document.body.appendChild(overlay);
@@ -2557,7 +2872,7 @@ async function viewBill(id) {
     const image = await dbGetImage(id);
     const viewport = document.getElementById("billImgViewport");
     if (!viewport) return; // modal already closed
-    if (!image) { viewport.innerHTML = `<div style="color:#888;font-size:13px;padding:40px 0">ບໍ່ມີຮູບບິນ</div>`; return; }
+    if (!image) { viewport.innerHTML = `<div style="color:#8a8fa2;font-size:13px;padding:40px 0">ບໍ່ມີຮູບບິນ</div>`; return; }
     viewport.innerHTML = `<img src="${image}" class="modal-img" id="billImgEl" ondblclick="toggleZoomBillImg()">`;
     document.getElementById("billRotateBtn").style.display = "";
   } catch(e) {
@@ -2606,7 +2921,7 @@ async function doBackup() {
   overlay.innerHTML = `<div class="backup-modal">
     <div style="font-size:36px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h6"/></svg></div>
     <div style="font-size:18px;font-weight:800">Backup ຂໍ້ຄວາມ</div>
-    <div style="font-size:12px;color:#aaa">ກົດທີ່ຊ່ອງດ້ານລຸ່ມ → Copy → Paste ໃນ Note/Line</div>
+    <div style="font-size:12px;color:#57607a">ກົດທີ່ຊ່ອງດ້ານລຸ່ມ → Copy → Paste ໃນ Note/Line</div>
     <textarea class="backup-textarea" readonly onclick="this.select();navigator.clipboard.writeText(this.value).catch(()=>{})">${text}</textarea>
     <button class="btn-green" style="margin-bottom:0;width:100%" onclick="this.closest('.overlay').remove()">ປິດ</button>
   </div>`;
@@ -2852,7 +3167,7 @@ function openBankHistoryModal() {
       <span class="bank-modal-title" style="margin:0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5a1 1 0 001 1h5"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg> ປະຫວັດການມອບເຂົ້າບັນຊີ</span>
       <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
-    ${inner || `<div style="text-align:center;color:#888;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
+    ${inner || `<div style="text-align:center;color:#8a8fa2;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
   </div>`;
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
   document.body.appendChild(overlay);
@@ -2882,7 +3197,7 @@ function openBankModal() {
         <span id="bank-cur-badge">ກີບ</span>
       </div>
       <div id="bank-preview" style="font-size:13px;font-weight:700;color:#27ae60;margin-top:6px;min-height:20px"></div>
-      <div id="bank-remain" style="font-size:12px;color:#aaa;margin-top:2px;min-height:18px"></div>
+      <div id="bank-remain" style="font-size:12px;color:#57607a;margin-top:2px;min-height:18px"></div>
     </div>
     <div>
       <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin-bottom:8px">ໝາຍເຫດ (ຖ້າມີ)</div>
@@ -2945,7 +3260,7 @@ function onBankAmtInput(el) {
     preview.textContent = fmtAmt(num, cur);
     if(remain >= 0) {
       remainEl.textContent = "ເງິນສົດເຫຼືອ: " + fmtAmt(remain, cur);
-      remainEl.style.color = remain > 0 ? "#aaa" : "#f39c12";
+      remainEl.style.color = remain > 0 ? "#57607a" : "#c47f10";
       errEl.textContent = "";
       btn.disabled = false;
     } else {
@@ -3034,7 +3349,7 @@ function openWithdrawModal() {
         <span id="wd-cur-badge">ກີບ</span>
       </div>
       <div id="wd-preview" style="font-size:13px;font-weight:700;color:#c0392b;margin-top:6px;min-height:20px"></div>
-      <div id="wd-remain" style="font-size:12px;color:#aaa;margin-top:2px;min-height:18px"></div>
+      <div id="wd-remain" style="font-size:12px;color:#57607a;margin-top:2px;min-height:18px"></div>
     </div>
     <div>
       <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a89f88;margin-bottom:8px">ລາຍລະອຽດ (ເບີກໄປໃຊ້ຫຍັງ)</div>
@@ -3094,7 +3409,7 @@ function onWdAmtInput(el) {
     preview.textContent = "− " + fmtAmt(num, cur);
     if(remain >= 0) {
       remainEl.textContent = "ເງິນສົດເຫຼືອ: " + fmtAmt(remain, cur);
-      remainEl.style.color = remain > 0 ? "#aaa" : "#f39c12";
+      remainEl.style.color = remain > 0 ? "#57607a" : "#c47f10";
       errEl.textContent = "";
       btn.disabled = false;
     } else {
@@ -3158,7 +3473,7 @@ function openWithdrawHistoryModal() {
       <span class="bank-modal-title" style="margin:0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/><path d="M4 3h16"/></svg> ປະຫວັດການເບີກ / ຈ່າຍ</span>
       <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
-    ${inner || `<div style="text-align:center;color:#888;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
+    ${inner || `<div style="text-align:center;color:#8a8fa2;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
   </div>`;
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
   document.body.appendChild(overlay);
@@ -3270,7 +3585,7 @@ function onAdjAmtInput(el) {
   }
   if(delta === 0) {
     preview.textContent = "ຕົງກັບລະບົບແລ້ວ (ບໍ່ຕ້ອງປັບ)";
-    preview.style.color = "#888";
+    preview.style.color = "#8a8fa2";
     btn.disabled = true;
   } else {
     preview.textContent = "ສ່ວນຕ່າງ: " + (delta>0?"+ ":"− ") + fmtAmt(Math.abs(delta), cur);
@@ -3332,7 +3647,7 @@ function openAdjustHistoryModal() {
       <span class="bank-modal-title" style="margin:0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4M20 7l-3-3M20 7l-3 3M4 17h16M4 17l3-3M4 17l3 3"/></svg> ປະຫວັດການປັບຍອດ</span>
       <button style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
-    ${inner || `<div style="text-align:center;color:#888;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
+    ${inner || `<div style="text-align:center;color:#8a8fa2;padding:20px 0;font-size:13px">ຍັງບໍ່ມີລາຍການ</div>`}
   </div>`;
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
   document.body.appendChild(overlay);
@@ -3378,7 +3693,7 @@ function renderStaffBankForm() {
       <div class="env-dept">
         <span class="sw" style="background:${d?d.color:"#1B2A4A"}">${chip}</span>
         <div><b>ມອບເຂົ້າທະນາຄານ</b><span>${d?d.name:""}</span></div>
-        <i class="env-dot" style="background:#7ea6ea;color:#7ea6ea"></i>
+        <i class="env-dot" style="background:#2f5fa8;color:#2f5fa8"></i>
       </div>
       <div class="env-lab">💰 ສະກຸນເງິນ <em>(ມອບເຂົ້າທະນາຄານໄດ້ເທື່ອລະສະກຸນ)</em></div>
       <div class="env-curs">
@@ -3397,7 +3712,7 @@ function renderStaffBankForm() {
       <div class="env-lab"><svg viewBox="0 0 24 24"><path d="M21 11l-9 9a5 5 0 01-7-7l9-9a3 3 0 014 4l-9 9a1 1 0 01-2-2l8-8"/></svg> ຮູບໃບໂອນ / ສະລິບ (ຖ້າມີ)</div>
       <input type="file" id="sbank-file" accept="image/*" capture="environment" class="hidden" onchange="onStaffBankFileChange(this)">
       <div id="sbank-photo-zone"></div>
-      <div id="sbank-err" style="color:#ff9a8c;font-size:12px;min-height:16px;text-align:center"></div>
+      <div id="sbank-err" style="color:#b3382a;font-size:12px;min-height:16px;text-align:center"></div>
     </div>
     <div class="env-track-wrap">
       <div class="env-track off" id="env-track">

@@ -681,6 +681,225 @@ input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 
   .es-row .amt{grid-area:amt;text-align:right}
 }
 
+
+/* ══════════ HUB THEME — ແບບສະຫວ່າງ (ນ້ຳເງິນເຂັ້ມ + ທອງ ເທິງພື້ນຄີມ) ══════════
+   ໂທນດຽວກັນກັບ ສາຂາເມືອງຮຸນ · DAVONE SHOP · ໂຄງສ້າງ/ຟັງຊັນຄືເກົ່າ */
+@media screen{
+:root{
+  --bg:#f2eee4;
+  --surface:#fffdf8;
+  --card:#fffdf8;
+  --card2:#f8f3e9;
+  --border:#e4ddcd;
+  --border-gold:#d9cdb0;
+  --gold:#a57a36;--gold-lt:#8a6224;--gold-dim:rgba(165,122,54,.12);
+  --admin:#2f5fa8;--admin-dim:rgba(47,95,168,.10);
+  --goods:#2f7d57;--goods-dim:rgba(47,125,87,.10);
+  --text:#1b2437;--text2:#1b2437;--muted:#57607a;
+  --danger:#b3382a;
+  --glass:none;
+  --gold-grad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
+  --navy-grad:linear-gradient(170deg,#0b1a3d,#16284f 60%,#0b1a3d);
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text)}
+body::before,body::after{content:none!important;display:none!important}
+
+/* ── ແຖບເທິງ = ນ້ຳເງິນເຂັ້ມ ຕັດເສັ້ນທອງ ── */
+.topbar{background:var(--navy-grad);backdrop-filter:none;-webkit-backdrop-filter:none;
+  border-bottom:2px solid #d4a85a;box-shadow:0 3px 16px rgba(11,26,61,.18)}
+.topbar-time{color:rgba(243,234,210,.7)}
+.brand-sub{color:rgba(243,234,210,.72)}
+.btn-summary{background:rgba(255,255,255,.1);border-color:rgba(243,217,155,.45);color:#f6dc9c}
+.btn-summary:hover{background:rgba(243,217,155,.22);border-color:#f6dc9c}
+.btn-hamburger{color:rgba(243,234,210,.85)}
+.sync-badge.ok{border-color:rgba(127,224,176,.5);color:#8fe0b3;background:rgba(127,224,176,.12)}
+.sync-badge.err{border-color:rgba(255,154,140,.5);color:#ff9a8c;background:rgba(255,120,100,.14)}
+.sync-badge.loading{border-color:rgba(243,217,155,.3);color:rgba(243,234,210,.7);background:transparent}
+
+/* ── ແຖບຂ້າງ = ນ້ຳເງິນເຂັ້ມ ── */
+.sidebar{background:var(--navy-grad);backdrop-filter:none;-webkit-backdrop-filter:none;
+  border-right:2px solid #d4a85a;box-shadow:3px 0 18px rgba(11,26,61,.14)}
+.sidebar-section{color:rgba(243,234,210,.55)}
+.sidebar-divider{background:rgba(243,217,155,.16)}
+.nav-item{color:rgba(243,234,210,.82)}
+.nav-item:hover{background:rgba(243,217,155,.1);color:#fff}
+.nav-item.active{background:var(--gold-grad);color:#1a1405;font-weight:700;box-shadow:0 4px 14px rgba(212,168,90,.3)}
+.sidebar-stats{background:rgba(255,255,255,.06);border-color:rgba(243,217,155,.22)}
+.sidebar-stats .ss-label{color:rgba(243,234,210,.6)}
+.sidebar-stats .ss-name{color:rgba(243,234,210,.88)}
+.sidebar-stats .ss-sep{background:rgba(243,217,155,.16)}
+.sidebar-stats .ss-val.admin{color:#9dc4ff}
+.sidebar-stats .ss-val.goods{color:#7fe0b0}
+.sidebar-stats [style*="var(--text2)"],.sidebar-stats [style*="var(--text)"]{color:#fff!important}
+.sidebar-stats [style*="var(--gold-lt)"]{color:#f6dc9c!important}
+.sidebar-stats [style*="var(--muted)"]{color:rgba(243,234,210,.6)!important}
+.sidebar-overlay{background:rgba(11,26,61,.5)}
+
+/* ── ຫົວຂໍ້ໜ້າ ── */
+.page-title{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#0b1a3d}
+.page-sub{color:var(--muted)}
+.date-pill{background:#fffdf8;border:1px solid var(--border-gold);backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:0 2px 8px rgba(27,36,55,.06)}
+.date-pill label{color:var(--muted)}
+.date-pill input[type=date]{color:#1b2437}
+.date-pill input[type=date]::-webkit-calendar-picker-indicator{filter:none;opacity:.55}
+.dep-inp::-webkit-calendar-picker-indicator{filter:none;opacity:.55}
+
+/* ── ກາດ ── */
+.scard,.total-card,.hist-card,.stmt,.dep-form,.bal-c,.sblk,.gblk{
+  backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:14px;
+  box-shadow:0 4px 16px rgba(27,36,55,.07)}
+.scard{background:#fffdf8;border:1px solid var(--border)}
+.scard.admin{border-top:2px solid var(--admin);box-shadow:0 4px 16px rgba(27,36,55,.07)}
+.scard.goods{border-top:2px solid var(--goods);box-shadow:0 4px 16px rgba(27,36,55,.07)}
+.scard-head{border-bottom:1px solid var(--border)}
+.snum{background:var(--gold-grad);color:#1a1405}
+.field>label{color:#1b2437}
+.total-card,.hist-card,.stmt,.dep-form{background:#fffdf8;border:1px solid var(--border-gold)}
+.bal-c,.sblk{background:#fffdf8;border:1px solid var(--border)}
+.gblk{background:linear-gradient(135deg,rgba(165,122,54,.07),transparent);border:1px solid var(--border-gold)}
+
+/* ── ຊ່ອງປ້ອນ ── */
+input[type=text],textarea,.dep-inp,.cfg-field input{background:#fffdf8;border:1px solid #ded6c4;color:#1b2437}
+input[type=text]::placeholder,textarea::placeholder,.dep-inp::placeholder{color:#a9a294}
+input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
+  border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15)}
+.admin input[type=text]:focus,.admin textarea:focus{border-color:var(--admin);box-shadow:0 0 0 3px rgba(47,95,168,.15)}
+.goods input[type=text]:focus,.goods textarea:focus{border-color:var(--goods);box-shadow:0 0 0 3px rgba(47,125,87,.15)}
+.cfg-field label{color:#1b2437}
+
+/* ── ປຸ່ມເລືອກ ── */
+.tag{background:#f6f1e6;border-color:#ded6c4;color:#57607a}
+.tag:hover{border-color:#a57a36;color:#1b2437}
+.tag.active-admin{border-color:var(--admin);background:var(--admin-dim);color:var(--admin)}
+.tag.active-goods{border-color:var(--goods);background:var(--goods-dim);color:var(--goods)}
+.cur-btn{background:#f6f1e6;border-color:#ded6c4;color:#57607a}
+.cur-btn:hover{border-color:#a57a36;color:#1b2437}
+.cur-btn.active-lak{background:rgba(212,168,90,.18);border-color:#a57a36;color:#8a6224;box-shadow:none}
+.cur-btn.active-thb{background:var(--admin-dim);border-color:var(--admin);color:var(--admin)}
+.cur-btn.active-usd{background:var(--goods-dim);border-color:var(--goods);color:var(--goods)}
+.kind-btn{background:#f6f1e6;border-color:#ded6c4;color:#57607a}
+.kind-btn:hover{border-color:#a57a36}
+.kind-btn.active-in{border-color:#a57a36;background:rgba(212,168,90,.18);color:#8a6224}
+.kind-btn.active-out{border-color:var(--danger);background:rgba(179,56,42,.1);color:var(--danger)}
+.mtab{background:#fffdf8;border-color:#ded6c4;color:#57607a}
+.mtab:hover{border-color:#a57a36;color:#1b2437}
+.mtab.active{background:var(--gold-grad);color:#1a1405;border-color:transparent}
+
+/* ── ປຸ່ມ ── */
+.btn-save{background:var(--gold-grad);color:#1a1405;border:0;box-shadow:0 6px 18px rgba(165,122,54,.28)}
+.btn-save:hover{background:var(--gold-grad);filter:brightness(1.05)}
+.btn-cfg-save{background:var(--gold-grad);color:#1a1405;border:0}
+.btn-reset{color:var(--muted);border-color:var(--border)}
+.btn-clr,.btn-multi,.btn-sel-cancel{color:var(--muted);border-color:var(--border);background:#fffdf8}
+.btn-multi:hover,.btn-sel-cancel:hover{border-color:#a57a36;color:#1b2437}
+.blink{background:#f8f3e9;border:1px solid var(--border)}
+.blink:hover{border-color:#a57a36}
+.blink-box{border-color:#c4bba6}
+.blink:has(input:checked){border-color:#a57a36;background:rgba(212,168,90,.14)}
+.blink input:checked+.blink-box{background:#a57a36;border-color:#a57a36}
+.blink input:checked+.blink-box::after{color:#fff}
+.blink-txt b{color:#8a6224}
+.blink-txt em{color:var(--goods)}
+.blink-txt em.neg{color:var(--danger)}
+.hi-link{border-color:var(--border-gold);color:#8a6224;background:rgba(212,168,90,.14)}
+
+/* ── ລາຍການ / ສະຫຼຸບ ── */
+.tc-head,.hist-head{background:#f8f3e9;border-bottom:1px solid var(--border)}
+.tc-title,.hist-title{color:#8a6224;opacity:1}
+.tc-val.grand{color:#8a6224}
+.tc-label,.gcl,.bal-bar-lbl,.sel-count b,.hi-desc,.dep-item-note,.stmt-row .l,.stmt-tx .n{color:#1b2437}
+.hi:hover{background:#f8f3e9}
+.hi-del,.dep-del,.stmt-tx .x{color:#c4bba6}
+.hi-badge.admin{border-color:rgba(47,95,168,.35);color:var(--admin);background:rgba(47,95,168,.08)}
+.hi-badge.goods{border-color:rgba(47,125,87,.35);color:var(--goods);background:rgba(47,125,87,.08)}
+.hist-toolbar{background:rgba(179,56,42,.05);border-bottom:1px solid var(--border)}
+.hi.selectable:hover{background:#f8f3e9}
+.hi.selected{background:rgba(179,56,42,.07)!important}
+.hi-cb{border-color:#c4bba6}
+.szero{color:#c4bba6!important}
+.sblk.admin .sblk-head{color:var(--admin);background:rgba(47,95,168,.07)}
+.sblk.goods .sblk-head{color:var(--goods);background:rgba(47,125,87,.07)}
+.gcv{color:#8a6224}
+.glbl{color:#8a6224;opacity:.7}
+
+/* ── ໃບຍອດເງິນ / ງົບ ── */
+.stmt-hd{border-bottom:2px solid #d4a85a}
+.stmt-hd h3,.stmt-net .a{color:#0b1a3d}
+.stmt-hd .bic,.dep-form-title .bic{color:#a57a36}
+.stmt-hd .per b{color:#1b2437}
+.stmt-cr{color:var(--goods)}
+.stmt-db{color:var(--danger)}
+.stmt-net{border-top:2px solid #d4a85a;background:rgba(212,168,90,.08)}
+.stmt-net .a.neg{color:var(--danger)}
+.stmt-bar{background:#eee6d6}
+.stmt-bar i{background:#a57a36}
+.stmt-bar i.warn{background:#d4a85a}
+.stmt-bar i.over{background:var(--danger)}
+.stmt-barlab b{color:#8a6224}
+.stmt-txhd{border-bottom:2px solid var(--border)}
+.dep-form-title{color:#0b1a3d}
+.dep-item-amt{color:#8a6224}
+.bal-bar{background:#eee6d6;border-color:var(--border)}
+.bal-bar-pct{color:#8a6224}
+.bal-c.in .bal-c-val{color:#8a6224}
+.bal-note-cur b{color:var(--admin)}
+
+/* ── ໜ້າຕ່າງ / ແຈ້ງເຕືອນ ── */
+.overlay,.cfg-overlay{background:rgba(27,36,55,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.msheet,.cfg-sheet{background:#fffdf8;backdrop-filter:none;-webkit-backdrop-filter:none;
+  border:1px solid var(--border-gold);border-radius:16px;box-shadow:0 24px 60px rgba(11,26,61,.28)}
+.mhead{border-bottom:1px solid var(--border)}
+.mtitle,.cfg-title{color:#0b1a3d}
+.mclose{background:#f8eae7;border:1px solid #e6cdc7;color:#b3382a;box-shadow:none}
+.mclose:hover{background:#b3382a;border-color:#b3382a;color:#fff}
+#toast{background:#0b1a3d;border:1px solid #d4a85a;color:#f6dc9c;box-shadow:0 10px 30px rgba(11,26,61,.35)}
+#toast.err{background:#7e241a;border-color:#e6cdc7;color:#ffd9d2}
+.dtbl{border-color:var(--border)}
+
+/* ── ສະຫຼຸບລາຍຈ່າຍ (Hero split) ── */
+.es-tile{background:#fffdf8;border:1px solid var(--border);backdrop-filter:none;-webkit-backdrop-filter:none;
+  border-radius:16px;box-shadow:0 4px 16px rgba(27,36,55,.07)}
+.es-dot{background:#a57a36;box-shadow:none}
+.es-h4{color:var(--muted)}
+.es-mo{background:#f8f3e9;border-color:var(--border);color:#57607a}
+.es-mo:hover{border-color:#a57a36}
+.es-mo.on{background:var(--gold-grad);color:#1a1405;border-color:transparent;box-shadow:0 6px 16px rgba(165,122,54,.26)}
+.es-curs{background:#f8f3e9;border-color:var(--border)}
+.es-curs button{color:#57607a}
+.es-curs button.on{color:#1a1405}
+.es-hero{background:radial-gradient(120% 90% at 0% 0%,rgba(212,168,90,.18),transparent 55%),radial-gradient(90% 90% at 100% 100%,rgba(47,95,168,.1),transparent 60%),#fffdf8}
+.es-huge{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#0b1a3d}
+.es-unit{color:#8a6224}
+.es-delta{background:#f8f3e9;border-color:var(--border);color:#57607a}
+.es-delta.up{color:var(--danger);border-color:rgba(179,56,42,.4)}
+.es-delta.down{color:var(--goods);border-color:rgba(47,125,87,.4)}
+.es-ring .trk{stroke:#eee6d6}
+.es-ring .seg{filter:none}
+.es-ring-mid .t{color:var(--muted)}
+.es-ring-mid .v{color:#0b1a3d}
+.es-ring-mid .p{color:#8a6224}
+.es-split h3{color:#0b1a3d}
+.es-split .sub,.es-split .pc,.es-col .n,.es-row .date,.es-lh,.es-empty{color:var(--muted)}
+.es-split .bar,.es-stack,.es-row .sh{background:#eee6d6}
+.es-split .others span{background:#f8f3e9;border-color:var(--border)}
+.es-col.on .n{color:#8a6224}
+.es-search input{background:#fffdf8;border-color:#ded6c4;color:#1b2437}
+.es-search input::placeholder{color:#a9a294}
+.es-search svg{color:#a9a294}
+.es-chip{background:#f8f3e9;border-color:var(--border);color:#57607a}
+.es-chip.on{background:var(--gold-grad);color:#1a1405;border-color:transparent}
+.es-row{background:#fffdf8;border:1px solid var(--border)}
+.es-row:hover{border-color:#a57a36}
+.es-row .nm b{color:#1b2437}
+.es-badge.admin{background:rgba(47,95,168,.12);color:var(--admin)}
+.es-badge.goods{background:rgba(47,125,87,.12);color:var(--goods)}
+
+@media(max-width:640px){
+  .sidebar{background:linear-gradient(170deg,#0b1a3d,#16284f 60%,#0b1a3d)}
+}
+}
 </style>
 </head>
 <body>
@@ -691,7 +910,7 @@ input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 
     <div class="cfg-title">⚙️ ຕັ້ງຄ່າ Supabase</div>
     <div class="cfg-desc">
       ໃສ່ຂໍ້ມູນ Supabase ຂອງທ່ານ ເພື່ອໃຫ້ຂໍ້ມູນຖືກເກັບ Cloud ແລະ ໃຊ້ຮ່ວມກັນໄດ້ຫຼາຍຄົນ.<br><br>
-      📌 <b style="color:var(--gold-lt)">ສຳລັບດາວອນ:</b> ໃຊ້ Project <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:3px">snyyhmeprngskneaaubb</code> ທີ່ມີຢູ່ແລ້ວ
+      📌 <b style="color:var(--gold-lt)">ສຳລັບດາວອນ:</b> ໃຊ້ Project <code style="background:rgba(11,26,61,0.07);padding:1px 6px;border-radius:3px">snyyhmeprngskneaaubb</code> ທີ່ມີຢູ່ແລ້ວ
     </div>
     <div class="cfg-field">
       <label>SUPABASE URL</label>
@@ -1276,7 +1495,7 @@ function buildM() {
         <div id="esDelta"></div>
       </div>
       <div><div class="es-ring">
-        <svg viewBox="0 0 200 200"><circle class="trk" cx="100" cy="100" r="78"/><circle class="seg" id="esSegA" cx="100" cy="100" r="78" stroke="#7fb2ff"/><circle class="seg" id="esSegG" cx="100" cy="100" r="78" stroke="#6fd49c"/></svg>
+        <svg viewBox="0 0 200 200"><circle class="trk" cx="100" cy="100" r="78"/><circle class="seg" id="esSegA" cx="100" cy="100" r="78" stroke="#2f5fa8"/><circle class="seg" id="esSegG" cx="100" cy="100" r="78" stroke="#2f7d57"/></svg>
         <div class="es-ring-mid"><div class="t" id="esRingT">ລວມທັງໝົດ</div><div class="v es-mono" id="esRingV">0</div><div class="p" id="esRingP"></div></div>
       </div></div>
     </div>
@@ -1346,8 +1565,8 @@ function esRender(){
 
   // ສອງປະເພດ
   const SP = [
-    { k:'admin', h:'ຈ່າຍບໍລິຫານ', s:'ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', v:a, col:'#7fb2ff', ic:'<path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-5h4v5"/>' },
-    { k:'goods', h:'ຈ່າຍຄ່າສິນຄ້າ', s:'ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', v:g, col:'#6fd49c', ic:'<path d="M3.5 8.2 12 4l8.5 4.2-8.5 4.2z"/><path d="M3.5 8.2v7.6L12 20l8.5-4.2V8.2"/>' },
+    { k:'admin', h:'ຈ່າຍບໍລິຫານ', s:'ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', v:a, col:'#2f5fa8', ic:'<path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-5h4v5"/>' },
+    { k:'goods', h:'ຈ່າຍຄ່າສິນຄ້າ', s:'ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', v:g, col:'#2f7d57', ic:'<path d="M3.5 8.2 12 4l8.5 4.2-8.5 4.2z"/><path d="M3.5 8.2v7.6L12 20l8.5-4.2V8.2"/>' },
   ];
   document.getElementById('esSplits').innerHTML = SP.map(x => {
     const pc = tot ? Math.round(x.v/tot*100) : 0;
@@ -1368,10 +1587,10 @@ function esRender(){
   document.getElementById('esBars').innerHTML = show6.map(k => {
     const t = esSum(months[k],'all',c), h = t/mx*100;
     return `<button class="es-col ${k===ES.month?'on':''}" onclick="esPick('${k}')">
-      <div class="v es-mono" style="color:${k===ES.month?'#f3d99b':'rgba(243,234,210,.6)'}">${fmt(t)}</div>
+      <div class="v es-mono" style="color:${k===ES.month?'#8a6224':'#57607a'}">${fmt(t)}</div>
       <div class="es-stack" style="height:${Math.max(h,1)}%">
-        <i style="background:#6fd49c" data-h="${t?esSum(months[k],'goods',c)/t*100:0}"></i>
-        <i style="background:#7fb2ff" data-h="${t?esSum(months[k],'admin',c)/t*100:0}"></i>
+        <i style="background:#2f7d57" data-h="${t?esSum(months[k],'goods',c)/t*100:0}"></i>
+        <i style="background:#2f5fa8" data-h="${t?esSum(months[k],'admin',c)/t*100:0}"></i>
       </div><div class="n">${esName(k)}</div></button>`; }).join('');
   requestAnimationFrame(()=>document.querySelectorAll('.es-stack i').forEach(i2=>i2.style.height=i2.dataset.h+'%'));
 
@@ -1392,8 +1611,8 @@ function esList(){
   document.getElementById('esList').innerHTML = rows.length ? rows.map(r => `
     <div class="es-row"><div class="date es-mono">${r.date.slice(5)}</div>
       <div class="nm"><b>${escHtml(r.description||r.category||'—')}</b><span class="es-badge ${r.type}">${escHtml(r.category||(r.type==='admin'?'ບໍລິຫານ':'ຄ່າສິນຄ້າ'))}</span></div>
-      <div class="amt es-mono" style="color:${r.type==='admin'?'#9dc4ff':'#7fe0b0'}">${fmt(r.amount)}</div>
-      <div class="sh"><i style="background:${r.type==='admin'?'#7fb2ff':'#6fd49c'}" data-w="${Number(r.amount)/mx*100}"></i></div>
+      <div class="amt es-mono" style="color:${r.type==='admin'?'#2f5fa8':'#2f7d57'}">${fmt(r.amount)}</div>
+      <div class="sh"><i style="background:${r.type==='admin'?'#2f5fa8':'#2f7d57'}" data-w="${Number(r.amount)/mx*100}"></i></div>
     </div>`).join('') : `<div class="es-empty">ບໍ່ພົບລາຍການສະກຸນ ${lbl}</div>`;
   requestAnimationFrame(()=>document.querySelectorAll('.es-row .sh i').forEach(i2=>i2.style.width=i2.dataset.w+'%'));
 }
