@@ -883,7 +883,7 @@ body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{b
 }
 
   /* ================= ຊອງມອບເງິນ · Envelope — ໜ້າມອບເງິນຂອງພະນັກງານ =================
-     ທີມດຽວກັບໜ້າ login (ກະຈົກ + ທອງ) · ປິດຜະນຶກດ້ວຍການລາກຕາທອງແທນປຸ່ມກົດ */
+     ທີມດຽວກັບໜ້າ login (ກະຈົກ + ທອງ) · ບັນທຶກດ້ວຍການລາກຕາທອງແທນປຸ່ມກົດ */
   .env{--eg:#d4a85a;--eg2:#f3d99b;--eink:#f2e9d4;
     position:relative;color:var(--eink);
     background:radial-gradient(120% 78% at 50% -8%,#22386b 0%,#0e1b3c 46%,#070d21 100%)!important;}
@@ -1510,7 +1510,7 @@ function formBodyHTML() {
     + '<div class="env-steps">'
       + '<div class="env-step'+(hasAmt?' on':'')+'" id="env-s1"><div class="t"><i></i></div><div class="l">ໃສ່ຈຳນວນ</div></div>'
       + '<div class="env-step'+(hasImg?' on':'')+'" id="env-s2"><div class="t"><i></i></div><div class="l">ຮູບບິນ</div></div>'
-      + '<div class="env-step" id="env-s3"><div class="t"><i></i></div><div class="l">ປິດຜະນຶກ</div></div>'
+      + '<div class="env-step" id="env-s3"><div class="t"><i></i></div><div class="l">ສຳເລັດ</div></div>'
     + '</div>'
     + '<div class="env-card">'
       + '<div class="env-dept">'
@@ -1531,7 +1531,7 @@ function formBodyHTML() {
       + '<div class="env-track'+(hasAmt?'':' off')+'" id="env-track">'
         + '<i class="fill" id="env-fill"></i>'
         + '<div class="hint" id="env-hint"></div>'
-        + '<div class="env-seal" id="env-seal" role="button" aria-label="ລາກເພື່ອປິດຜະນຶກ ແລະ ສົ່ງ">✦</div>'
+        + '<div class="env-seal" id="env-seal" role="button" aria-label="ລາກເພື່ອບັນທຶກ ແລະ ສົ່ງ">✦</div>'
       + '</div>'
     + '</div>';
 }
@@ -1545,7 +1545,7 @@ function curAmtRowHTML(c) {
     + '</div>';
 }
 
-// ── ຊອງມອບເງິນ: ຂັ້ນຕອນ + ການລາກປິດຜະນຶກ ──────────────────
+// ── ຊອງມອບເງິນ: ຂັ້ນຕອນ + ການລາກເພື່ອບັນທຶກ ──────────────────
 function envStepSync() {
   const hasAmt = anyAmount(), hasImg = !!staffState.img;
   const s1 = document.getElementById("env-s1"), s2 = document.getElementById("env-s2");
@@ -1555,7 +1555,7 @@ function envStepSync() {
   if (track) track.classList.toggle("off", !hasAmt);
   if (hint && !staffState.saving) {
     hint.innerHTML = hasAmt
-      ? '<span>ລາກເພື່ອປິດຜະນຶກ &amp; ສົ່ງ →</span>'
+      ? '<span>ລາກເພື່ອບັນທຶກ &amp; ສົ່ງ →</span>'
       : 'ໃສ່ຈຳນວນເງິນກ່ອນ';
   }
   return hasAmt;
@@ -1565,7 +1565,7 @@ function envStepSync() {
 function envSetSending(on, label) {
   const hint = document.getElementById("env-hint");
   const seal = document.getElementById("env-seal");
-  if (hint) { hint.style.opacity = "1"; hint.innerHTML = on ? (label || "ກຳລັງສົ່ງ...") : '<span>ລາກເພື່ອປິດຜະນຶກ &amp; ສົ່ງ →</span>'; }
+  if (hint) { hint.style.opacity = "1"; hint.innerHTML = on ? (label || "ກຳລັງສົ່ງ...") : '<span>ລາກເພື່ອບັນທຶກ &amp; ສົ່ງ →</span>'; }
   if (seal) seal.style.cursor = on ? "default" : "grab";
   if (!on) {
     const s3 = document.getElementById("env-s3"); if (s3) s3.classList.remove("on");
@@ -1745,7 +1745,7 @@ function showDone(entries) {
   ).join("");
   app.insertAdjacentHTML("beforeend", `<div class="env-done">
     <div class="env-wax">✦</div>
-    <h3>ປິດຜະນຶກແລ້ວ</h3>
+    <h3>ສຳເລັດແລ້ວ</h3>
     <div class="sub">${d.name} · ລໍຖ້າຫົວໜ້າອະນຸມັດ</div>
     ${amtHTML}
     <button class="again" onclick="backToDept()">ສົ່ງລາຍການໃໝ່</button>
@@ -3360,7 +3360,7 @@ function renderStaffBankForm() {
     <div class="env-steps">
       <div class="env-step" id="env-s1"><div class="t"><i></i></div><div class="l">ໃສ່ຈຳນວນ</div></div>
       <div class="env-step" id="env-s2"><div class="t"><i></i></div><div class="l">ຮູບສະລິບ</div></div>
-      <div class="env-step" id="env-s3"><div class="t"><i></i></div><div class="l">ປິດຜະນຶກ</div></div>
+      <div class="env-step" id="env-s3"><div class="t"><i></i></div><div class="l">ສຳເລັດ</div></div>
     </div>
     <div class="env-card">
       <div class="env-dept">
@@ -3392,7 +3392,7 @@ function renderStaffBankForm() {
       <div class="env-track off" id="env-track">
         <i class="fill" id="env-fill"></i>
         <div class="hint" id="env-hint">ໃສ່ຈຳນວນເງິນກ່ອນ</div>
-        <div class="env-seal" id="env-seal" role="button" aria-label="ລາກເພື່ອປິດຜະນຶກ ແລະ ມອບເຂົ້າທະນາຄານ">✦</div>
+        <div class="env-seal" id="env-seal" role="button" aria-label="ລາກເພື່ອບັນທຶກ ແລະ ມອບເຂົ້າທະນາຄານ">✦</div>
       </div>
     </div>
   </div></div>`);
@@ -3421,7 +3421,7 @@ function sbankStepSync() {
   if (track) track.classList.toggle("off", num <= 0);
   if (hint && !_staffBankSaving) {
     hint.innerHTML = num > 0
-      ? '<span>ລາກເພື່ອປິດຜະນຶກ &amp; ສົ່ງ →</span>'
+      ? '<span>ລາກເພື່ອບັນທຶກ &amp; ສົ່ງ →</span>'
       : 'ໃສ່ຈຳນວນເງິນກ່ອນ';
   }
 }
@@ -3512,7 +3512,7 @@ function showStaffBankDone(num, cur) {
   if (header) { header.classList.add("env-head"); app.appendChild(header); }
   app.insertAdjacentHTML("beforeend", `<div class="env-done">
     <div class="env-wax">✦</div>
-    <h3>ປິດຜະນຶກແລ້ວ</h3>
+    <h3>ສຳເລັດແລ້ວ</h3>
     <div class="sub">ມອບເຂົ້າທະນາຄານ${d ? " · " + d.name : ""} · ເຂົ້າບັນຊີຫົວໜ້າ</div>
     <div class="amt ${cur === "THB" ? "thb" : cur === "USD" ? "usd" : ""}">${fmtAmt(num, cur)}</div>
     <button class="again" onclick="backToDept()">ກັບໜ້າຫຼັກ</button>
