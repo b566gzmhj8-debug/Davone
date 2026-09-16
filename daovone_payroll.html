@@ -498,9 +498,9 @@
   .summary-bar { background:#fffdf8; border:1px solid var(--border); border-radius:14px; overflow:hidden;
     box-shadow:0 4px 16px rgba(27,36,55,.07); }
   .sum-box { background:transparent; border-color:var(--border); padding:16px; }
-  .sum-box .label { color:#57607a; }
+  .sum-box .label { color:#4a5468; font-size:.78rem; font-weight:600; }
   .sum-box .label .ico { color:#a57a36; }
-  .sum-box .value { font-family:inherit; font-size:1.2rem; color:#0b1a3d; }
+  .sum-box .value { font-family:inherit; font-size:1.24rem; color:#0b1a3d; }
   .sum-box.red .value { color:#b3382a; }
   .sum-box.gold .value { color:#8a6224; }
   #sum-paid { color:#2f7d57 !important; }
@@ -510,29 +510,34 @@
     box-shadow:0 4px 16px rgba(27,36,55,.07); }
   #admin-panel .card h2 { font-family:inherit; color:#0b1a3d; font-size:1.06rem; border-bottom:1px solid #d4a85a; }
   #admin-panel .card h2 .ico { color:#a57a36; }
-  #emp-table thead th { background:#f6f1e6; color:#57607a; border-bottom:1px solid #d4a85a; font-weight:600; }
+  /* ── ໜັງສືໃນຕາຕະລາງ: ໃຫຍ່ຂຶ້ນ + ເຂັ້ມຂຶ້ນ ອ່ານງ່າຍທັງວັນ ── */
+  #emp-table { font-size:.93rem; }
+  #emp-table thead th { background:#f6f1e6; color:#0b1a3d; border-bottom:2px solid #d4a85a;
+    font-weight:700; font-size:.84rem; letter-spacing:0; line-height:1.45; padding:12px 8px; }
   #emp-table thead th:first-child { border-radius:10px 0 0 0; }
   #emp-table thead th:last-child { border-radius:0 10px 0 0; }
   #emp-table tbody tr { background:transparent; }
   #emp-table tbody tr:nth-child(even) { background:#fbf8f1; }
   #emp-table tbody tr:hover { background:#f6f1e6; }
-  #emp-table tbody td { border-bottom:1px solid #eee6d6; color:#1b2437; }
-  .hdr-reset { border-color:#d9cdb0; background:#fffdf8; color:#8a6224; }
+  #emp-table tbody td { border-bottom:1px solid #eee6d6; color:#1b2437; padding:9px 6px; }
+  .hdr-reset { border-color:#d9cdb0; background:#fffdf8; color:#8a6224; font-size:.68rem; padding:3px 8px; }
   .hdr-reset:hover { background:#f4ecd9; border-color:#a57a36; }
 
   #admin-panel input.cell-input, .modal-backdrop input.cell-input, .bonus-row input, .bonus-row textarea, .wa-row .wa-phone {
-    background:#fffdf8; border:1px solid #ded6c4; border-radius:9px; color:#1b2437; }
+    background:#fffdf8; border:1px solid #d5cbb6; border-radius:9px; color:#1b2437; font-size:.9rem; padding:7px 8px; }
   #admin-panel input.cell-input:focus, .modal-backdrop input.cell-input:focus, .bonus-row input:focus, .bonus-row textarea:focus {
     border-color:#a57a36; background:#fff; box-shadow:0 0 0 3px rgba(165,122,54,.15); }
   #admin-panel input::placeholder, .modal-backdrop input::placeholder, .modal-backdrop textarea::placeholder { color:#a9a294; }
   #admin-panel input[type=number] { color-scheme:light; }
-  .net-cell { font-family:inherit; font-size:.95rem; color:#0b1a3d; font-weight:700; }
-  .net-cell.negative { color:#b3382a; }
-  .gross-cell { font-weight:600; color:#1b2437; white-space:nowrap; }
-  .adv-lbl { font-size:9px; white-space:nowrap; width:34px; flex-shrink:0; color:#8a8fa2; }
+  /* ໃຊ້ #emp-table ນຳ ເພື່ອໃຫ້ຊະນະ #emp-table tbody td (ສະເພາະເຈາະຈົງສູງກວ່າ) */
+  #emp-table .net-cell, .net-cell { font-family:inherit; font-size:1.02rem; color:#0b1a3d; font-weight:700; }
+  #emp-table .net-cell.negative, .net-cell.negative { color:#b3382a; }
+  #emp-table .gross-cell, .gross-cell { font-weight:700; font-size:.95rem; color:#0b1a3d; white-space:nowrap; }
+  .adv-lbl { font-size:10px; font-weight:600; white-space:nowrap; width:36px; flex-shrink:0; color:#57607a; }
   .adv-lbl.cut { color:#b3382a; }
-  #admin-panel input.cell-input.adv-bal { color:#8a6224; font-size:12px; }
-  #admin-panel input.cell-input.adv-cut { color:#b3382a; }
+  #admin-panel input.cell-input.adv-bal { color:#8a6224; font-size:.82rem; }
+  #admin-panel input.cell-input.adv-cut { color:#b3382a; font-size:.82rem; }
+  .bonus-badge { font-size:.8rem; }
   .bonus-badge { background:#f4ecd9; color:#8a6224; border:1px solid #d9cdb0; border-radius:10px; padding:5px 10px; }
   .bonus-badge:hover { background:#ecdfc2; }
   .bonus-add { background:transparent; color:#57607a; border:1px dashed #d0c5ab; border-radius:10px; }
@@ -583,6 +588,13 @@
     .admin-header h1 { font-size:1.08rem; }
     .admin-header .logo-circle { width:40px; height:40px; margin-right:10px; }
     #admin-panel .card, .summary-bar { border-radius:12px; }
+    /* ມືຖື: ຍັງໃຫ້ອ່ານອອກ (ຕາຕະລາງເລື່ອນຊ້າຍ-ຂວາໄດ້ຢູ່ແລ້ວ) */
+    #emp-table { font-size:.86rem; }
+    #emp-table thead th { font-size:.8rem; padding:10px 6px; }
+    #emp-table tbody td { padding:8px 5px; }
+    #admin-panel input.cell-input { font-size:.84rem; padding:6px 7px; }
+    .net-cell { font-size:.95rem; }
+    .gross-cell { font-size:.88rem; }
   }
   }
   /* ══════════ SLIP THEME — ໃບຮັບເງິນໂທນດຽວກັບ Hub (ນ້ຳເງິນເຂັ້ມ + ທອງ ເທິງເຈ້ຍຂາວ) ══════════ */
