@@ -3640,11 +3640,16 @@
     if(!w){ alert("ບຣາວເຊີບລັອກປັອບອັບ ກະລຸນາອະນຸຍາດເພື່ອພິມບິນ ແລ້ວລອງໃໝ່"); return; }
     // the shop seal, taken from the app's own icon so the printed bill carries the brand
     var logo = new URL("assets/apple-touch-icon.png", location.href).href;
+    var isA5 = ((opts && opts.page) || "A5") !== "A4";
     var html =
       '<!DOCTYPE html><html lang="lo"><head><meta charset="UTF-8"><title>'+title+'</title>'+
       '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&display=swap" rel="stylesheet">'+
       '<style>'+
-      '@page{ size:'+((opts && opts.page) || "A5")+'; margin:'+((opts && opts.margin) || "10mm")+'; }'+
+      (isA5
+        // A5: no page margin on the first page so the navy header bleeds to the top/left/right edges;
+        // the side gutters come from the body padding instead
+        ? '@page{ size:A5; margin:8mm 0; } @page :first{ margin-top:0; }'
+        : '@page{ size:'+((opts && opts.page) || "A5")+'; margin:'+((opts && opts.margin) || "10mm")+'; }')+
       "body{ font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif; color:#1A1A1A; font-size:13px; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }"+
       /* navy letterhead with the shop seal, closed by a gold hairline */
       ".shop-header{display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#122A55 0%,#1E4178 100%);color:#FFF;padding:11px 13px;border-radius:8px 8px 4px 4px;margin:0;break-inside:avoid;}"+
@@ -3706,7 +3711,12 @@
       "html{height:100%;}"+
       "body{box-sizing:border-box;}"+
       "@media screen{ body{padding:16px 18px;} }"+
-      "body.a5{display:flex;flex-direction:column;min-height:100%;font-size:15px;}"+
+      "body.a5{display:flex;flex-direction:column;min-height:100%;font-size:15px;padding:0 9mm 8mm;}"+
+      "body.a5 > *{max-width:100%;min-width:0;}"+
+      /* full-bleed header: pulled out over the side gutters, square corners, flush with the paper edge */
+      "body.a5 .shop-header{margin:0 -9mm;max-width:none;border-radius:0;padding:7mm 9mm 5mm;}"+
+      "body.a5 .head-rule{margin:0 -9mm 16px;max-width:none;border-radius:0;}"+
+      "body.a5 table{table-layout:auto;} body.a5 td:nth-child(2){overflow-wrap:anywhere;}"+
       "body.a5 > *{flex:none;}"+
       "body.a5 .signs{margin-top:auto;padding-top:26px;}"+
       "body.a5 .shop-logo{width:54px;height:54px;}"+
@@ -3730,7 +3740,7 @@
       "body.a4 .cust{font-size:14px;padding:12px 15px;}"+
       "body.a4 .grand{font-size:21px;padding:13px 16px;} body.a4 .grand span:last-child{font-size:24px;}"+
       "body.a4 .sign-line{height:56px;} body.a4 .sign-label{font-size:14px;} body.a4 .sign-sub{font-size:12.5px;}"+
-      '</style></head><body class="'+(((opts && opts.page) || "A5") === "A4" ? "a4" : "a5")+'">'+
+      '</style></head><body class="'+(isA5 ? "a5" : "a4")+'">'+
       '<div class="shop-header">'+
         '<img class="shop-logo" src="'+logo+'" alt="" onerror="this.style.display=\'none\'">'+
         '<div class="shop-id">'+
