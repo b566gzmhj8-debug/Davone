@@ -17,13 +17,13 @@
 })();
 </script>
 <title>Davone Shop - ລະບົບສະຕັອກ &amp; ບິນຂາຍ</title>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3">
-<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png?v=3">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png?v=3">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=3">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=3">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3">
-<link rel="shortcut icon" href="favicon.ico?v=3">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
+<link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png?v=3">
+<link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png?v=3">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=3">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=3">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=3">
+<link rel="shortcut icon" href="assets/favicon.ico?v=3">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -557,7 +557,7 @@
   <div id="mainScreen" style="display:none;flex-direction:column;flex:1;">
     <header>
       <div class="head-left">
-        <div class="shop-logo"><img src="icon-512.png" alt="Davone"></div>
+        <div class="shop-logo"><img src="assets/icon-512.png" alt="Davone"></div>
         <div>
           <div class="title">DAVONE SHOP</div>
           <div class="role" id="roleLabel"></div>
@@ -747,7 +747,7 @@ function moneyCur(n, c){ return fmtMoney(n) + ' ' + curLabel(c); }
 /* ຫົວກະດາດ (ຊື່ຮ້ານ + ສາຂາ + ເບີໂທ + ທີ່ຢູ່) ໃຊ້ຮ່ວມກັນທັງໜ້າຈໍ ແລະ ໜ້າພິມ */
 function shopLogoUrl(){
   /* ໜ້າຕ່າງພິມເປັນ about:blank ຕ້ອງໃຊ້ URL ເຕັມ ຮູບໂລໂກ້ຈຶ່ງຈະອອກ */
-  try{ return new URL('icon-512.png', location.href).href; }catch(e){ return 'icon-512.png'; }
+  try{ return new URL('assets/icon-512.png', location.href).href; }catch(e){ return 'assets/icon-512.png'; }
 }
 function shopHeaderHtml(){
   return '<div class="shop-header">' +
