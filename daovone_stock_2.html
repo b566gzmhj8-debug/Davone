@@ -187,7 +187,7 @@
   .paper .shop-logo img{width:100%;height:100%;display:block;object-fit:cover;}
   .paper .shop-id{flex:1;min-width:0;}
   .paper .shop-name{font-size:14.5px;font-weight:700;margin:0;line-height:1.45;color:#fff;}
-  .paper .shop-branch{font-weight:700;color:#f0d28a;}
+  .paper .shop-branch{display:block;font-size:13px;font-weight:700;color:#f0d28a;margin:2px 0 0;line-height:1.4;}
   .paper .shop-meta{font-size:11px;color:rgba(255,255,255,.78);line-height:1.6;margin:3px 0 0;}
   .paper .shop-rule{height:4px;border-radius:3px;margin:7px 0 0;background:linear-gradient(90deg,#a8801f,#f0d28a 45%,#a8801f);}
   .paper h1{font-size:19px;font-weight:700;margin:22px 0 4px;text-align:center;color:#14265c;display:block;font-family:inherit;}
@@ -753,8 +753,8 @@ function shopHeaderHtml(){
   return '<div class="shop-header">' +
       '<div class="shop-logo"><img src="' + escHtml(shopLogoUrl()) + '" alt=""></div>' +
       '<div class="shop-id">' +
-        '<p class="shop-name">' + escHtml(SHOP_INFO.name) +
-          ' <span class="shop-branch">(' + escHtml(SHOP_INFO.branch) + ')</span></p>' +
+        '<p class="shop-name">' + escHtml(SHOP_INFO.name) + '</p>' +
+        '<p class="shop-branch">(' + escHtml(SHOP_INFO.branch) + ')</p>' +
         '<p class="shop-meta">' + escHtml(SHOP_INFO.tel) + '</p>' +
         '<p class="shop-meta">' + escHtml(SHOP_INFO.address) + '</p>' +
       '</div>' +
@@ -789,7 +789,7 @@ function printDoc(title, bodyHtml, opts){
     '.shop-logo img{width:100%;height:100%;display:block;object-fit:cover;}',
     '.shop-id{flex:1;min-width:0;}',
     '.shop-name{font-size:14.5px;font-weight:700;margin:0;line-height:1.45;color:#fff;}',
-    '.shop-branch{font-weight:700;color:#f0d28a;}',
+    '.shop-branch{display:block;font-size:13px;font-weight:700;color:#f0d28a;margin:2px 0 0;line-height:1.4;}',
     '.shop-meta{font-size:11px;color:rgba(255,255,255,.78);line-height:1.6;margin:3px 0 0;}',
     '.shop-rule{height:4px;border-radius:3px;margin:7px 0 0;background:linear-gradient(90deg,#a8801f,#f0d28a 45%,#a8801f);}',
     'h1{font-size:19px;font-weight:700;margin:22px 0 4px;text-align:center;color:#14265c;display:block;font-family:inherit;}',
