@@ -425,6 +425,15 @@
   .ps-head input{margin:0;}
   .ps-addr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
   .ps-head-tr{grid-template-columns:1.4fr 1.4fr 170px auto;}
+  .ps-head-rcv{grid-template-columns:minmax(0,1.6fr) 180px auto;}
+  .ps-entry-row .f-cur{flex:0 0 160px;}
+  .ps-entry-row .f-cost{flex:0 0 190px;}
+  .ps-entry textarea{margin:0;}
+  .ps-rate{margin-top:12px;padding:11px 14px;background:#faf6ec;border:1px solid #eee5d3;border-radius:12px;}
+  .ps-rate-in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .ps-rate-in label{margin:0;font-size:12.5px;color:#57607a;}
+  .ps-rate-in input{width:130px;margin:0;text-align:right;}
+  .ps-rate-note{font-size:11px;margin-top:5px;}
   .ps-meta{text-align:right;font-size:12px;color:#57607a;line-height:1.7;white-space:nowrap;}
   .ps-meta b{color:#8a6224;}
   .ps-meta span{display:block;}
@@ -517,12 +526,16 @@
   @media (max-width:760px){
     .ps-table th,.ps-table td{padding:8px 4px;font-size:13px;}
     .ps-table-sell th:nth-child(4),.ps-table-sell td:nth-child(4){display:none;}
+    .ps-table-rcv th:nth-child(5),.ps-table-rcv td:nth-child(5){display:none;}
+    .ps-table-rcv td:nth-child(3){word-break:break-all;}
+    .ps-table-rcv td.r{white-space:normal;}
   }
   @media (max-width:900px){
-    .ps-head,.ps-head-tr{grid-template-columns:1fr;}
+    .ps-head,.ps-head-tr,.ps-head-rcv{grid-template-columns:1fr;}
     .ps-meta{text-align:left;}
     .ps-entry-row .f-model,.ps-entry-row .f-unit,.ps-entry-row .f-qp,
-    .ps-entry-row .f-qty,.ps-entry-row .f-add{flex:1 1 100%;}
+    .ps-entry-row .f-qty,.ps-entry-row .f-add,
+    .ps-entry-row .f-cur,.ps-entry-row .f-cost{flex:1 1 100%;}
     .ps-entry .f-qp{grid-template-columns:1fr 1fr;}
     .ps-foot{grid-template-columns:1fr;}
     .ps-big-amount{font-size:27px;}
@@ -2053,52 +2066,76 @@ async function renderReceive(main){
   const historyMonth = main.dataset.rcvMonth || todayStr().slice(0,7);
   const canSeeCost = currentRole === 'admin';
   main.innerHTML = `
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ຮັບສິນຄ້າເຂົ້າສະຕັອກ</h3>
-      <label>ຜູ້ສະໜອງ / ຈາກໃສ</label>
-      <input id="r_supplier" placeholder="ຊື່ຜູ້ສະໜອງ (ຖ້າມີ)">
-      <label>ວັນທີ</label>
-      <input id="r_date" type="date" value="${todayStr()}">
-      <hr class="sep">
-      <label>ເລືອກສິນຄ້າ</label>
-      <select id="r_model">
-        <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
-      </select>
-      <div id="r_qtyBlock">
-        <label>ຈຳນວນ</label>
-        <input id="r_qty" type="number" value="1" min="1">
-      </div>
-      <div id="r_serialBlock" style="display:none;">
-        <label>ເລກເຄື່ອງ (ພິມແລ້ວກົດ Enter ເພື່ອເພີ່ມເຂົ້າລາຍການທັນທີ)</label>
-        <textarea id="r_serials" rows="3" placeholder="W95TD-00011&#10;W95TD-00012"></textarea>
-      </div>
-      ${canSeeCost ? `
-      <label>ຊື້ເປັນສະກຸນ</label>
-      <select id="r_currency">
-        <option value="LAK">ກີບ (LAK)</option>
-        <option value="THB">ບາດ (THB)</option>
-      </select>
-      <label id="r_cost_lbl">ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)</label>
-      <input id="r_cost" type="text" value="0">
-      <div id="r_rateBlock" style="display:none;">
-        <label>ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)</label>
-        <input id="r_rate" type="text" placeholder="ເຊັ່ນ 620">
-        <div class="muted" style="font-size:11px;margin-top:3px;" id="r_lockedPreview"></div>
-      </div>` : ''}
-      <button class="btn secondary" id="r_addItem"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າລາຍການ</button>
+    <div class="ps-seg" id="rcvSeg">
+      <button type="button" class="on" data-v="new">ຮັບສິນຄ້າເຂົ້າ</button>
+      <button type="button" data-v="hist">ປະຫວັດການຮັບເຂົ້າ</button>
     </div>
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການທີ່ຈະຮັບເຂົ້າ <span id="r_count" class="rcv-count-badge">${receiveCartCountText()}</span></h3>
-      <div id="r_cartList">${renderReceiveCart()}</div>
-      ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receiveCart.reduce((s,i)=>s+i.amount,0))}</div>` : ''}
-      <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກຮັບເຂົ້າ</button>
+    <div id="rcvNewView">
+      <div class="card ps-sheet">
+        <div class="ps-head ps-head-rcv">
+          <input id="r_supplier" placeholder="ຜູ້ສະໜອງ / ຈາກໃສ (ຖ້າມີ)">
+          <input id="r_date" type="date" value="${todayStr()}">
+          <div class="ps-meta">
+            <span>ໃບຮັບສິນຄ້າເຂົ້າສະຕັອກ</span>
+            <span class="mono">${fmtDateDMY(todayStr())}</span>
+          </div>
+        </div>
+        <div class="ps-entry">
+          <div class="ps-entry-row rcv">
+            <div class="f f-model">
+              <label>ລະຫັດ / ຊື່ສິນຄ້າ — ເລືອກເພື່ອເພີ່ມ</label>
+              <select id="r_model">
+                <option value="">-- ເລືອກສິນຄ້າ --</option>
+                ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="f f-qty" id="r_qtyBlock"><label>ຈຳນວນ</label><input id="r_qty" type="number" value="1" min="1"></div>
+            ${canSeeCost ? `
+            <div class="f f-cur"><label>ຊື້ເປັນສະກຸນ</label>
+              <select id="r_currency">
+                <option value="LAK">ກີບ (LAK)</option>
+                <option value="THB">ບາດ (THB)</option>
+              </select>
+            </div>
+            <div class="f f-cost"><label id="r_cost_lbl">ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)</label><input id="r_cost" type="text" value="0"></div>` : ''}
+            <div class="f f-add"><label>&nbsp;</label><button class="btn secondary" id="r_addItem">+ ເພີ່ມ</button></div>
+          </div>
+          ${canSeeCost ? `
+          <div class="ps-rate" id="r_rateBlock" style="display:none;">
+            <div class="ps-rate-in">
+              <label>ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)</label>
+              <input id="r_rate" type="text" placeholder="ເຊັ່ນ 620">
+            </div>
+            <div class="muted ps-rate-note" id="r_lockedPreview"></div>
+          </div>` : ''}
+          <div id="r_serialBlock" style="display:none;">
+            <label style="display:block;margin:12px 0 4px;font-size:12.5px;color:#57607a;">ເລກເຄື່ອງ (ພິມແລ້ວກົດ Enter ເພື່ອເພີ່ມເຂົ້າລາຍການທັນທີ)</label>
+            <textarea id="r_serials" rows="3" placeholder="W95TD-00011&#10;W95TD-00012"></textarea>
+          </div>
+        </div>
+        <p class="ps-list-head">ລາຍການທີ່ຈະຮັບເຂົ້າ</p>
+        <div class="ps-table-wrap" id="r_cartList">${renderReceiveCart()}</div>
+        <div class="ps-foot">
+          <div class="ps-big">
+            <p class="ps-big-label">${canSeeCost ? 'ມູນຄ່າລວມ (ຕົ້ນທຶນ)' : 'ຈຳນວນທີ່ຮັບເຂົ້າ'}</p>
+            <p class="ps-big-amount mono" id="r_bigAmount">0</p>
+          </div>
+          <div class="ps-sum">
+            <div class="ps-line"><span>ຈຳນວນລາຍການ</span><b class="mono" id="r_lineCount">0</b></div>
+            <div class="ps-line"><span>ຈຳນວນໜ່ວຍລວມ</span><b class="mono" id="r_unitCount">0</b></div>
+            <p class="ps-note">ບັນທຶກແລ້ວສິນຄ້າຈະເຂົ້າສະຕັອກທັນທີ${canSeeCost ? ' — ຕົ້ນທຶນຈະຖືກລ໋ອກໄວ້ຕາມອັດຕາມື້ນີ້' : ''}</p>
+            <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກຮັບເຂົ້າ →</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການຮັບເຂົ້າ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
-      <label>ເລືອກເດືອນ</label>
-      <input type="month" id="rcv_month" value="${historyMonth}">
-      <div id="rcv_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+    <div id="rcvHistView" style="display:none;">
+      <div class="card">
+        <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການຮັບເຂົ້າ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
+        <label>ເລືອກເດືອນ</label>
+        <input type="month" id="rcv_month" value="${historyMonth}">
+        <div id="rcv_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+      </div>
     </div>
   `;
   document.getElementById('rcv_month').addEventListener('change', (e)=>{
@@ -2106,6 +2143,15 @@ async function renderReceive(main){
     loadReceiveHistory(e.target.value);
   });
   loadReceiveHistory(historyMonth);
+  /* ສະຫຼັບລະຫວ່າງ ຮັບສິນຄ້າເຂົ້າ ກັບ ປະຫວັດການຮັບເຂົ້າ (ຄືແຖບຂອງໂອນສາຂາ) */
+  const rcvSeg = document.getElementById('rcvSeg');
+  rcvSeg.addEventListener('click', (e)=>{
+    const b = e.target.closest('button'); if(!b) return;
+    Array.from(rcvSeg.children).forEach(x=> x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('rcvNewView').style.display = b.dataset.v === 'new' ? '' : 'none';
+    document.getElementById('rcvHistView').style.display = b.dataset.v === 'hist' ? '' : 'none';
+  });
   if(canSeeCost) attachMoneyInput('r_cost', 0);
   const modelSel = document.getElementById('r_model');
   enableSearchableSelect(modelSel);
@@ -2208,10 +2254,6 @@ async function renderReceive(main){
       addedCount = qty;
     }
     document.getElementById('r_cartList').innerHTML = renderReceiveCart();
-    const totalEl = main.querySelector('.invoice-total');
-    if(totalEl) totalEl.textContent = 'ລວມ: ' + fmtMoney(receiveCart.reduce((s,i)=>s+i.amount,0));
-    const countEl = document.getElementById('r_count');
-    if(countEl) countEl.textContent = receiveCartCountText();
     bindReceiveCartRemove();
     toast(`ເພີ່ມ ${opt.textContent} ແລ້ວ (ລວມ ${receiveCartCountText()})`);
   });
@@ -2352,16 +2394,40 @@ function receiveCartCountText(){
   return units !== lines ? `${lines} ລາຍການ · ${units} ໜ່ວຍ` : `${lines} ລາຍການ`;
 }
 function renderReceiveCart(){
-  if(!receiveCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
   const canSeeCost = currentRole === 'admin';
+  const head = '<table class="ps-table ps-table-rcv"><thead><tr><th class="c">ລຳດັບ</th><th>ຊື່ສິນຄ້າ</th>'+
+    '<th>ເລກເຄື່ອງ</th><th class="c">ຈຳນວນ</th>'+
+    (canSeeCost ? '<th class="r">ຕົ້ນທຶນ/ໜ່ວຍ</th><th class="r">ຈຳນວນເງິນ</th>' : '')+
+    '<th></th></tr></thead><tbody>';
+  const cols = canSeeCost ? 7 : 5;
+  if(!receiveCart.length){
+    return head + '<tr class="ps-empty"><td colspan="'+cols+'">ຍັງບໍ່ມີລາຍການ — ເລືອກສິນຄ້າຂ້າງເທິງ ແລ້ວກົດ + ເພີ່ມ</td></tr></tbody></table>';
+  }
   /* ຮຽງລຳດັບ 1, 2, 3 ... ໃຫ້ ບໍ່ຕ້ອງນັບເອງ */
-  return receiveCart.map((it,idx)=> `
-    <div class="cart-item">
-      <span><span class="rcv-seq mono">${idx+1}.</span> ${it.model_name}${it.serial_no?(' · '+it.serial_no):(' × '+it.quantity)}${it.cost_currency==='THB' ? ' <span class="muted" style="font-size:11px;">(ຊື້ ' + fmtMoney(it.unit_cost_thb) + ' ບາດ @' + it.exchange_rate + ')</span>' : ''}</span>
-      <span>${canSeeCost ? fmtMoney(it.amount)+' ກີບ ' : ''}<span class="x" data-idx="${idx}">✕</span></span>
-    </div>`).join('');
+  const rows = receiveCart.map((it,idx)=>
+    `<tr><td class="c mono">${idx+1}</td>`+
+    `<td>${it.model_name}${it.cost_currency==='THB' && canSeeCost ? ' <span class="muted" style="font-size:11px;">(ຊື້ '+fmtMoney(it.unit_cost_thb)+' ບາດ @'+it.exchange_rate+')</span>' : ''}</td>`+
+    `<td class="mono muted">${it.serial_no || '—'}</td>`+
+    `<td class="c mono b">${it.quantity}</td>`+
+    (canSeeCost ? `<td class="r mono">${fmtMoney(it.unit_cost)}</td><td class="r mono b">${fmtMoney(it.amount)} ກີບ</td>` : '')+
+    `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
+  return head + rows + '</tbody></table>';
+}
+/* ຕົວເລກໃນແຖບລຸ່ມສຸດ (ມູນຄ່າລວມ / ຈຳນວນລາຍການ / ຈຳນວນໜ່ວຍ) */
+function updateReceiveCount(){
+  const big = document.getElementById('r_bigAmount');
+  if(!big) return;
+  const canSeeCost = currentRole === 'admin';
+  const units = receiveCart.reduce((s,i)=> s + (Number(i.quantity)||0), 0);
+  const total = receiveCart.reduce((s,i)=> s + (Number(i.amount)||0), 0);
+  big.textContent = canSeeCost ? (fmtMoney(total) + ' ກີບ') : fmtMoney(units);
+  const line = document.getElementById('r_lineCount');
+  if(line) line.textContent = receiveCart.length;
+  const unit = document.getElementById('r_unitCount');
+  if(unit) unit.textContent = fmtMoney(units);
 }
 function bindReceiveCartRemove(){
+  updateReceiveCount();
   document.querySelectorAll('#r_cartList .x').forEach(el=>{
     el.addEventListener('click', ()=>{
       receiveCart.splice(Number(el.dataset.idx),1);
