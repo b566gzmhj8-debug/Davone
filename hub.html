@@ -32,7 +32,7 @@
     --ivory:#f6f3ec; --card:#ffffff; --navy:#16233d; --navy-2:#1c2a48;
     --gold:#a9834b; --gold-light:#e9ddc4; --ink:#1c2430; --muted:#7a7568;
     --hair:rgba(28,36,48,.14);
-    --font-lao:'Davone Lao','Noto Sans Lao','Lao MN','Segoe UI',-apple-system,sans-serif;
+    --font-lao:'Lao MN','Davone Lao','Noto Sans Lao','Segoe UI',-apple-system,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{touch-action:manipulation;}
@@ -283,95 +283,106 @@
     .mn-card .ic{width:52px;height:52px;border-radius:14px;}
   }
 
-  /* ================= ຄວາມໜາ & ຂະໜາດຕົວອັກສອນ (ໃຫ້ຄືກັນທຸກເຄື່ອງ) ================= */
-  html,body,input,button,select,textarea,
-  #login-wrap,#menu-wrap,.lg-welcome,.serif,.back-btn,.module-bar .mtitle{
+  /* ================= ປັບສະເພາະເຄື່ອງທີ່ບໍ່ມີຟອນ 'Lao MN' (Windows / Android) =================
+     Mac / iPhone / iPad ມີ Lao MN ຢູ່ແລ້ວ → ໃຊ້ຂອງເດີມ ບໍ່ແຕະຫຍັງ
+     ເຄື່ອງອື່ນ → ໃຊ້ຟອນທີ່ຝັງໄວ້ + ປັບຄວາມໜາ/ຂະໜາດ ໃຫ້ຄືກັບ MacBook */
+  html.no-laomn,html.no-laomn body,html.no-laomn input,html.no-laomn button,html.no-laomn select,html.no-laomn textarea,html.no-laomn #login-wrap,html.no-laomn #menu-wrap,html.no-laomn .lg-welcome,html.no-laomn .serif,html.no-laomn .back-btn,html.no-laomn .module-bar .mtitle{
     font-family:var(--font-lao)!important;}
-  body{font-weight:600;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  html.no-laomn body{font-weight:600;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
     text-rendering:optimizeLegibility;font-synthesis-weight:none;}
-  input,button,textarea,select{font-weight:600;}
+  html.no-laomn input,html.no-laomn button,html.no-laomn textarea,html.no-laomn select{font-weight:600;}
 
   /* ໜ້າ login */
-  .lg-t1{font-weight:800;letter-spacing:.01em;}
-  .lg-t2{font-weight:800;}
-  .lg-t3{font-weight:600;color:rgba(233,221,196,.85);}
-  .lg-field label{font-weight:700;letter-spacing:.01em;}
-  .lg-field input{font-weight:700;}
-  .lg-field input::placeholder{font-weight:600;color:rgba(233,221,196,.5);}
-  .lg-row,.lg-check{font-weight:700;}
-  .lg-forgot{font-weight:700;}
-  .lg-btn{font-weight:800;letter-spacing:.01em;}
-  .faceid-btn{font-weight:700;}
-  .lg-secure{font-weight:700;}
-  .lg-foot{font-weight:600;}
-  .login-err{font-weight:700;}
+  html.no-laomn .lg-t1{font-weight:800;letter-spacing:.01em;}
+  html.no-laomn .lg-t2{font-weight:800;}
+  html.no-laomn .lg-t3{font-weight:600;color:rgba(233,221,196,.85);}
+  html.no-laomn .lg-field label{font-weight:700;letter-spacing:.01em;}
+  html.no-laomn .lg-field input{font-weight:700;}
+  html.no-laomn .lg-field input::placeholder{font-weight:600;color:rgba(233,221,196,.5);}
+  html.no-laomn .lg-row,html.no-laomn .lg-check{font-weight:700;}
+  html.no-laomn .lg-forgot{font-weight:700;}
+  html.no-laomn .lg-btn{font-weight:800;letter-spacing:.01em;}
+  html.no-laomn .faceid-btn{font-weight:700;}
+  html.no-laomn .lg-secure{font-weight:700;}
+  html.no-laomn .lg-foot{font-weight:600;}
+  html.no-laomn .login-err{font-weight:700;}
 
   /* ໜ້າເມນູ */
-  .mn-co b{font-weight:800;}
-  .mn-co small{font-weight:600;}
-  .logout-btn{font-weight:700;}
-  .mn-hello .greet{font-weight:700;}
-  .mn-hello .name{font-weight:800;}
-  .mn-date{font-weight:700;}
-  .faceid-setup{font-weight:700;}
-  .mn-sec{font-weight:700;}
-  .mn-card .txt b{font-weight:800;}
-  .mn-card .txt span{font-weight:600;color:rgba(243,234,210,.75);}
-  .mn-card .num{font-weight:700;}
-  .empty-note{font-weight:600;}
-  .mn-foot{font-weight:600;}
-  .back-btn,.module-bar .mtitle{font-weight:700;}
-  .lg-welcome h2{font-weight:800;}
+  html.no-laomn .mn-co b{font-weight:800;}
+  html.no-laomn .mn-co small{font-weight:600;}
+  html.no-laomn .logout-btn{font-weight:700;}
+  html.no-laomn .mn-hello .greet{font-weight:700;}
+  html.no-laomn .mn-hello .name{font-weight:800;}
+  html.no-laomn .mn-date{font-weight:700;}
+  html.no-laomn .faceid-setup{font-weight:700;}
+  html.no-laomn .mn-sec{font-weight:700;}
+  html.no-laomn .mn-card .txt b{font-weight:800;}
+  html.no-laomn .mn-card .txt span{font-weight:600;color:rgba(243,234,210,.75);}
+  html.no-laomn .mn-card .num{font-weight:700;}
+  html.no-laomn .empty-note{font-weight:600;}
+  html.no-laomn .mn-foot{font-weight:600;}
+  html.no-laomn .back-btn,html.no-laomn .module-bar .mtitle{font-weight:700;}
+  html.no-laomn .lg-welcome h2{font-weight:800;}
 
   /* ---------- ມືຖື: ຕົວອັກສອນເຕັມຕາ ບໍ່ໃຫ້ນ້ອຍກວ່າ MacBook ---------- */
   @media (max-width:640px){
-    .lg-t1{font-size:clamp(1.5rem,6.6vw,2rem);line-height:1.4;}
-    .lg-t2{font-size:clamp(1.1rem,4.8vw,1.28rem);}
-    .lg-t3{font-size:clamp(.92rem,3.8vw,1rem);}
-    .lg-field label{font-size:1.08rem;}
-    .lg-field input{font-size:1.08rem;height:58px;}   /* ≥16px ກັນ iOS ຊູມເອງ */
-    .lg-row{font-size:1.02rem;}
-    .lg-btn{font-size:1.14rem;height:60px;}
-    .faceid-btn{font-size:1rem;}
-    .lg-secure{font-size:.92rem;}
-    .lg-foot{font-size:.82rem;}
-    .mn-co b{font-size:1rem;} .mn-co small{font-size:.78rem;}
-    .logout-btn{font-size:.9rem;}
-    .mn-hello .greet{font-size:.98rem;}
-    .mn-sec{font-size:1rem;}
-    .mn-card .txt b{font-size:1.1rem;}
-    .mn-card .txt span{font-size:.86rem;}
-    .mn-date{font-size:.9rem;}
-    .mn-foot{font-size:.8rem;}
+    html.no-laomn .lg-t1{font-size:clamp(1.5rem,6.6vw,2rem);line-height:1.4;}
+    html.no-laomn .lg-t2{font-size:clamp(1.1rem,4.8vw,1.28rem);}
+    html.no-laomn .lg-t3{font-size:clamp(.92rem,3.8vw,1rem);}
+    html.no-laomn .lg-field label{font-size:1.08rem;}
+    html.no-laomn .lg-field input{font-size:1.08rem;height:58px;}   /* ≥16px ກັນ iOS ຊູມເອງ */
+    html.no-laomn .lg-row{font-size:1.02rem;}
+    html.no-laomn .lg-btn{font-size:1.14rem;height:60px;}
+    html.no-laomn .faceid-btn{font-size:1rem;}
+    html.no-laomn .lg-secure{font-size:.92rem;}
+    html.no-laomn .lg-foot{font-size:.82rem;}
+    html.no-laomn .mn-co b{font-size:1rem;} .mn-co small{font-size:.78rem;}
+    html.no-laomn .logout-btn{font-size:.9rem;}
+    html.no-laomn .mn-hello .greet{font-size:.98rem;}
+    html.no-laomn .mn-sec{font-size:1rem;}
+    html.no-laomn .mn-card .txt b{font-size:1.1rem;}
+    html.no-laomn .mn-card .txt span{font-size:.86rem;}
+    html.no-laomn .mn-date{font-size:.9rem;}
+    html.no-laomn .mn-foot{font-size:.8rem;}
   }
 
   /* ---------- Windows / ຈໍເຕ້ຍ: ຈັດຟອມໃຫ້ພໍດີໜ້າຈໍ ບໍ່ຕ້ອງເລື່ອນ ---------- */
   @media (min-width:641px) and (max-height:860px){
-    #login-wrap{padding-top:12px;}
-    .lg-logo{--s:clamp(84px,16vh,124px);}
-    .lg-brand{margin-bottom:12px;}
-    .lg-card{padding-top:22px;padding-bottom:18px;}
-    .lg-field{margin-bottom:14px;}
-    .lg-field input{height:54px;}
-    .lg-btn{height:56px;}
-    .lg-secure{margin-top:14px;}
-    .lg-foot{margin-top:10px;}
+    html.no-laomn #login-wrap{padding-top:12px;}
+    html.no-laomn .lg-logo{--s:clamp(84px,16vh,124px);}
+    html.no-laomn .lg-brand{margin-bottom:12px;}
+    html.no-laomn .lg-card{padding-top:22px;padding-bottom:18px;}
+    html.no-laomn .lg-field{margin-bottom:14px;}
+    html.no-laomn .lg-field input{height:54px;}
+    html.no-laomn .lg-btn{height:56px;}
+    html.no-laomn .lg-secure{margin-top:14px;}
+    html.no-laomn .lg-foot{margin-top:10px;}
   }
   @media (min-width:641px) and (max-height:700px){
-    .lg-logo{--s:76px;}
-    .lg-t1{font-size:1.5rem;}
-    .lg-t2{font-size:1.02rem;}
-    .lg-t3{font-size:.86rem;}
-    .lg-field{margin-bottom:11px;}
-    .lg-field input{height:50px;}
-    .lg-btn{height:52px;}
+    html.no-laomn .lg-logo{--s:76px;}
+    html.no-laomn .lg-t1{font-size:1.5rem;}
+    html.no-laomn .lg-t2{font-size:1.02rem;}
+    html.no-laomn .lg-t3{font-size:.86rem;}
+    html.no-laomn .lg-field{margin-bottom:11px;}
+    html.no-laomn .lg-field input{height:50px;}
+    html.no-laomn .lg-btn{height:52px;}
   }
   /* ແຖບເລື່ອນສີທອງ ໃຫ້ເຂົ້າກັບທີມ (Windows/Chrome) */
-  *{scrollbar-width:thin;scrollbar-color:rgba(212,168,90,.55) transparent;}
-  ::-webkit-scrollbar{width:10px;height:10px;}
-  ::-webkit-scrollbar-thumb{background:rgba(212,168,90,.55);border-radius:8px;}
-  ::-webkit-scrollbar-track{background:transparent;}
+  html.no-laomn *{scrollbar-width:thin;scrollbar-color:rgba(212,168,90,.55) transparent;}
+  html.no-laomn ::-webkit-scrollbar{width:10px;height:10px;}
+  html.no-laomn ::-webkit-scrollbar-thumb{background:rgba(212,168,90,.55);border-radius:8px;}
+  html.no-laomn ::-webkit-scrollbar-track{background:transparent;}
 </style>
+<script>
+/* ກວດວ່າເຄື່ອງນີ້ມີຟອນ 'Lao MN' ຂອງ Apple ຫຼືບໍ່ — ຖ້າບໍ່ມີ ຈຶ່ງເປີດຊຸດປັບຟອນສຳຮອງ */
+(function(){try{
+  var t='ກຂຄງຈຊຍດຕ ABCabc123',c=document.createElement('canvas').getContext('2d');
+  function w(f){c.font='72px '+f;return c.measureText(t).width;}
+  if(w('monospace')===w('"Lao MN",monospace') && w('serif')===w('"Lao MN",serif')){
+    document.documentElement.className+=' no-laomn';
+  }
+}catch(e){}})();
+</script>
 </head>
 <body>
 
