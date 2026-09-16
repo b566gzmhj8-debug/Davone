@@ -451,11 +451,13 @@
   .ps-table .x{cursor:pointer;color:#b3382a;font-weight:700;padding:2px 6px;}
   .ps-table .ps-empty td{padding:36px 6px;text-align:center;color:#8a8fa2;font-size:13px;border-bottom:none;}
   .ps-table .ps-sub td{font-size:13px;color:#7b8194;}
-  .ps-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,48%);border-top:1px solid #eee5d3;}
-  .ps-big{display:flex;flex-direction:column;justify-content:center;padding:18px 24px;
-    background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f6dc9c;}
-  .ps-big-label{margin:0;font-size:13px;color:rgba(255,255,255,.78);}
-  .ps-big-amount{margin:6px 0 0;font-size:40px;font-weight:800;line-height:1.05;overflow-wrap:anywhere;}
+  /* ແຖບລຸ່ມ: ບລ໊ອກຍອດເງິນ ສູງພໍດີເນື້ອໃນ (ບໍ່ຍືດເຕັມ) ບໍ່ໃຫ້ໃຫຍ່ເກີນ */
+  .ps-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,48%);align-items:start;border-top:1px solid #eee5d3;}
+  .ps-big{display:flex;flex-direction:column;justify-content:center;margin:14px 0 14px 16px;padding:15px 20px;
+    border-radius:14px;background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f6dc9c;
+    box-shadow:0 6px 18px rgba(11,26,61,.18);}
+  .ps-big-label{margin:0;font-size:12.5px;color:rgba(255,255,255,.78);}
+  .ps-big-amount{margin:5px 0 0;font-size:clamp(24px,2.5vw,32px);font-weight:800;line-height:1.1;overflow-wrap:anywhere;}
   .ps-sum{padding:14px 18px 16px;background:#fffdf8;}
   .ps-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:14px;color:#57607a;}
   .ps-line b{color:#0b1a3d;}
@@ -480,7 +482,8 @@
     .ps-entry-row,.ps-entry-row.tr{grid-template-columns:1fr;}
     .ps-entry .f-qp{grid-template-columns:1fr 1fr;}
     .ps-foot{grid-template-columns:1fr;}
-    .ps-big-amount{font-size:32px;}
+    .ps-big{margin:12px 12px 4px;}
+    .ps-big-amount{font-size:27px;}
     .ps-pay-top{grid-template-columns:1fr;}
     .ps-seg button{max-width:none;font-size:13px;}
   }
