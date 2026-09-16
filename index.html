@@ -1003,6 +1003,17 @@ body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{b
     background:linear-gradient(135deg,#f6dc9c,#d4a85a 60%,#a57a36);
     box-shadow:0 10px 28px rgba(212,168,90,.34);}
 
+  .env-note{display:flex;align-items:flex-start;gap:9px;background:rgba(243,217,155,.07);
+    border:1px solid rgba(243,217,155,.2);border-radius:14px;padding:11px 13px;
+    font-size:12px;line-height:1.55;color:rgba(243,234,210,.85);}
+  .env-note svg{width:15px;height:15px;flex:none;stroke:#f3d99b;fill:none;stroke-width:1.8;margin-top:2px;}
+  .env-curs{display:flex;gap:8px;}
+  .env-cur{flex:1;padding:11px 6px;border-radius:13px;cursor:pointer;font-family:inherit;
+    font-size:13px;font-weight:700;white-space:nowrap;transition:.2s;
+    background:rgba(6,13,31,.5);border:1px solid rgba(243,217,155,.18);color:rgba(243,234,210,.6);
+    -webkit-tap-highlight-color:transparent;}
+  .env-cur-on{background:linear-gradient(135deg,#f6dc9c,#d4a85a 62%,#a57a36);border-color:transparent;
+    color:#1a1405;box-shadow:0 5px 15px rgba(212,168,90,.28);}
   .env-opt{width:100%;background:rgba(16,27,54,.5);border:1px solid rgba(243,217,155,.17);
     border-radius:20px;padding:18px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;
     text-align:left;font-family:inherit;color:#f2e9d4;backdrop-filter:blur(14px);
@@ -1093,7 +1104,7 @@ const DEPTS = [
   { id:"sell_tractor",  name:"ເງິນຂາຍລົດແທັກເຕີ້",icon:null,  color:"#27ae60" },
   { id:"sell_plow",     name:"ເງິນຂາຍລົດໄຖນາ",   icon:null,  color:"#16a085" },
   { id:"sell_truck",    name:"ເງິນຂາຍລົດໃຫຍ່",    icon:null,  color:"#8e44ad" },
-  { id:"accessories",   name:"ຂາຍອຸປະກອນເສີມ",   icon:BOX_ICON,  color:"#d35400" },
+  { id:"accessories",   name:"ຂາຍອຸປະກອນເສີມ",   icon:"📦",  color:"#d35400" },
 ];
 
 let supa = null;
@@ -1551,10 +1562,10 @@ function envStepSync() {
 }
 
 // Shown while the record is being written to Supabase.
-function envSetSending(on) {
+function envSetSending(on, label) {
   const hint = document.getElementById("env-hint");
   const seal = document.getElementById("env-seal");
-  if (hint) { hint.style.opacity = "1"; hint.innerHTML = on ? "ກຳລັງສົ່ງ..." : '<span>ລາກເພື່ອປິດຜະນຶກ &amp; ສົ່ງ →</span>'; }
+  if (hint) { hint.style.opacity = "1"; hint.innerHTML = on ? (label || "ກຳລັງສົ່ງ...") : '<span>ລາກເພື່ອປິດຜະນຶກ &amp; ສົ່ງ →</span>'; }
   if (seal) seal.style.cursor = on ? "default" : "grab";
   if (!on) {
     const s3 = document.getElementById("env-s3"); if (s3) s3.classList.remove("on");
@@ -1570,8 +1581,10 @@ function envResetSeal() {
 
 // Drag the gold seal to the end of the track to submit — harder to fire by accident
 // than a plain button, which matters because a submit cannot be undone by staff.
-let _envMove = null, _envEnd = null;
-function initEnvSeal() {
+// cfg lets the bank form reuse the same gesture: { ready, busy, onSeal }.
+let _envMove = null, _envEnd = null, _envCfg = null;
+function initEnvSeal(cfg) {
+  _envCfg = cfg || { ready: () => anyAmount(), busy: () => staffState.saving, onSeal: () => submitRecord() };
   if (_envMove) { window.removeEventListener("mousemove", _envMove); window.removeEventListener("touchmove", _envMove); }
   if (_envEnd)  { window.removeEventListener("mouseup", _envEnd);   window.removeEventListener("touchend", _envEnd); }
   _envMove = _envEnd = null;
@@ -1589,7 +1602,7 @@ function initEnvSeal() {
     return p;
   };
   const start = ev => {
-    if (staffState.saving || !anyAmount()) return;
+    if (_envCfg.busy() || !_envCfg.ready()) return;
     dragging = true;
     span = track.clientWidth - seal.offsetWidth - 10;
     grabX = (ev.touches ? ev.touches[0].clientX : ev.clientX) - seal.offsetLeft;
@@ -1610,7 +1623,7 @@ function initEnvSeal() {
       setP(1);
       if (navigator.vibrate) navigator.vibrate(35);
       const s3 = document.getElementById("env-s3"); if (s3) s3.classList.add("on");
-      submitRecord();
+      _envCfg.onSeal();
     } else {
       setP(0);
       if (hint) hint.style.opacity = "1";
@@ -3340,56 +3353,92 @@ function renderStaffBankForm() {
   app.innerHTML = "";
   if (header) { header.classList.add("env-head"); app.appendChild(header); }
   const chip = d && DEPT_IMGS[d.id]
-    ? '<img src="'+DEPT_IMGS[d.id]+'" alt="" style="width:42px;height:42px;border-radius:12px;object-fit:cover">'
-    : '<span style="font-size:30px">'+((d&&d.icon)||BOX_ICON)+'</span>';
-  app.insertAdjacentHTML("beforeend", `<div class="form-scroll env" style="padding:22px 18px 100px">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      ${chip}
-      <div><div style="font-size:16px;font-weight:700;color:#fff"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg> ມອບເຂົ້າທະນາຄານ</div><div style="font-size:12px;color:rgba(243,234,210,.55)">${d?d.name:""}</div></div>
+    ? '<img src="'+DEPT_IMGS[d.id]+'" alt="">'
+    : '<span style="font-size:22px">'+((d&&d.icon)||BOX_ICON)+'</span>';
+  const bankIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg>';
+  app.insertAdjacentHTML("beforeend", `<div class="form-scroll env"><div class="env-in">
+    <div class="env-steps">
+      <div class="env-step" id="env-s1"><div class="t"><i></i></div><div class="l">ໃສ່ຈຳນວນ</div></div>
+      <div class="env-step" id="env-s2"><div class="t"><i></i></div><div class="l">ຮູບສະລິບ</div></div>
+      <div class="env-step" id="env-s3"><div class="t"><i></i></div><div class="l">ປິດຜະນຶກ</div></div>
     </div>
-    <div style="background:rgba(243,217,155,.08);border:1px solid rgba(243,217,155,.22);border-radius:12px;padding:11px 14px;font-size:12px;color:#f2e9d4;margin-bottom:20px;line-height:1.5">ℹ ເງິນກ້ອນນີ້ຈະເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ (ນັບເປັນຍອດ “ເຂົ້າບັນຊີຫົວໜ້າ”)</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button id="scur-lak" class="cur-btn cur-active" onclick="setStaffBankCur('LAK')">ກີບ</button>
-      <button id="scur-thb" class="cur-btn" onclick="setStaffBankCur('THB')">ບາດ</button>
-      <button id="scur-usd" class="cur-btn" onclick="setStaffBankCur('USD')">USD</button>
+    <div class="env-card">
+      <div class="env-dept">
+        <span class="sw" style="background:${d?d.color:"#1B2A4A"}">${chip}</span>
+        <div><b>ມອບເຂົ້າທະນາຄານ</b><span>${d?d.name:""}</span></div>
+        <i class="env-dot" style="background:#7ea6ea;color:#7ea6ea"></i>
+      </div>
+      <div class="env-note">${bankIcon} ເງິນກ້ອນນີ້ຈະເຂົ້າບັນຊີຫົວໜ້າໂດຍກົງ (ນັບເປັນຍອດ “ເຂົ້າບັນຊີຫົວໜ້າ”)</div>
+      <div class="env-lab">💰 ສະກຸນເງິນ <em>(ມອບເຂົ້າທະນາຄານໄດ້ເທື່ອລະສະກຸນ)</em></div>
+      <div class="env-curs">
+        <button id="scur-lak" class="env-cur env-cur-on" onclick="setStaffBankCur('LAK')">ກີບ</button>
+        <button id="scur-thb" class="env-cur" onclick="setStaffBankCur('THB')">ບາດ</button>
+        <button id="scur-usd" class="env-cur" onclick="setStaffBankCur('USD')">USD</button>
+      </div>
+      <div class="env-lab">ຈຳນວນທີ່ມອບ</div>
+      <div class="env-row">
+        <span class="cur" id="sbank-badge">ກີບ</span>
+        <input type="text" inputmode="numeric" placeholder="0" id="sbank-amt" oninput="onStaffBankInput(this)" aria-label="ຈຳນວນທີ່ມອບ">
+      </div>
+      <div id="sbank-preview" class="multi-preview" style="display:none"></div>
+      <div class="env-lab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ໝາຍເຫດ (ຊື່ທະນາຄານ / ຜູ້ມອບ)</div>
+      <div class="env-field"><textarea id="sbank-note" placeholder="ເຊັ່ນ: BCEL, ທ້າວ x ນຳໄປຝາກ..."></textarea></div>
+      <div class="env-lab"><svg viewBox="0 0 24 24"><path d="M21 11l-9 9a5 5 0 01-7-7l9-9a3 3 0 014 4l-9 9a1 1 0 01-2-2l8-8"/></svg> ຮູບໃບໂອນ / ສະລິບ (ຖ້າມີ)</div>
+      <input type="file" id="sbank-file" accept="image/*" capture="environment" class="hidden" onchange="onStaffBankFileChange(this)">
+      <div id="sbank-photo-zone"></div>
+      <div id="sbank-err" style="color:#ff9a8c;font-size:12px;min-height:16px;text-align:center"></div>
     </div>
-    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(243,234,210,.55);margin-bottom:8px">ຈຳນວນທີ່ມອບ</div>
-    <div class="bank-input-wrap">
-      <input type="text" inputmode="numeric" placeholder="0" id="sbank-amt" oninput="onStaffBankInput(this)" autofocus>
-      <span id="sbank-badge">ກີບ</span>
+    <div class="env-track-wrap">
+      <div class="env-track off" id="env-track">
+        <i class="fill" id="env-fill"></i>
+        <div class="hint" id="env-hint">ໃສ່ຈຳນວນເງິນກ່ອນ</div>
+        <div class="env-seal" id="env-seal" role="button" aria-label="ລາກເພື່ອປິດຜະນຶກ ແລະ ມອບເຂົ້າທະນາຄານ">✦</div>
+      </div>
     </div>
-    <div id="sbank-preview" style="font-size:15px;font-weight:700;color:#27ae60;margin-top:8px;min-height:22px"></div>
-    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(243,234,210,.55);margin:18px 0 8px">ໝາຍເຫດ (ຊື່ທະນາຄານ / ຜູ້ມອບ)</div>
-    <div class="bank-note-wrap">
-      <input type="text" placeholder="ເຊັ່ນ: BCEL, ທ້າວ x ນຳໄປຝາກ..." id="sbank-note">
-    </div>
-    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(243,234,210,.55);margin:18px 0 8px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-9 9a5 5 0 01-7-7l9-9a3 3 0 014 4l-9 9a1 1 0 01-2-2l8-8"/></svg> ຮູບໃບໂອນ / ສະລິບ (ຖ້າມີ)</div>
-    <input type="file" id="sbank-file" accept="image/*" capture="environment" class="hidden" onchange="onStaffBankFileChange(this)">
-    <div id="sbank-photo-zone"></div>
-    <div id="sbank-err" style="color:#e74c3c;font-size:12px;min-height:16px;text-align:center;margin-top:10px"></div>
-    <button class="btn-bank-confirm" style="width:100%;margin-top:18px" id="sbank-confirm" onclick="confirmStaffBank(this)" disabled><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> ຢືນຢັນມອບເຂົ້າທະນາຄານ</button>
-  </div>`);
-  setTimeout(() => {
-    const i = document.getElementById("sbank-amt"); if (i) i.focus();
-    renderSbankPhotoZone();
-  }, 150);
+  </div></div>`);
+  initEnvSeal({
+    ready: () => sbankNum() > 0,
+    busy:  () => _staffBankSaving,
+    onSeal: () => confirmStaffBank()
+  });
+  renderSbankPhotoZone();
+  sbankStepSync();
+  setTimeout(() => { const i = document.getElementById("sbank-amt"); if (i) i.focus(); }, 150);
+}
+
+function sbankNum() {
+  const el = document.getElementById("sbank-amt");
+  const digits = ((el && el.value) || "").replace(/\D/g, "");
+  return digits ? parseInt(digits, 10) : 0;
+}
+
+function sbankStepSync() {
+  const num = sbankNum(), hasImg = !!_staffBankImg;
+  const s1 = document.getElementById("env-s1"), s2 = document.getElementById("env-s2");
+  if (s1) s1.classList.toggle("on", num > 0);
+  if (s2) s2.classList.toggle("on", hasImg);
+  const track = document.getElementById("env-track"), hint = document.getElementById("env-hint");
+  if (track) track.classList.toggle("off", num <= 0);
+  if (hint && !_staffBankSaving) {
+    hint.innerHTML = num > 0
+      ? '<span>ລາກເພື່ອປິດຜະນຶກ &amp; ສົ່ງ →</span>'
+      : 'ໃສ່ຈຳນວນເງິນກ່ອນ';
+  }
 }
 
 function renderSbankPhotoZone() {
   const zone = document.getElementById("sbank-photo-zone");
   if (!zone) return;
-  if (_staffBankImg) {
-    zone.innerHTML = '<div class="img-preview-wrap" style="border-radius:12px;overflow:hidden">'
-      + '<img src="'+_staffBankImg+'" style="width:100%;display:block;border-radius:12px">'
-      + '<button class="rephoto-btn" onclick="document.getElementById(\'sbank-file\').click()"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> ຖ່າຍໃໝ່</button>'
+  const camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+  zone.innerHTML = _staffBankImg
+    ? '<div class="env-photo"><img src="'+_staffBankImg+'" alt="ສະລິບ">'
+      + '<button class="env-rephoto" onclick="document.getElementById(\'sbank-file\').click()">'
+      + '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> ຖ່າຍໃໝ່</button></div>'
+    : '<div class="env-shot" onclick="document.getElementById(\'sbank-file\').click()">'
+      + '<div class="ic">'+camIcon+'</div>'
+      + '<b>ຖ່າຍຮູບໃບໂອນ / ສະລິບ</b>'
+      + '<small>JPG, PNG · ຂະໜາດສູງສຸດ 5MB</small>'
       + '</div>';
-  } else {
-    zone.innerHTML = '<div class="photo-zone-pro" onclick="document.getElementById(\'sbank-file\').click()">'
-      + '<div class="photo-icon-pro"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'
-      + '<div class="photo-text-pro">ຖ່າຍຮູບໃບໂອນ / ສະລິບ</div>'
-      + '<div class="photo-sub-pro">JPG, PNG · ຂະໜາດສູງສຸດ 5MB</div>'
-      + '</div>';
-  }
 }
 
 function onStaffBankFileChange(el) {
@@ -3398,16 +3447,17 @@ function onStaffBankFileChange(el) {
   r.onload = async ev => {
     _staffBankImg = await compressImg(ev.target.result);
     renderSbankPhotoZone();
+    sbankStepSync();
   };
   r.readAsDataURL(file);
 }
 
 function setStaffBankCur(cur) {
   _staffBankCur = cur;
-  document.getElementById("scur-lak").className = "cur-btn" + (cur === "LAK" ? " cur-active" : "");
-  document.getElementById("scur-thb").className = "cur-btn" + (cur === "THB" ? " cur-active" : "");
-  document.getElementById("scur-usd").className = "cur-btn" + (cur === "USD" ? " cur-active" : "");
-  document.getElementById("sbank-badge").textContent = cur === "THB" ? "ບາດ" : cur === "USD" ? "USD" : "ກີບ";
+  document.getElementById("scur-lak").className = "env-cur" + (cur === "LAK" ? " env-cur-on" : "");
+  document.getElementById("scur-thb").className = "env-cur" + (cur === "THB" ? " env-cur-on" : "");
+  document.getElementById("scur-usd").className = "env-cur" + (cur === "USD" ? " env-cur-on" : "");
+  document.getElementById("sbank-badge").textContent = curLabel(cur);
   onStaffBankInput(document.getElementById("sbank-amt"));
 }
 
@@ -3416,27 +3466,26 @@ function onStaffBankInput(el) {
   el.value = fmtNum(digits);
   const num = digits ? parseInt(digits, 10) : 0;
   const preview = document.getElementById("sbank-preview");
-  const btn = document.getElementById("sbank-confirm");
-  if (num > 0) {
-    preview.textContent = fmtAmt(num, _staffBankCur);
-    btn.disabled = false;
-  } else {
-    preview.textContent = "";
-    btn.disabled = true;
+  if (preview) {
+    const cInfo = CUR_DISPLAY[_staffBankCur] || {};
+    preview.innerHTML = num > 0
+      ? '<span class="multi-preview-chip" style="color:'+(cInfo.color||"#f3d99b")+'">'+fmtAmt(num,_staffBankCur)+'</span>'
+      : "";
+    preview.style.display = num > 0 ? "flex" : "none";
   }
+  sbankStepSync();
 }
 
-async function confirmStaffBank(btn) {
+async function confirmStaffBank() {
   if (_staffBankSaving) return;                 // block double-submit
-  const digits = (document.getElementById("sbank-amt").value || "").replace(/\D/g, "");
-  const num = digits ? parseInt(digits, 10) : 0;
+  const num = sbankNum();
   if (num <= 0) return;
   const userNote = (document.getElementById("sbank-note").value || "").trim();
   const deptName = staffState.dept ? staffState.dept.name : "";
   // "S|" prefix marks a STAFF deposit (money went straight to the boss); dept name records the source
   const note = "S|" + deptName + (userNote ? " · " + userNote : "");
   _staffBankSaving = true;
-  btn.disabled = true; btn.textContent = "ກຳລັງບັນທຶກ...";
+  envSetSending(true, "ກຳລັງບັນທຶກ...");
   const dep = { id: Date.now().toString(), ts: Date.now(), amount: num, currency: _staffBankCur, note, image: _staffBankImg || null };
   try {
     await addBankDeposit(dep);
@@ -3445,23 +3494,29 @@ async function confirmStaffBank(btn) {
     _staffBankImg = null;
     showStaffBankDone(num, _staffBankCur);
   } catch {
-    btn.disabled = false; btn.textContent = "ຢືນຢັນມອບເຂົ້າທະນາຄານ";
+    _staffBankSaving = false;
+    envSetSending(false);
+    const err = document.getElementById("sbank-err");
+    if (err) err.textContent = "ບັນທຶກບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່";
   } finally {
     _staffBankSaving = false;
   }
 }
 
 function showStaffBankDone(num, cur) {
+  playSuccessSound();
+  const d = staffState.dept;
   const app = document.getElementById("app");
   const header = app.querySelector(".header");
   app.innerHTML = "";
-  if (header) app.appendChild(header);
-  app.insertAdjacentHTML("beforeend", `<div class="center"><div class="done-box">
-    <div class="done-check" style="background:#1a5276"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg></div>
-    <div class="done-title">ມອບເຂົ້າທະນາຄານສຳເລັດ!</div>
-    <div class="done-amount ${cur === "THB" ? "thb" : cur === "USD" ? "usd" : ""}">${fmtAmt(num, cur)}</div>
-    <button class="btn-green" onclick="backToDept()" style="margin-bottom:0">ກັບໜ້າຫຼັກ</button>
-  </div></div>`);
+  if (header) { header.classList.add("env-head"); app.appendChild(header); }
+  app.insertAdjacentHTML("beforeend", `<div class="env-done">
+    <div class="env-wax">✦</div>
+    <h3>ປິດຜະນຶກແລ້ວ</h3>
+    <div class="sub">ມອບເຂົ້າທະນາຄານ${d ? " · " + d.name : ""} · ເຂົ້າບັນຊີຫົວໜ້າ</div>
+    <div class="amt ${cur === "THB" ? "thb" : cur === "USD" ? "usd" : ""}">${fmtAmt(num, cur)}</div>
+    <button class="again" onclick="backToDept()">ກັບໜ້າຫຼັກ</button>
+  </div>`);
 }
 
 let isDark = false;
