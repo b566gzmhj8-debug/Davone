@@ -587,6 +587,100 @@ input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 
   .brand-sub{display:none}
   .scard,.total-card,.hist-card{border-radius:18px}
 }
+/* ══════════ SUMMARY "HERO SPLIT" (ສະຫຼຸບລາຍຈ່າຍ) ══════════ */
+.summary-wrap{max-width:1180px}
+.es-mono{font-family:'IBM Plex Mono','SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+.es-tile{border-radius:22px;background:rgba(12,22,48,.6);border:1px solid rgba(243,217,155,.16);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  padding:20px;box-shadow:0 14px 40px rgba(0,0,0,.26);margin-bottom:14px}
+.es-dot{width:7px;height:7px;border-radius:50%;background:#f3d99b;box-shadow:0 0 8px #d4a85a;flex:none;display:inline-block}
+.es-h4{margin:0 0 12px;font-size:12.5px;color:rgba(243,234,210,.62);display:flex;align-items:center;gap:8px}
+
+/* ເດືອນ */
+.es-months{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin-bottom:10px}
+.es-mo{flex:none;border:1px solid rgba(243,217,155,.16);background:rgba(6,14,34,.5);color:rgba(243,234,210,.7);font-family:inherit;font-size:13px;
+  padding:10px 16px;border-radius:14px;cursor:pointer;transition:.2s;text-align:left;min-width:130px}
+.es-mo b{display:block;font-size:12.5px;font-weight:800}
+.es-mo span{display:block;font-size:13.5px;font-weight:700;margin-top:3px;opacity:.85}
+.es-mo:hover{border-color:rgba(243,217,155,.45)}
+.es-mo.on{background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);color:#1a1405;border-color:transparent;box-shadow:0 8px 22px rgba(212,168,90,.3)}
+
+/* ສະກຸນເງິນ */
+.es-curs{position:relative;display:inline-grid;grid-auto-flow:column;padding:5px;border-radius:16px;background:rgba(6,14,34,.55);border:1px solid rgba(243,217,155,.16);margin-bottom:14px}
+.es-curs button{position:relative;z-index:1;border:0;background:none;color:rgba(243,234,210,.62);font-family:inherit;font-size:15px;font-weight:700;padding:11px 24px;cursor:pointer;transition:color .3s;white-space:nowrap}
+.es-curs button.on{color:#1a1405}
+.es-curs .es-pill{position:absolute;top:5px;bottom:5px;left:5px;border-radius:12px;background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);transition:transform .45s cubic-bezier(.3,1.35,.5,1),width .45s}
+
+/* HERO */
+.es-hero{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;align-items:center;
+  background:radial-gradient(120% 90% at 0% 0%,rgba(212,168,90,.32),transparent 55%),radial-gradient(90% 90% at 100% 100%,rgba(80,120,220,.26),transparent 60%),rgba(12,22,48,.68)}
+.es-huge{font-size:clamp(40px,7.2vw,92px);font-weight:800;line-height:1;margin:10px 0 4px;letter-spacing:-.02em;overflow-wrap:anywhere;
+  background:linear-gradient(100deg,#fff 0%,#fff3cf 42%,#f3d99b 72%,#d4a85a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.es-unit{font-size:clamp(15px,1.9vw,22px);color:#f3d99b;font-weight:700}
+.es-delta{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:13.5px;padding:9px 14px;border-radius:20px;background:rgba(6,14,34,.5);border:1px solid rgba(243,217,155,.16)}
+.es-delta.up{color:#ff9a8c;border-color:rgba(255,143,128,.45)}
+.es-delta.down{color:#7fe0b0;border-color:rgba(111,212,156,.45)}
+.es-ring{position:relative;width:min(250px,62vw);aspect-ratio:1;margin:0 auto}
+.es-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.es-ring circle{fill:none;stroke-width:22;stroke-linecap:round;transition:stroke-dasharray 1.1s cubic-bezier(.2,.9,.3,1),opacity .25s}
+.es-ring .trk{stroke:rgba(255,255,255,.07)}
+.es-ring .seg{cursor:pointer;filter:drop-shadow(0 0 8px currentColor)}
+.es-ring .seg.dim{opacity:.22}
+.es-ring-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:0 15%}
+.es-ring-mid .t{font-size:12px;color:rgba(243,234,210,.62)}
+.es-ring-mid .v{font-size:clamp(17px,2.3vw,25px);font-weight:800;color:#fff;margin-top:4px;overflow-wrap:anywhere}
+.es-ring-mid .p{font-size:12px;color:#f3d99b;margin-top:2px}
+
+/* ສອງປະເພດ */
+.es-splits{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.es-split .top{display:flex;align-items:center;gap:10px}
+.es-split .ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:none}
+.es-split .ic svg{width:21px;height:21px}
+.es-split h3{margin:0;font-size:15px;font-weight:700;color:#fff}
+.es-split .sub{font-size:11.5px;color:rgba(243,234,210,.6)}
+.es-split .amt{font-size:clamp(26px,4.2vw,46px);font-weight:800;margin-top:12px;line-height:1.05;overflow-wrap:anywhere}
+.es-split .bar{height:10px;border-radius:6px;background:rgba(255,255,255,.06);margin-top:14px;overflow:hidden}
+.es-split .bar i{display:block;height:100%;border-radius:6px;width:0;transition:width 1.1s cubic-bezier(.2,.9,.3,1)}
+.es-split .pc{display:flex;justify-content:space-between;font-size:12px;color:rgba(243,234,210,.6);margin-top:7px}
+.es-split .others{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:12px}
+.es-split .others span{padding:6px 10px;border-radius:12px;background:rgba(6,14,34,.45);border:1px solid rgba(243,217,155,.16)}
+
+/* ແນວໂນ້ມ */
+.es-bars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:12px;height:190px;align-items:end}
+.es-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:pointer;text-align:center;gap:8px;background:none;border:0;font-family:inherit;padding:0}
+.es-col .v{font-size:12.5px;font-weight:700;white-space:nowrap}
+.es-stack{display:flex;flex-direction:column;justify-content:flex-end;height:100%;border-radius:10px 10px 4px 4px;overflow:hidden;background:rgba(255,255,255,.04)}
+.es-stack i{display:block;width:100%;height:0;transition:height .9s cubic-bezier(.2,1.1,.3,1)}
+.es-col .n{font-size:11.5px;color:rgba(243,234,210,.6)}
+.es-col.on .n{color:#f3d99b;font-weight:700}
+.es-col:hover .es-stack{filter:brightness(1.15)}
+
+/* ລາຍການ */
+.es-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.es-search{position:relative;flex:1;min-width:200px}
+.es-search input{width:100%;height:46px;padding:0 14px 0 42px;border-radius:14px;border:1px solid rgba(243,217,155,.22);background:rgba(6,14,34,.55);color:var(--text);font-family:inherit;font-size:15px;outline:none}
+.es-search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:rgba(243,234,210,.6)}
+.es-chip{border:1px solid rgba(243,217,155,.16);background:rgba(6,14,34,.5);color:rgba(243,234,210,.7);font-family:inherit;font-size:13px;padding:11px 15px;border-radius:13px;cursor:pointer}
+.es-chip.on{background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);color:#1a1405;border-color:transparent;font-weight:700}
+.es-lh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 4px 8px;font-size:12.5px;color:rgba(243,234,210,.62);flex-wrap:wrap}
+.es-row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border-radius:16px;background:rgba(6,14,34,.4);border:1px solid rgba(243,217,155,.1);margin-bottom:9px;transition:.2s}
+.es-row:hover{border-color:rgba(243,217,155,.4);transform:translateX(3px)}
+.es-row .date{font-size:12.5px;color:rgba(243,234,210,.6)}
+.es-row .nm{min-width:0}
+.es-row .nm b{display:block;font-size:14.5px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.es-badge{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:9px}
+.es-badge.admin{background:rgba(127,178,255,.16);color:#9dc4ff}
+.es-badge.goods{background:rgba(111,212,156,.16);color:#7fe0b0}
+.es-row .amt{font-size:clamp(16px,2.1vw,23px);font-weight:800;white-space:nowrap}
+.es-row .sh{grid-column:2/-1;height:4px;border-radius:4px;background:rgba(255,255,255,.05);overflow:hidden;margin-top:-4px}
+.es-row .sh i{display:block;height:100%;width:0;border-radius:4px;transition:width .9s}
+.es-empty{text-align:center;color:rgba(243,234,210,.6);padding:24px;font-size:14px}
+@media(max-width:900px){
+  .es-hero,.es-splits{grid-template-columns:1fr}
+  .es-bars{height:160px;gap:7px}
+  .es-row{grid-template-columns:62px 1fr;grid-template-areas:"date nm" "amt amt"}
+  .es-row .amt{grid-area:amt;text-align:right}
+}
+
 </style>
 </head>
 <body>
@@ -1152,42 +1246,156 @@ function linkedDep(expenseId) { return deposits.find(d => d.expense_id === expen
 // ═══════════════════════════════════════════════
 //  SUMMARY MODAL
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  SUMMARY · ສະຫຼຸບລາຍຈ່າຍ (ດີໄຊນ໌ "Hero Split")
+// ═══════════════════════════════════════════════
+const ES = { cur:'LAK', month:null, filter:'all', sort:'amt' };
+const ES_C = ['LAK','THB','USD'];
+const ES_MN = ['ມັງກອນ','ກຸມພາ','ມີນາ','ເມສາ','ພຶດສະພາ','ມິຖຸນາ','ກໍລະກົດ','ສິງຫາ','ກັນຍາ','ຕຸລາ','ພະຈິກ','ທັນວາ'];
+const esName = k => { const [y,m] = k.split('-'); return ES_MN[Number(m)-1] + ' ' + y; };
+function esGroup(){ const m={}; records.forEach(r=>{ const k=r.date.slice(0,7); (m[k]=m[k]||[]).push(r); }); return m; }
+function esSum(recs, type, cur){ return recs.filter(r => (type==='all'||r.type===type) && r.currency===cur).reduce((s,r)=>s+Number(r.amount),0); }
+function esCount(el, to){ const t0=performance.now();
+  (function f(t){ const p=Math.min(1,(t-t0)/1200), e=1-Math.pow(1-p,4); el.textContent = fmt(to*e); if(p<1) requestAnimationFrame(f); })(t0); }
+
 function buildM() {
   const body = document.getElementById('summaryBody');
   if (!records.length) { body.innerHTML='<div class="nodata">ຍັງບໍ່ມີຂໍ້ມູນ</div>'; return; }
-  const months = {};
-  records.forEach(r => { const m=r.date.slice(0,7); if(!months[m]) months[m]=[]; months[m].push(r); });
-  const sorted = Object.keys(months).sort().reverse();
-  let h = '<div class="mtabs">';
-  sorted.forEach((m,i) => {
-    const l = new Date(m+'-01').toLocaleDateString('lo-LA',{year:'numeric',month:'long'});
-    h += `<button class="mtab ${i===0?'active':''}" onclick="swM(this,'${m}')">${l}</button>`;
+  const months = esGroup(), keys = Object.keys(months).sort().reverse();
+  if (!ES.month || !months[ES.month]) ES.month = keys[0];
+  window._esM = months; window._esK = keys;
+
+  body.innerHTML = `
+    <div class="es-months" id="esMonths"></div>
+    <div class="es-curs" id="esCurs"><i class="es-pill"></i>${ES_C.map(c=>`<button data-c="${c}">${SYM[c]} ${c==='LAK'?'ກີບ':c==='THB'?'ບາດ':'USD'}</button>`).join('')}</div>
+    <div class="es-tile es-hero">
+      <div>
+        <div class="es-h4" style="margin:0"><span class="es-dot"></span>ລາຍຈ່າຍລວມທັງໝົດ · <b id="esMName"></b></div>
+        <div class="es-huge es-mono" id="esTotal">0</div>
+        <div class="es-unit" id="esUnit"></div>
+        <div id="esDelta"></div>
+      </div>
+      <div><div class="es-ring">
+        <svg viewBox="0 0 200 200"><circle class="trk" cx="100" cy="100" r="78"/><circle class="seg" id="esSegA" cx="100" cy="100" r="78" stroke="#7fb2ff"/><circle class="seg" id="esSegG" cx="100" cy="100" r="78" stroke="#6fd49c"/></svg>
+        <div class="es-ring-mid"><div class="t" id="esRingT">ລວມທັງໝົດ</div><div class="v es-mono" id="esRingV">0</div><div class="p" id="esRingP"></div></div>
+      </div></div>
+    </div>
+    <div class="es-splits" id="esSplits"></div>
+    <div class="es-tile"><div class="es-h4"><span class="es-dot"></span>ປຽບທຽບເດືອນ (ກົດເພື່ອເບິ່ງເດືອນນັ້ນ)</div><div class="es-bars" id="esBars"></div></div>
+    <div class="es-tile">
+      <div class="es-tools">
+        <label class="es-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="esQ" placeholder="ຄົ້ນຫາລາຍການ…" oninput="esList()"></label>
+        <button class="es-chip on" data-f="all" onclick="esFilter(this,'all')">ທັງໝົດ</button>
+        <button class="es-chip" data-f="admin" onclick="esFilter(this,'admin')">ບໍລິຫານ</button>
+        <button class="es-chip" data-f="goods" onclick="esFilter(this,'goods')">ຄ່າສິນຄ້າ</button>
+        <button class="es-chip" id="esSortBtn" onclick="esToggleSort(this)">ຫຼຽງ: ຍອດສູງ→ຕ່ຳ</button>
+      </div>
+      <div class="es-lh"><span id="esCount"></span><span id="esSum"></span></div>
+      <div id="esList"></div>
+    </div>`;
+
+  document.getElementById('esMonths').innerHTML = keys.map(k =>
+    `<button class="es-mo ${k===ES.month?'on':''}" data-k="${k}" onclick="esPick('${k}')"><b>${esName(k)}</b><span class="es-mono" data-mo="${k}"></span></button>`).join('');
+  const curs = document.getElementById('esCurs');
+  curs.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('on', b.dataset.c===ES.cur);
+    b.onclick = () => { ES.cur = b.dataset.c; curs.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); esPill(); esRender(); };
   });
-  h += '</div><div id="mdet"></div>';
-  body.innerHTML = h;
-  window._md = months;
-  renderDet(sorted[0], months);
+  esPill(); esRender();
+}
+function esPill(){ const c=document.getElementById('esCurs'); if(!c) return; const on=c.querySelector('button.on')||c.querySelector('button');
+  const p=c.querySelector('.es-pill'); p.style.width=on.offsetWidth+'px'; p.style.transform=`translateX(${on.offsetLeft-5}px)`; }
+function esPick(k){ ES.month=k; document.querySelectorAll('.es-mo').forEach(b=>b.classList.toggle('on', b.dataset.k===k)); esRender(); }
+function esFilter(el,f){ ES.filter=f; document.querySelectorAll('.es-chip[data-f]').forEach(x=>x.classList.toggle('on',x===el)); esList(); }
+function esToggleSort(el){ ES.sort = ES.sort==='amt' ? 'date' : 'amt';
+  el.textContent = ES.sort==='amt' ? 'ຫຼຽງ: ຍອດສູງ→ຕ່ຳ' : 'ຫຼຽງ: ວັນທີ່ໃໝ່→ເກົ່າ'; esList(); }
+
+function esRender(){
+  const months = window._esM || esGroup(), keys = window._esK || Object.keys(months).sort().reverse();
+  const recs = months[ES.month] || [], c = ES.cur;
+  const a = esSum(recs,'admin',c), g = esSum(recs,'goods',c), tot = a+g;
+  const lbl = c==='LAK' ? 'ກີບ' : c==='THB' ? 'ບາດ' : 'USD';
+  document.querySelectorAll('[data-mo]').forEach(el => el.textContent = fmt(esSum(months[el.dataset.mo]||[],'all',c)) + ' ' + SYM[c]);
+  document.getElementById('esMName').textContent = esName(ES.month);
+  document.getElementById('esUnit').textContent = lbl;
+  esCount(document.getElementById('esTotal'), tot);
+
+  // ຕ່າງຈາກເດືອນກ່ອນ
+  const i = keys.indexOf(ES.month), prevK = keys[i+1];
+  const prev = prevK ? esSum(months[prevK],'all',c) : null;
+  const d = document.getElementById('esDelta');
+  if (prev) { const diff = tot-prev, pc = prev ? Math.round(diff/prev*100) : 0;
+    d.innerHTML = `<span class="es-delta ${diff>0?'up':'down'}">${diff>0?'▲ ເພີ່ມ':'▼ ຫຼຸດ'} ${fmt(Math.abs(diff))} (${Math.abs(pc)}%) ຈາກ ${esName(prevK)}</span>`;
+  } else d.innerHTML = '';
+
+  // ວົງແຫວນ
+  const C = 2*Math.PI*78, pa = tot ? a/tot : 0;
+  const sA = document.getElementById('esSegA'), sG = document.getElementById('esSegG');
+  sA.style.strokeDasharray = `${Math.max(pa*C-3,0)} ${C}`; sA.style.strokeDashoffset = 0;
+  sG.style.strokeDasharray = `${Math.max((1-pa)*C-3,0)} ${C}`; sG.style.strokeDashoffset = -pa*C;
+  const show = k => {
+    document.querySelectorAll('.es-ring .seg').forEach((s,idx)=>s.classList.toggle('dim', k>=0 && idx!==k));
+    const v = k===0?a:k===1?g:tot;
+    document.getElementById('esRingT').textContent = k===0?'ຈ່າຍບໍລິຫານ':k===1?'ຈ່າຍຄ່າສິນຄ້າ':'ລວມທັງໝົດ';
+    document.getElementById('esRingV').textContent = fmt(v);
+    document.getElementById('esRingP').textContent = tot ? Math.round(v/tot*100)+'% ຂອງລວມ' : '';
+  };
+  sA.onmouseenter = ()=>show(0); sG.onmouseenter = ()=>show(1);
+  sA.onmouseleave = sG.onmouseleave = ()=>show(-1); show(-1);
+
+  // ສອງປະເພດ
+  const SP = [
+    { k:'admin', h:'ຈ່າຍບໍລິຫານ', s:'ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', v:a, col:'#7fb2ff', ic:'<path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-5h4v5"/>' },
+    { k:'goods', h:'ຈ່າຍຄ່າສິນຄ້າ', s:'ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', v:g, col:'#6fd49c', ic:'<path d="M3.5 8.2 12 4l8.5 4.2-8.5 4.2z"/><path d="M3.5 8.2v7.6L12 20l8.5-4.2V8.2"/>' },
+  ];
+  document.getElementById('esSplits').innerHTML = SP.map(x => {
+    const pc = tot ? Math.round(x.v/tot*100) : 0;
+    const others = ES_C.filter(cc => cc!==c && esSum(recs,x.k,cc)>0).map(cc => `<span>${SYM[cc]} ${fmt(esSum(recs,x.k,cc))}</span>`).join('');
+    return `<div class="es-tile es-split" style="margin:0">
+      <div class="top"><span class="ic" style="background:${x.col}22;color:${x.col}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${x.ic}</svg></span>
+        <div><h3>${x.h}</h3><div class="sub">${x.s}</div></div></div>
+      <div class="amt es-mono" style="color:${x.col}">${fmt(x.v)}</div>
+      <div class="bar"><i style="background:${x.col}" data-w="${pc}"></i></div>
+      <div class="pc"><span>${pc}% ຂອງລາຍຈ່າຍລວມ</span><span>${lbl}</span></div>
+      ${others ? `<div class="others">${others}</div>` : ''}
+    </div>`; }).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.es-split .bar i').forEach(i2=>i2.style.width=i2.dataset.w+'%'));
+
+  // ແນວໂນ້ມ (ສູງສຸດ 6 ເດືອນ, ເກົ່າ→ໃໝ່)
+  const show6 = keys.slice(0,6).reverse();
+  const mx = Math.max(...show6.map(k => esSum(months[k],'all',c)), 1);
+  document.getElementById('esBars').innerHTML = show6.map(k => {
+    const t = esSum(months[k],'all',c), h = t/mx*100;
+    return `<button class="es-col ${k===ES.month?'on':''}" onclick="esPick('${k}')">
+      <div class="v es-mono" style="color:${k===ES.month?'#f3d99b':'rgba(243,234,210,.6)'}">${fmt(t)}</div>
+      <div class="es-stack" style="height:${Math.max(h,1)}%">
+        <i style="background:#6fd49c" data-h="${t?esSum(months[k],'goods',c)/t*100:0}"></i>
+        <i style="background:#7fb2ff" data-h="${t?esSum(months[k],'admin',c)/t*100:0}"></i>
+      </div><div class="n">${esName(k)}</div></button>`; }).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.es-stack i').forEach(i2=>i2.style.height=i2.dataset.h+'%'));
+
+  esList();
 }
 
-function swM(el,m) { document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderDet(m,window._md); }
-
-function renderDet(m, months) {
-  const recs = months[m]||[], C=['LAK','THB','USD'];
-  const t = {admin:{LAK:0,THB:0,USD:0}, goods:{LAK:0,THB:0,USD:0}};
-  recs.forEach(r => t[r.type][r.currency] += Number(r.amount));
-  const g = {}; C.forEach(c => g[c]=(t.admin[c]||0)+(t.goods[c]||0));
-  let h = '<div class="sgrid"><div class="sblk admin"><div class="sblk-head">ຈ່າຍບໍລິຫານ</div>';
-  C.forEach(c=>{ const v=t.admin[c]; h+=`<div class="scr"><span class="scrl">${SYM[c]} ${c}</span><span class="scrv admin ${v===0?'szero':''}">${fmt(v)}</span></div>`; });
-  h += '</div><div class="sblk goods"><div class="sblk-head">ຈ່າຍຄ່າສິນຄ້າ</div>';
-  C.forEach(c=>{ const v=t.goods[c]; h+=`<div class="scr"><span class="scrl">${SYM[c]} ${c}</span><span class="scrv goods ${v===0?'szero':''}">${fmt(v)}</span></div>`; });
-  h += '</div></div><div class="gblk"><div class="glbl">ລວມທັງໝົດ</div>';
-  const has = C.some(c=>g[c]>0);
-  if(has){ C.forEach(c=>{ if(g[c]>0) h+=`<div class="grow"><span class="gcl">${SYM[c]} ${c}</span><span class="gcv">${fmt(g[c])} ${SYM[c]}</span></div>`; }); }
-  else { h += '<div style="color:var(--muted);font-size:13px">ບໍ່ມີລາຍການ</div>'; }
-  h += `</div><div class="dlbl" style="margin-top:12px">ລາຍການ ${recs.length} ລາຍການ</div><div class="dtbl">`;
-  recs.forEach(r => { h+=`<div class="hi"><div class="hi-top"><span class="hi-date">${r.date}</span><span class="hi-badge ${r.type}">${r.category}</span></div><div class="hi-mid"><span class="hi-desc">${escHtml(r.description)}</span><span class="hi-amt ${r.type}">${fmt(r.amount)} ${SYM[r.currency]}</span></div>${r.note?`<span class="hi-note">${escHtml(r.note)}</span>`:''}</div>`; });
-  h += '</div>';
-  document.getElementById('mdet').innerHTML = h;
+function esList(){
+  const months = window._esM || esGroup(), recs = months[ES.month] || [], c = ES.cur;
+  const qEl = document.getElementById('esQ'), q = qEl ? qEl.value.trim().toLowerCase() : '';
+  let rows = recs.filter(r => r.currency===c && Number(r.amount)>0)
+    .filter(r => ES.filter==='all' || r.type===ES.filter)
+    .filter(r => !q || String(r.description||'').toLowerCase().includes(q) || String(r.category||'').toLowerCase().includes(q));
+  rows.sort((p,r) => ES.sort==='amt' ? Number(r.amount)-Number(p.amount) : (p.date<r.date?1:-1));
+  const sum = rows.reduce((s,r)=>s+Number(r.amount),0), mx = Math.max(...rows.map(r=>Number(r.amount)), 1);
+  const lbl = c==='LAK' ? 'ກີບ' : c==='THB' ? 'ບາດ' : 'USD';
+  document.getElementById('esCount').textContent = `ລາຍການ ${rows.length} ລາຍການ · ${lbl}`;
+  document.getElementById('esSum').textContent = `ລວມທີ່ເຫັນ ${fmt(sum)} ${SYM[c]}`;
+  document.getElementById('esList').innerHTML = rows.length ? rows.map(r => `
+    <div class="es-row"><div class="date es-mono">${r.date.slice(5)}</div>
+      <div class="nm"><b>${escHtml(r.description||r.category||'—')}</b><span class="es-badge ${r.type}">${escHtml(r.category||(r.type==='admin'?'ບໍລິຫານ':'ຄ່າສິນຄ້າ'))}</span></div>
+      <div class="amt es-mono" style="color:${r.type==='admin'?'#9dc4ff':'#7fe0b0'}">${fmt(r.amount)}</div>
+      <div class="sh"><i style="background:${r.type==='admin'?'#7fb2ff':'#6fd49c'}" data-w="${Number(r.amount)/mx*100}"></i></div>
+    </div>`).join('') : `<div class="es-empty">ບໍ່ພົບລາຍການສະກຸນ ${lbl}</div>`;
+  requestAnimationFrame(()=>document.querySelectorAll('.es-row .sh i').forEach(i2=>i2.style.width=i2.dataset.w+'%'));
 }
 
 // ═══════════════════════════════════════════════
