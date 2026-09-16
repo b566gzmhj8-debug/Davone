@@ -426,6 +426,28 @@
   .ps-addr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
   .ps-head-tr{grid-template-columns:1.4fr 1.4fr 170px auto;}
   .ps-head-rcv{grid-template-columns:minmax(0,1.6fr) 180px auto;}
+  .ps-head-ap{grid-template-columns:minmax(0,1fr) auto;}
+  .ap-title{display:flex;align-items:center;gap:9px;font-size:18px;font-weight:700;color:#0b1a3d;}
+  .ap-title .dv-icon{width:22px;height:22px;color:#a57a36;}
+  .ap-sec{margin:4px 0 8px;font-size:12px;font-weight:700;letter-spacing:.3px;color:#8a6224;text-transform:uppercase;}
+  .ap-sec:not(:first-child){margin-top:16px;}
+  .ps-entry-row .ap-code{flex:0 0 280px;}
+  .ap-row2{margin-top:10px;}
+  .ps-entry-row .ap-cat{flex:1 1 260px;min-width:0;}
+  .ps-entry-row .ap-unit{flex:0 0 180px;}
+  .ps-entry-row .ap-th{flex:0 0 200px;}
+  .ap-serial{display:flex;align-items:flex-start;gap:10px;margin:12px 0 0;padding:11px 14px;background:#faf6ec;
+    border:1px solid #eee5d3;border-radius:12px;cursor:pointer;}
+  .ap-serial input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:#a57a36;}
+  .ap-serial b{display:block;color:#0b1a3d;font-size:14px;}
+  .ap-serial small{display:block;color:#7b8194;font-size:12px;margin-top:2px;}
+  .ap-prices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+  .ap-prices .f label{display:block;margin:0 0 4px;font-size:12.5px;color:#57607a;}
+  .ap-prices input{text-align:right;}
+  .ap-warn{margin:12px 0 0;padding:9px 13px;border-radius:10px;background:#fbeee9;border:1px solid #efc9bf;color:#b3382a;font-size:13px;}
+  .ap-prev-sub{margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.8);}
+  #ap_prevName{font-size:clamp(20px,2.1vw,27px);}
+  .ps-sum #ap_clear{margin-top:6px;}
   .ps-entry-row .f-cur{flex:0 0 160px;}
   .ps-entry-row .f-cost{flex:0 0 190px;}
   .ps-entry textarea{margin:0;}
@@ -529,13 +551,18 @@
     .ps-table-rcv th:nth-child(5),.ps-table-rcv td:nth-child(5){display:none;}
     .ps-table-rcv td:nth-child(3){word-break:break-all;}
     .ps-table-rcv td.r{white-space:normal;}
+    .ps-table-ap th:nth-child(3),.ps-table-ap td:nth-child(3),
+    .ps-table-ap th:nth-child(5),.ps-table-ap td:nth-child(5){display:none;}
   }
   @media (max-width:900px){
-    .ps-head,.ps-head-tr,.ps-head-rcv{grid-template-columns:1fr;}
+    .ps-head,.ps-head-tr,.ps-head-rcv,.ps-head-ap{grid-template-columns:1fr;}
+    .ap-prices{grid-template-columns:1fr 1fr;}
     .ps-meta{text-align:left;}
     .ps-entry-row .f-model,.ps-entry-row .f-unit,.ps-entry-row .f-qp,
     .ps-entry-row .f-qty,.ps-entry-row .f-add,
-    .ps-entry-row .f-cur,.ps-entry-row .f-cost{flex:1 1 100%;}
+    .ps-entry-row .f-cur,.ps-entry-row .f-cost,
+    .ps-entry-row .ap-code,.ps-entry-row .ap-cat{flex:1 1 100%;}
+    .ps-entry-row .ap-unit,.ps-entry-row .ap-th{flex:1 1 40%;min-width:0;}
     .ps-entry .f-qp{grid-template-columns:1fr 1fr;}
     .ps-foot{grid-template-columns:1fr;}
     .ps-big-amount{font-size:27px;}
@@ -588,7 +615,7 @@
 
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
 <symbol id="i-home" viewBox="0 0 24 24"><polyline points="3 11 12 4 21 11"></polyline><path d="M5 10v9a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1v-9"></path></symbol>
-<symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5l9-4 9 4-9 4-9-4z"></path><path d="M3 7.5v9l9 4 9-4v-9"></path><path d="M12 11.5v9"></path></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5l9-4 9 4-9 4-9-4z"></path><path d="M3 7.5v9l9 4 9-4v-9"></path><path d="M12 11.5v9"></path></symbol>
 <symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="7" width="13" height="9" rx="1"></rect><path d="M14 10h4l3 3v3h-7z"></path><circle cx="5.5" cy="18.2" r="1.6"></circle><circle cx="17" cy="18.2" r="1.6"></circle></symbol>
 <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20V3z"></path><line x1="8.5" y1="8" x2="15.5" y2="8"></line><line x1="8.5" y1="11.5" x2="15.5" y2="11.5"></line><line x1="8.5" y1="15" x2="13" y2="15"></line></symbol>
 <symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 9V3h10v6"></path><path d="M7 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="7" y="14" width="10" height="7"></rect></symbol>
@@ -1298,6 +1325,7 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
 const TABS = [
   { id:'dashboard', label:'ໜ້າຫຼັກ', icon:'i-home',    roles:['staff','admin','viewer','manager'] },
   { id:'products',  label:'ສິນຄ້າ',   icon:'i-box',     roles:['staff','admin','viewer','manager'] },
+  { id:'addproduct', label:'ເພີ່ມສິນຄ້າ', icon:'i-plus',  roles:['staff','admin'] },
   { id:'receive',   label:'ຮັບເຂົ້າ', icon:'i-truck',   roles:['staff','admin'] },
   { id:'sell',      label:'ອອກບິນຂາຍ', icon:'i-receipt', roles:['staff','admin'] },
   { id:'transfer',  label:'ໂອນສາຂາ',  icon:'i-truck',   roles:['staff','admin','manager'] },
@@ -1310,7 +1338,7 @@ let activeTab = 'dashboard';
    ຮັກສາຄ່າໃນຊ່ອງຕ່າງໆ (ຊື່ຜູ້ສະໜອງ/ລູກຄ້າ, ວັນທີ, ຈຳນວນ, ລາຄາ...) ເມື່ອສະຫຼັບແທັບ ບໍ່ໃຫ້ຫາຍ
    ບັນທຶກ (submit) ສຳເລັດຄ່ອຍລ້າງ. ບໍ່ເກັບ: ຊ່ອງເລືອກສິນຄ້າ (auto-fill ລາຄາເອງ), ຊ່ອງຈ່າຍເງິນ (ຊົ່ວຄາວ),
    ຕົວເລືອກເດືອນປະຫວັດ (ຈື່ໄວ້ໃນ dataset ຢູ່ແລ້ວ) */
-const tabDrafts = { receive:{}, sell:{}, transfer:{} };
+const tabDrafts = { receive:{}, sell:{}, transfer:{}, addproduct:{} };
 /* ຊ່ອງເງິນ: ໃສ່ຄືນ "ຫຼັງສຸດ" ເພາະ dispatch change ຊ່ອງສະກຸນເງິນ ຈະ auto-fill ຄ່າພວກນີ້ທັບ */
 const DRAFT_MONEY_LAST = ['r_cost','r_rate','s_price','s_discount'];
 const DRAFT_SKIP = new Set(['r_model','s_model','tr_model','s_unitSelect','rcv_month','tr_month',
@@ -1384,6 +1412,7 @@ async function renderTab(){
   try{
     if(activeTab === 'dashboard') await renderDashboard(main);
     else if(activeTab === 'products') await renderProducts(main);
+    else if(activeTab === 'addproduct') await renderAddProduct(main);
     else if(activeTab === 'receive') await renderReceive(main);
     else if(activeTab === 'sell') await renderSell(main);
     else if(activeTab === 'transfer') await renderTransfer(main);
@@ -1673,7 +1702,7 @@ async function renderProducts(main){
     }
   }
   main.innerHTML = `
-    <button class="btn" id="addModelBtn"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມສິນຄ້າ/ຮຸ່ນໃໝ່</button>
+    ${currentRole === 'staff' || isAdmin ? `<button class="btn" id="addModelBtn"><svg class="dv-icon"><use href="#i-plus"></use></svg>ເພີ່ມສິນຄ້າ/ຮຸ່ນໃໝ່</button>` : ''}
     ${isAdmin ? `<button class="btn secondary" id="adjHistoryBtn"><svg class="dv-icon"><use href="#i-gear"></use></svg>ປະຫວັດການປรับສะຕັອก</button>` : ''}
     ${isAdmin ? `<button class="btn secondary" id="checkDupBtn"><svg class="dv-icon"><use href="#i-alert"></use></svg>ກວດເລກເຄື່ອງຊ້ຳ</button>` : ''}
     <button class="btn secondary" id="exportStockBtn"><svg class="dv-icon"><use href="#i-receipt"></use></svg>ສົ່ງອອກໃບນັບສະຕັອກ (CSV)</button>
@@ -1683,7 +1712,8 @@ async function renderProducts(main){
       <div id="prod_list">${rowsHtml(models)}</div>
     </div>
   `;
-  document.getElementById('addModelBtn').addEventListener('click', ()=> openModelModal());
+  const addModelBtn = document.getElementById('addModelBtn');
+  if(addModelBtn) addModelBtn.addEventListener('click', ()=>{ activeTab = 'addproduct'; buildNav(); renderTab(); });
   if(isAdmin){
     document.getElementById('adjHistoryBtn').addEventListener('click', ()=> openAdjustHistoryModal());
     document.getElementById('checkDupBtn').addEventListener('click', ()=> openDuplicateSerialsModal(models));
@@ -2044,6 +2074,144 @@ function openModelModal(existing){
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); }
   });
+}
+
+/* ============================================================
+   ADD PRODUCT (ເພີ່ມສິນຄ້າ) — ໜ້າແຍກຕ່າງຫາກ ແບບແຜ່ນດຽວຄືໜ້າຮັບເຂົ້າ
+   (ແກ້ໄຂສິນຄ້າເກົ່າ ຍັງໃຊ້ປັອບອັບ openModelModal ຢູ່ໜ້າສິນຄ້າ)
+   ============================================================ */
+async function renderAddProduct(main){
+  const all = await sb('stock_product_models?select=*&order=created_at.desc');
+  const canSeeCost = currentRole === 'admin';
+  const uniq = arr=> [...new Set(arr.map(v=> (v||'').trim()).filter(Boolean))].sort((a,b)=> a.localeCompare(b));
+  const cats = uniq(all.map(m=> m.category));
+  const units = uniq(['ອັນ', ...all.map(m=> m.unit)]);
+  const esc = v=> String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const recent = all.slice(0, 8);
+  main.innerHTML = `
+    <div class="card ps-sheet">
+      <div class="ps-head ps-head-ap">
+        <div class="ap-title"><svg class="dv-icon"><use href="#i-plus"></use></svg>ເພີ່ມສິນຄ້າ / ຮຸ່ນໃໝ່</div>
+        <div class="ps-meta">
+          <span>ສິນຄ້າໃນລະບົບ <b class="mono">${all.filter(m=> m.active!==false).length}</b> ລາຍການ</span>
+          <span class="mono">${fmtDateDMY(todayStr())}</span>
+        </div>
+      </div>
+      <div class="ps-entry">
+        <p class="ap-sec">ຂໍ້ມູນສິນຄ້າ</p>
+        <div class="ps-entry-row">
+          <div class="f f-model"><label>ຊື່ສິນຄ້າ *</label><input id="ap_name" placeholder="ເຊັ່ນ ແທັກເຕີ M6040" autocomplete="off"></div>
+          <div class="f ap-code"><label>ລະຫັດ (code)</label><input id="ap_code" placeholder="ເຊັ່ນ W9500-95511" autocomplete="off"></div>
+        </div>
+        <div class="ps-entry-row ap-row2">
+          <div class="f ap-cat"><label>ໝວດໝູ່</label><input id="ap_cat" list="ap_catList" placeholder="ແທັກເຕີ / ອາໄຫລ່ / ຢາງ" autocomplete="off"></div>
+          <div class="f ap-unit"><label>ຫົວໜ່ວຍ</label><input id="ap_unit" list="ap_unitList" value="ອັນ" autocomplete="off"></div>
+          <div class="f ap-th"><label>ແຈ້ງເຕືອນເມື່ອເຫຼືອ ≤</label><input id="ap_threshold" type="number" min="0" value="1"></div>
+        </div>
+        <datalist id="ap_catList">${cats.map(c=> `<option value="${esc(c)}">`).join('')}</datalist>
+        <datalist id="ap_unitList">${units.map(u=> `<option value="${esc(u)}">`).join('')}</datalist>
+        <label class="ap-serial">
+          <input type="checkbox" id="ap_serial">
+          <span><b>ຕ້ອງເກັບເລກເຄື່ອງແຍກທີລະໜ່ວຍ</b><small>ສຳລັບແທັກເຕີ / ເຄື່ອງຈັກ — ຕອນຮັບເຂົ້າ ແລະ ຂາຍ ຈະຕ້ອງໃສ່ເລກເຄື່ອງ</small></span>
+        </label>
+        <p class="ap-sec">ລາຄາ</p>
+        <div class="ap-prices">
+          <div class="f"><label>ລາຄາຂາຍ (ກີບ)</label><input id="ap_price" type="text" placeholder="0"></div>
+          <div class="f"><label>ລາຄາຂາຍ (ບາດ)</label><input id="ap_price_thb" type="text" placeholder="0"></div>
+          ${canSeeCost ? `
+          <div class="f"><label>ຕົ້ນທຶນ (ກີບ)</label><input id="ap_cost" type="text" placeholder="0"></div>
+          <div class="f"><label>ຕົ້ນທຶນ (ບາດ)</label><input id="ap_cost_thb" type="text" placeholder="0"></div>` : ''}
+        </div>
+        ${canSeeCost ? '' : '<p class="ps-note" style="margin:8px 0 0;">* ຕົ້ນທຶນຈະໃສ່ໂດຍແອດມິນທີຫຼັງ</p>'}
+        <p class="ap-warn" id="ap_warn" hidden></p>
+      </div>
+      <p class="ps-list-head">ສິນຄ້າທີ່ເພີ່ມລ່າສຸດ</p>
+      <div class="ps-table-wrap">
+        <table class="ps-table ps-table-ap"><thead><tr><th class="c">ລຳດັບ</th><th>ຊື່ສິນຄ້າ</th><th>ລະຫັດ</th><th>ໝວດໝູ່</th><th class="c">ຫົວໜ່ວຍ</th><th class="r">ລາຄາຂາຍ</th></tr></thead><tbody>
+        ${recent.length ? recent.map((m,i)=> `<tr><td class="c mono">${i+1}</td>`+
+          `<td class="b">${esc(m.name)}${m.has_serial ? ' <span class="tag ok">ມີເລກເຄື່ອງ</span>' : ''}${m.active===false ? ' <span class="muted" style="font-size:11px;">(ປິດໃຊ້)</span>' : ''}</td>`+
+          `<td class="mono muted">${esc(m.code)||'—'}</td><td>${esc(m.category)||'—'}</td><td class="c">${esc(m.unit)||''}</td>`+
+          `<td class="r mono">${m.sale_price ? fmtMoney(m.sale_price)+' ກີບ' : (m.sale_price_thb ? fmtMoney(m.sale_price_thb)+' ບາດ' : '—')}</td></tr>`).join('')
+          : '<tr class="ps-empty"><td colspan="6">ຍັງບໍ່ມີສິນຄ້າ</td></tr>'}
+        </tbody></table>
+      </div>
+      <div class="ps-foot">
+        <div class="ps-big">
+          <p class="ps-big-label">ສິນຄ້າທີ່ກຳລັງເພີ່ມ</p>
+          <p class="ps-big-amount" id="ap_prevName">—</p>
+          <p class="ap-prev-sub mono" id="ap_prevSub"></p>
+        </div>
+        <div class="ps-sum">
+          <p class="ps-note">ບັນທຶກແລ້ວ ສິນຄ້າຈະຂຶ້ນໃຫ້ເລືອກໃນໜ້າ ຮັບເຂົ້າ / ອອກບິນຂາຍ / ໂອນສາຂາ ທັນທີ — ສະຕັອກເລີ່ມຕົ້ນເປັນ 0 (ໃຫ້ໄປຮັບເຂົ້າ)</p>
+          <button class="btn secondary" id="ap_clear">ລ້າງຟອມ</button>
+          <button class="btn" id="ap_save"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກສິນຄ້າໃໝ່ →</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const $ = id=> document.getElementById(id);
+  ['ap_price','ap_price_thb'].concat(canSeeCost ? ['ap_cost','ap_cost_thb'] : []).forEach(id=> attachMoneyInput(id, ''));
+  const norm = v=> (v||'').trim().toLowerCase();
+  /* ຕົວຢ່າງດ້ານລຸ່ມ + ເຕືອນຊື່/ລະຫັດຊ້ຳກັບສິນຄ້າທີ່ມີແລ້ວ */
+  function refreshPreview(){
+    const name = $('ap_name').value.trim();
+    $('ap_prevName').textContent = name || '—';
+    const bits = [];
+    const lak = moneyValue('ap_price'), thb = moneyValue('ap_price_thb');
+    if(lak) bits.push(fmtMoney(lak)+' ກີບ');
+    if(thb) bits.push(fmtMoney(thb)+' ບາດ');
+    const unit = $('ap_unit').value.trim();
+    $('ap_prevSub').textContent = bits.length ? bits.join(' · ') + (unit ? ' / '+unit : '') : '';
+    const warn = [];
+    const dupName = name && all.find(m=> norm(m.name) === norm(name));
+    const code = $('ap_code').value.trim();
+    const dupCode = code && all.find(m=> norm(m.code) === norm(code));
+    if(dupName) warn.push(`ມີຊື່ "${dupName.name}" ໃນລະບົບແລ້ວ${dupName.active===false ? ' (ປິດໃຊ້ຢູ່)' : ''}`);
+    if(dupCode) warn.push(`ລະຫັດ ${code} ເປັນຂອງ "${dupCode.name}" ແລ້ວ`);
+    $('ap_warn').hidden = !warn.length;
+    $('ap_warn').textContent = warn.length ? '⚠ ' + warn.join(' · ') : '';
+  }
+  main.querySelectorAll('input').forEach(el=> el.addEventListener('input', refreshPreview));
+  const order = ['ap_name','ap_code','ap_cat','ap_unit','ap_threshold','ap_price','ap_price_thb'];
+  if(canSeeCost) order.push('ap_cost','ap_cost_thb');
+  bindEnterAdvance(order, 'ap_save');
+  $('ap_clear').addEventListener('click', ()=>{ tabDrafts.addproduct = {}; renderTab(); });
+  $('ap_save').addEventListener('click', async (e)=>{
+    const btn = e.currentTarget;
+    if(btn.disabled) return;
+    const name = $('ap_name').value.trim();
+    if(!name){ toast('ກະລຸນາໃສ່ຊື່ສິນຄ້າ'); $('ap_name').focus(); return; }
+    const code = $('ap_code').value.trim();
+    const dupName = all.find(m=> norm(m.name) === norm(name));
+    const dupCode = code && all.find(m=> norm(m.code) === norm(code));
+    if((dupName || dupCode) && !confirm('ມີສິນຄ້າຊື່ ຫຼື ລະຫັດນີ້ໃນລະບົບແລ້ວ\n\n' + $('ap_warn').textContent.replace(/^⚠ /,'') + '\n\nຍັງຈະເພີ່ມເປັນສິນຄ້າໃໝ່ອີກລາຍການບໍ?')) return;
+    const payload = {
+      id: uid(),
+      name,
+      code,
+      category: $('ap_cat').value.trim(),
+      unit: $('ap_unit').value.trim() || 'ອັນ',
+      sale_price: moneyValue('ap_price'),
+      sale_price_thb: moneyValue('ap_price_thb'),
+      low_stock_threshold: Number($('ap_threshold').value)||0,
+      has_serial: $('ap_serial').checked
+    };
+    if(canSeeCost){
+      payload.cost_price = moneyValue('ap_cost');
+      payload.cost_price_thb = moneyValue('ap_cost_thb');
+    }
+    btn.disabled = true;
+    try{
+      await sb('stock_product_models', { method:'POST', body: payload });
+      toast(`ເພີ່ມ "${name}" ສຳເລັດ`);
+      tabDrafts.addproduct = {};
+      await renderTab();
+      const nameEl = document.getElementById('ap_name');
+      if(nameEl) nameEl.focus();
+    }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
+  });
+  /* ຫຼັງ restore draft ຄ່ອຍອັບເດດຕົວຢ່າງ */
+  setTimeout(refreshPreview, 0);
 }
 
 /* ============================================================
