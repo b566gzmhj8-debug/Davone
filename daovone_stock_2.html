@@ -321,84 +321,93 @@
   .model-search-meta{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:2px;}
   .model-search-item:hover,.model-search-item.active{background:var(--panel2);}
   .model-search-empty{padding:10px 12px;font-size:13px;color:var(--muted);}
-  /* ══════════ HUB THEME — ໃຫ້ເຂົ້າກັບ hub.html (ພື້ນຫຼັງຮູບ · ແກ້ວ · ທອງ) ══════════
-     ປ່ຽນແຕ່ໜ້າຈໍ; ໃບບິນ/ໃບໂອນ ຕົວຢ່າງກະດາດ (.paper-sheet) ແລະ ຕອນພິມ ຍັງເປັນເຈ້ຍຂາວຄືເກົ່າ */
+  /* ══════════ HUB THEME — ແບບສະຫວ່າງ (ນ້ຳເງິນເຂັ້ມ + ທອງ ເທິງພື້ນຄີມ) ══════════
+     ໂທນດຽວກັບ ສາຂາເມືອງຮຸນ · ປ່ຽນແຕ່ໜ້າຈໍ; ໃບບິນ/ໃບໂອນ ຕົວຢ່າງກະດາດ ແລະ ຕອນພິມ ຍັງເປັນເຈ້ຍຂາວຄືເກົ່າ */
   @media screen{
   :root{
-    --bg:rgba(6,14,34,.55); --panel:rgba(12,22,48,.62); --panel2:rgba(243,217,155,.07); --border:rgba(243,217,155,.16);
-    --orange:#d4a85a; --orange-soft:#f3d99b; --ink:#f3ead2; --muted:rgba(243,234,210,.62);
-    --danger:#ff8f80; --ok:#6fd49c;
+    --bg:#f2eee4; --panel:#fffdf8; --panel2:#f8f3e9; --border:#e4ddcd;
+    --orange:#a57a36; --orange-soft:#8a6224; --ink:#1b2437; --muted:#57607a;
+    --danger:#b3382a; --ok:#2f7d57;
     --font-body:'Lao MN','Noto Sans Lao','Lao Sangam MN',-apple-system,sans-serif;
-    --hub-glass:blur(18px) saturate(1.3);
+    --hub-navy:linear-gradient(170deg,#0b1a3d,#16284f 60%,#0b1a3d);
     --hub-grad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
   }
-  html{background:#0b1a3d;}
-  body{background:transparent;}
-  body::before{content:"";position:fixed;inset:0;z-index:-1;background:#0b1a3d url(login-bg.jpg) center/cover no-repeat;}
-  body::after{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(6,12,30,.52),rgba(6,12,30,.32) 45%,rgba(6,12,30,.6));}
-  @media (max-aspect-ratio:1/1){ body::before{background-position:8% center;} }
+  html,body{background:var(--bg);}
+  body{color:var(--ink);}
   #app{background:transparent;}
-  input,select,textarea{color-scheme:dark;border-radius:10px;}
-  input::placeholder,textarea::placeholder{color:rgba(243,234,210,.4);}
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(212,168,90,.16);}
-  select option{background:#16264d;color:#f3ead2;}
+  input,select,textarea{border-radius:9px;background:#fffdf8;border-color:#ded6c4;}
+  input::placeholder,textarea::placeholder{color:#a9a294;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
 
-  /* หัว + เมนู */
-  header{background:rgba(10,20,44,.72);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);border-bottom:1px solid rgba(243,217,155,.3);}
-  .shop-logo{width:38px;height:38px;flex:none;border-radius:50%;overflow:hidden;background:#000;box-shadow:0 0 0 2px #e9c27a,0 0 14px 2px rgba(255,190,90,.45);}
+  /* ── ຫົວ + ເມນູ = ນ້ຳເງິນເຂັ້ມ ຕັດເສັ້ນທອງ ── */
+  header{background:var(--hub-navy);border-bottom:2px solid #d4a85a;box-shadow:0 2px 14px rgba(11,26,61,.18);}
+  .shop-logo{width:38px;height:38px;flex:none;border-radius:50%;overflow:hidden;background:#000;
+    box-shadow:0 0 0 2px #e9c27a,0 0 14px 2px rgba(255,190,90,.45);}
   .shop-logo img{width:100%;height:100%;display:block;transform:scale(1.15);}
   header .title{font-size:16px;font-weight:800;letter-spacing:.02em;
     background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 55%,#b8893f 75%,#f6dc9c);background-size:250% 100%;
-    -webkit-background-clip:text;background-clip:text;color:transparent;animation:hubShine 6s linear infinite;}
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-filter:drop-shadow(0 0 7px rgba(255,218,150,.55)) drop-shadow(0 0 18px rgba(212,168,90,.35));
+    filter:drop-shadow(0 0 7px rgba(255,218,150,.55)) drop-shadow(0 0 18px rgba(212,168,90,.35));
+    animation:hubShine 6s linear infinite;}
   @keyframes hubShine{to{background-position:-250% 0;}}
-  header .logout{border-radius:10px;border-color:rgba(243,217,155,.35);color:#f3ead2;background:rgba(18,30,58,.5);}
-  nav{background:rgba(10,20,44,.55);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);border-color:rgba(243,217,155,.14);}
-  nav button{color:rgba(243,234,210,.72);}
-  nav button.active{color:#f3d99b;}
-  .seal-mark{border-color:#d4a85a;color:#f3d99b;}
-  .seal-mark::before{border-color:rgba(243,217,155,.5);}
-  .brand .name{background:linear-gradient(100deg,#f6dc9c,#e2b466);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  header .role{color:rgba(243,234,210,.7);}
+  header .logout{border-radius:10px;border-color:rgba(243,217,155,.4);color:#f3ead2;background:rgba(255,255,255,.07);}
+  nav{background:var(--hub-navy);border-bottom:2px solid #d4a85a;}
+  nav button{color:rgba(243,234,210,.78);}
+  nav button.active{color:#f6dc9c;border-bottom-color:#d4a85a;}
+  nav button:hover{color:#fff;}
+  @media (min-width:900px){
+    nav{border-bottom:none;border-right:2px solid #d4a85a;box-shadow:4px 0 22px rgba(11,26,61,.14);}
+    nav button.active{border-left:3px solid #d4a85a;background:rgba(243,217,155,.14);color:#f6dc9c;}
+  }
+  .brand .name{background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 60%,#b8893f);
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;}
+  .seal-mark{border-color:#a57a36;color:#8a6224;}
+  .seal-mark::before{border-color:rgba(165,122,54,.4);}
 
-  /* การ์ด / สถิติ */
-  .card{border-radius:18px;backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);box-shadow:0 14px 40px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);}
-  .card h3{color:#f3d99b;border-bottom-color:rgba(243,217,155,.28);}
-  .stat{border-radius:16px;background:rgba(12,22,48,.6);border:1px solid rgba(243,217,155,.16);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);}
-  button.stat.active{background:rgba(212,168,90,.18);}
-  .yr-bar{background:rgba(6,14,34,.5);}
+  /* ── ກາດ / ສະຖິຕິ ── */
+  .card{background:var(--panel);border-radius:14px;box-shadow:0 4px 16px rgba(27,36,55,.07);}
+  .card h3{color:#0b1a3d;border-bottom-color:#eee5d3;}
+  .stat{background:#fffdf8;border:1px solid var(--border);border-radius:14px;box-shadow:0 2px 10px rgba(27,36,55,.05);}
+  .stat b,.stat .num{color:#0b1a3d;}
+  button.stat.active{background:#f7efdc;border-color:#d4a85a;}
+  .yr-bar{background:#f0e9db;}
   .yr-bar i{background:var(--hub-grad);}
 
-  /* ปุ่ม */
-  .btn,.login-btn{background:var(--hub-grad);color:#1a1405;border-radius:12px;box-shadow:0 8px 20px rgba(212,168,90,.25);}
-  .btn:hover,.login-btn:hover{filter:brightness(1.06);}
-  .btn.secondary{background:rgba(212,168,90,.1);border:1px solid rgba(243,217,155,.5);color:#f3d99b;box-shadow:none;}
-  .btn.danger{background:rgba(255,120,100,.14);border:1px solid rgba(255,140,120,.45);color:#ff9a8c;box-shadow:none;}
-  .icon-btn{border-radius:10px;border-color:rgba(243,217,155,.24);}
-  .pay-chips button{background:rgba(6,14,34,.45);}
+  /* ── ປຸ່ມ ── */
+  .btn,.login-btn{background:var(--hub-grad);color:#1a1405;border-radius:11px;box-shadow:0 6px 16px rgba(165,122,54,.26);}
+  .btn:hover,.login-btn:hover{filter:brightness(1.05);}
+  .btn.secondary{background:#fffdf8;border:1px solid #d9cdb0;color:#8a6224;box-shadow:none;}
+  .btn.secondary:hover{border-color:#a57a36;color:#6f4e1c;}
+  .btn.danger{background:#fbeae7;border:1px solid #e3b5ac;color:#a4301f;box-shadow:none;}
+  .icon-btn{border-radius:10px;border-color:#ded6c4;color:#57607a;}
+  .icon-btn:hover{border-color:#a57a36;color:#8a6224;}
+  .pay-chips button,.pay-quick button{background:#fffdf8;border-color:#ded6c4;}
   .pay-chips button[aria-pressed="true"]{background:var(--hub-grad);color:#1a1405;border-color:transparent;}
-  .pay-quick button{background:rgba(6,14,34,.45);}
   .rcv-count-badge{background:var(--hub-grad);color:#1a1405;}
-  .cart-item{background:rgba(243,217,155,.07);border:1px solid rgba(243,217,155,.12);border-radius:12px;}
-  .tag.ok{background:rgba(111,212,156,.1);}
-  .tag.sold{background:rgba(255,143,128,.1);}
+  .cart-item{background:#faf6ec;border:1px solid #eee3cc;border-radius:12px;}
+  .tag.ok{background:#e8f2ec;color:#2f7d57;}
+  .tag.sold{background:#f8eae7;color:#b3382a;}
 
-  /* ปັອບອັບ / ແຈ້ງເຕືອນ / ລາຍການເລືອກ */
-  .modal-bg{background:rgba(4,10,26,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
-  .modal{background:rgba(16,28,56,.94);backdrop-filter:var(--hub-glass);-webkit-backdrop-filter:var(--hub-glass);border:1px solid rgba(243,217,155,.3);box-shadow:0 30px 80px rgba(0,0,0,.5);}
-  .model-search-dropdown{background:#16264d;}
-  .toast{background:rgba(16,28,56,.95);border:1px solid rgba(243,217,155,.35);color:#f3ead2;}
+  /* ── ປັອບອັບ / ແຈ້ງເຕືອນ / ລາຍການເລືອກ ── */
+  .modal-bg{background:rgba(11,26,61,.42);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .modal{background:#fffdf8;border:1px solid #e8dfc9;box-shadow:0 24px 60px rgba(27,36,55,.25);}
+  .model-search-dropdown{background:#fffdf8;box-shadow:0 12px 26px rgba(27,36,55,.14);}
+  .toast{background:linear-gradient(135deg,#0b1a3d,#1c3264);border:1px solid #d4a85a;color:#f3ead2;}
 
-  /* ການ໌ດເອກະສານ (ໃບໂອນ ຯລຯ) ໃນແອັບ → ນ້ຳເງິນ+ທອງ ຄືໃບຮັບເງິນ */
-  .doc-card{background:rgba(12,22,48,.7);}
+  /* ── ການ໌ດເອກະສານ (ໃບໂອນ ຯລຯ) ໃນແອັບ → ນ້ຳເງິນ+ທອງ ຄືໃບຮັບເງິນ ── */
+  .doc-card{background:#fffdf8;border-color:#e8dfc9;}
   .doc-head{background:linear-gradient(135deg,#0b1a3d,#1c3264);border-bottom:3px solid #d4a85a;}
   .doc-head-title h3{color:#f3d99b;}
   .doc-brand .seal-mark{border-color:#d4a85a;color:#f3d99b;}
   .doc-tag{border-color:rgba(243,217,155,.7);}
   .doc-avatar{background:var(--hub-grad);color:#1a1405;}
-  .doc-table-head{background:#0f1f45;color:#f3d99b;border:1px solid rgba(243,217,155,.25);border-bottom:none;}
-  .doc-total-band{background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f3d99b;border:1px solid rgba(243,217,155,.35);}
-  .doc-footer{background:rgba(6,14,34,.4);}
-  /* ຕົວຢ່າງກະດາດ: ພື້ນຮອງເປັນແກ້ວ, ແຜ່ນເຈ້ຍຍັງຂາວ */
-  .paper{background:rgba(6,14,34,.45);border:1px solid rgba(243,217,155,.16);}
+  .doc-table-head{background:#0f1f45;color:#f3d99b;border:1px solid rgba(15,31,69,.3);border-bottom:none;}
+  .doc-total-band{background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f3d99b;border:1px solid rgba(15,31,69,.3);}
+  .doc-footer{background:#faf6ec;}
+  /* ຕົວຢ່າງກະດາດ: ພື້ນຮອງຄີມ, ແຜ່ນເຈ້ຍຍັງຂາວ */
+  .paper{background:#eae3d3;border:1px solid #ded6c4;}
   }
 
 </style>
