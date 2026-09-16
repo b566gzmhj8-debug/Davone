@@ -410,6 +410,82 @@
   .paper{background:#eae3d3;border:1px solid #ded6c4;}
   }
 
+  /* ══════════ POS SHEET — ໜ້າອອກບິນຂາຍ / ໂອນສາຂາ ໃຫ້ຄືກັບ ສາຂາເມືອງຮຸນ ══════════ */
+  @media screen{
+  .ps-seg{display:flex;gap:8px;margin-bottom:12px;}
+  .ps-seg button{flex:1;max-width:230px;padding:11px 14px;border-radius:11px;border:1px solid #ded6c4;
+    background:#fffdf8;color:#57607a;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+  .ps-seg button.on{background:var(--hub-grad);border-color:transparent;color:#1a1405;font-weight:700;}
+  .ps-sheet{padding:0;overflow:hidden;display:flex;flex-direction:column;}
+  .ps-editbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;
+    background:#fbf1de;border-bottom:1px solid #e8dfc9;color:#8a6224;font-weight:700;font-size:13px;}
+  .ps-editbar .btn{width:auto;margin:0;padding:6px 14px;}
+  .ps-head{display:grid;grid-template-columns:1fr 1fr 1.5fr auto;gap:10px;align-items:center;
+    padding:14px 16px;background:#faf6ed;border-bottom:1px solid #eee5d3;}
+  .ps-head input{margin:0;}
+  .ps-addr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+  .ps-head-tr{grid-template-columns:1.4fr 1.4fr 170px auto;}
+  .ps-meta{text-align:right;font-size:12px;color:#57607a;line-height:1.7;white-space:nowrap;}
+  .ps-meta b{color:#8a6224;}
+  .ps-meta span{display:block;}
+  .ps-entry{padding:14px 16px 10px;border-bottom:1px solid #eee5d3;}
+  .ps-entry-row{display:grid;grid-template-columns:minmax(0,1fr) 160px 200px 120px;gap:12px;align-items:end;}
+  .ps-entry-row.tr{grid-template-columns:minmax(0,1fr) 150px 130px;}
+  .ps-entry .f label{display:block;margin:0 0 4px;font-size:12.5px;color:#57607a;}
+  .ps-entry .f-qp{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end;}
+  .ps-entry .f input,.ps-entry .f select{margin:0;}
+  .ps-entry .btn{margin:0;}
+  #s_model,#tr_model{font-size:16px;padding:12px;}
+  .tr-serials{max-height:210px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;
+    padding:8px;background:#fffdf8;margin-top:6px;}
+  .ps-list-head{padding:12px 16px 0;font-size:14px;font-weight:700;color:#0b1a3d;}
+  .ps-table-wrap{padding:4px 16px 10px;flex:1;min-height:150px;overflow:auto;}
+  .ps-table{width:100%;border-collapse:collapse;}
+  .ps-table th{padding:8px 6px;border-bottom:1px solid #e8dfc9;font-size:12px;font-weight:700;
+    color:#8a8fa2;text-align:left;white-space:nowrap;}
+  .ps-table td{padding:9px 6px;border-bottom:1px solid #f2ebdd;font-size:14px;color:#1b2437;vertical-align:middle;}
+  .ps-table tr:last-child td{border-bottom:none;}
+  .ps-table .c{text-align:center;}
+  .ps-table .r{text-align:right;white-space:nowrap;}
+  .ps-table .b{font-weight:700;color:#0b1a3d;}
+  .ps-table .x{cursor:pointer;color:#b3382a;font-weight:700;padding:2px 6px;}
+  .ps-table .ps-empty td{padding:36px 6px;text-align:center;color:#8a8fa2;font-size:13px;border-bottom:none;}
+  .ps-table .ps-sub td{font-size:13px;color:#7b8194;}
+  .ps-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,48%);border-top:1px solid #eee5d3;}
+  .ps-big{display:flex;flex-direction:column;justify-content:center;padding:18px 24px;
+    background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f6dc9c;}
+  .ps-big-label{margin:0;font-size:13px;color:rgba(255,255,255,.78);}
+  .ps-big-amount{margin:6px 0 0;font-size:40px;font-weight:800;line-height:1.05;overflow-wrap:anywhere;}
+  .ps-sum{padding:14px 18px 16px;background:#fffdf8;}
+  .ps-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:14px;color:#57607a;}
+  .ps-line b{color:#0b1a3d;}
+  .ps-line input{width:150px;margin:0;text-align:right;}
+  .ps-remain{border-top:1px solid #eee5d3;margin-top:4px;padding-top:8px;}
+  .ps-remain span,.ps-remain b{color:#8a6224;font-weight:700;}
+  .ps-pay{margin:8px 0;padding:10px 0;border-top:1px dashed #e8dfc9;border-bottom:1px dashed #e8dfc9;}
+  .ps-pay-top{display:grid;grid-template-columns:auto minmax(0,1fr) 108px auto;gap:8px;align-items:center;}
+  .ps-pay-top input,.ps-pay-top select{margin:0;}
+  .ps-pay-top .btn{margin:0;width:auto;padding:9px 14px;}
+  .ps-pay .pay-quick{margin-top:8px;}
+  .ps-pay #s_paymentList:not(:empty){margin-top:8px;}
+  .ps-note{margin:6px 0 10px;font-size:12px;color:#8a8fa2;line-height:1.6;}
+  .ps-sum .btn{margin-top:10px;}
+  @media (max-width:760px){
+    .ps-table th,.ps-table td{padding:8px 4px;font-size:13px;}
+    .ps-table-sell th:nth-child(4),.ps-table-sell td:nth-child(4){display:none;}
+  }
+  @media (max-width:900px){
+    .ps-head,.ps-head-tr{grid-template-columns:1fr;}
+    .ps-meta{text-align:left;}
+    .ps-entry-row,.ps-entry-row.tr{grid-template-columns:1fr;}
+    .ps-entry .f-qp{grid-template-columns:1fr 1fr;}
+    .ps-foot{grid-template-columns:1fr;}
+    .ps-big-amount{font-size:32px;}
+    .ps-pay-top{grid-template-columns:1fr;}
+    .ps-seg button{max-width:none;font-size:13px;}
+  }
+  }
+
 </style>
 </head>
 <body>
@@ -2586,90 +2662,91 @@ async function renderSell(main){
   const models = await getModels();
   if(!editingInvoice) sellPayments = [];
   main.innerHTML = `
-    ${editingInvoice ? `
-    <div class="card" style="border:2px solid var(--orange-soft);">
-      <div class="row" style="align-items:center;">
-        <span style="font-weight:700;color:var(--orange-soft);"><svg class="dv-icon"><use href="#i-pencil"></use></svg> ກຳລັງແກ້ໄຂບິນ <span class="mono">${editingInvoice.inv.invoice_no || ''}</span></span>
-        <button class="btn danger" id="s_cancelEdit" style="width:auto;padding:6px 14px;margin:0;">ຍົກເລີກ</button>
+    <div class="card ps-sheet">
+      ${editingInvoice ? `
+      <div class="ps-editbar">
+        <span><svg class="dv-icon"><use href="#i-pencil"></use></svg> ກຳລັງແກ້ໄຂບິນ <span class="mono">${editingInvoice.inv.invoice_no || ''}</span> · ບັນທຶກແລ້ວສະຕັອກຈະຄິດໃໝ່ໃຫ້</span>
+        <button class="btn danger" id="s_cancelEdit">ຍົກເລີກ</button>
+      </div>` : ''}
+      <div class="ps-head">
+        <input id="s_name" placeholder="ຊື່ລູກຄ້າ (ບໍ່ບັງຄັບ)">
+        <input id="s_phone" placeholder="ເບີໂທ 020xxxxxxxx">
+        <div class="ps-addr">
+          <input id="s_village" placeholder="ບ້ານ">
+          <input id="s_district" placeholder="ເມືອງ">
+          <input id="s_province" placeholder="ແຂວງ">
+        </div>
+        <div class="ps-meta">
+          <span>${editingInvoice ? 'ແກ້ໄຂບິນ <b class="mono">'+(editingInvoice.inv.invoice_no||'')+'</b>' : 'ບິນຂາຍໃໝ່'}</span>
+          <span class="mono">${fmtDateDMY(todayStr())} ${new Date().toTimeString().slice(0,5)}</span>
+        </div>
       </div>
-      <div class="muted" style="font-size:12px;margin-top:6px;">ແກ້ໄດ້ທັງລູກຄ້າ ລາຍການ ຈຳນວນ ແລະ ການຈ່າຍ · ບັນທຶກແລ້ວ ສະຕັອກຈະຄິດໃໝ່ໃຫ້ອັດຕະໂນມັດ</div>
-    </div>` : ''}
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-users"></use></svg>ຂໍ້ມູນລູກຄ້າ</h3>
-      <label>ຊື່ລູກຄ້າ</label>
-      <input id="s_name" placeholder="ຊື່ ນາມສະກຸນ">
-      <label>ເບີໂທ</label>
-      <input id="s_phone" placeholder="020xxxxxxxx">
-      <div class="grid2">
-        <div><label>ບ້ານ</label><input id="s_village"></div>
-        <div><label>ເມືອງ</label><input id="s_district"></div>
+      <div class="ps-entry">
+        <div class="ps-entry-row">
+          <div class="f f-model">
+            <label>ລະຫັດ / ຊື່ສິນຄ້າ — ເລືອກເພື່ອເພີ່ມ</label>
+            <select id="s_model">
+              <option value="">-- ເລືອກສິນຄ້າ --</option>
+              ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="f f-unit" id="s_unitBlock" style="display:none;">
+            <label>ເລກເຄື່ອງ</label>
+            <select id="s_unitSelect"></select>
+          </div>
+          <div class="f-qp" id="s_qtyPriceBlock">
+            <div class="f"><label>ຈຳນວນ</label><input id="s_qty" type="number" value="1" min="1"></div>
+            <div class="f"><label>ລາຄາ/ໜ່ວຍ</label><input id="s_price" type="text" value="0"></div>
+          </div>
+          <div class="f f-add"><label>&nbsp;</label><button class="btn secondary" id="s_addItem">+ ເພີ່ມ</button></div>
+        </div>
       </div>
-      <label>ແຂວງ</label>
-      <input id="s_province">
-    </div>
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-box"></use></svg>ເລືອກລາຍການ</h3>
-      <select id="s_model">
-        <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
-      </select>
-      <div id="s_unitBlock" style="display:none;">
-        <label>ເລືອກໜ່ວຍ (ເລກເຄື່ອງ)</label>
-        <select id="s_unitSelect"></select>
+      <p class="ps-list-head">ລາຍການສິນຄ້າໃນບິນ</p>
+      <div class="ps-table-wrap" id="s_cartList">${renderSellCart()}</div>
+      <div class="ps-foot">
+        <div class="ps-big">
+          <p class="ps-big-label">ຍອດທີ່ຕ້ອງຊຳລະ</p>
+          <p class="ps-big-amount mono" id="s_totalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</p>
+        </div>
+        <div class="ps-sum">
+          <div class="ps-line"><span>ລວມຄ່າສິນຄ້າ</span><b class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</b></div>
+          <div class="ps-line"><span>ຫຼຸດລາຄາ</span><input id="s_discount" type="text" value="0"></div>
+          <div class="ps-pay">
+            <div class="ps-pay-top">
+              <div class="pay-chips" id="s_pay_methodChips">
+                <button type="button" data-method="cash" aria-pressed="true">ເງິນສົດ</button>
+                <button type="button" data-method="transfer" aria-pressed="false">ໂອນ</button>
+              </div>
+              <input id="s_pay_amount" type="text" placeholder="ຈຳນວນທີ່ຮັບ">
+              <select id="s_pay_currency">
+                <option value="LAK">ກີບ</option>
+                <option value="THB">ບາດ</option>
+              </select>
+              <button class="btn secondary" id="s_addPayment">ຮັບເງິນ</button>
+            </div>
+            <div class="pay-quick"><button type="button" id="s_pay_fillRest">ໃສ່ຍອດຄ້າງທັງໝົດ</button></div>
+            <div id="s_pay_rateBlock" style="display:none;">
+              <label>ອັດຕາແລກປ່ຽນມື້ນີ້ (1 ບາດ = ? ກີບ)</label>
+              <input id="s_pay_rate" type="text" placeholder="ເຊັ່ນ 620">
+            </div>
+            <div id="s_paymentList"></div>
+            <!-- select ເກົ່າເຊື່ອງໄວ້ ໃຫ້ປຸ່ມຂ້າງເທິງເປັນຄົນຕັ້ງຄ່າ .value ໂຄ້ດສ່ວນອື່ນຈຶ່ງອ່ານໄດ້ຄືເກົ່າ -->
+            <select id="s_pay_method" style="display:none;">
+              <option value="cash">ເງິນສົດ</option>
+              <option value="transfer">ໂອນ</option>
+            </select>
+          </div>
+          <div class="ps-line"><span>ຍອດບິນ</span><b class="mono" id="s_sumTotal">0</b></div>
+          <div class="ps-line"><span>ຈ່າຍແລ້ວ</span><b class="mono" id="s_sumPaid">0</b></div>
+          <div class="ps-line ps-remain"><span>ຄ້າງຊຳລະ</span><b class="mono" id="s_sumRemain">0</b></div>
+          <button class="btn" id="s_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>${editingInvoice ? 'ບັນທຶກການແກ້ໄຂບິນ' : 'ຢືນຢັນອອກບິນ (ຫັກສະຕັອກທັນທີ) →'}</button>
+          <!-- ສະກຸນເງິນບິນເລືອກອັດຕະໂນມັດຕາມສິນຄ້າ ຈຶ່ງເຊື່ອງ dropdown ໄວ້ -->
+          <select id="s_currency" style="display:none;">
+            <option value="LAK">ກີບ (LAK)</option>
+            <option value="THB">ບາດ (THB)</option>
+          </select>
+        </div>
       </div>
-      <div class="grid2" id="s_qtyPriceBlock">
-        <div><label>ຈຳນວນ</label><input id="s_qty" type="number" value="1" min="1"></div>
-        <div><label>ລາຄາ/ໜ່ວຍ</label><input id="s_price" type="text" value="0"></div>
-      </div>
-      <button class="btn secondary" id="s_addItem"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າບິນ</button>
-    </div>
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການໃນບິນ</h3>
-      <div id="s_cartList">${renderSellCart()}</div>
-      <div class="row"><span>ລວມຍ່ອຍ</span><span class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</span></div>
-      <label>ຫຼຸດລາຄາ (ຖ້າມີ)</label>
-      <input id="s_discount" type="text" value="0">
-      <div class="invoice-total mono" id="s_totalDisplay">ລວມ: ${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</div>
-      <!-- ສະກຸນເງິນບິນເລືອກອັດຕະໂນມັດຕາມສິນຄ້າ (ສິນຄ້າແຕ່ລະລາຍການຕັ້ງລາຄາສະກຸນດຽວ) ຈຶ່ງເຊື່ອງ dropdown ໄວ້ ບໍ່ໃຫ້ຜູ້ໃຊ້ເລືອກເອງ -->
-      <select id="s_currency" style="display:none;">
-        <option value="LAK">ກີບ (LAK)</option>
-        <option value="THB">ບາດ (THB)</option>
-      </select>
-    </div>
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-wallet"></use></svg>ການຈ່າຍເງິນ</h3>
-      <div id="s_paymentList"></div>
-      <hr class="sep">
-      <label>ຊ່ອງທາງຈ່າຍ</label>
-      <div class="pay-chips" id="s_pay_methodChips">
-        <button type="button" data-method="cash" aria-pressed="true">ເງິນສົດ</button>
-        <button type="button" data-method="transfer" aria-pressed="false">ໂອນ</button>
-      </div>
-      <!-- select ເກົ່າເຊື່ອງໄວ້ ໃຫ້ປຸ່ມຂ້າງເທິງເປັນຄົນຕັ້ງຄ່າ .value ໂຄ້ດສ່ວນອື່ນຈຶ່ງອ່ານໄດ້ຄືເກົ່າ -->
-      <select id="s_pay_method" style="display:none;">
-        <option value="cash">ເງິນສົດ</option>
-        <option value="transfer">ໂອນ</option>
-      </select>
-      <div class="grid2" style="margin-top:10px;">
-        <input id="s_pay_amount" type="text" placeholder="ຈຳນວນ">
-        <select id="s_pay_currency">
-          <option value="LAK">ກີບ (LAK)</option>
-          <option value="THB">ບາດ (THB)</option>
-        </select>
-      </div>
-      <div class="pay-quick">
-        <button type="button" id="s_pay_fillRest">ໃສ່ຍອດຄ້າງທັງໝົດ</button>
-      </div>
-      <div id="s_pay_rateBlock" style="display:none;">
-        <label>ອັດຕາແລກປ່ຽນມື້ນີ້ (1 ບາດ = ? ກີບ)</label>
-        <input id="s_pay_rate" type="text" placeholder="ເຊັ່ນ 620">
-      </div>
-      <button class="btn secondary" id="s_addPayment"><svg class="dv-icon"><use href="#i-wallet"></use></svg>ເພີ່ມການຈ່າຍ</button>
-      <hr class="sep">
-      <div class="row"><span>ຍອດບິນ</span><span class="mono" id="s_sumTotal">0</span></div>
-      <div class="row"><span>ຈ່າຍແລ້ວ</span><span class="mono" id="s_sumPaid">0</span></div>
-      <div class="row"><span class="gold">ຄ້າງຊຳລະ</span><span class="gold mono" id="s_sumRemain">0</span></div>
-      <button class="btn" id="s_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>${editingInvoice ? 'ບັນທຶກການແກ້ໄຂບິນ' : 'ຢືນຢັນອອກບິນ (ຫັກສະຕັອກທັນທີ)'}</button>
     </div>
   `;
   attachMoneyInput('s_price', 0);
@@ -3015,28 +3092,35 @@ function updateSellTotals(){
   const subtotalDisplay = document.getElementById('s_subtotalDisplay');
   if(subtotalDisplay) subtotalDisplay.textContent = fmtMoney(subtotal) + ' ' + unit;
   const totalDisplay = document.getElementById('s_totalDisplay');
-  if(totalDisplay) totalDisplay.textContent = 'ລວມ: ' + fmtMoney(total) + ' ' + unit;
+  if(totalDisplay) totalDisplay.textContent = fmtMoney(total) + ' ' + unit;
   const st = document.getElementById('s_sumTotal'); if(st) st.textContent = fmtMoney(total) + ' ' + unit;
   const sp = document.getElementById('s_sumPaid'); if(sp) sp.textContent = fmtMoney(paid) + ' ' + unit;
   const sr = document.getElementById('s_sumRemain'); if(sr) sr.textContent = fmtMoney(remain > 0 ? remain : 0) + ' ' + unit;
 }
 function renderSellCart(){
-  if(!sellCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
-  return sellCart.map((it,idx)=> {
+  const head = '<table class="ps-table ps-table-sell"><thead><tr><th class="c">ລຳດັບ</th><th>ຊື່ສິນຄ້າ</th>'+
+    '<th class="c">ຈຳນວນ</th><th class="r">ລາຄາ/ໜ່ວຍ</th><th class="r">ຈຳນວນເງິນ</th><th></th></tr></thead><tbody>';
+  if(!sellCart.length){
+    return head + '<tr class="ps-empty"><td colspan="6">ຍັງບໍ່ມີລາຍການ — ເລືອກສິນຄ້າຂ້າງເທິງ ແລ້ວກົດ + ເພີ່ມ</td></tr></tbody></table>';
+  }
+  const rows = sellCart.map((it,idx)=> {
     if(it.bundleComponent){
-      /* ອຸປະກອນທີ່ມາພ້ອມໃນຊຸດ: ໂຊວ໌ຫຍໍ້ຍໍ້ ລາຄາປົກກະຕິ (ບໍ່ບວກເຂົ້າຍອດ) */
-      return `
-    <div class="cart-item" style="margin-left:16px;opacity:.8;">
-      <span>↳ ${it.model_name} × ${it.quantity} <span class="muted" style="font-size:11px;">(${BUNDLE_TAG})</span></span>
-      <span class="muted">${fmtMoney(it.unit_price)} ${sellCurUnit()} <span class="x" data-idx="${idx}">✕</span></span>
-    </div>`;
+      /* ອຸປະກອນທີ່ມາພ້ອມໃນຊຸດ: ໂຊວ໌ລາຄາປົກກະຕິ (ບໍ່ບວກເຂົ້າຍອດ) */
+      return `<tr class="ps-sub"><td class="c"></td>`+
+        `<td>↳ ${it.model_name} <span class="muted" style="font-size:11px;">(${BUNDLE_TAG})</span></td>`+
+        `<td class="c mono">${it.quantity}</td>`+
+        `<td class="r mono">${fmtMoney(it.unit_price)}</td>`+
+        `<td class="r">—</td>`+
+        `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`;
     }
-    return `
-    <div class="cart-item">
-      <span>${it.model_name}${it.variant_note?(' · '+it.variant_note):(' × '+it.quantity)}</span>
-      <span>${fmtMoney(it.amount)} ${sellCurUnit()} <span class="x" data-idx="${idx}">✕</span></span>
-    </div>`;
+    return `<tr><td class="c mono">${idx+1}</td>`+
+      `<td>${it.model_name}${it.variant_note?(' · <span class="mono muted">'+it.variant_note+'</span>'):''}</td>`+
+      `<td class="c mono">${it.quantity}</td>`+
+      `<td class="r mono">${fmtMoney(it.unit_price)}</td>`+
+      `<td class="r mono b">${fmtMoney(it.amount)} ${sellCurUnit()}</td>`+
+      `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`;
   }).join('');
+  return head + rows + '</tbody></table>';
 }
 function bindSellCartRemove(){
   document.querySelectorAll('#s_cartList .x').forEach(el=>{
@@ -3068,43 +3152,61 @@ async function renderTransfer(main){
   main.innerHTML = `
     ${!canTransfer ? '<div class="card"><div class="muted" style="font-size:12px;">ທ່ານເບິ່ງໄດ້ຢ່າງດຽວ · ເບິ່ງປະຫວັດການໂອນສາຂາລຸ່ມນີ້</div></div>' : ''}
     ${canTransfer ? `
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ໂອນສິນຄ້າໄປສາຂາອື່ນ</h3>
-      <div class="muted" style="font-size:12px;margin-bottom:8px;">ຟັງຊັນນີ້ຕັດສະຕັອກອອກຈາກສາຂານີ້ເທົ່ານັ້ນ ບໍ່ມີການອອກບິນ ບໍ່ຮັບເງິນ ບໍ່ກະທົບຍອດຂາຍ/ກຳໄລ</div>
-      <label>ສາຂາປາຍທາງ</label>
-      <input id="tr_branch" placeholder="ເຊັ່ນ: ສາຂາ 2 - ຫຼວງພະບາງ">
-      <label>ວັນທີ</label>
-      <input id="tr_date" type="date" value="${todayStr()}">
-      <hr class="sep">
-      <label>ເລືອກສິນຄ້າ</label>
-      <select id="tr_model">
-        <option value="">-- ເລືອກສິນຄ້າ --</option>
-        ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
-      </select>
-      <div id="tr_qtyBlock">
-        <label>ຈຳນວນ</label>
-        <input id="tr_qty" type="number" value="1" min="1">
-      </div>
-      <div id="tr_serialBlock" style="display:none;">
-        <label>ເລືອກເລກເຄື່ອງທີ່ຈະໂອນ (ເລືອກໄດ້ຫຼາຍລາຍການ)</label>
-        <input id="tr_serialSearch" placeholder="ພິມເລກເຄື່ອງເພື່ອຄົ້ນຫາ..." autocomplete="off" style="margin-bottom:8px;">
-        <div id="tr_serialList" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--panel);"></div>
-      </div>
-      <label>ໝາຍເຫດ (ຖ້າມີ)</label>
-      <input id="tr_note" placeholder="ເຊັ່ນ ຜູ້ຮັບຜິດຊອບຂົນສົ່ງ">
-      <button class="btn secondary" id="tr_addItem" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-box"></use></svg>ເພີ່ມເຂົ້າລາຍການ</button>
+    <div class="ps-seg" id="trSeg">
+      <button type="button" class="on" data-v="new">ສ້າງໃບໂອນ</button>
+      <button type="button" data-v="hist">ປະຫວັດການໂອນ</button>
     </div>
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-receipt"></use></svg>ລາຍການທີ່ຈະໂອນ</h3>
-      <div id="tr_cartList">${renderTransferCart()}</div>
-      <button class="btn" id="tr_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກໂອນສາຂາ (ຕັດສະຕັອກ)</button>
-    </div>
-    ` : ''}
-    <div class="card">
-      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການໂອນສາຂາ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
-      <label>ເລືອກເດືອນ</label>
-      <input type="month" id="tr_month" value="${historyMonth}">
-      <div id="tr_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+    <div id="trNewView">
+      <div class="card ps-sheet">
+        <div class="ps-head ps-head-tr">
+          <input id="tr_branch" placeholder="ໂອນໄປສາຂາ (ຕ້ອງໃສ່) ເຊັ່ນ: ສາຂາເມືອງຮຸນ">
+          <input id="tr_note" placeholder="ໝາຍເຫດ / ຜູ້ຮັບຜິດຊອບຂົນສົ່ງ">
+          <input id="tr_date" type="date" value="${todayStr()}">
+          <div class="ps-meta">
+            <span>ໃບໂອນສິນຄ້າ</span>
+            <span class="mono">${fmtDateDMY(todayStr())}</span>
+          </div>
+        </div>
+        <div class="ps-entry">
+          <div class="ps-entry-row tr">
+            <div class="f f-model">
+              <label>ລະຫັດ / ຊື່ສິນຄ້າ — ເລືອກເພື່ອເພີ່ມ</label>
+              <select id="tr_model">
+                <option value="">-- ເລືອກສິນຄ້າ --</option>
+                ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="f f-qty" id="tr_qtyBlock"><label>ຈຳນວນ</label><input id="tr_qty" type="number" value="1" min="1"></div>
+            <div class="f f-add"><label>&nbsp;</label><button class="btn secondary" id="tr_addItem">+ ເພີ່ມ</button></div>
+          </div>
+          <div id="tr_serialBlock" style="display:none;">
+            <label style="display:block;margin:12px 0 4px;font-size:12.5px;color:#57607a;">ເລືອກເລກເຄື່ອງທີ່ຈະໂອນ (ເລືອກໄດ້ຫຼາຍລາຍການ)</label>
+            <input id="tr_serialSearch" placeholder="ພິມເລກເຄື່ອງເພື່ອຄົ້ນຫາ..." autocomplete="off">
+            <div id="tr_serialList" class="tr-serials"></div>
+          </div>
+        </div>
+        <p class="ps-list-head">ລາຍການສິນຄ້າທີ່ໂອນ</p>
+        <div class="ps-table-wrap" id="tr_cartList">${renderTransferCart()}</div>
+        <div class="ps-foot">
+          <div class="ps-big">
+            <p class="ps-big-label">ຈຳນວນທີ່ໂອນ</p>
+            <p class="ps-big-amount mono" id="tr_bigCount">0</p>
+          </div>
+          <div class="ps-sum">
+            <div class="ps-line"><span>ຈຳນວນລາຍການ</span><b class="mono" id="tr_lineCount">0</b></div>
+            <p class="ps-note">ຕັດແຕ່ສະຕັອກ — ບໍ່ນັບເປັນຍອດຂາຍ ແລະ ບໍ່ກະທົບກຳໄລ</p>
+            <button class="btn" id="tr_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກການໂອນ (ຕັດສະຕັອກ) →</button>
+          </div>
+        </div>
+      </div>
+    </div>` : ''}
+    <div id="trHistView"${canTransfer ? ' style="display:none;"' : ''}>
+      <div class="card">
+        <h3><svg class="dv-icon"><use href="#i-truck"></use></svg>ປະຫວັດການໂອນສາຂາ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
+        <label>ເລືອກເດືອນ</label>
+        <input type="month" id="tr_month" value="${historyMonth}">
+        <div id="tr_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+      </div>
     </div>
   `;
   /* ປະຫວັດການໂອນ — ຜູກໄວ້ກ່ອນສະເໝີ ໃຫ້ manager (view only) ກໍ່ເຫັນ */
@@ -3113,6 +3215,17 @@ async function renderTransfer(main){
     loadTransferHistory(e.target.value);
   });
   loadTransferHistory(historyMonth);
+  /* ສະຫຼັບລະຫວ່າງ ສ້າງໃບໂອນ ກັບ ປະຫວັດການໂອນ (ຄືແຖບຂອງສາຂາເມືອງຮຸນ) */
+  const trSeg = document.getElementById('trSeg');
+  if(trSeg){
+    trSeg.addEventListener('click', (e)=>{
+      const b = e.target.closest('button'); if(!b) return;
+      Array.from(trSeg.children).forEach(x=> x.classList.remove('on'));
+      b.classList.add('on');
+      document.getElementById('trNewView').style.display = b.dataset.v === 'new' ? '' : 'none';
+      document.getElementById('trHistView').style.display = b.dataset.v === 'hist' ? '' : 'none';
+    });
+  }
   if(!canTransfer) return; /* ຜູ້ຈັດການ ບໍ່ຕ້ອງຜູກຟອມສ້າງໂອນ (ບໍ່ໄດ້ render ຟອມ) */
   const modelSel = document.getElementById('tr_model');
   enableSearchableSelect(modelSel);
@@ -3274,14 +3387,29 @@ async function renderTransfer(main){
   });
 }
 function renderTransferCart(){
-  if(!transferCart.length) return '<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
-  return transferCart.map((it,idx)=> `
-    <div class="cart-item">
-      <span>${it.model_name}${it.serial_no ? (' · <span class="mono">'+it.serial_no+'</span>') : (' × '+it.quantity)}</span>
-      <span class="x" data-idx="${idx}">✕</span>
-    </div>`).join('');
+  const head = '<table class="ps-table ps-table-tr"><thead><tr><th class="c">ລຳດັບ</th><th>ຊື່ສິນຄ້າ</th>'+
+    '<th>ເລກເຄື່ອງ</th><th class="c">ຈຳນວນ</th><th></th></tr></thead><tbody>';
+  if(!transferCart.length){
+    return head + '<tr class="ps-empty"><td colspan="5">ຍັງບໍ່ມີລາຍການ — ເລືອກສິນຄ້າຂ້າງເທິງ ແລ້ວກົດ + ເພີ່ມ</td></tr></tbody></table>';
+  }
+  const rows = transferCart.map((it,idx)=>
+    `<tr><td class="c mono">${idx+1}</td><td>${it.model_name}</td>`+
+    `<td class="mono muted">${it.serial_no || '—'}</td>`+
+    `<td class="c mono b">${it.quantity}</td>`+
+    `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
+  return head + rows + '</tbody></table>';
+}
+/* ຕົວເລກໃນແຖບລຸ່ມສຸດ (ຈຳນວນທີ່ໂອນ / ຈຳນວນລາຍການ) */
+function updateTransferCount(){
+  const big = document.getElementById('tr_bigCount');
+  if(!big) return;
+  const qty = transferCart.reduce((s,i)=> s + (Number(i.quantity)||0), 0);
+  big.textContent = fmtMoney(qty);
+  const line = document.getElementById('tr_lineCount');
+  if(line) line.textContent = transferCart.length;
 }
 function bindTransferCartRemove(){
+  updateTransferCount();
   document.querySelectorAll('#tr_cartList .x').forEach(el=>{
     el.addEventListener('click', ()=>{
       transferCart.splice(Number(el.dataset.idx),1);
