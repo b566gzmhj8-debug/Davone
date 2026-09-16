@@ -1010,6 +1010,15 @@ body.hub [style*="background:#08080f"], body.hub [style*="background:#1a1a2e"]{b
     -webkit-tap-highlight-color:transparent;}
   .env-cur-on{background:linear-gradient(135deg,#f6dc9c,#d4a85a 62%,#a57a36);border-color:transparent;
     color:#1a1405;box-shadow:0 5px 15px rgba(212,168,90,.28);}
+  /* ---------- MacBook / desktop (>=900px) ----------
+     .app ມີ transform ຢູ່ແລ້ວ ເຮັດໃຫ້ position:fixed ອີງໃສ່ .app ເຕັມຄວາມກວ້າງຈໍ
+     ລາງລາກຈຶ່ງໄປທັບຮູບບິນ ແລະ ຕາທອງໄປຢູ່ສຸດຂອບຊ້າຍ — ເທິງເດັສທັອບຈຶ່ງເອົາລົງມາຢູ່ໃນແຖວປົກກະຕິ */
+  @media (min-width:900px){
+    .env .env-in{padding-bottom:40px;}
+    .env .env-track-wrap{position:static;padding:0;background:none;display:flex;justify-content:center;}
+    .env .env-track{width:100%;max-width:640px;}
+  }
+
   .env-opt{width:100%;background:rgba(16,27,54,.5);border:1px solid rgba(243,217,155,.17);
     border-radius:20px;padding:18px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;
     text-align:left;font-family:inherit;color:#f2e9d4;backdrop-filter:blur(14px);
