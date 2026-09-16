@@ -451,9 +451,10 @@
   .ps-table .x{cursor:pointer;color:#b3382a;font-weight:700;padding:2px 6px;}
   .ps-table .ps-empty td{padding:36px 6px;text-align:center;color:#8a8fa2;font-size:13px;border-bottom:none;}
   .ps-table .ps-sub td{font-size:13px;color:#7b8194;}
-  /* ແຖບລຸ່ມ: ບລ໊ອກຍອດເງິນ ສູງພໍດີເນື້ອໃນ (ບໍ່ຍືດເຕັມ) ບໍ່ໃຫ້ໃຫຍ່ເກີນ */
-  .ps-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,48%);align-items:start;border-top:1px solid #eee5d3;}
-  .ps-big{display:flex;flex-direction:column;justify-content:center;margin:14px 0 14px 16px;padding:15px 20px;
+  /* ແຖບລຸ່ມ: ຊ້າຍ = ຍອດເງິນ + ຮັບເງິນ · ຂວາ = ສະຫຼຸບ + ປຸ່ມ (ບໍ່ໃຫ້ມີຊ່ອງຫວ່າງ) */
+  .ps-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,42%);align-items:stretch;border-top:1px solid #eee5d3;}
+  .ps-foot-left{display:flex;flex-direction:column;gap:12px;padding:14px 14px 16px 16px;}
+  .ps-big{display:flex;flex-direction:column;justify-content:center;margin:0;padding:15px 20px;
     border-radius:14px;background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f6dc9c;
     box-shadow:0 6px 18px rgba(11,26,61,.18);}
   .ps-big-label{margin:0;font-size:12.5px;color:rgba(255,255,255,.78);}
@@ -464,7 +465,8 @@
   .ps-line input{width:150px;margin:0;text-align:right;}
   .ps-remain{border-top:1px solid #eee5d3;margin-top:4px;padding-top:8px;}
   .ps-remain span,.ps-remain b{color:#8a6224;font-weight:700;}
-  .ps-pay{margin:8px 0;padding:10px 0;border-top:1px dashed #e8dfc9;border-bottom:1px dashed #e8dfc9;}
+  .ps-pay{margin:0;padding:12px 14px;background:#faf6ec;border:1px solid #eee5d3;border-radius:12px;}
+  .ps-pay-title{margin:0 0 8px;font-size:13px;font-weight:700;color:#0b1a3d;}
   .ps-pay-top{display:grid;grid-template-columns:auto minmax(0,1fr) 108px auto;gap:8px;align-items:center;}
   .ps-pay-top input,.ps-pay-top select{margin:0;}
   .ps-pay-top .btn{margin:0;width:auto;padding:9px 14px;}
@@ -482,7 +484,7 @@
     .ps-entry-row,.ps-entry-row.tr{grid-template-columns:1fr;}
     .ps-entry .f-qp{grid-template-columns:1fr 1fr;}
     .ps-foot{grid-template-columns:1fr;}
-    .ps-big{margin:12px 12px 4px;}
+    .ps-foot-left{padding:12px 12px 0;}
     .ps-big-amount{font-size:27px;}
     .ps-pay-top{grid-template-columns:1fr;}
     .ps-seg button{max-width:none;font-size:13px;}
@@ -2707,14 +2709,13 @@ async function renderSell(main){
       <p class="ps-list-head">ລາຍການສິນຄ້າໃນບິນ</p>
       <div class="ps-table-wrap" id="s_cartList">${renderSellCart()}</div>
       <div class="ps-foot">
-        <div class="ps-big">
-          <p class="ps-big-label">ຍອດທີ່ຕ້ອງຊຳລະ</p>
-          <p class="ps-big-amount mono" id="s_totalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</p>
-        </div>
-        <div class="ps-sum">
-          <div class="ps-line"><span>ລວມຄ່າສິນຄ້າ</span><b class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</b></div>
-          <div class="ps-line"><span>ຫຼຸດລາຄາ</span><input id="s_discount" type="text" value="0"></div>
+        <div class="ps-foot-left">
+          <div class="ps-big">
+            <p class="ps-big-label">ຍອດທີ່ຕ້ອງຊຳລະ</p>
+            <p class="ps-big-amount mono" id="s_totalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</p>
+          </div>
           <div class="ps-pay">
+            <p class="ps-pay-title">ຮັບເງິນ</p>
             <div class="ps-pay-top">
               <div class="pay-chips" id="s_pay_methodChips">
                 <button type="button" data-method="cash" aria-pressed="true">ເງິນສົດ</button>
@@ -2739,6 +2740,10 @@ async function renderSell(main){
               <option value="transfer">ໂອນ</option>
             </select>
           </div>
+        </div>
+        <div class="ps-sum">
+          <div class="ps-line"><span>ລວມຄ່າສິນຄ້າ</span><b class="mono" id="s_subtotalDisplay">${fmtMoney(sellCart.reduce((s,i)=>s+i.amount,0))} ${sellCurUnit()}</b></div>
+          <div class="ps-line"><span>ຫຼຸດລາຄາ</span><input id="s_discount" type="text" value="0"></div>
           <div class="ps-line"><span>ຍອດບິນ</span><b class="mono" id="s_sumTotal">0</b></div>
           <div class="ps-line"><span>ຈ່າຍແລ້ວ</span><b class="mono" id="s_sumPaid">0</b></div>
           <div class="ps-line ps-remain"><span>ຄ້າງຊຳລະ</span><b class="mono" id="s_sumRemain">0</b></div>
@@ -3191,13 +3196,15 @@ async function renderTransfer(main){
         <p class="ps-list-head">ລາຍການສິນຄ້າທີ່ໂອນ</p>
         <div class="ps-table-wrap" id="tr_cartList">${renderTransferCart()}</div>
         <div class="ps-foot">
-          <div class="ps-big">
-            <p class="ps-big-label">ຈຳນວນທີ່ໂອນ</p>
-            <p class="ps-big-amount mono" id="tr_bigCount">0</p>
+          <div class="ps-foot-left">
+            <div class="ps-big">
+              <p class="ps-big-label">ຈຳນວນທີ່ໂອນ</p>
+              <p class="ps-big-amount mono" id="tr_bigCount">0</p>
+            </div>
+            <p class="ps-note">ຕັດແຕ່ສະຕັອກ — ບໍ່ນັບເປັນຍອດຂາຍ ແລະ ບໍ່ກະທົບກຳໄລ</p>
           </div>
           <div class="ps-sum">
             <div class="ps-line"><span>ຈຳນວນລາຍການ</span><b class="mono" id="tr_lineCount">0</b></div>
-            <p class="ps-note">ຕັດແຕ່ສະຕັອກ — ບໍ່ນັບເປັນຍອດຂາຍ ແລະ ບໍ່ກະທົບກຳໄລ</p>
             <button class="btn" id="tr_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກການໂອນ (ຕັດສະຕັອກ) →</button>
           </div>
         </div>
