@@ -753,7 +753,7 @@ input[type=text]:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 
   --border-gold:#d9cdb0;
   --gold:#a57a36;--gold-lt:#8a6224;--gold-dim:rgba(165,122,54,.12);
   --admin:#2f5fa8;--admin-dim:rgba(47,95,168,.10);
-  --goods:#2f7d57;--goods-dim:rgba(47,125,87,.10);
+  --goods:#2b6e4c;--goods-dim:rgba(47,125,87,.10);
   --text:#1b2437;--text2:#1b2437;--muted:#57607a;
   --danger:#b3382a;
   --glass:none;
@@ -771,6 +771,9 @@ body::before,body::after{content:none!important;display:none!important}
 .brand-sub{color:rgba(243,234,210,.72)}
 .btn-summary{background:rgba(255,255,255,.1);border-color:rgba(243,217,155,.45);color:#f6dc9c}
 .btn-summary:hover{background:rgba(243,217,155,.22);border-color:#f6dc9c}
+/* ປຸ່ມ ສຳຮອງ ມີ inline style ສີຂຽວເຂັ້ມ (ອອກແບບໃຫ້ພື້ນຂາວ) → ເທິງແຖບນ້ຳເງິນຕ້ອງເປັນຂຽວອ່ອນ */
+.topbar-right .btn-summary[style]{background:rgba(127,224,176,.16)!important;border-color:rgba(127,224,176,.5)!important;color:#8fe0b3!important}
+.topbar-right .btn-summary[style]:hover{background:rgba(127,224,176,.3)!important}
 .btn-hamburger{color:rgba(243,234,210,.85)}
 .sync-badge.ok{border-color:rgba(127,224,176,.5);color:#8fe0b3;background:rgba(127,224,176,.12)}
 .sync-badge.err{border-color:rgba(255,154,140,.5);color:#ff9a8c;background:rgba(255,120,100,.14)}
@@ -821,7 +824,7 @@ body::before,body::after{content:none!important;display:none!important}
 
 /* ── ຊ່ອງປ້ອນ ── */
 input[type=text],textarea,.dep-inp,.cfg-field input{background:#fffdf8;border:1px solid #ded6c4;color:#1b2437}
-input[type=text]::placeholder,textarea::placeholder,.dep-inp::placeholder{color:#a9a294}
+input[type=text]::placeholder,textarea::placeholder,.dep-inp::placeholder{color:#726b5c}
 input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
   border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15)}
 .admin input[type=text]:focus,.admin textarea:focus{border-color:var(--admin);box-shadow:0 0 0 3px rgba(47,95,168,.15)}
@@ -855,7 +858,7 @@ input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
 .btn-multi:hover,.btn-sel-cancel:hover{border-color:#a57a36;color:#1b2437}
 .blink{background:#f8f3e9;border:1px solid var(--border)}
 .blink:hover{border-color:#a57a36}
-.blink-box{border-color:#c4bba6}
+.blink-box{border-color:#a49a83}
 .blink:has(input:checked){border-color:#a57a36;background:rgba(212,168,90,.14)}
 .blink input:checked+.blink-box{background:#a57a36;border-color:#a57a36}
 .blink input:checked+.blink-box::after{color:#fff}
@@ -873,14 +876,14 @@ input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
 .hi{background:#fffdf8;border-color:var(--border);box-shadow:0 2px 8px rgba(27,36,55,.05)}
 .hi-sh{background:#eee6d6}
 #histList{background:#f2eee4}
-.hi-del,.dep-del,.stmt-tx .x{color:#c4bba6}
+.hi-del,.dep-del,.stmt-tx .x{color:#726b5c}
 .hi-badge.admin{border-color:rgba(47,95,168,.35);color:var(--admin);background:rgba(47,95,168,.08)}
 .hi-badge.goods{border-color:rgba(47,125,87,.35);color:var(--goods);background:rgba(47,125,87,.08)}
 .hist-toolbar{background:rgba(179,56,42,.05);border-bottom:1px solid var(--border)}
 .hi.selectable:hover{background:#f8f3e9}
 .hi.selected{background:rgba(179,56,42,.07)!important;border-color:#b3382a}
-.hi-cb{border-color:#c4bba6}
-.szero{color:#c4bba6!important}
+.hi-cb{border-color:#a49a83}
+.szero{color:#9a9184!important}
 .sblk.admin .sblk-head{color:var(--admin);background:rgba(47,95,168,.07)}
 .sblk.goods .sblk-head{color:var(--goods);background:rgba(47,125,87,.07)}
 .gcv{color:#8a6224}
@@ -953,8 +956,8 @@ input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
 .es-split .others span{background:#f8f3e9;border-color:var(--border)}
 .es-col.on .n{color:#8a6224}
 .es-search input{background:#fffdf8;border-color:#ded6c4;color:#1b2437}
-.es-search input::placeholder{color:#a9a294}
-.es-search svg{color:#a9a294}
+.es-search input::placeholder{color:#726b5c}
+.es-search svg{color:#726b5c}
 .es-chip{background:#f8f3e9;border-color:var(--border);color:#57607a}
 .es-chip.on{background:var(--gold-grad);color:#1a1405;border-color:transparent}
 .es-row{background:#fffdf8;border:1px solid var(--border)}
