@@ -207,23 +207,43 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .btn-clr{background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;padding:3px 10px;border-radius:6px;font-family:var(--font);transition:all .12s}
 .btn-clr:hover{border-color:var(--danger);color:var(--danger)}
 .hempty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
-.hi{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:3px}
-.hi:last-child{border-bottom:none}
-.hi:hover{background:rgba(255,255,255,0.02)}
-.hi-top{display:flex;align-items:center;gap:7px}
-.hi-date{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.hi-badge{font-size:10px;font-weight:700;padding:2px 10px;border:1px solid;border-radius:50px;letter-spacing:.02em}
+/* ແຖວລາຍການລ່າສຸດ = ກາດ ຄືກັບໜ້າ ສະຫຼຸບລາຍຈ່າຍ ແລະ ໃບຍອດເງິນ (ຕົວເລກໃຫຍ່ ອ່ານງ່າຍ) */
+#histList{padding:10px 12px;background:var(--bg);container-type:inline-size}
+.hi{position:relative;display:grid;
+  grid-template-columns:78px minmax(0,1fr) auto 24px;
+  grid-template-areas:"date nm amt del" "bar bar bar bar";
+  gap:2px 12px;align-items:center;padding:14px 16px;border-radius:16px;
+  background:var(--surface);border:1px solid var(--border);margin-bottom:9px;transition:.2s}
+.hi:last-child{margin-bottom:0}
+.hi:hover{border-color:var(--border-gold)}
+.hi-date{grid-area:date;font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hi-main{grid-area:nm;min-width:0}
+.hi-desc{display:block;font-size:14.5px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.hi-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border:1px solid;border-radius:9px;letter-spacing:.02em}
 .hi-badge.admin{border-color:rgba(74,144,217,0.4);color:var(--admin);background:rgba(74,144,217,0.06)}
 .hi-badge.goods{border-color:rgba(61,170,128,0.4);color:var(--goods);background:rgba(61,170,128,0.06)}
-.hi-mid{display:flex;justify-content:space-between;align-items:center}
-.hi-desc{font-size:13px;font-weight:500;color:var(--text2)}
-.hi-right{display:flex;align-items:center;gap:8px}
-.hi-amt{font-family:var(--mono);font-size:13px;font-weight:600}
+.hi-note{display:block;font-size:11.5px;color:var(--muted);margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi-amt{grid-area:amt;font-family:var(--mono);font-size:clamp(17px,2.1vw,23px);font-weight:800;
+  white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .hi-amt.admin{color:var(--admin)}
 .hi-amt.goods{color:var(--goods)}
-.hi-del{background:none;border:none;color:rgba(255,255,255,0.1);cursor:pointer;font-size:12px;padding:2px 4px;transition:color .12s}
+.hi-del{grid-area:del;justify-self:end;background:none;border:none;color:rgba(255,255,255,0.1);cursor:pointer;font-size:13px;padding:2px 4px;transition:color .12s;line-height:1}
 .hi-del:hover{color:var(--danger)}
-.hi-note{font-size:11px;color:var(--muted)}
+.hi-sh{grid-area:bar;height:4px;border-radius:4px;background:var(--card2);overflow:hidden;margin-top:8px}
+.hi-sh i{display:block;height:100%;border-radius:4px;width:0;transition:width .9s cubic-bezier(.2,.9,.3,1)}
+.hi-sh i.admin{background:var(--admin)}
+.hi-sh i.goods{background:var(--goods)}
+@media(max-width:640px){
+  .hi{grid-template-columns:64px minmax(0,1fr) 24px;
+    grid-template-areas:"date nm del" "amt amt amt" "bar bar bar";padding:13px 14px}
+  .hi-amt{text-align:right;margin-top:8px}
+}
+@container (max-width:520px){
+  .hi{grid-template-columns:64px minmax(0,1fr) 24px;
+    grid-template-areas:"date nm del" "amt amt amt" "bar bar bar";padding:13px 14px}
+  .hi-amt{text-align:right;margin-top:8px;font-size:22px}
+}
 
 /* ── DATE PICKER ── */
 .date-pill input[type=date]{font-size:15px;padding:2px 4px;cursor:pointer}
@@ -241,7 +261,9 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
   :root{--sidebar:240px}
   .form-grid{grid-template-columns:1fr!important;padding:16px}
   .right-panel{grid-column:1/-1}
-  .right-panel[style]{display:flex!important;flex-direction:column!important;gap:16px!important}
+  /* inline style ມີ align-items:start → ໃນໂໝດຖັນດຽວມັນເຮັດໃຫ້ກາດບໍ່ຢືດເຕັມ ຈຶ່ງບັງຄັບ stretch */
+  .right-panel[style]{display:flex!important;flex-direction:column!important;gap:16px!important;align-items:stretch!important}
+  .right-panel > *{min-width:0}
   .topbar{padding:0 16px}
   .topbar-time{display:none}
   .content-header{padding:16px 16px 0;flex-wrap:wrap;gap:10px}
@@ -259,11 +281,17 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
   .sidebar.open{transform:translateX(0)}
   .layout{height:auto}
   .content{min-height:0}
-  .topbar{gap:10px}
+  /* ແຖບເທິງເທິງມືຖື: ໃຫ້ຊື່ຫຍໍ້ໄດ້ ປຸ່ມຈຶ່ງບໍ່ລົ້ນຈໍ (ເມື່ອກ່ອນເຮັດໃຫ້ໜ້າເລື່ອນຊ້າຍ-ຂວາໄດ້) */
+  .topbar{gap:8px;padding:0 12px}
+  .brand{min-width:0;flex:1 1 auto;overflow:hidden}
+  .brand-txt{min-width:0}
+  .brand-name{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .brand-sub{display:none}
+  .topbar-right{gap:8px;flex:0 0 auto}
   .btn-summary span{display:none}
   .btn-summary{padding:7px 10px}
   .sync-badge span{display:none}
+  .sync-badge{font-size:9.5px;padding:4px 8px;max-width:110px;overflow:hidden;text-overflow:ellipsis}
   .form-grid{padding:12px;gap:14px}
   .content-header{padding:14px 12px 0}
   .page-title{font-size:18px}
@@ -290,9 +318,10 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .btn-multi.active{border-color:var(--danger);color:var(--danger)}
 .hi.selectable{cursor:pointer}
 .hi.selectable:hover{background:rgba(255,255,255,0.03)}
-.hi.selected{background:rgba(192,57,43,0.07)!important;border-left:2px solid var(--danger)}
-.hi-cb{display:none;width:16px;height:16px;border:1.5px solid rgba(255,255,255,0.2);border-radius:4px;flex-shrink:0;align-items:center;justify-content:center;transition:all .12s;margin-right:4px}
+.hi.selected{background:rgba(192,57,43,0.07)!important;border-color:var(--danger)}
+.hi-cb{position:absolute;left:14px;top:50%;transform:translateY(-50%);display:none;width:18px;height:18px;border:1.5px solid rgba(255,255,255,0.2);border-radius:5px;flex-shrink:0;align-items:center;justify-content:center;transition:all .12s}
 .selmode .hi-cb{display:flex}
+.selmode .hi{padding-left:44px}
 .hi.selected .hi-cb{background:var(--danger);border-color:var(--danger)}
 .hi.selected .hi-cb::after{content:'✓';font-size:10px;color:#fff;font-weight:800}
 
@@ -459,6 +488,11 @@ input[type=date].dep-inp{
 input[type=date].dep-inp::-webkit-date-and-time-value{text-align:left}
 .dep-grid .amt-wrap input{box-sizing:border-box;height:42px;min-width:0;width:100%}
 .dep-form>.field>input[type=text]{box-sizing:border-box;width:100%;min-width:0}
+
+@media(max-width:480px){
+  /* ຈໍນ້ອຍ: ປ້າຍສະຖານະເຊື່ອມຕໍ່ ເຫຼືອແຕ່ໄອຄອນ (ສີຍັງບອກສະຖານະຢູ່) ຊື່ຫົວເພຈຈຶ່ງສະແດງເຕັມ */
+  .sync-badge{max-width:26px;padding:4px 6px;text-overflow:clip}
+}
 
 @media(max-width:640px){
   .dep-grid{grid-template-columns:1fr;gap:12px}
@@ -835,13 +869,16 @@ input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
 .tc-title,.hist-title{color:#8a6224;opacity:1}
 .tc-val.grand{color:#8a6224}
 .tc-label,.gcl,.bal-bar-lbl,.sel-count b,.hi-desc,.dep-item-note,.stmt-row .l,.stmt-tx .nm b{color:#1b2437}
-.hi:hover{background:#f8f3e9}
+.hi:hover{border-color:#a57a36}
+.hi{background:#fffdf8;border-color:var(--border);box-shadow:0 2px 8px rgba(27,36,55,.05)}
+.hi-sh{background:#eee6d6}
+#histList{background:#f2eee4}
 .hi-del,.dep-del,.stmt-tx .x{color:#c4bba6}
 .hi-badge.admin{border-color:rgba(47,95,168,.35);color:var(--admin);background:rgba(47,95,168,.08)}
 .hi-badge.goods{border-color:rgba(47,125,87,.35);color:var(--goods);background:rgba(47,125,87,.08)}
 .hist-toolbar{background:rgba(179,56,42,.05);border-bottom:1px solid var(--border)}
 .hi.selectable:hover{background:#f8f3e9}
-.hi.selected{background:rgba(179,56,42,.07)!important}
+.hi.selected{background:rgba(179,56,42,.07)!important;border-color:#b3382a}
 .hi-cb{border-color:#c4bba6}
 .szero{color:#c4bba6!important}
 .sblk.admin .sblk-head{color:var(--admin);background:rgba(47,95,168,.07)}
@@ -1451,25 +1488,32 @@ function renderHistory() {
   const sm = state.selMode;
   if (sm) el.classList.add('selmode'); else el.classList.remove('selmode');
   if (!records.length) { el.innerHTML = '<div class="hempty">ຍັງບໍ່ມີລາຍການ</div>'; return; }
-  el.innerHTML = records.slice(0, 50).map(r => {
+  const shown = records.slice(0, 50);
+  // ແຖບທຽບຂະໜາດ: ແຍກມາດຕາສ່ວນ ຕາມສະກຸນເງິນ (ກີບ/ບາດ/ໂດລາ ທຽບກັນກົງໆບໍ່ໄດ້)
+  const mxCur = {};
+  shown.forEach(r => { const c = r.currency || 'LAK';
+    mxCur[c] = Math.max(mxCur[c] || 1, Math.abs(Number(r.amount))); });
+  el.innerHTML = shown.map(r => {
     const sel = state.selected.has(r.id);
+    const cur = r.currency || 'LAK';
+    const pc = Math.abs(Number(r.amount)) / mxCur[cur] * 100;
     return `<div class="hi${sm?' selectable':''}${sel?' selected':''}" onclick="${sm?`toggleSel('${r.id}')`:''}" >
-      <div class="hi-top">
-        <div class="hi-cb"></div>
-        <span class="hi-date">${r.date}</span>
-        <span class="hi-badge ${r.type}">${r.category}</span>
-        ${linkedDep(r.id)?'<span class="hi-link">ຕັດງົບແລ້ວ</span>':''}
-      </div>
-      <div class="hi-mid">
-        <span class="hi-desc">${escHtml(r.description)}</span>
-        <div class="hi-right">
-          <span class="hi-amt ${r.type}">${fmt(r.amount)} ${SYM[r.currency]||r.currency}</span>
-          ${sm?'':`<button class="hi-del" onclick="event.stopPropagation();delRecord('${r.id}')">✕</button>`}
+      <div class="hi-cb"></div>
+      <div class="hi-date" title="${r.date}">${String(r.date).slice(5)}</div>
+      <div class="hi-main">
+        <b class="hi-desc">${escHtml(r.description)}</b>
+        <div class="hi-tags">
+          <span class="hi-badge ${r.type}">${r.category}</span>
+          ${linkedDep(r.id)?'<span class="hi-link">ຕັດງົບແລ້ວ</span>':''}
         </div>
+        ${r.note?`<span class="hi-note">${escHtml(r.note)}</span>`:''}
       </div>
-      ${r.note?`<span class="hi-note">${escHtml(r.note)}</span>`:''}
+      <div class="hi-amt ${r.type}">${fmt(r.amount)} ${SYM[cur]||cur}</div>
+      ${sm?'':`<button class="hi-del" onclick="event.stopPropagation();delRecord('${r.id}')" title="ລຶບລາຍການ">✕</button>`}
+      <div class="hi-sh"><i class="${r.type}" data-w="${pc}"></i></div>
     </div>`;
   }).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.hi-sh i').forEach(i2=>i2.style.width=i2.dataset.w+'%'));
   if (sm) document.getElementById('selCount').textContent = state.selected.size;
 }
 
