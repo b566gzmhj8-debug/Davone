@@ -400,16 +400,41 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .stmt-barlab{display:flex;justify-content:space-between;padding:10px 22px 14px;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
 .stmt-barlab b{font-family:var(--font);color:var(--gold-lt);font-weight:600;font-variant-numeric:tabular-nums}
 .stmt-warn{padding:0 22px 14px;font-size:12px;color:var(--danger)}
-.stmt-txhd{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin:22px 0 0;padding-bottom:9px;border-bottom:2px solid var(--border)}
-.stmt-tx{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid var(--border)}
-.stmt-tx:last-child{border-bottom:none}
-.stmt-tx .tic{width:18px;height:18px;flex-shrink:0}
-.stmt-tx .m{flex:1;min-width:0}
-.stmt-tx .d{font-family:var(--font);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.03em}
-.stmt-tx .n{font-size:13.5px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stmt-tx .v{font-family:var(--font);font-size:15px;font-variant-numeric:tabular-nums}
-.stmt-tx .x{background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:13px;padding:2px 4px;transition:color .12s;line-height:1}
+.stmt-txhd{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin:22px 0 10px;padding-bottom:9px;border-bottom:2px solid var(--border)}
+/* ແຖວລາຍການ = ກາດ ຄືກັບໜ້າ ສະຫຼຸບລາຍຈ່າຍ (ຕົວເລກໃຫຍ່ ອ່ານງ່າຍ) */
+.stmt-tx{display:grid;grid-template-columns:78px minmax(0,1fr) auto 24px;
+  grid-template-areas:"date nm amt del" "bar bar bar bar";
+  gap:2px 12px;align-items:center;padding:14px 16px;border-radius:16px;
+  background:var(--surface);border:1px solid var(--border);margin-bottom:9px;transition:.2s}
+.stmt-tx:hover{border-color:var(--border-gold)}
+.stmt-tx .date{grid-area:date;font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.stmt-tx .nm{grid-area:nm;min-width:0}
+.stmt-tx .nm b{display:block;font-size:14.5px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stx-badge{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:9px}
+.stx-badge.in{background:rgba(69,201,154,.16);color:var(--goods)}
+.stx-badge.out{background:rgba(224,102,102,.16);color:var(--danger)}
+.stmt-tx .amt{grid-area:amt;font-family:var(--mono);font-size:clamp(17px,2.1vw,23px);font-weight:800;
+  white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stmt-tx.in .amt{color:var(--goods)}
+.stmt-tx.out .amt{color:var(--danger)}
+.stmt-tx .x{grid-area:del;justify-self:end;background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:13px;padding:2px 4px;transition:color .12s;line-height:1}
 .stmt-tx .x:hover{color:var(--danger)}
+.stmt-tx .sh{grid-area:bar;height:4px;border-radius:4px;background:var(--card2);overflow:hidden;margin-top:8px}
+.stmt-tx .sh i{display:block;height:100%;border-radius:4px;width:0;transition:width .9s cubic-bezier(.2,.9,.3,1)}
+.stmt-tx.in .sh i{background:var(--goods)}
+.stmt-tx.out .sh i{background:var(--danger)}
+@media(max-width:640px){
+  .stmt-tx{grid-template-columns:64px minmax(0,1fr) 24px;
+    grid-template-areas:"date nm del" "amt amt amt" "bar bar bar";padding:13px 14px}
+  .stmt-tx .amt{text-align:right;margin-top:8px}
+}
+/* ຖ້າຖັນຂວາແຄບ (ຈໍນ້ອຍ / ໜ້າຕ່າງນ້ອຍ) → ຍ້າຍຕົວເລກລົງແຖວໃໝ່ ບໍ່ໃຫ້ຊື່ຖືກຕັດ */
+#balDet{container-type:inline-size}
+@container (max-width:560px){
+  .stmt-tx{grid-template-columns:64px minmax(0,1fr) 24px;
+    grid-template-areas:"date nm del" "amt amt amt" "bar bar bar";padding:13px 14px}
+  .stmt-tx .amt{text-align:right;margin-top:8px;font-size:22px}
+}
 .stmt-empty{padding:20px 2px;color:var(--muted);font-size:13px}
 .dep-form{background:var(--surface);border:1px solid var(--border-gold);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
 .dep-form-title{font-size:13px;font-weight:800;color:var(--gold-lt);letter-spacing:.02em}
@@ -809,7 +834,7 @@ input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
 .tc-head,.hist-head{background:#f8f3e9;border-bottom:1px solid var(--border)}
 .tc-title,.hist-title{color:#8a6224;opacity:1}
 .tc-val.grand{color:#8a6224}
-.tc-label,.gcl,.bal-bar-lbl,.sel-count b,.hi-desc,.dep-item-note,.stmt-row .l,.stmt-tx .n{color:#1b2437}
+.tc-label,.gcl,.bal-bar-lbl,.sel-count b,.hi-desc,.dep-item-note,.stmt-row .l,.stmt-tx .nm b{color:#1b2437}
 .hi:hover{background:#f8f3e9}
 .hi-del,.dep-del,.stmt-tx .x{color:#c4bba6}
 .hi-badge.admin{border-color:rgba(47,95,168,.35);color:var(--admin);background:rgba(47,95,168,.08)}
@@ -839,6 +864,11 @@ input[type=text]:focus,textarea:focus,.dep-inp:focus,.cfg-field input:focus{
 .stmt-bar i.over{background:var(--danger)}
 .stmt-barlab b{color:#8a6224}
 .stmt-txhd{border-bottom:2px solid var(--border)}
+.stmt-tx{background:#fffdf8;border-color:var(--border);box-shadow:0 2px 8px rgba(27,36,55,.05)}
+.stmt-tx:hover{border-color:#a57a36}
+.stmt-tx .sh{background:#eee6d6}
+.stx-badge.in{background:rgba(47,125,87,.12);color:var(--goods)}
+.stx-badge.out{background:rgba(179,56,42,.12);color:var(--danger)}
 .dep-form-title{color:#0b1a3d}
 .dep-item-amt{color:#8a6224}
 .bal-bar{background:#eee6d6;border-color:var(--border)}
@@ -1763,14 +1793,22 @@ function renderBalDet(m) {
   // ── ລາຍການ ໃນເດືອນນີ້ ──
   h += `<div class="stmt-txhd">ລາຍການ · ${depM.length} ລາຍການ</div>`;
   if (depM.length) {
+    // ແຖບທຽບຂະໜາດ: ແຍກມາດຕາສ່ວນ ເງິນເຂົ້າ / ເງິນອອກ ຕ່າງຫາກ
+    // (ບໍ່ດັ່ງນັ້ນ ລາຍການເງິນອອກຈະຖືກ ເງິນເຂົ້າກ້ອນໃຫຍ່ ກົດໃຫ້ແຖບນ້ອຍຈົນເບິ່ງບໍ່ອອກ)
+    const mxBy = { in:1, out:1 };
+    depM.forEach(x => { const k = x.kind==='out' ? 'out' : 'in';
+      mxBy[k] = Math.max(mxBy[k], Math.abs(Number(x.amount))); });
     depM.forEach(d => {
       const isOut = d.kind==='out';
-      const col = isOut ? '#ff9a9a' : 'var(--goods)';
-      h += `<div class="stmt-tx">
-        <span class="tic" style="color:${col}">${isOut?IC.out:IC.in}</span>
-        <div class="m"><div class="d">${d.date} · ${isOut?'ເງິນອອກ':'ເງິນເຂົ້າ'}</div>${d.note?`<div class="n">${escHtml(d.note)}</div>`:''}</div>
-        <span class="v" style="color:${col}">${isOut?'−':'+'}${fmt(d.amount)} ₭</span>
-        <button class="x" onclick="delDeposit('${d.id}')">✕</button>
+      const k = isOut ? 'out' : 'in';
+      const lbl = isOut ? 'ເງິນອອກ' : 'ເງິນເຂົ້າ';
+      const amt = Math.abs(Number(d.amount));
+      h += `<div class="stmt-tx ${k}">
+        <div class="date" title="${d.date}">${d.date.slice(5)}</div>
+        <div class="nm"><b>${d.note ? escHtml(d.note) : lbl}</b><span class="stx-badge ${k}">${lbl}</span></div>
+        <div class="amt">${isOut?'−':'+'}${fmt(amt)} ₭</div>
+        <button class="x" onclick="delDeposit('${d.id}')" title="ລຶບລາຍການ">✕</button>
+        <div class="sh"><i data-w="${amt/mxBy[k]*100}"></i></div>
       </div>`;
     });
   } else {
@@ -1778,6 +1816,7 @@ function renderBalDet(m) {
   }
 
   document.getElementById('balDet').innerHTML = h;
+  requestAnimationFrame(()=>document.querySelectorAll('.stmt-tx .sh i').forEach(i2=>i2.style.width=i2.dataset.w+'%'));
 }
 
 // ═══════════════════════════════════════════════
