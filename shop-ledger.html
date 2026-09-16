@@ -3711,8 +3711,10 @@
       "html{height:100%;}"+
       "body{box-sizing:border-box;}"+
       "@media screen{ body{padding:16px 18px;} }"+
-      /* fixed height a little under A5 (210mm): Safari resolves 100% taller than the page and spills onto a 2nd sheet */
-      "body.a5{display:flex;flex-direction:column;min-height:204mm;font-size:15px;padding:0 9mm 10mm;}"+
+      /* fixed height under the printable A5 area (Epson L3210: 204mm): Safari/WebKit spills onto a blank 2nd sheet
+         from about 200mm up, and counts bottom padding on top of it, so keep the height at 190mm with no bottom padding */
+      "body.a5{display:flex;flex-direction:column;min-height:190mm;font-size:15px;padding:0 9mm;}"+
+      "body.a5 .thanks{margin-bottom:0;}"+
       "body.a5 > *{max-width:100%;min-width:0;}"+
       /* full-bleed header: pulled out over the side gutters, square corners, flush with the paper edge */
       "body.a5 .shop-header{margin:0 -9mm;max-width:none;border-radius:0;padding:7mm 9mm 5mm;}"+
