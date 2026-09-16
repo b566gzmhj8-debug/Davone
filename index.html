@@ -2170,10 +2170,18 @@ function renderAdmin() {
 
   const existing = app.querySelector(".admin-scroll");
   if (existing) {
+    // ປ່ຽນ innerHTML ຈະເຮັດໃຫ້ scrollTop ກັບໄປ 0 — ຈຳຕຳແໜ່ງໄວ້ ແລ້ວວາງຄືນ
+    // ກ່ອນ browser ແຕ້ມ ຈຶ່ງບໍ່ເຫັນມັນເດັ້ງຂຶ້ນເທິງຕອນກົດອະນຸມັດ
+    const keepTop = existing.scrollTop;
     const newWrap = document.createElement("div");
     newWrap.innerHTML = html;
     existing.innerHTML = "";
     existing.appendChild(newWrap.firstElementChild);
+    existing.scrollTop = keepTop;
+    if (keepTop > 0) requestAnimationFrame(() => {
+      // ວາງຄືນອີກເທື່ອ ເຜື່ອຮູບ/ເນື້ອຫາໂຫຼດຊ້າແລ້ວຄວາມສູງປ່ຽນ
+      if (existing.isConnected && existing.scrollTop !== keepTop) existing.scrollTop = keepTop;
+    });
     return;
   }
 
