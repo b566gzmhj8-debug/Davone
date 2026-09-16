@@ -718,6 +718,116 @@
     .pos-sum > *{grid-column:1;}
     .pos-sum .btn{grid-column:2;grid-row:1 / span 4;align-self:stretch;margin:0;white-space:nowrap;}
   }
+
+  /* ══════════ HUB THEME — ແບບສະຫວ່າງ (ນ້ຳເງິນເຂັ້ມ + ທອງ ເທິງພື້ນຄີມ) ══════════
+     ໂຄງສ້າງ/ຟັງຊັນຄືເກົ່າ · ຕາສະບາຍສຳລັບໃຊ້ທັງວັນ · ເອກະສານພິມບໍ່ກະທົບ */
+  @media screen{
+  :root{
+    --bg:#f2eee4;
+    --surface:#fffdf8;
+    --surface-alt:#f8f3e9;
+    --ink:#1b2437;
+    --ink-soft:#57607a;
+    --ink-faint:#8a8fa2;
+    --line:#e4ddcd;
+    --brown:#a57a36;
+    --brown-deep:#8a6224;
+    --green:#2f7d57;
+    --green-bg:#e8f2ec;
+    --red:#b3382a;
+    --red-bg:#f8eae7;
+    --hub-grad:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57a36);
+  }
+  html{background:var(--bg);}
+  body{background:var(--bg);color:var(--ink);}
+
+  /* ກ່ອງຫົວເພຈເປົ່າ (ຄລາສ .top-bar ຊ້ຳກັນ) → ເຊື່ອງ */
+  .wrap > .top-bar{display:none;}
+
+  /* ── ແຖບເມນູ = ນ້ຳເງິນເຂັ້ມ ຕັດເສັ້ນທອງ ── */
+  .app-nav{background:linear-gradient(170deg,#0b1a3d,#16284f 60%,#0b1a3d);border-top:2px solid #d4a85a;
+    box-shadow:0 -4px 18px rgba(11,26,61,.14);}
+  .nav-btn{color:rgba(243,234,210,.78);}
+  .nav-btn.active{color:#f6dc9c;}
+  .nav-brand{border-bottom-color:rgba(243,217,155,.22);}
+  .nav-brand-sub{color:rgba(243,234,210,.62);letter-spacing:.04em;}
+  .brand-name,.nav-brand-name{
+    background:linear-gradient(100deg,#b8893f,#f6dc9c 30%,#fff3cf 40%,#e2b466 55%,#b8893f 75%,#f6dc9c);
+    background-size:250% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-filter:drop-shadow(0 0 7px rgba(255,218,150,.6)) drop-shadow(0 0 18px rgba(212,168,90,.4));
+    filter:drop-shadow(0 0 7px rgba(255,218,150,.6)) drop-shadow(0 0 18px rgba(212,168,90,.4));
+    animation:hubShineLt 6s linear infinite;}
+  @keyframes hubShineLt{to{background-position:-250% 0;}}
+  @media (min-width:1024px){
+    .app-nav{border-top:none;border-right:2px solid #d4a85a;box-shadow:4px 0 22px rgba(11,26,61,.16);}
+    .nav-btn:hover{background:rgba(243,217,155,.12);color:#fff;}
+    .nav-btn.active{background:var(--hub-grad);color:#1a1405;font-weight:700;}
+  }
+
+  /* ── ກາດ ── */
+  .card{background:var(--surface);border-radius:14px;box-shadow:0 4px 16px rgba(27,36,55,.07);}
+  .card-title{color:#0b1a3d;}
+  .shop-title,.row-name{color:#1b2437;}
+  .subhead{color:#0b1a3d;border-top-color:var(--line);}
+
+  /* ── ປຸ່ມ ── */
+  .btn-brown{background:var(--hub-grad);color:#1a1405;box-shadow:0 6px 16px rgba(165,122,54,.26);}
+  .btn-brown:hover{background:var(--hub-grad);filter:brightness(1.05);}
+  .btn-outline{border-color:#d9cdb0;color:#8a6224;}
+  .btn-outline:hover{border-color:#a57a36;color:#6f4e1c;}
+  .seg button.active{background:var(--hub-grad);color:#1a1405;border-color:transparent;font-weight:700;}
+  .tool-btn.on{background:var(--hub-grad);border-color:transparent;color:#1a1405;}
+  .link-btn{color:#8a6224;}
+
+  /* ── ແຜ່ນສະຫຼຸບ / ເອກະສານໃນແອັບ ── */
+  .stmt-tabs{background:#faf6ed;}
+  .stmt-tabs button{color:#8a8fa2;}
+  .stmt-tabs button:hover{color:#a57a36;}
+  .stmt-tabs button.active,.stmt-tabs .tool-btn.on{color:#0b1a3d;font-weight:700;background:var(--surface);border-bottom-color:#d4a85a;}
+  .stmt .stmt-head{background:linear-gradient(135deg,#0b1a3d,#1c3264);border-bottom:3px solid #d4a85a;}
+  .stmt .stmt-title{color:#f6dc9c;}
+  .stmt .stmt-sub{color:rgba(255,255,255,.78);}
+  .stmt .stmt-head .count{color:#fff;}
+  .stmt .stmt-head .count b{color:#f6dc9c;}
+  .stmt-table th{background:#f6f1e6;color:#57607a;}
+  .st-row.alt{background:#fbf8f1;}
+  .st-row:hover{background:#f6f1e6;}
+  .stmt-total{border-top-color:#d4a85a;}
+  .net-cell b{color:#0b1a3d;}
+  .stmt-sum b{color:#0b1a3d;}
+  .stmt .stmt-sum b.pos,.stmt .net-cell b.pos{color:#2f7d57;}
+  .stmt .stmt-sum b.neg,.stmt .net-cell b.neg{color:#b3382a;}
+  .cash-head{color:#0b1a3d;}
+
+  /* ── ໜ້າຂາຍ (POS) ── */
+  .pos-head{background:#faf6ed;}
+  .pos-big{background:linear-gradient(135deg,#0b1a3d,#1c3264);color:#f6dc9c;}
+  .pos-big-label{color:rgba(255,255,255,.8);}
+  .sum-total{color:#0b1a3d;}
+  .pay-line b{color:#8a6224;}
+  .pay-sec{color:#0b1a3d;}
+  .pay-due b{color:#0b1a3d;}
+  .modal-title{color:#0b1a3d;}
+
+  /* ── ສະຕັອກ / ສິນຄ້າຂາຍດີ ── */
+  .stock-col.sell{color:#8a6224;}
+  .sf-prev-t{color:#8a6224;}
+  .sf-prev-name{color:#1b2437;}
+  .top-row .top-bar{background:#f0e9db;}
+  .top-row .top-bar span{background:var(--hub-grad);}
+
+  /* ── ອັດຕາແລກປ່ຽນ ── */
+  .rates-mini{background:var(--surface);border-color:var(--line);}
+  .rates-mini-title{color:#0b1a3d;}
+
+  /* ── ຊ່ອງປ້ອນ ── */
+  input,select{background:#fffdf8;border-color:#ded6c4;color:#1b2437;}
+  input::placeholder{color:#a9a294;}
+  input:focus,select:focus{outline:none;border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
+  .search-suggestions{background:#fffdf8;}
+  }
+
 </style>
 </head>
 <body>
@@ -3528,60 +3638,111 @@
   function printDoc(title, bodyHtml, opts){
     var w = window.open("", "_blank", "width=440,height=620");
     if(!w){ alert("ບຣາວເຊີບລັອກປັອບອັບ ກະລຸນາອະນຸຍາດເພື່ອພິມບິນ ແລ້ວລອງໃໝ່"); return; }
+    // the shop seal, taken from the app's own icon so the printed bill carries the brand
+    var logo = new URL("apple-touch-icon.png", location.href).href;
     var html =
       '<!DOCTYPE html><html lang="lo"><head><meta charset="UTF-8"><title>'+title+'</title>'+
       '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&display=swap" rel="stylesheet">'+
       '<style>'+
-      '@page{ size:'+((opts && opts.page) || "A5")+'; margin:'+((opts && opts.margin) || "12mm")+'; }'+
-      "body{ font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif; color:#0E0E0E; font-size:13px; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }"+
-      ".shop-header{margin:0 0 10px;padding-bottom:10px;border-bottom:2px solid #0E0E0E;}"+
-      ".shop-name{font-size:17px;font-weight:700;margin:0 0 2px;line-height:1.4;}"+
-      ".shop-branch{font-size:14px;font-weight:700;margin:0 0 5px;}"+
-      ".shop-meta{font-size:11.5px;color:#3A382F;line-height:1.6;margin:0;}"+
-      "h1{font-size:16px;margin:0 0 2px;text-align:center;}"+
-      ".sub{font-size:11px;color:#3A382F;margin:0 0 14px;text-align:center;}"+
-      "table{width:100%;border-collapse:collapse;margin-top:8px;}"+
-      "th,td{padding:5px 4px;border-bottom:1px solid #C6BCA8;text-align:left;font-size:12.5px;color:#0E0E0E;font-weight:500;}"+
-      "th:first-child,td:first-child{width:1%;white-space:nowrap;color:#0E0E0E;font-weight:600;}"+
+      '@page{ size:'+((opts && opts.page) || "A5")+'; margin:'+((opts && opts.margin) || "10mm")+'; }'+
+      "body{ font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif; color:#1A1A1A; font-size:13px; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }"+
+      /* navy letterhead with the shop seal, closed by a gold hairline */
+      ".shop-header{display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#122A55 0%,#1E4178 100%);color:#FFF;padding:11px 13px;border-radius:8px 8px 4px 4px;margin:0;break-inside:avoid;}"+
+      ".shop-logo{width:46px;height:46px;flex:none;border-radius:50%;object-fit:cover;}"+
+      ".shop-id{min-width:0;}"+
+      ".shop-name{font-size:14.5px;font-weight:700;margin:0;line-height:1.4;color:#FFF;}"+
+      ".shop-branch{font-size:14.5px;font-weight:700;margin:0 0 4px;line-height:1.4;color:#FFF;}"+
+      ".shop-meta{font-size:10.5px;color:#C7D6EE;line-height:1.55;margin:0;}"+
+      ".rule{height:3px;border-radius:2px;background:linear-gradient(90deg,#8A6010,#C9A227 40%,#EFDCA0 55%,#C9A227 70%,#8A6010);}"+
+      ".head-rule{margin:3px 0 16px;}"+
+      ".foot-rule{margin:22px 0 0;}"+
+      "h1{font-size:18px;font-weight:700;color:#122A55;margin:0 0 4px;text-align:center;}"+
+      /* every document gets the same short gold bar under its subtitle */
+      ".sub{font-size:11px;color:#6B6455;margin:0 0 6px;text-align:center;}"+
+      '.sub::after{content:"";display:block;width:74px;height:3px;margin:10px auto 0;border-radius:2px;background:linear-gradient(90deg,#EFDCA0,#C9A227 50%,#8A6010);}'+
+      "table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px;}"+
+      "th,td{padding:7px 6px;text-align:left;font-size:12.5px;color:#1A1A1A;font-weight:500;}"+
+      "thead th{background:#122A55;color:#FFF;font-weight:700;font-size:11.5px;}"+
+      "thead th:first-child{white-space:nowrap;}"+
+      "thead th:first-child{border-radius:6px 0 0 6px;}"+
+      "thead th:last-child{border-radius:0 6px 6px 0;}"+
+      "tbody td{border-bottom:1px solid #E8E1D2;}"+
+      "tbody tr:nth-child(even) td{background:#FBF8F1;}"+
+      "tbody td:first-child{width:1%;white-space:nowrap;color:#122A55;font-weight:700;}"+
       "th:nth-child(2),td:nth-child(2){width:auto;}"+
       "thead{display:table-header-group;}"+
       "tr{break-inside:avoid;page-break-inside:avoid;}"+
-      ".rep th,.rep td{font-size:11px;padding:4px 5px;}"+
+      ".rep th,.rep td{font-size:11px;padding:5px 5px;}"+
       ".rep th:nth-child(2),.rep td:nth-child(2){width:1%;white-space:nowrap;}"+
       ".rep th:nth-child(5),.rep td:nth-child(5){width:auto;}"+
-      ".rec th,.rec td{font-size:12px;padding:5px 6px;}"+
-      ".sec{font-size:14px;font-weight:700;margin:18px 0 4px;}"+
-      ".rep-sum{display:flex;gap:26px;margin:12px 0 2px;font-size:12px;color:#3A382F;}"+
-      ".rep-sum b{display:block;margin-top:2px;font-size:15px;color:#0E0E0E;}"+
-      ".rep-note{font-size:11.5px;color:#3A382F;margin:6px 0 0;}"+
+      ".rec th,.rec td{font-size:12px;padding:6px 6px;}"+
+      ".sec{font-size:13.5px;font-weight:700;color:#122A55;margin:20px 0 2px;padding-left:9px;border-left:3px solid #C9A227;}"+
+      ".rep-sum{display:flex;gap:26px;margin:14px 0 2px;font-size:11px;color:#6B6455;}"+
+      ".rep-sum b{display:block;margin-top:3px;font-size:15px;color:#122A55;}"+
+      ".rep-note{font-size:11.5px;color:#6B6455;margin:6px 0 0;}"+
       "th.num,td.num{white-space:nowrap;width:1%;padding-left:12px;}"+
-      "th{font-size:11.5px;color:#0E0E0E;font-weight:700;}"+
       "td.num, th.num{text-align:right;}"+
-      ".cust{margin:14px 0;padding:10px;background:#F7F4EC;border-radius:6px;font-size:12.5px;line-height:1.8;color:#0E0E0E;}"+
+      "tbody td.num{font-weight:600;}"+
+      /* customer / counterparty block: cream ledger card with a gold spine */
+      ".cust{margin:16px 0 0;padding:11px 13px;background:#FBF7EC;border:1px solid #EDE2C8;border-left:4px solid #C9A227;border-radius:6px;font-size:12.5px;line-height:1.85;color:#1A1A1A;break-inside:avoid;}"+
       ".meta-row{text-align:left;}"+
-      ".meta-row b{color:#0E0E0E;margin-right:6px;}"+
-      ".grand{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:2px solid #0E0E0E;font-size:16px;font-weight:700;color:#0E0E0E;}"+
+      ".meta-row b{color:#122A55;font-weight:700;margin-right:6px;}"+
       ".cust-split{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}"+
       ".cust-info{flex:1;min-width:0;}"+
-      ".cust-pay{font-size:12px;font-weight:600;color:#3A382F;text-align:right;max-width:55%;}"+
-      ".sub-total{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;}"+
+      ".cust-pay{font-size:12px;font-weight:700;color:#8A6010;text-align:right;max-width:55%;}"+
+      ".grand{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding:11px 14px;border-radius:7px;background:linear-gradient(135deg,#122A55 0%,#1E4178 100%);color:#FFF;font-size:15px;font-weight:700;break-inside:avoid;}"+
+      ".grand span:last-child{color:#F1D68C;font-size:17px;text-align:right;}"+
+      ".sub-total{display:flex;justify-content:space-between;padding:4px 2px;font-size:13px;color:#3A382F;}"+
       "table + .sub-total{margin-top:10px;}"+
-      ".grand span:last-child,.sub-total span:last-child{text-align:right;}"+
+      ".sub-total span:last-child{text-align:right;font-weight:600;color:#1A1A1A;}"+
       ".signs{display:flex;gap:28px;margin-top:44px;break-inside:avoid;page-break-inside:avoid;}"+
       ".sign{flex:1;text-align:center;}"+
-      ".sign-line{height:46px;border-bottom:1px dotted #0E0E0E;margin-bottom:6px;}"+
-      ".sign-label{font-size:12.5px;font-weight:600;margin:0;}"+
-      ".sign-sub{font-size:11.5px;color:#3A382F;margin:2px 0 0;}"+
-      ".thanks{text-align:center;margin-top:26px;font-size:12px;color:#3A382F;}"+
-      ".c{color:#8B8677;font-size:11px;}"+
-      "</style></head><body>"+
+      ".sign-line{height:46px;border-bottom:1px dotted #9A927F;margin-bottom:6px;}"+
+      ".sign-label{font-size:12.5px;font-weight:700;color:#122A55;margin:0;}"+
+      ".sign-sub{font-size:11.5px;color:#6B6455;margin:2px 0 0;}"+
+      ".thanks{text-align:center;margin-top:26px;font-size:12.5px;font-weight:700;color:#122A55;}"+
+      ".c{color:#8B8677;font-size:11px;font-weight:500;}"+
+      /* ── ເຕັມໜ້າເຈ້ຍ: A5 (ບິນ/ໃບຮັບເງິນ/ໃບໂອນ/ໃບຈ່າຍເງິນ) ── */
+      "html{height:100%;}"+
+      "body{box-sizing:border-box;}"+
+      "@media screen{ body{padding:16px 18px;} }"+
+      "body.a5{display:flex;flex-direction:column;min-height:100%;font-size:15px;}"+
+      "body.a5 > *{flex:none;}"+
+      "body.a5 .signs{margin-top:auto;padding-top:26px;}"+
+      "body.a5 .shop-logo{width:54px;height:54px;}"+
+      "body.a5 .shop-name{font-size:16px;} body.a5 .shop-branch{font-size:15.5px;} body.a5 .shop-meta{font-size:11.5px;}"+
+      "body.a5 h1{font-size:23px;margin-bottom:5px;} body.a5 .sub{font-size:12.5px;}"+
+      "body.a5 th,body.a5 td{font-size:14.5px;padding:8px 7px;} body.a5 thead th{font-size:13px;}"+
+      "body.a5 .cust{font-size:14px;padding:12px 15px;} body.a5 .cust-pay{font-size:13.5px;}"+
+      "body.a5 .sub-total{font-size:14.5px;}"+
+      "body.a5 .grand{font-size:20px;padding:13px 16px;} body.a5 .grand span:last-child{font-size:23px;}"+
+      "body.a5 .sign-line{height:54px;} body.a5 .sign-label{font-size:14px;} body.a5 .sign-sub{font-size:12.5px;}"+
+      "body.a5 .thanks{font-size:14px;}"+
+      /* ── ເຕັມໜ້າເຈ້ຍ: A4 (ລາຍງານການຂາຍ) ── */
+      "body.a4{font-size:14px;}"+
+      "body.a4 .shop-logo{width:56px;height:56px;}"+
+      "body.a4 .shop-name{font-size:17px;} body.a4 .shop-branch{font-size:16px;} body.a4 .shop-meta{font-size:12px;}"+
+      "body.a4 h1{font-size:25px;margin-bottom:5px;} body.a4 .sub{font-size:13px;}"+
+      "body.a4 .rep-sum{font-size:13px;} body.a4 .rep-sum b{font-size:18px;}"+
+      "body.a4 .rep th,body.a4 .rep td{font-size:12.5px;padding:7px 7px;}"+
+      "body.a4 .rec th,body.a4 .rec td{font-size:13px;padding:7.5px 8px;}"+
+      "body.a4 .sec{font-size:15.5px;}"+
+      "body.a4 .cust{font-size:14px;padding:12px 15px;}"+
+      "body.a4 .grand{font-size:21px;padding:13px 16px;} body.a4 .grand span:last-child{font-size:24px;}"+
+      "body.a4 .sign-line{height:56px;} body.a4 .sign-label{font-size:14px;} body.a4 .sign-sub{font-size:12.5px;}"+
+      '</style></head><body class="'+(((opts && opts.page) || "A5") === "A4" ? "a4" : "a5")+'">'+
       '<div class="shop-header">'+
-        '<p class="shop-name">ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ ຜູ້ດຽວ</p>'+
-        '<p class="shop-branch">('+BRANCH_NAME+')</p>'+
-        '<p class="shop-meta">Tel: 030 9975155, 020 5693 9546, 020 5659 3242</p>'+
-        '<p class="shop-meta">ບ້ານໂພນສະຫວັນ, ເມືອງຮຸນ, ແຂວງອຸດົມໄຊ</p>'+
+        '<img class="shop-logo" src="'+logo+'" alt="" onerror="this.style.display=\'none\'">'+
+        '<div class="shop-id">'+
+          '<p class="shop-name">ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ ຂາອອກ-ຂາເຂົ້າ ຈຳກັດ ຜູ້ດຽວ</p>'+
+          '<p class="shop-branch">('+BRANCH_NAME+')</p>'+
+          '<p class="shop-meta">Tel: 030 9975155, 020 5693 9546, 020 5659 3242</p>'+
+          '<p class="shop-meta">ບ້ານໂພນສະຫວັນ, ເມືອງຮຸນ, ແຂວງອຸດົມໄຊ</p>'+
+        "</div>"+
       "</div>"+
+      '<div class="rule head-rule"></div>'+
       bodyHtml+
+      '<div class="rule foot-rule"></div>'+
       "<script>window.onload=function(){ var go=function(){ setTimeout(function(){ window.print(); }, 250); }; if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(go, go); } else { go(); } };<\/script>"+
       "</body></html>";
     w.document.open();
@@ -3761,7 +3922,7 @@
   // a voucher for one expense: what it was for, how much, and a line for each side to sign
   function printExpense(e){
     var cur = curOf(e);
-    var blank = '<span style="display:inline-block;min-width:200px;border-bottom:1px dotted #0E0E0E;"></span>';
+    var blank = '<span style="display:inline-block;min-width:200px;border-bottom:1px dotted #9A927F;"></span>';
     printDoc("ໃບຈ່າຍເງິນ "+(e.expNo || fmtDMY(e.date)),
       "<h1>ໃບຈ່າຍເງິນ</h1>"+
       '<p class="sub">'+(e.expNo ? "ເລກທີ "+e.expNo+" · " : "")+fmtDMY(e.date)+" "+e.time+"</p>"+
@@ -4097,7 +4258,7 @@
 
   // a voucher for one deposit, for the shop and the bank to sign
   function printDeposit(dp){
-    var blank = '<span style="display:inline-block;min-width:200px;border-bottom:1px dotted #0E0E0E;"></span>';
+    var blank = '<span style="display:inline-block;min-width:200px;border-bottom:1px dotted #9A927F;"></span>';
     printDoc("ໃບມອບເງິນເຂົ້າທະນາຄານ "+(dp.depNo || fmtDMY(dp.date)),
       "<h1>ໃບມອບເງິນເຂົ້າທະນາຄານ</h1>"+
       '<p class="sub">'+(dp.depNo ? "ເລກທີ "+dp.depNo+" · " : "")+fmtDMY(dp.date)+" "+dp.time+"</p>"+
