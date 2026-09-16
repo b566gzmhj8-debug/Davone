@@ -179,36 +179,47 @@
   .doc-footer{padding:12px 18px;border-top:1px solid var(--border);background:var(--panel2);text-align:center;font-size:11px;color:var(--muted);}
   /* ---- ກະດາດຕົວຢ່າງໃນແອັບ: ໜ້າຕາອັນດຽວກັນກັບໃບ A5 ທີ່ພິມອອກມາ (ເຫັນແນວໃດ ພິມແນວນັ້ນ) ---- */
   .paper{background:#E6DFD0;padding:12px;border-radius:14px;margin:-16px -16px 14px;}
-  .paper-sheet{background:#FFFFFF;color:#0E0E0E;border-radius:6px;padding:18px 18px 22px;overflow-x:auto;
+  .paper-sheet{background:#FFFFFF;color:#22211d;border-radius:8px;padding:16px 16px 20px;overflow-x:auto;
     font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif;font-size:13px;line-height:1.5;
     box-shadow:0 10px 26px -14px rgba(0,0,0,.6);}
-  .paper .shop-header{margin:0 0 10px;padding-bottom:10px;border-bottom:2px solid #0E0E0E;}
-  .paper .shop-name{font-size:16px;font-weight:700;margin:0 0 2px;line-height:1.4;color:#0E0E0E;}
-  .paper .shop-branch{font-size:13.5px;font-weight:700;margin:0 0 5px;color:#0E0E0E;}
-  .paper .shop-meta{font-size:11.5px;color:#3A382F;line-height:1.6;margin:0;}
-  .paper h1{font-size:16px;margin:0 0 2px;text-align:center;color:#0E0E0E;font-family:inherit;display:block;}
-  .paper .sub{font-size:11px;color:#3A382F;margin:0 0 14px;text-align:center;}
-  .paper table{width:100%;border-collapse:collapse;margin-top:8px;}
-  .paper th,.paper td{padding:5px 4px;border-bottom:1px solid #C6BCA8;text-align:left;font-size:12.5px;color:#0E0E0E;font-weight:500;}
-  .paper th:first-child,.paper td:first-child{width:1%;white-space:nowrap;font-weight:600;}
-  .paper th{font-size:11.5px;font-weight:700;}
-  .paper th.num,.paper td.num{white-space:nowrap;width:1%;padding-left:12px;text-align:right;}
-  .paper .cust{margin:14px 0;padding:10px;background:#F7F4EC;border-radius:6px;font-size:12.5px;line-height:1.8;color:#0E0E0E;}
+  .paper .shop-header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#0d1c44 0%,#1b3068 55%,#12224f 100%);color:#fff;}
+  .paper .shop-logo{width:46px;height:46px;flex:none;border-radius:50%;overflow:hidden;background:#000;box-shadow:0 0 0 2px #d9b85c;}
+  .paper .shop-logo img{width:100%;height:100%;display:block;object-fit:cover;}
+  .paper .shop-id{flex:1;min-width:0;}
+  .paper .shop-name{font-size:14.5px;font-weight:700;margin:0;line-height:1.45;color:#fff;}
+  .paper .shop-branch{font-weight:700;color:#f0d28a;}
+  .paper .shop-meta{font-size:11px;color:rgba(255,255,255,.78);line-height:1.6;margin:3px 0 0;}
+  .paper .shop-rule{height:4px;border-radius:3px;margin:7px 0 0;background:linear-gradient(90deg,#a8801f,#f0d28a 45%,#a8801f);}
+  .paper h1{font-size:19px;font-weight:700;margin:22px 0 4px;text-align:center;color:#14265c;display:block;font-family:inherit;}
+  .paper .sub{font-size:11.5px;color:#6b6a63;margin:0;text-align:center;}
+  .paper .sub::after{content:"";display:block;width:96px;height:4px;border-radius:2px;margin:12px auto 0;background:linear-gradient(90deg,#d9b85c,#a8801f);}
+  .paper .cust{margin:16px 0;padding:12px 14px;background:#FBF6EA;border-left:4px solid #d9b85c;border-radius:8px;font-size:12.5px;line-height:1.85;color:#2a2a2a;}
   .paper .cust-split{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
   .paper .cust-info{flex:1;min-width:0;}
-  .paper .cust-pay{font-size:12px;font-weight:600;color:#3A382F;text-align:right;max-width:55%;}
+  .paper .cust-pay{font-size:12px;font-weight:700;color:#8a6a1e;text-align:right;max-width:55%;}
   .paper .meta-row{text-align:left;}
-  .paper .meta-row b{margin-right:6px;color:#0E0E0E;}
-  .paper .sub-total{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;}
+  .paper .meta-row b{color:#14265c;margin-right:6px;}
+  .paper table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;}
+  .paper thead{display:table-header-group;}
+  .paper thead th{background:#14265c;color:#fff;font-size:11.5px;font-weight:700;padding:8px;text-align:left;}
+  .paper thead th:first-child{border-radius:8px 0 0 8px;}
+  .paper thead th:last-child{border-radius:0 8px 8px 0;}
+  .paper tbody td{padding:9px 8px;border-bottom:1px solid #E4DCC8;text-align:left;font-size:12.5px;color:#22211d;font-weight:500;}
+  .paper tbody td:first-child{width:1%;white-space:nowrap;font-weight:700;color:#14265c;}
+  .paper th.num,.paper td.num{text-align:right;white-space:nowrap;width:1%;padding-left:12px;}
+  .paper tr{break-inside:avoid;page-break-inside:avoid;}
+  .paper .sub-total{display:flex;justify-content:space-between;padding:4px 2px;font-size:13px;color:#2a2a2a;}
   .paper table + .sub-total{margin-top:10px;}
-  .paper .grand{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:2px solid #0E0E0E;font-size:16px;font-weight:700;}
-  .paper .signs{display:flex;gap:28px;margin-top:40px;}
+  .paper .grand{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding:13px 16px;border-radius:10px;background:linear-gradient(135deg,#0d1c44,#1b3068);color:#fff;font-size:17px;font-weight:700;}
+  .paper .grand span:last-child{color:#f0d28a;text-align:right;white-space:nowrap;}
+  .paper .signs{display:flex;gap:28px;margin-top:44px;break-inside:avoid;page-break-inside:avoid;}
   .paper .sign{flex:1;text-align:center;}
-  .paper .sign-line{height:42px;border-bottom:1px dotted #0E0E0E;margin-bottom:6px;}
-  .paper .sign-label{font-size:12.5px;font-weight:600;margin:0;color:#0E0E0E;}
-  .paper .sign-sub{font-size:11.5px;color:#3A382F;margin:2px 0 0;}
-  .paper .thanks{text-align:center;margin-top:22px;font-size:12px;color:#3A382F;}
-  .paper .c{color:#8B8677;font-size:11px;}
+  .paper .sign-line{height:46px;border-bottom:1px dotted #9a9488;margin-bottom:6px;}
+  .paper .sign-label{font-size:12.5px;font-weight:700;color:#14265c;margin:0;}
+  .paper .sign-sub{font-size:11.5px;color:#6b6a63;margin:2px 0 0;}
+  .paper .thanks{text-align:center;margin-top:26px;font-size:13px;font-weight:700;color:#14265c;}
+  .paper .sheet-bar{height:4px;border-radius:3px;margin-top:18px;background:linear-gradient(90deg,#a8801f,#f0d28a 45%,#a8801f);}
+  .paper .c{color:#8B8677;font-size:11px;font-weight:500;}
   .paper .note{font-size:11.5px;color:#3A382F;margin:8px 0 0;}
   @media (min-width:860px){
     .paper{margin:-28px -32px 16px;}
@@ -604,17 +615,26 @@ function curLabel(c){ return c === 'THB' ? 'ບາດ' : 'ກີບ'; }
 function moneyCur(n, c){ return fmtMoney(n) + ' ' + curLabel(c); }
 
 /* ຫົວກະດາດ (ຊື່ຮ້ານ + ສາຂາ + ເບີໂທ + ທີ່ຢູ່) ໃຊ້ຮ່ວມກັນທັງໜ້າຈໍ ແລະ ໜ້າພິມ */
+function shopLogoUrl(){
+  /* ໜ້າຕ່າງພິມເປັນ about:blank ຕ້ອງໃຊ້ URL ເຕັມ ຮູບໂລໂກ້ຈຶ່ງຈະອອກ */
+  try{ return new URL('icon-512.png', location.href).href; }catch(e){ return 'icon-512.png'; }
+}
 function shopHeaderHtml(){
   return '<div class="shop-header">' +
-      '<p class="shop-name">' + escHtml(SHOP_INFO.name) + '</p>' +
-      '<p class="shop-branch">(' + escHtml(SHOP_INFO.branch) + ')</p>' +
-      '<p class="shop-meta">' + escHtml(SHOP_INFO.tel) + '</p>' +
-      '<p class="shop-meta">' + escHtml(SHOP_INFO.address) + '</p>' +
-    '</div>';
+      '<div class="shop-logo"><img src="' + escHtml(shopLogoUrl()) + '" alt=""></div>' +
+      '<div class="shop-id">' +
+        '<p class="shop-name">' + escHtml(SHOP_INFO.name) +
+          ' <span class="shop-branch">(' + escHtml(SHOP_INFO.branch) + ')</span></p>' +
+        '<p class="shop-meta">' + escHtml(SHOP_INFO.tel) + '</p>' +
+        '<p class="shop-meta">' + escHtml(SHOP_INFO.address) + '</p>' +
+      '</div>' +
+    '</div>' +
+    '<div class="shop-rule"></div>';
 }
 /* ກະດາດຕົວຢ່າງເທິງໜ້າຈໍ — ໜ້າຕາຄືກັບໃບທີ່ຈະພິມອອກມາ */
 function paperHtml(bodyHtml){
-  return '<div class="paper"><div class="paper-sheet">' + shopHeaderHtml() + bodyHtml + '</div></div>';
+  return '<div class="paper"><div class="paper-sheet">' + shopHeaderHtml() + bodyHtml +
+    '<div class="sheet-bar"></div></div></div>';
 }
 
 /* ຕ້ອງເປີດໜ້າຕ່າງພິມທັນທີຕອນຜູ້ໃຊ້ກົດປຸ່ມ ແລ້ວຄ່ອຍຂຽນເນື້ອໃນລົງໄປຫຼັງໂຫລດຂໍ້ມູນເສັດ
@@ -632,38 +652,46 @@ function printDoc(title, bodyHtml, opts){
   const w = opts.win || openPrintWindow();
   if(!w) return;
   const css = [
-    '@page{ size:' + (opts.page || 'A5') + '; margin:' + (opts.margin || '12mm') + '; }',
-    "body{ font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif; color:#0E0E0E; font-size:13px; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }",
-    '.shop-header{margin:0 0 10px;padding-bottom:10px;border-bottom:2px solid #0E0E0E;}',
-    '.shop-name{font-size:17px;font-weight:700;margin:0 0 2px;line-height:1.4;}',
-    '.shop-branch{font-size:14px;font-weight:700;margin:0 0 5px;}',
-    '.shop-meta{font-size:11.5px;color:#3A382F;line-height:1.6;margin:0;}',
-    'h1{font-size:16px;margin:0 0 2px;text-align:center;}',
-    '.sub{font-size:11px;color:#3A382F;margin:0 0 14px;text-align:center;}',
-    'table{width:100%;border-collapse:collapse;margin-top:8px;}',
-    'th,td{padding:5px 4px;border-bottom:1px solid #C6BCA8;text-align:left;font-size:12.5px;color:#0E0E0E;font-weight:500;}',
-    'th:first-child,td:first-child{width:1%;white-space:nowrap;font-weight:600;}',
-    'thead{display:table-header-group;}',
-    'tr{break-inside:avoid;page-break-inside:avoid;}',
-    'th{font-size:11.5px;font-weight:700;}',
-    'th.num,td.num{white-space:nowrap;width:1%;padding-left:12px;text-align:right;}',
-    '.cust{margin:14px 0;padding:10px;background:#F7F4EC;border-radius:6px;font-size:12.5px;line-height:1.8;}',
+    '@page{ size:' + (opts.page || 'A5') + '; margin:' + (opts.margin || '10mm') + '; }',
+    "body{ font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif; color:#22211d; font-size:13px; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }",
+    '.shop-header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#0d1c44 0%,#1b3068 55%,#12224f 100%);color:#fff;}',
+    '.shop-logo{width:46px;height:46px;flex:none;border-radius:50%;overflow:hidden;background:#000;box-shadow:0 0 0 2px #d9b85c;}',
+    '.shop-logo img{width:100%;height:100%;display:block;object-fit:cover;}',
+    '.shop-id{flex:1;min-width:0;}',
+    '.shop-name{font-size:14.5px;font-weight:700;margin:0;line-height:1.45;color:#fff;}',
+    '.shop-branch{font-weight:700;color:#f0d28a;}',
+    '.shop-meta{font-size:11px;color:rgba(255,255,255,.78);line-height:1.6;margin:3px 0 0;}',
+    '.shop-rule{height:4px;border-radius:3px;margin:7px 0 0;background:linear-gradient(90deg,#a8801f,#f0d28a 45%,#a8801f);}',
+    'h1{font-size:19px;font-weight:700;margin:22px 0 4px;text-align:center;color:#14265c;display:block;font-family:inherit;}',
+    '.sub{font-size:11.5px;color:#6b6a63;margin:0;text-align:center;}',
+    '.sub::after{content:"";display:block;width:96px;height:4px;border-radius:2px;margin:12px auto 0;background:linear-gradient(90deg,#d9b85c,#a8801f);}',
+    '.cust{margin:16px 0;padding:12px 14px;background:#FBF6EA;border-left:4px solid #d9b85c;border-radius:8px;font-size:12.5px;line-height:1.85;color:#2a2a2a;}',
     '.cust-split{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}',
     '.cust-info{flex:1;min-width:0;}',
-    '.cust-pay{font-size:12px;font-weight:600;color:#3A382F;text-align:right;max-width:55%;}',
+    '.cust-pay{font-size:12px;font-weight:700;color:#8a6a1e;text-align:right;max-width:55%;}',
     '.meta-row{text-align:left;}',
-    '.meta-row b{margin-right:6px;}',
-    '.sub-total{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;}',
+    '.meta-row b{color:#14265c;margin-right:6px;}',
+    'table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;}',
+    'thead{display:table-header-group;}',
+    'thead th{background:#14265c;color:#fff;font-size:11.5px;font-weight:700;padding:8px;text-align:left;}',
+    'thead th:first-child{border-radius:8px 0 0 8px;}',
+    'thead th:last-child{border-radius:0 8px 8px 0;}',
+    'tbody td{padding:9px 8px;border-bottom:1px solid #E4DCC8;text-align:left;font-size:12.5px;color:#22211d;font-weight:500;}',
+    'tbody td:first-child{width:1%;white-space:nowrap;font-weight:700;color:#14265c;}',
+    'th.num,td.num{text-align:right;white-space:nowrap;width:1%;padding-left:12px;}',
+    'tr{break-inside:avoid;page-break-inside:avoid;}',
+    '.sub-total{display:flex;justify-content:space-between;padding:4px 2px;font-size:13px;color:#2a2a2a;}',
     'table + .sub-total{margin-top:10px;}',
-    '.grand{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:2px solid #0E0E0E;font-size:16px;font-weight:700;}',
-    '.grand span:last-child,.sub-total span:last-child{text-align:right;}',
+    '.grand{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding:13px 16px;border-radius:10px;background:linear-gradient(135deg,#0d1c44,#1b3068);color:#fff;font-size:17px;font-weight:700;}',
+    '.grand span:last-child{color:#f0d28a;text-align:right;white-space:nowrap;}',
     '.signs{display:flex;gap:28px;margin-top:44px;break-inside:avoid;page-break-inside:avoid;}',
     '.sign{flex:1;text-align:center;}',
-    '.sign-line{height:46px;border-bottom:1px dotted #0E0E0E;margin-bottom:6px;}',
-    '.sign-label{font-size:12.5px;font-weight:600;margin:0;}',
-    '.sign-sub{font-size:11.5px;color:#3A382F;margin:2px 0 0;}',
-    '.thanks{text-align:center;margin-top:26px;font-size:12px;color:#3A382F;}',
-    '.c{color:#8B8677;font-size:11px;}',
+    '.sign-line{height:46px;border-bottom:1px dotted #9a9488;margin-bottom:6px;}',
+    '.sign-label{font-size:12.5px;font-weight:700;color:#14265c;margin:0;}',
+    '.sign-sub{font-size:11.5px;color:#6b6a63;margin:2px 0 0;}',
+    '.thanks{text-align:center;margin-top:26px;font-size:13px;font-weight:700;color:#14265c;}',
+    '.sheet-bar{height:4px;border-radius:3px;margin-top:18px;background:linear-gradient(90deg,#a8801f,#f0d28a 45%,#a8801f);}',
+    '.c{color:#8B8677;font-size:11px;font-weight:500;}',
     '.note{font-size:11.5px;color:#3A382F;margin:8px 0 0;}'
   ].join('');
   const html =
@@ -672,6 +700,7 @@ function printDoc(title, bodyHtml, opts){
     '<style>' + css + '</style></head><body>' +
     shopHeaderHtml() +
     bodyHtml +
+    '<div class="sheet-bar"></div>' +
     '<' + 'script>window.onload=function(){ var go=function(){ setTimeout(function(){ window.print(); }, 250); }; if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(go, go); } else { go(); } };<\/' + 'script>' +
     '</body></html>';
   w.document.open();
