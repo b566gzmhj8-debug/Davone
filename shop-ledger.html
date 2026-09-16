@@ -3648,7 +3648,7 @@
       (isA5
         // A5: no page margin on the first page so the navy header bleeds to the top/left/right edges;
         // the side gutters come from the body padding instead
-        ? '@page{ size:A5; margin:8mm 0; } @page :first{ margin-top:0; }'
+        ? '@page{ size:A5; margin:0; }'
         : '@page{ size:'+((opts && opts.page) || "A5")+'; margin:'+((opts && opts.margin) || "10mm")+'; }')+
       "body{ font-family:'Lao MN','Lao Sangam MN','Noto Sans Lao','Phetsarath OT',Arial,sans-serif; color:#1A1A1A; font-size:13px; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }"+
       /* navy letterhead with the shop seal, closed by a gold hairline */
@@ -3711,7 +3711,8 @@
       "html{height:100%;}"+
       "body{box-sizing:border-box;}"+
       "@media screen{ body{padding:16px 18px;} }"+
-      "body.a5{display:flex;flex-direction:column;min-height:100%;font-size:15px;padding:0 9mm 8mm;}"+
+      /* fixed height a little under A5 (210mm): Safari resolves 100% taller than the page and spills onto a 2nd sheet */
+      "body.a5{display:flex;flex-direction:column;min-height:204mm;font-size:15px;padding:0 9mm 6mm;}"+
       "body.a5 > *{max-width:100%;min-width:0;}"+
       /* full-bleed header: pulled out over the side gutters, square corners, flush with the paper edge */
       "body.a5 .shop-header{margin:0 -9mm;max-width:none;border-radius:0;padding:7mm 9mm 5mm;}"+
