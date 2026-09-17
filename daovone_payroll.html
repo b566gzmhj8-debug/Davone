@@ -627,7 +627,7 @@
 .pay-hero{display:grid;}
 .pay-tools{display:flex;}
 .pay-tools{align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;}
-.pay-search{position:relative;flex:1 1 240px;max-width:340px;}
+.pay-search{position:relative;flex:1 1 280px;min-width:0;} /* ຊ່ອງຄົ້ນຫາຍືດເຕັມແຖວ ໃຫ້ແຖວນີ້ກວ້າງເທົ່າກັບຕາຕະລາງ */
 .pay-search svg{position:absolute;left:11px;top:50%;width:16px;height:16px;transform:translateY(-50%);stroke:#8a90a2;fill:none;stroke-width:2;}
 .pay-search input{width:100%;padding:9px 12px 9px 34px;font:inherit;font-size:.9rem;border:1px solid #d5d9e2;border-radius:8px;background:#fff;color:#1b2437;}
 .pay-search input:focus{outline:none;border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
@@ -635,7 +635,7 @@
 .pay-chip{font:inherit;font-size:.82rem;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid #d5d9e2;background:#fff;color:#57607a;cursor:pointer;}
 .pay-chip b{font-weight:700;margin-left:4px;}
 .pay-chip.on{background:#0b1a3d;border-color:#0b1a3d;color:#f6dc9c;}
-.pay-count{margin-left:auto;font-size:.8rem;color:#57607a;}
+.pay-count{font-size:.8rem;color:#57607a;white-space:nowrap;}
 #emp-tbody tr.pay-hide{display:none;}
 .pay-bar{height:8px;border-radius:99px;background:#e6e1d4;overflow:hidden;}
 .pay-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#2f7d57,#56b07f);transition:width .4s;}
