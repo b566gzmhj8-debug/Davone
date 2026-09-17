@@ -621,9 +621,85 @@
   .slip-footer { background:linear-gradient(90deg,#a57a36,#f3d99b,#a57a36) !important; }
   .slip-close-row .btn-primary { background:#0f1f45; color:#f3d99b; }
   .slip-close-row .btn-gold { background:#fff; color:#0f1f45; border:1px solid #d4a85a; }
+
+  /* ══════════ PAYROLL V2 — ແບບແອັບການເງິນ (ກ່ອງຍອດໃຫຍ່ + ວົງຄວາມຄືບໜ້າ + ຄົ້ນຫາ/ກອງ) ══════════ */
+  @media screen {
+.pay-hero{display:grid;}
+.pay-tools{display:flex;}
+.pay-tools{align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;}
+.pay-search{position:relative;flex:1 1 240px;max-width:340px;}
+.pay-search svg{position:absolute;left:11px;top:50%;width:16px;height:16px;transform:translateY(-50%);stroke:#8a90a2;fill:none;stroke-width:2;}
+.pay-search input{width:100%;padding:9px 12px 9px 34px;font:inherit;font-size:.9rem;border:1px solid #d5d9e2;border-radius:8px;background:#fff;color:#1b2437;}
+.pay-search input:focus{outline:none;border-color:#a57a36;box-shadow:0 0 0 3px rgba(165,122,54,.15);}
+.pay-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.pay-chip{font:inherit;font-size:.82rem;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid #d5d9e2;background:#fff;color:#57607a;cursor:pointer;}
+.pay-chip b{font-weight:700;margin-left:4px;}
+.pay-chip.on{background:#0b1a3d;border-color:#0b1a3d;color:#f6dc9c;}
+.pay-count{margin-left:auto;font-size:.8rem;color:#57607a;}
+#emp-tbody tr.pay-hide{display:none;}
+.pay-bar{height:8px;border-radius:99px;background:#e6e1d4;overflow:hidden;}
+.pay-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#2f7d57,#56b07f);transition:width .4s;}
+.pay-avatar{display:none;}
+
+/* ══════════════════ 2 · ແອັບການເງິນ (ຕົວເລກໃຫຍ່ + ກາດ) ══════════════════ */
+body.pay-v2{background:radial-gradient(1200px 500px at 10% -10%,#e9e4f3 0,transparent 60%),#f3f1ec;}
+body.pay-v2 #admin-panel{max-width:1200px;}
+body.pay-v2 .admin-header{border-radius:22px;padding:18px 24px;border-bottom:none;box-shadow:0 14px 34px rgba(11,26,61,.22);}
+body.pay-v2 .pay-hero{grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px;}
+body.pay-v2 .pay-hero-main{position:relative;overflow:hidden;border-radius:22px;padding:24px 28px;color:#fff;
+  background:linear-gradient(135deg,#132a5c,#0b1a3d 60%);box-shadow:0 14px 34px rgba(11,26,61,.2);}
+body.pay-v2 .pay-hero-main::before,body.pay-v2 .pay-hero-main::after{content:"";position:absolute;border-radius:50%;background:rgba(246,220,156,.09);}
+body.pay-v2 .pay-hero-main::before{width:260px;height:260px;right:-60px;top:-110px;}
+body.pay-v2 .pay-hero-main::after{width:160px;height:160px;right:90px;bottom:-90px;}
+body.pay-v2 .pay-hero-main small{font-size:.85rem;color:rgba(255,255,255,.7);}
+body.pay-v2 .pay-hero-main .pay-big{display:block;margin:6px 0 10px;font-size:2.6rem;font-weight:800;color:#f6dc9c;letter-spacing:-.01em;line-height:1.1;}
+body.pay-v2 .pay-hero-main .pay-sub{display:flex;gap:18px;flex-wrap:wrap;font-size:.86rem;color:rgba(255,255,255,.82);}
+body.pay-v2 .pay-hero-main .pay-sub b{color:#fff;}
+body.pay-v2 .pay-hero-ring{display:flex;align-items:center;gap:18px;border-radius:22px;padding:20px 24px;background:#fff;box-shadow:0 10px 28px rgba(27,36,55,.08);}
+body.pay-v2 .pay-ring{--p:0;flex:none;width:112px;height:112px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(#2f7d57 calc(var(--p)*1%),#ece7dc 0);}
+body.pay-v2 .pay-ring span{width:84px;height:84px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:1.4rem;font-weight:800;color:#0b1a3d;}
+body.pay-v2 .pay-hero-ring b{display:block;font-size:1.05rem;color:#0b1a3d;margin-bottom:4px;}
+body.pay-v2 .pay-hero-ring p{font-size:.85rem;color:#57607a;line-height:1.6;}
+body.pay-v2 .pay-hero-ring .pay-unpaid{color:#b3382a;font-weight:700;}
+body.pay-v2 #save-status-bar{border-radius:16px !important;}
+body.pay-v2 .summary-bar{background:transparent;border:none;box-shadow:none;gap:12px;overflow:visible;}
+body.pay-v2 .sum-box{background:#fff;border:none;border-radius:18px;box-shadow:0 8px 22px rgba(27,36,55,.07);align-items:flex-start;text-align:left;padding:16px;}
+body.pay-v2 .sum-box .label{flex-direction:column;align-items:flex-start;gap:9px;white-space:normal;}
+body.pay-v2 .sum-box .label .ico{width:34px;height:34px;padding:8px;border-radius:11px;background:#eef1f8;color:#1c3264;}
+body.pay-v2 .sum-box.red .label .ico{background:#f8eae7;color:#b3382a;}
+body.pay-v2 .sum-box.gold .label .ico{background:#f4ecd9;color:#8a6224;}
+body.pay-v2 .sum-box .value{font-size:1.3rem;margin-top:4px;}
+body.pay-v2 #admin-panel .card{border:none;border-radius:22px;box-shadow:0 10px 28px rgba(27,36,55,.08);padding:22px;}
+body.pay-v2 #admin-panel .card h2{border-bottom:none;font-size:1.15rem;}
+body.pay-v2 .pay-search input{border-radius:999px;background:#f6f4ef;border-color:transparent;}
+body.pay-v2 #emp-table{border-collapse:separate;border-spacing:0 8px;}
+body.pay-v2 #emp-table thead th{background:transparent;color:#8a90a2;border-bottom:none;font-weight:600;font-size:.76rem;padding:4px 8px;}
+body.pay-v2 .hdr-reset{border-radius:999px;}
+body.pay-v2 #emp-table tbody tr,body.pay-v2 #emp-table tbody tr:nth-child(even){background:#faf8f4;}
+body.pay-v2 #emp-table tbody tr:hover{background:#f4efe3;}
+body.pay-v2 #emp-table tbody td{border-bottom:none;padding:12px 6px;}
+body.pay-v2 #emp-table tbody td:first-child{border-radius:16px 0 0 16px;color:#a0a5b3;}
+body.pay-v2 #emp-table tbody td:last-child{border-radius:0 16px 16px 0;}
+body.pay-v2 #emp-table tbody tr.pay-paid{background:#eef6f1;}
+body.pay-v2 .pay-avatar{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;margin-right:8px;vertical-align:middle;
+  font-weight:700;font-size:.95rem;color:#f6dc9c;background:linear-gradient(135deg,#1c3264,#0b1a3d);}
+/* ຊ່ອງພິມ (ຊື່ / ເງິນເດືອນ / ວັນວຽກ / ຄ້າງ / ຫັກ) ແບບເອກະສານ: ເສັ້ນປະລຸ່ມ ບໍ່ມີກອບ, ກົດແລ້ວເປັນກອບເຕັມ */
+body.pay-v2 #admin-panel input.cell-input{border:1px solid transparent;border-bottom:1px dashed #c3c9d5;border-radius:2px;background:transparent;box-shadow:none;font-size:.92rem;}
+body.pay-v2 #admin-panel input.cell-input:hover{border-color:#cfd4de;background:#fafbfc;}
+body.pay-v2 #admin-panel input.cell-input:focus{border:1px solid #0b1a3d;border-radius:4px;background:#fff;box-shadow:0 0 0 3px rgba(11,26,61,.1);}
+body.pay-v2 #emp-table .net-cell{font-size:1.12rem;}
+body.pay-v2 .bonus-badge,body.pay-v2 .bonus-add{border-radius:14px;}
+body.pay-v2 .paid-btn{width:42px;height:42px;}
+body.pay-v2 #admin-panel .btn{border-radius:14px;}
+body.pay-v2 .modal-box{border-radius:24px;}
+@media (max-width:768px){ body.pay-v2 .pay-hero{grid-template-columns:1fr;} body.pay-v2 .pay-hero-main .pay-big{font-size:2rem;} }
+
+
+  }
 </style>
 </head>
-<body>
+<body class="pay-v2">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
 <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
@@ -2443,6 +2519,101 @@ async function exportAllPDFs() {
     btn.disabled = false;
   }
 }
+</script>
+<script>
+/* ══ PAYROLL V2: ກ່ອງຍອດໃຫຍ່ + ວົງຄວາມຄືບໜ້າການໂອນ + ຄົ້ນຫາ/ກອງ + Enter ລົງແຖວລຸ່ມ ══ */
+(function(){
+  var LAO_M=['ມັງກອນ','ກຸມພາ','ມີນາ','ເມສາ','ພຶດສະພາ','ມິຖຸນາ','ກໍລະກົດ','ສິງຫາ','ກັນຍາ','ຕຸລາ','ພະຈິກ','ທັນວາ'];
+  function $(id){ return document.getElementById(id); }
+  function txt(id){ var e=$(id); return e ? e.textContent.trim() : ''; }
+  function initial(name){
+    var s=String(name||'').trim(); var i=s.indexOf('.'); if(i>=0 && i<8) s=s.slice(i+1);
+    s=s.replace(/^[\s.]+/,'').replace(/^[ເແໂໃໄ]+/,'');
+    return s.charAt(0) || '?';
+  }
+  var header=document.querySelector('.admin-header');
+  header.insertAdjacentHTML('afterend',
+    '<div class="pay-hero">'+
+      '<div class="pay-hero-main"><small>ຍອດຈ່າຍເງິນເດືອນ · <span id="pay-period2">—</span></small>'+
+        '<span class="pay-big" id="pay-net">—</span>'+
+        '<div class="pay-sub"><span>ພະນັກງານ <b id="pay-emp">—</b></span><span>ເງິນເດືອນ <b id="pay-sal">—</b></span><span>ໂບນັດ <b id="pay-bon">—</b></span></div></div>'+
+      '<div class="pay-hero-ring"><div class="pay-ring" id="pay-ring"><span id="pay-pct">0%</span></div>'+
+        '<div><b>ຄວາມຄືບໜ້າການໂອນ</b><p>ໂອນແລ້ວ <b style="display:inline;color:#2f7d57" id="pay-paid">0</b> ຄົນ<br>ຍັງບໍ່ໂອນ <span class="pay-unpaid" id="pay-unpaid">0</span> ຄົນ</p></div></div>'+
+    '</div>');
+  document.querySelector('.emp-table-wrap').insertAdjacentHTML('beforebegin',
+    '<div class="pay-tools">'+
+      '<label class="pay-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'+
+        '<input id="pay-q" placeholder="ຄົ້ນຫາຊື່ພະນັກງານ..." autocomplete="off"></label>'+
+      '<div class="pay-chips">'+
+        '<button class="pay-chip on" data-f="all">ທັງໝົດ<b id="pay-c-all">0</b></button>'+
+        '<button class="pay-chip" data-f="unpaid">ຍັງບໍ່ໂອນ<b id="pay-c-unpaid">0</b></button>'+
+        '<button class="pay-chip" data-f="paid">ໂອນແລ້ວ<b id="pay-c-paid">0</b></button>'+
+      '</div>'+
+            '<span class="pay-count" id="pay-count"></span>'+
+    '</div>');
+
+  var filter='all', q='';
+  function apply(){
+    var rows=[].slice.call(document.querySelectorAll('#emp-tbody tr'));
+    var shown=0, paid=0;
+    rows.forEach(function(tr){
+      var isPaid=!!tr.querySelector('.paid-btn.on');
+      tr.classList.toggle('pay-paid', isPaid);
+      if(isPaid) paid++;
+      var inp=tr.querySelector('.emp-name-input');
+      if(inp && !tr.querySelector('.pay-avatar')) inp.insertAdjacentHTML('beforebegin','<span class="pay-avatar"></span>');
+      var av=tr.querySelector('.pay-avatar'); if(av && inp) av.textContent=initial(inp.value);
+      var name=(inp && inp.value || '').toLowerCase();
+      var ok=(!q || name.indexOf(q)>=0) && (filter==='all' || ((filter==='paid')===isPaid));
+      tr.classList.toggle('pay-hide', !ok);
+      if(ok) shown++;
+    });
+    var total=rows.length, unpaid=total-paid, pct=total ? Math.round(paid*100/total) : 0;
+    $('pay-c-all').textContent=total; $('pay-c-paid').textContent=paid; $('pay-c-unpaid').textContent=unpaid;
+    $('pay-count').textContent = shown===total ? ('ສະແດງ '+total+' ຄົນ') : ('ສະແດງ '+shown+' / '+total+' ຄົນ');
+    var mv=($('month-picker')||{}).value||''; var period='—';
+    if(/^\d{4}-\d{2}$/.test(mv)) period=LAO_M[Number(mv.slice(5))-1]+' '+mv.slice(0,4);
+    $('pay-period2').textContent=period;
+    $('pay-net').textContent=txt('sum-net'); $('pay-emp').textContent=txt('sum-total');
+    $('pay-sal').textContent=txt('sum-salary'); $('pay-bon').textContent=txt('sum-bonus');
+    $('pay-paid').textContent=paid; $('pay-unpaid').textContent=unpaid;
+    $('pay-ring').style.setProperty('--p', pct); $('pay-pct').textContent=pct+'%';
+  }
+  ['renderTable','updateSummary'].forEach(function(fn){
+    var orig=window[fn]; if(typeof orig!=='function') return;
+    window[fn]=function(){ var r=orig.apply(this, arguments); try{ apply(); }catch(e){} return r; };
+  });
+  $('pay-q').addEventListener('input', function(){ q=this.value.trim().toLowerCase(); apply(); });
+  document.querySelector('.pay-chips').addEventListener('click', function(e){
+    var b=e.target.closest('.pay-chip'); if(!b) return;
+    filter=b.dataset.f;
+    [].forEach.call(this.children, function(x){ x.classList.toggle('on', x===b); });
+    apply();
+  });
+  var mp=$('month-picker'); if(mp) mp.addEventListener('change', apply);
+  /* Enter = ລົງແຖວລຸ່ມ ຊ່ອງດຽວກັນ (ຂ້າມແຖວທີ່ຖືກກອງອອກ) */
+  $('emp-tbody').addEventListener('keydown', function(e){
+    if(e.key!=='Enter') return;
+    var inp=e.target; if(!inp.classList || !inp.classList.contains('cell-input')) return;
+    e.preventDefault();
+    var td=inp.closest('td'), tr=td.parentNode;
+    var rows=[].slice.call(tr.parentNode.children), r=rows.indexOf(tr), c=td.cellIndex;
+    var k=[].indexOf.call(td.querySelectorAll('input.cell-input'), inp);
+    inp.blur();
+    setTimeout(function(){
+      var all=[].slice.call(document.querySelectorAll('#emp-tbody tr'));
+      for(var i=r+1;i<all.length;i++){
+        if(all[i].classList.contains('pay-hide')) continue;
+        var t=all[i].cells[c]; var list=t && t.querySelectorAll('input.cell-input');
+        var nx=list && (list[k] || list[0]);
+        if(nx){ nx.focus(); if(nx.select) nx.select(); }
+        break;
+      }
+    }, 0);
+  });
+  apply();
+  setInterval(apply, 2000);
+})();
 </script>
 </body>
 </html>
