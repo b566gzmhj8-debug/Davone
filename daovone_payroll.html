@@ -639,7 +639,6 @@
 #emp-tbody tr.pay-hide{display:none;}
 .pay-bar{height:8px;border-radius:99px;background:#e6e1d4;overflow:hidden;}
 .pay-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#2f7d57,#56b07f);transition:width .4s;}
-.pay-avatar{display:none;}
 
 /* ══════════════════ 2 · ແອັບການເງິນ (ຕົວເລກໃຫຍ່ + ກາດ) ══════════════════ */
 body.pay-v2{background:radial-gradient(1200px 500px at 10% -10%,#e9e4f3 0,transparent 60%),#f3f1ec;}
@@ -682,8 +681,6 @@ body.pay-v2 #emp-table tbody td{border-bottom:none;padding:12px 6px;}
 body.pay-v2 #emp-table tbody td:first-child{border-radius:16px 0 0 16px;color:#a0a5b3;}
 body.pay-v2 #emp-table tbody td:last-child{border-radius:0 16px 16px 0;}
 body.pay-v2 #emp-table tbody tr.pay-paid{background:#eef6f1;}
-body.pay-v2 .pay-avatar{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;margin-right:8px;vertical-align:middle;
-  font-weight:700;font-size:.95rem;color:#f6dc9c;background:linear-gradient(135deg,#1c3264,#0b1a3d);}
 /* ຊ່ອງພິມ (ຊື່ / ເງິນເດືອນ / ວັນວຽກ / ຄ້າງ / ຫັກ) ແບບເອກະສານ: ເສັ້ນປະລຸ່ມ ບໍ່ມີກອບ, ກົດແລ້ວເປັນກອບເຕັມ */
 body.pay-v2 #admin-panel input.cell-input{border:1px solid transparent;border-bottom:1px dashed #c3c9d5;border-radius:2px;background:transparent;box-shadow:none;font-size:.92rem;}
 body.pay-v2 #admin-panel input.cell-input:hover{border-color:#cfd4de;background:#fafbfc;}
@@ -2526,11 +2523,6 @@ async function exportAllPDFs() {
   var LAO_M=['ມັງກອນ','ກຸມພາ','ມີນາ','ເມສາ','ພຶດສະພາ','ມິຖຸນາ','ກໍລະກົດ','ສິງຫາ','ກັນຍາ','ຕຸລາ','ພະຈິກ','ທັນວາ'];
   function $(id){ return document.getElementById(id); }
   function txt(id){ var e=$(id); return e ? e.textContent.trim() : ''; }
-  function initial(name){
-    var s=String(name||'').trim(); var i=s.indexOf('.'); if(i>=0 && i<8) s=s.slice(i+1);
-    s=s.replace(/^[\s.]+/,'').replace(/^[ເແໂໃໄ]+/,'');
-    return s.charAt(0) || '?';
-  }
   var header=document.querySelector('.admin-header');
   header.insertAdjacentHTML('afterend',
     '<div class="pay-hero">'+
@@ -2561,8 +2553,6 @@ async function exportAllPDFs() {
       tr.classList.toggle('pay-paid', isPaid);
       if(isPaid) paid++;
       var inp=tr.querySelector('.emp-name-input');
-      if(inp && !tr.querySelector('.pay-avatar')) inp.insertAdjacentHTML('beforebegin','<span class="pay-avatar"></span>');
-      var av=tr.querySelector('.pay-avatar'); if(av && inp) av.textContent=initial(inp.value);
       var name=(inp && inp.value || '').toLowerCase();
       var ok=(!q || name.indexOf(q)>=0) && (filter==='all' || ((filter==='paid')===isPaid));
       tr.classList.toggle('pay-hide', !ok);
