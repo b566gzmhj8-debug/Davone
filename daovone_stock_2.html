@@ -2326,6 +2326,8 @@ async function renderAddProduct(main){
    RECEIVE STOCK (ຮັບເຂົ້າ)
    ============================================================ */
 let receiveCart = [];
+/* ກຳລັງແກ້ໄຂໃບຮັບເຂົ້າເກົ່າຢູ່ບໍ? (null = ຮັບເຂົ້າໃໝ່) — ພະນັກງານ ແລະ ແອດມິນ ແກ້ໄດ້ */
+let editingReceipt = null;
 /* ถ้ากด Enter ตอนที่ไม่ได้อยู่ในช่องพิมพ์ไหนเลย (เช่น เพิ่งกด X ลบรายการ หรือคลิกออกจากช่องไปแล้ว) แล้วอยู่แท็บຮับเข้า+มีรายการในตะกร้าแล้ว = บันทึกรับเข้าทันที กันปัญหากด Enter ไม่ติดตอนโฟกัสหลุดจากช่อง */
 document.addEventListener('keydown', (e)=>{
   if(e.key !== 'Enter') return;
@@ -2348,12 +2350,17 @@ async function renderReceive(main){
     </div>
     <div id="rcvNewView">
       <div class="card ps-sheet">
+        ${editingReceipt ? `
+        <div class="ps-editbar">
+          <span><svg class="dv-icon"><use href="#i-pencil"></use></svg> ກຳລັງແກ້ໄຂໃບຮັບເຂົ້າ <span class="mono">${editingReceipt.receipt.receipt_no || ''}</span> · ບັນທຶກແລ້ວສະຕັອກຈະຄິດໃໝ່ໃຫ້</span>
+          <button class="btn danger" id="r_cancelEdit">ຍົກເລີກ</button>
+        </div>` : ''}
         <div class="ps-head ps-head-rcv">
-          <input id="r_supplier" placeholder="ຜູ້ສະໜອງ / ຈາກໃສ (ຖ້າມີ)">
-          <input id="r_date" type="date" value="${todayStr()}">
+          <input id="r_supplier" placeholder="ຜູ້ສະໜອງ / ຈາກໃສ (ຖ້າມີ)" value="${editingReceipt ? (editingReceipt.receipt.supplier_name||'').replace(/"/g,'&quot;') : ''}">
+          <input id="r_date" type="date" value="${editingReceipt ? (editingReceipt.receipt.receipt_date||todayStr()) : todayStr()}">
           <div class="ps-meta">
-            <span>ໃບຮັບສິນຄ້າເຂົ້າສະຕັອກ</span>
-            <span class="mono">${fmtDateDMY(todayStr())}</span>
+            <span>${editingReceipt ? 'ແກ້ໄຂໃບ <b class="mono">'+(editingReceipt.receipt.receipt_no||'')+'</b>' : 'ໃບຮັບສິນຄ້າເຂົ້າສະຕັອກ'}</span>
+            <span class="mono">${fmtDateDMY(editingReceipt ? (editingReceipt.receipt.receipt_date||todayStr()) : todayStr())}</span>
           </div>
         </div>
         <div class="ps-entry">
@@ -2400,7 +2407,7 @@ async function renderReceive(main){
             <div class="ps-line"><span>ຈຳນວນລາຍການ</span><b class="mono" id="r_lineCount">0</b></div>
             <div class="ps-line"><span>ຈຳນວນໜ່ວຍລວມ</span><b class="mono" id="r_unitCount">0</b></div>
             <p class="ps-note">ບັນທຶກແລ້ວສິນຄ້າຈະເຂົ້າສະຕັອກທັນທີ${canSeeCost ? ' — ຕົ້ນທຶນຈະຖືກລ໋ອກໄວ້ຕາມອັດຕາມື້ນີ້' : ''}</p>
-            <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກຮັບເຂົ້າ →</button>
+            <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>${editingReceipt ? 'ບັນທຶກການແກ້ໄຂ →' : 'ບັນທຶກຮັບເຂົ້າ →'}</button>
           </div>
         </div>
       </div>
@@ -2420,6 +2427,8 @@ async function renderReceive(main){
   });
   loadReceiveHistory(historyMonth);
   /* ສະຫຼັບລະຫວ່າງ ຮັບສິນຄ້າເຂົ້າ ກັບ ປະຫວັດການຮັບເຂົ້າ (ຄືແຖບຂອງໂອນສາຂາ) */
+  const cancelEditBtn = document.getElementById('r_cancelEdit');
+  if(cancelEditBtn) cancelEditBtn.addEventListener('click', cancelEditReceipt);
   const rcvSeg = document.getElementById('rcvSeg');
   rcvSeg.addEventListener('click', (e)=>{
     const b = e.target.closest('button'); if(!b) return;
@@ -2513,8 +2522,12 @@ async function renderReceive(main){
       try{
         const list = serials.map(sn=> encodeURIComponent(sn)).join(',');
         const existing = await sb(`stock_product_units?select=serial_no&serial_no=in.(${list})`);
-        if(existing.length){
-          toast(`ເລກເຄື່ອງນີ້ມີໃນລະບົບແລ້ວ: ${existing.map(e=>e.serial_no).join(', ')}`);
+        /* ຖ້າກຳລັງແກ້ໄຂໃບເກົ່າ: ເລກເຄື່ອງທີ່ເປັນຂອງໃບນີ້ເອງ (ແລະຈະຖືກເອົາອອກ) ບໍ່ນັບວ່າຊ້ຳ */
+        const ownSerials = new Set((editingReceipt && editingReceipt.units || [])
+          .filter(u=> u.status==='in_stock').map(u=> String(u.serial_no||'').toUpperCase()));
+        const clash = existing.filter(e=> !ownSerials.has(String(e.serial_no||'').toUpperCase()));
+        if(clash.length){
+          toast(`ເລກເຄື່ອງນີ້ມີໃນລະບົບແລ້ວ: ${clash.map(e=>e.serial_no).join(', ')}`);
           return;
         }
       }catch(err){ toast('ກວດເລກເຄື່ອງຊ້ຳບໍ່ໄດ້: '+err.message); return; }
@@ -2607,6 +2620,7 @@ async function renderReceive(main){
     const btn = e.currentTarget;
     if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
     btn.disabled = true;
+    if(editingReceipt){ await saveReceiptEdit(btn); return; }
     try{
       const receiptId = uid();
       const total = receiveCart.reduce((s,i)=>s+i.amount,0);
@@ -2661,6 +2675,130 @@ async function renderReceive(main){
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
   });
+}
+/* ============================================================
+   ແກ້ໄຂໃບຮັບເຂົ້າທີ່ບັນທຶກໄປແລ້ວ (ພະນັກງານ ແລະ ແອດມິນ)
+   ໃຊ້ຕອນຮັບເຂົ້າຍັງບໍ່ທັນຄົບແລ້ວກົດບັນທຶກໄປກ່ອນ — ເປີດໃບເກົ່າຂຶ້ນມາເພີ່ມ/ລຶບ/ແກ້ໄດ້
+   ກົດບັນທຶກແລ້ວ: ເລກໃບ (RCV-xx) ຄືເກົ່າ · ສະຕັອກຄິດໃໝ່ຕາມລາຍການໃນໃບ
+   ເລກເຄື່ອງທີ່ຂາຍໄປແລ້ວ ເອົາອອກຈາກໃບບໍ່ໄດ້ (ຕ້ອງລຶບ/ແກ້ບິນຂາຍກ່ອນ)
+   ============================================================ */
+async function startEditReceipt(bg, receiptId, receipt, items){
+  try{
+    const movements = await sb(`stock_movements?select=id,unit_id,model_id,quantity&ref_type=eq.purchase&ref_id=eq.${receiptId}`);
+    const unitIds = movements.filter(m=> m.unit_id).map(m=> m.unit_id);
+    let units = [];
+    if(unitIds.length) units = await sb(`stock_product_units?select=id,serial_no,status&id=in.(${unitIds.join(',')})`);
+    const bySerial = {};
+    units.forEach(u=> bySerial[String(u.serial_no||'').toUpperCase()] = u);
+    receiveCart = items.map(it=>{
+      const u = it.serial_no ? bySerial[String(it.serial_no).toUpperCase()] : null;
+      return {
+        model_id: it.model_id,
+        model_name: it.stock_product_models ? it.stock_product_models.name : '(ບໍ່ພົບຊື່)',
+        serial_no: it.serial_no || null,
+        quantity: Number(it.quantity)||1,
+        unit_cost: Number(it.unit_cost)||0,
+        amount: Number(it.amount)||0,
+        cost_currency: it.cost_currency || 'LAK',
+        unit_cost_thb: it.unit_cost_thb,
+        exchange_rate: it.exchange_rate,
+        srcUnitId: u ? u.id : null,
+        srcSold: !!(u && u.status && u.status !== 'in_stock')
+      };
+    });
+    editingReceipt = { id: receiptId, receipt: receipt, units: units };
+    if(bg) bg.remove();
+    tabDrafts.receive = {};
+    activeTab = 'receive';
+    buildNav();
+    await renderTab();
+    const sold = receiveCart.filter(i=> i.srcSold).length;
+    toast(sold ? `ເປີດແກ້ໄຂ ${receipt.receipt_no||''} (ມີ ${sold} ເຄື່ອງຂາຍໄປແລ້ວ ເອົາອອກບໍ່ໄດ້)` : `ເປີດແກ້ໄຂ ${receipt.receipt_no||''} ແລ້ວ`);
+  }catch(err){ toast('ເປີດແກ້ໄຂບໍ່ໄດ້: '+err.message); }
+}
+function cancelEditReceipt(){
+  editingReceipt = null;
+  receiveCart = [];
+  tabDrafts.receive = {};
+  renderTab();
+}
+async function saveReceiptEdit(btn){
+  const ed = editingReceipt;
+  const receiptId = ed.id;
+  const date = document.getElementById('r_date').value || todayStr();
+  const supplier = document.getElementById('r_supplier').value.trim();
+  try{
+    /* 1) ເລກເຄື່ອງທີ່ຖືກເອົາອອກຈາກໃບ — ຖ້າຂາຍໄປແລ້ວ ຫ້າມເອົາອອກ */
+    const kept = new Set(receiveCart.filter(i=> i.srcUnitId).map(i=> i.srcUnitId));
+    const removed = (ed.units||[]).filter(u=> !kept.has(u.id));
+    const soldRemoved = removed.filter(u=> u.status && u.status !== 'in_stock');
+    if(soldRemoved.length){
+      toast('ເລກເຄື່ອງທີ່ຂາຍໄປແລ້ວ ເອົາອອກບໍ່ໄດ້: ' + soldRemoved.map(u=>u.serial_no).join(', '));
+      btn.disabled = false;
+      return;
+    }
+    /* 2) ລຶບການເຄື່ອນໄຫວ + ໜ່ວຍເກົ່າທີ່ບໍ່ຢູ່ໃນໃບແລ້ວ */
+    if(removed.length){
+      const ids = removed.map(u=> u.id).join(',');
+      await sb(`stock_movements?ref_type=eq.purchase&ref_id=eq.${receiptId}&unit_id=in.(${ids})`, { method:'DELETE' });
+      await sb(`stock_product_units?id=in.(${ids})`, { method:'DELETE' });
+    }
+    /* 3) ລາຍການບໍ່ມີເລກເຄື່ອງ: ລຶບ movement ເກົ່າທັງໝົດຂອງໃບນີ້ ແລ້ວໃສ່ໃໝ່ຕາມກະຕ່າ */
+    await sb(`stock_movements?ref_type=eq.purchase&ref_id=eq.${receiptId}&unit_id=is.null`, { method:'DELETE' });
+    /* 4) ເລກເຄື່ອງໃໝ່ທີ່ຫາກໍ່ເພີ່ມ */
+    const newUnits = receiveCart.filter(i=> i.serial_no && !i.srcUnitId).map(i=> ({
+      id: uid(), model_id: i.model_id, serial_no: i.serial_no, status:'in_stock',
+      received_at: date, cost_lak: i.unit_cost
+    }));
+    if(newUnits.length) await sb('stock_product_units', { method:'POST', body:newUnits });
+    /* 5) ໜ່ວຍເກົ່າທີ່ຍັງຢູ່: ອັບເດດຕົ້ນທຶນ/ວັນທີ່ຮັບ */
+    const keepRows = receiveCart.filter(i=> i.srcUnitId);
+    if(keepRows.length) await Promise.all(keepRows.map(i=>
+      sb(`stock_product_units?id=eq.${i.srcUnitId}`, { method:'PATCH', body:{ cost_lak: i.unit_cost, received_at: date } })));
+    /* 6) ການເຄື່ອນໄຫວໃໝ່ (ໜ່ວຍໃໝ່ + ລາຍການບໍ່ມີເລກເຄື່ອງ) */
+    const moves = newUnits.map(u=> ({
+      id: uid(), model_id: u.model_id, unit_id: u.id, movement_type:'in', quantity:1,
+      ref_type:'purchase', ref_id: receiptId, created_by: currentUsername
+    }));
+    receiveCart.filter(i=> !i.serial_no).forEach(i=> moves.push({
+      id: uid(), model_id: i.model_id, unit_id: null, movement_type:'in', quantity: i.quantity,
+      ref_type:'purchase', ref_id: receiptId, created_by: currentUsername
+    }));
+    if(moves.length) await sb('stock_movements', { method:'POST', body: moves });
+    /* 7) ລາຍການໃນໃບ: ຂຽນທັບໃໝ່ທັງໝົດ */
+    await sb(`stock_purchase_receipt_items?receipt_id=eq.${receiptId}`, { method:'DELETE' });
+    const itemsBody = receiveCart.map(i=> ({
+      id: uid(), receipt_id: receiptId, model_id: i.model_id, serial_no: i.serial_no,
+      quantity: i.quantity, unit_cost: i.unit_cost, amount: i.amount,
+      cost_currency: i.cost_currency||'LAK', unit_cost_thb: i.unit_cost_thb, exchange_rate: i.exchange_rate
+    }));
+    if(itemsBody.length) await sb('stock_purchase_receipt_items', { method:'POST', body: itemsBody });
+    /* 8) ຫົວໃບ */
+    const total = receiveCart.reduce((s,i)=> s + (Number(i.amount)||0), 0);
+    await sb(`stock_purchase_receipts?id=eq.${receiptId}`, { method:'PATCH', body:{
+      supplier_name: supplier, receipt_date: date, total_amount: total
+    }});
+    /* 9) ຕົ້ນທຶນອ້າງອິງຂອງຮຸ່ນສິນຄ້າ (ສະເພາະແອດມິນ ຄືກັບຕອນຮັບເຂົ້າໃໝ່) */
+    if(currentRole === 'admin'){
+      const patchByModel = {};
+      receiveCart.forEach(i=>{
+        if(!i.unit_cost) return;
+        const patch = patchByModel[i.model_id] || (patchByModel[i.model_id] = {});
+        patch.cost_price = i.unit_cost;
+        if(i.cost_currency === 'THB' && i.unit_cost_thb) patch.cost_price_thb = i.unit_cost_thb;
+      });
+      await Promise.all(Object.entries(patchByModel).map(([modelId, patch])=>
+        sb(`stock_product_models?id=eq.${modelId}`, { method:'PATCH', body: patch })));
+    }
+    toast(`ແກ້ໄຂ ${ed.receipt.receipt_no||''} ສຳເລັດ · ສະຕັອກອັບເດດແລ້ວ`);
+    editingReceipt = null;
+    receiveCart = [];
+    tabDrafts.receive = {};
+    renderTab();
+  }catch(err){
+    toast('ບັນທຶກການແກ້ໄຂບໍ່ໄດ້: ' + err.message);
+    btn.disabled = false;
+  }
 }
 /* ຂໍ້ຄວາມສະຫຼຸບຈຳນວນລາຍການທີ່ຈະຮັບເຂົ້າ: ນັບຈຳນວນແຖວ (ລາຍການ) ແລະ ຈຳນວນໜ່ວຍລວມ ຖ້າບໍ່ເທົ່າກັນ */
 function receiveCartCountText(){
@@ -2816,10 +2954,13 @@ async function openReceiptDetail(receiptId, receipt){
           ${canSeeCost ? `<span class="mono">${fmtMoney(it.amount)}</span>` : ''}
         </div>`).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
       ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receipt.total_amount)}</div>` : ''}
-      ${currentRole==='admin' ? `<button class="btn" id="rcvEditCostBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ໃສ່/ແກ້ໄຂຕົ້ນທຶນ</button>` : ''}
+      ${(currentRole==='staff'||currentRole==='admin') ? `<button class="btn" id="rcvEditBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂໃບຮັບເຂົ້ານີ້ (ເພີ່ມ / ລຶບ / ແກ້ລາຍການ)</button>` : ''}
+      ${currentRole==='admin' ? `<button class="btn secondary" id="rcvEditCostBtn" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ໃສ່/ແກ້ໄຂຕົ້ນທຶນ</button>` : ''}
       ${currentRole==='admin' ? `<button class="btn danger" id="rcvDeleteBtn" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການຮັບເຂົ້ານີ້ (ຄືນສະຕັອກ)</button>` : ''}
       <button class="btn secondary" id="rcvDetailClose">ປິດ</button>
     `;
+    const rcvEditBtn = bg.querySelector('#rcvEditBtn');
+    if(rcvEditBtn) rcvEditBtn.addEventListener('click', ()=> startEditReceipt(bg, receiptId, receipt, items));
     if(currentRole==='admin'){
       bg.querySelector('#rcvEditCostBtn').addEventListener('click', ()=>{
         openReceiptCostEditor(bg, receiptId, receipt, items);
