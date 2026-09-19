@@ -2217,11 +2217,11 @@ function recordsHTML(filtered, isOwner) {
 
   const used = new Set();
   const groups = [];
-  const sorted = [...filtered].sort((a,b) => {
-    const aSort = (a.verified && a.approvedAt) ? a.approvedAt : a.timestamp;
-    const bSort = (b.verified && b.approvedAt) ? b.approvedAt : b.timestamp;
-    return bSort - aSort;
-  });
+  /* ຮຽງຕາມ "ວັນທີ່" ທີ່ສະແດງໃນຕາຕະລາງສະເໝີ:
+     ໜ້າແອດມິນ (ກົດຢືນຢັນໄດ້) ໃຊ້ເວລາທີ່ບັນທຶກລາຍການ → ກົດຢືນຢັນແລ້ວແຖວຢູ່ບ່ອນເກົ່າ ບໍ່ເດັ້ງຂຶ້ນເທິງສຸດ
+     ໜ້າເຈົ້າຂອງ (ເບິ່ງຢ່າງດຽວ) ຍັງໃຊ້ເວລາທີ່ຢືນຢັນ ຄືກັບວັນທີ່ທີ່ສະແດງ */
+  const sortKeyOf = r => (isOwner && r.verified && r.approvedAt) ? r.approvedAt : r.timestamp;
+  const sorted = [...filtered].sort((a,b) => sortKeyOf(b) - sortKeyOf(a));
   for(const r of sorted) {
     if(used.has(r.id)) continue;
     used.add(r.id);
