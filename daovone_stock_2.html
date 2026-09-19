@@ -1063,6 +1063,49 @@ async function printInvoiceById(invoiceId, win){
   }
 }
 
+/* ---------- ໃບຮັບສິນຄ້າເຂົ້າສະຕັອກ ---------- */
+/* ໜ້າຕາດຽວກັບ ບິນຂາຍ ແລະ ໃບໂອນສາຂາ (ຫົວກະດາດຮ້ານ + ຕາຕະລາງ + ລາຍເຊັນ)
+   ຕົ້ນທຶນຂຶ້ນສະເພາະແອດມິນ (showCost) — ໃບຂອງພະນັກງານບໍ່ມີຕົວເລກຕົ້ນທຶນ */
+function receiveDocBody(receipt, items, opts){
+  opts = opts || {};
+  const showCost = !!opts.showCost;
+  const nameOf = (it)=> (it.stock_product_models && it.stock_product_models.name) || '-';
+  const unitOf = (it)=> (it.stock_product_models && it.stock_product_models.unit) || '';
+  const codeOf = (it)=> (it.stock_product_models && it.stock_product_models.code) || '';
+  const anySerial = items.some(it=> it.serial_no);
+  const firstHead = anySerial ? (items.every(it=> it.serial_no) ? 'ເລກເຄື່ອງ' : 'ເລກເຄື່ອງ / ລະຫັດ') : 'ລະຫັດສິນຄ້າ';
+  const rows = items.map((it, i)=>
+    '<tr><td>' + (i+1) + '</td>' +
+    '<td>' + escHtml(it.serial_no || codeOf(it) || '-') + '</td>' +
+    '<td>' + escHtml(nameOf(it)) +
+      (it.cost_currency === 'THB' && showCost && it.unit_cost_thb
+        ? '<div class="c">ຊື້ ' + fmtMoney(it.unit_cost_thb) + ' ບາດ @' + escHtml(it.exchange_rate || '') + '</div>' : '') + '</td>' +
+    '<td class="num">' + fmtMoney(it.quantity) + ' ' + escHtml(unitOf(it)) + '</td>' +
+    (showCost ? '<td class="num">' + moneyCur(it.unit_cost, 'LAK') + '</td>' +
+                '<td class="num">' + moneyCur(it.amount, 'LAK') + '</td>' : '') +
+    '</tr>').join('');
+  const totalQty = items.reduce((s, it)=> s + (Number(it.quantity) || 0), 0);
+  const totalAmt = items.reduce((s, it)=> s + (Number(it.amount) || 0), 0);
+  return '<h1>ໃບຮັບສິນຄ້າເຂົ້າສະຕັອກ</h1>' +
+    '<p class="sub">ເລກທີ ' + escHtml(receipt.receipt_no || '-') + ' · ' + escHtml(fmtDateDMY(receipt.receipt_date)) + '</p>' +
+    '<div class="cust">' +
+      '<div class="meta-row"><b>ຜູ້ສະໜອງ / ຈາກ:</b>' + escHtml(receipt.supplier_name || '-') + '</div>' +
+      '<div class="meta-row"><b>ຮັບເຂົ້າສາຂາ:</b>' + escHtml(SHOP_INFO.branch) + '</div>' +
+      (receipt.created_by ? '<div class="meta-row"><b>ຜູ້ຮັບເຂົ້າ:</b>' + escHtml(receipt.created_by) + '</div>' : '') +
+    '</div>' +
+    '<table><thead><tr><th>ລຳດັບ</th><th>' + firstHead + '</th><th>ລາຍການ</th><th class="num">ຈຳນວນ</th>' +
+      (showCost ? '<th class="num">ຕົ້ນທຶນ/ຫົວໜ່ວຍ</th><th class="num">ລວມ</th>' : '') +
+    '</tr></thead><tbody>' + rows + '</tbody></table>' +
+    (showCost ? '<div class="sub-total"><span>ລວມຈຳນວນ</span><span>' + fmtMoney(totalQty) + '</span></div>' +
+                '<div class="grand"><span>ມູນຄ່າລວມ (ຕົ້ນທຶນ)</span><span>' + moneyCur(totalAmt, 'LAK') + '</span></div>'
+              : '<div class="grand"><span>ລວມຈຳນວນ</span><span>' + fmtMoney(totalQty) + '</span></div>') +
+    printSigns('ຜູ້ສົ່ງເຄື່ອງ', escHtml(receipt.supplier_name || ''), 'ຜູ້ຮັບເຄື່ອງເຂົ້າສະຕັອກ', '(ກວດເຄື່ອງຄົບແລ້ວ)') +
+    '<p class="note">ໝາຍເຫດ: ໃບນີ້ຢືນຢັນວ່າສິນຄ້າຕາມລາຍການຂ້າງເທິງ ໄດ້ຮັບເຂົ້າສະຕັອກຂອງຮ້ານແລ້ວ</p>';
+}
+function printReceiveDoc(receipt, items, opts){
+  printDoc('ໃບຮັບເຂົ້າ ' + (receipt.receipt_no || ''), receiveDocBody(receipt, items, opts), opts);
+}
+
 /* ---------- ໃບໂອນສາຂາ ---------- */
 function transferDocBody(t, items){
   const rows = items.map((it, i)=>
@@ -2859,7 +2902,7 @@ async function getPurchaseReceipts(start, end){
   return rows.sort((a,b)=> a.receipt_date < b.receipt_date ? 1 : a.receipt_date > b.receipt_date ? -1 : rcvNum(b)-rcvNum(a));
 }
 async function getPurchaseReceiptItems(receiptId){
-  return await sb(`stock_purchase_receipt_items?select=*,stock_product_models(name,unit)&receipt_id=eq.${receiptId}`);
+  return await sb(`stock_purchase_receipt_items?select=*,stock_product_models(name,unit,code)&receipt_id=eq.${receiptId}`);
 }
 async function loadReceiveHistory(month){
   const el = document.getElementById('rcv_history');
@@ -2942,23 +2985,17 @@ async function openReceiptDetail(receiptId, receipt){
   try{
     const items = await getPurchaseReceiptItems(receiptId);
     bg.querySelector('.modal').innerHTML = `
-      <h3><svg class="dv-icon"><use href="#i-truck"></use></svg><span class="mono">${receipt.receipt_no || 'ການຮັບເຂົ້າ'}</span></h3>
-      <div class="muted" style="font-size:12px;margin-bottom:8px;">
-        ${receipt.supplier_name ? 'ຈາກ: '+receipt.supplier_name+'<br>' : ''}${fmtDateDMY(receipt.receipt_date)}<br>
-        <svg class="dv-icon" style="width:12px;height:12px;vertical-align:-1px;"><use href="#i-users"></use></svg> ຮັບເຂົ້າໂດຍ: <span style="color:var(--ink);font-weight:600;">${receipt.created_by || '-'}</span>
-      </div>
-      <hr class="sep">
-      ${items.length ? items.map(it=> `
-        <div class="row">
-          <span>${it.stock_product_models ? it.stock_product_models.name : '-'}${it.serial_no ? (' · <span class="mono">'+it.serial_no+'</span>') : (' × '+it.quantity)}</span>
-          ${canSeeCost ? `<span class="mono">${fmtMoney(it.amount)}</span>` : ''}
-        </div>`).join('') : '<div class="empty">ບໍ່ມີລາຍລະອຽດ</div>'}
-      ${canSeeCost ? `<div class="invoice-total mono">ລວມ: ${fmtMoney(receipt.total_amount)}</div>` : ''}
-      ${(currentRole==='staff'||currentRole==='admin') ? `<button class="btn" id="rcvEditBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂໃບຮັບເຂົ້ານີ້ (ເພີ່ມ / ລຶບ / ແກ້ລາຍການ)</button>` : ''}
+      ${paperHtml(receiveDocBody(receipt, items, { showCost: canSeeCost }))}
+      <button class="btn secondary" id="rcvPrintBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-printer"></use></svg>ພິມໃບຮັບເຂົ້າ (A5)</button>
+      ${(currentRole==='staff'||currentRole==='admin') ? `<button class="btn" id="rcvEditBtn" style="margin-top:8px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂໃບຮັບເຂົ້ານີ້ (ເພີ່ມ / ລຶບ / ແກ້ລາຍການ)</button>` : ''}
       ${currentRole==='admin' ? `<button class="btn secondary" id="rcvEditCostBtn" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ໃສ່/ແກ້ໄຂຕົ້ນທຶນ</button>` : ''}
       ${currentRole==='admin' ? `<button class="btn danger" id="rcvDeleteBtn" style="margin-top:10px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບການຮັບເຂົ້ານີ້ (ຄືນສະຕັອກ)</button>` : ''}
       <button class="btn secondary" id="rcvDetailClose">ປິດ</button>
     `;
+    bg.querySelector('#rcvPrintBtn').addEventListener('click', ()=>{
+      const w = openPrintWindow();
+      if(w) printReceiveDoc(receipt, items, { win: w, showCost: canSeeCost });
+    });
     const rcvEditBtn = bg.querySelector('#rcvEditBtn');
     if(rcvEditBtn) rcvEditBtn.addEventListener('click', ()=> startEditReceipt(bg, receiptId, receipt, items));
     if(currentRole==='admin'){
