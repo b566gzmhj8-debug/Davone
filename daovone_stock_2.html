@@ -485,6 +485,11 @@
   .ps-table .r{text-align:right;white-space:nowrap;}
   .ps-table .b{font-weight:700;color:#0b1a3d;}
   .ps-table .x{cursor:pointer;color:#b3382a;font-weight:700;padding:2px 6px;}
+  .rc-cost-wrap{display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+  .rc-cur{flex:none;font:inherit;font-size:12px;font-weight:700;padding:5px 9px;border-radius:8px;cursor:pointer;
+    border:1px solid #d9cdb0;background:#f8f3e9;color:#8a6224;}
+  .rc-cur:hover{border-color:#a57a36;}
+  .rc-cur.thb{background:#0b1a3d;border-color:#0b1a3d;color:#f6dc9c;}
   .ps-table .rc-cost{width:110px;margin:0;padding:6px 8px;text-align:right;font-size:13.5px;
     border:1px solid transparent;border-bottom:1px dashed #c3c9d5;border-radius:4px;background:transparent;color:#1b2437;}
   .ps-table .rc-cost:hover{border-color:#cfd4de;background:#fafbfc;}
@@ -2501,7 +2506,7 @@ async function renderReceive(main){
     const currency = document.getElementById('r_currency').value;
     const rateBlock = document.getElementById('r_rateBlock');
     const lbl = document.getElementById('r_cost_lbl');
-    rateBlock.style.display = currency === 'THB' ? 'block' : 'none';
+    rateBlock.style.display = (currency === 'THB' || receiveCart.some(i=> i.cost_currency === 'THB')) ? 'block' : 'none';
     lbl.textContent = currency === 'THB' ? 'ຕົ້ນທຶນ/ໜ່ວຍ (ບາດ)' : 'ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ)';
     fillReceiveCostFromModel();
     updateReceiveCostPreview();
@@ -2519,7 +2524,7 @@ async function renderReceive(main){
   if(canSeeCost){
     document.getElementById('r_currency').addEventListener('change', updateReceiveCostLabel);
     document.getElementById('r_cost').addEventListener('input', updateReceiveCostPreview);
-    document.getElementById('r_rate').addEventListener('input', updateReceiveCostPreview);
+    document.getElementById('r_rate').addEventListener('input', ()=>{ updateReceiveCostPreview(); recalcReceiveThbRows(); });
   }
   modelSel.addEventListener('change', ()=>{
     const opt = modelSel.selectedOptions[0];
@@ -2664,6 +2669,12 @@ async function renderReceive(main){
   bindReceiveCartRemove();
   document.getElementById('r_submit').addEventListener('click', async (e)=>{
     if(!receiveCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
+    /* ມີລາຍການຊື້ເປັນບາດ ແຕ່ຍັງບໍ່ໃສ່ອັດຕາແລກປ່ຽນ → ຕົ້ນທຶນກີບຈະເປັນ 0 ຈຶ່ງບໍ່ໃຫ້ບັນທຶກກ່ອນ */
+    if(receiveCart.some(i=> i.cost_currency === 'THB') && !receiveRate()){
+      toast('ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ) ກ່ອນບັນທຶກ');
+      const rateEl = document.getElementById('r_rate'); if(rateEl) rateEl.focus();
+      return;
+    }
     const btn = e.currentTarget;
     if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
     btn.disabled = true;
@@ -2867,13 +2878,47 @@ function renderReceiveCart(){
   /* ຮຽງລຳດັບ 1, 2, 3 ... ໃຫ້ ບໍ່ຕ້ອງນັບເອງ */
   const rows = receiveCart.map((it,idx)=>
     `<tr><td class="c mono">${idx+1}</td>`+
-    `<td>${it.model_name}${it.cost_currency==='THB' && canSeeCost ? ' <span class="muted" style="font-size:11px;">(ຊື້ '+fmtMoney(it.unit_cost_thb)+' ບາດ @'+it.exchange_rate+')</span>' : ''}</td>`+
+    `<td>${it.model_name}</td>`+
     `<td class="mono muted">${it.serial_no || '—'}</td>`+
     `<td class="c mono b">${it.quantity}</td>`+
-    (canSeeCost ? `<td class="r"><input class="rc-cost mono" type="text" inputmode="numeric" data-idx="${idx}" value="${fmtMoney(it.unit_cost)}" title="ພິມແກ້ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ) ໄດ້ເລີຍ"></td>`+
-                   `<td class="r mono b" data-amt="${idx}">${fmtMoney(it.amount)} ກີບ</td>` : '')+
+    (canSeeCost ? `<td class="r"><div class="rc-cost-wrap">`+
+                     `<input class="rc-cost mono" type="text" inputmode="numeric" data-idx="${idx}" value="${fmtMoney(it.cost_currency==='THB' ? (it.unit_cost_thb||0) : it.unit_cost)}" title="ພິມແກ້ຕົ້ນທຶນ/ໜ່ວຍ ໄດ້ເລີຍ">`+
+                     `<button type="button" class="rc-cur${it.cost_currency==='THB'?' thb':''}" data-idx="${idx}" title="ກົດເພື່ອສະຫຼັບ ກີບ ↔ ບາດ">${it.cost_currency==='THB'?'ບາດ':'ກີບ'}</button>`+
+                   `</div></td>`+
+                   `<td class="r mono b" data-amt="${idx}">${fmtMoney(it.amount)} ກີບ${it.cost_currency==='THB' ? '<div class="muted" style="font-size:11px;font-weight:400;">'+fmtMoney(it.unit_cost_thb||0)+' ບາດ @'+(it.exchange_rate||'—')+'</div>' : ''}</td>` : '')+
     `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
   return head + rows + '</tbody></table>';
+}
+/* ອັດຕາແລກປ່ຽນຂອງໃບນີ້ (1 ບາດ = ? ກີບ) — ໃຊ້ຮ່ວມກັນທຸກລາຍການທີ່ຊື້ເປັນບາດ */
+function receiveRate(){
+  const el = document.getElementById('r_rate');
+  const n = el ? Number(String(el.value||'').replace(/[^\d.]/g,'')) : 0;
+  if(n) return n;
+  const row = receiveCart.find(i=> i.cost_currency==='THB' && Number(i.exchange_rate));
+  return row ? Number(row.exchange_rate) : 0;
+}
+/* ຊ່ອງອັດຕາແລກປ່ຽນຕ້ອງໂຊວ໌ ເມື່ອເລືອກຊື້ເປັນບາດ ຫຼື ມີລາຍການໃນກະຕ່າເປັນບາດ */
+function syncReceiveRateBlock(){
+  const block = document.getElementById('r_rateBlock');
+  if(!block) return;
+  const curEl = document.getElementById('r_currency');
+  const need = (curEl && curEl.value === 'THB') || receiveCart.some(i=> i.cost_currency === 'THB');
+  block.style.display = need ? 'block' : 'none';
+  const rate = receiveRate();
+  const rateEl = document.getElementById('r_rate');
+  if(rateEl && !rateEl.value && rate) rateEl.value = rate;
+}
+/* ຄິດຕົ້ນທຶນກີບຄືນໃໝ່ຂອງທຸກລາຍການທີ່ຊື້ເປັນບາດ (ເມື່ອປ່ຽນອັດຕາແລກປ່ຽນ) */
+function recalcReceiveThbRows(){
+  const rate = receiveRate();
+  receiveCart.forEach(i=>{
+    if(i.cost_currency !== 'THB') return;
+    i.exchange_rate = rate || null;
+    i.unit_cost = rate ? Math.round((Number(i.unit_cost_thb)||0) * rate) : 0;
+    i.amount = i.unit_cost * (Number(i.quantity)||1);
+  });
+  const list = document.getElementById('r_cartList');
+  if(list){ list.innerHTML = renderReceiveCart(); bindReceiveCartRemove(); }
 }
 /* ຕົວເລກໃນແຖບລຸ່ມສຸດ (ມູນຄ່າລວມ / ຈຳນວນລາຍການ / ຈຳນວນໜ່ວຍ) */
 function updateReceiveCount(){
@@ -2892,6 +2937,35 @@ function bindReceiveCartRemove(){
   updateReceiveCount();
   /* ແກ້ຕົ້ນທຶນ/ໜ່ວຍ ໄດ້ໂດຍກົງໃນຕາຕະລາງ (ແອດມິນ) — ໃຊ້ໄດ້ທັງຕອນຮັບເຂົ້າໃໝ່ ແລະ ຕອນແກ້ໄຂໃບເກົ່າ
      ພິມແລ້ວ ຈຳນວນເງິນ ແລະ ມູນຄ່າລວມ ປ່ຽນຕາມທັນທີ (ບໍ່ຕ້ອງ render ຕາຕະລາງໃໝ່ ເຄີເຊີຈຶ່ງບໍ່ກະໂດດ) */
+  syncReceiveRateBlock();
+  /* ສະຫຼັບສະກຸນເງິນຂອງແຕ່ລະລາຍການ ກີບ ↔ ບາດ */
+  document.querySelectorAll('#r_cartList .rc-cur').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const it = receiveCart[Number(el.dataset.idx)];
+      if(!it) return;
+      const rate = receiveRate();
+      if(it.cost_currency === 'THB'){
+        /* ບາດ → ກີບ: ເອົາຕົ້ນທຶນກີບທີ່ຄິດໄວ້ແລ້ວເປັນຕົວຕັ້ງ */
+        it.cost_currency = 'LAK';
+        it.unit_cost_thb = null;
+        it.exchange_rate = null;
+      } else {
+        it.cost_currency = 'THB';
+        it.unit_cost_thb = rate ? Math.round((Number(it.unit_cost)||0) / rate * 100) / 100 : 0;
+        it.exchange_rate = rate || null;
+        it.unit_cost = rate ? Math.round((Number(it.unit_cost_thb)||0) * rate) : 0;
+      }
+      it.amount = (Number(it.unit_cost)||0) * (Number(it.quantity)||1);
+      const list = document.getElementById('r_cartList');
+      list.innerHTML = renderReceiveCart();
+      bindReceiveCartRemove();
+      if(it.cost_currency === 'THB' && !rate){
+        toast('ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ) ຢູ່ຂ້າງເທິງກ່ອນ');
+        const rateEl = document.getElementById('r_rate');
+        if(rateEl) rateEl.focus();
+      }
+    });
+  });
   document.querySelectorAll('#r_cartList .rc-cost').forEach(el=>{
     el.addEventListener('input', ()=>{
       const idx = Number(el.dataset.idx);
@@ -2904,21 +2978,26 @@ function bindReceiveCartRemove(){
         const shift = el.value.length - before;
         try{ el.setSelectionRange(Math.max(0,pos+shift), Math.max(0,pos+shift)); }catch(e){}
       }
-      it.unit_cost = n;
-      it.amount = n * (Number(it.quantity)||1);
-      /* ຊື້ເປັນບາດ: ຄິດຕົ້ນທຶນບາດຄືນຕາມອັດຕາທີ່ບັນທຶກໄວ້ ເພື່ອບໍ່ໃຫ້ຕົວເລກຂັດກັນ */
       if(it.cost_currency === 'THB'){
-        const rate = Number(it.exchange_rate)||0;
-        if(rate) it.unit_cost_thb = Math.round((n/rate)*100)/100;
-        else { it.cost_currency = 'LAK'; it.unit_cost_thb = null; }
+        /* ຕົວເລກທີ່ພິມ = ບາດ → ລ໋ອກເປັນກີບຕາມອັດຕາຂອງໃບນີ້ */
+        const rate = receiveRate();
+        it.unit_cost_thb = n;
+        it.exchange_rate = rate || null;
+        it.unit_cost = rate ? Math.round(n * rate) : 0;
+      } else {
+        it.unit_cost = n;
+        it.unit_cost_thb = null;
+        it.exchange_rate = null;
       }
+      it.amount = (Number(it.unit_cost)||0) * (Number(it.quantity)||1);
       const amtCell = document.querySelector(`#r_cartList [data-amt="${idx}"]`);
-      if(amtCell) amtCell.textContent = fmtMoney(it.amount) + ' ກີບ';
+      if(amtCell) amtCell.innerHTML = fmtMoney(it.amount) + ' ກີບ' +
+        (it.cost_currency === 'THB' ? '<div class="muted" style="font-size:11px;font-weight:400;">'+fmtMoney(it.unit_cost_thb||0)+' ບາດ @'+(it.exchange_rate||'—')+'</div>' : '');
       updateReceiveCount();
     });
     el.addEventListener('blur', ()=>{
       const it = receiveCart[Number(el.dataset.idx)];
-      if(it) el.value = fmtMoney(it.unit_cost);
+      if(it) el.value = fmtMoney(it.cost_currency === 'THB' ? (it.unit_cost_thb||0) : it.unit_cost);
     });
     el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); el.blur(); } });
   });
