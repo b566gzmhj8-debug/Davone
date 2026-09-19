@@ -485,6 +485,10 @@
   .ps-table .r{text-align:right;white-space:nowrap;}
   .ps-table .b{font-weight:700;color:#0b1a3d;}
   .ps-table .x{cursor:pointer;color:#b3382a;font-weight:700;padding:2px 6px;}
+  .ps-table .rc-cost{width:110px;margin:0;padding:6px 8px;text-align:right;font-size:13.5px;
+    border:1px solid transparent;border-bottom:1px dashed #c3c9d5;border-radius:4px;background:transparent;color:#1b2437;}
+  .ps-table .rc-cost:hover{border-color:#cfd4de;background:#fafbfc;}
+  .ps-table .rc-cost:focus{outline:none;border:1px solid #0b1a3d;border-radius:6px;background:#fff;box-shadow:0 0 0 3px rgba(11,26,61,.1);}
   .ps-table .ps-empty td{padding:36px 6px;text-align:center;color:#8a8fa2;font-size:13px;border-bottom:none;}
   .ps-table .ps-sub td{font-size:13px;color:#7b8194;}
   /* ແຖບລຸ່ມ: ຊ້າຍ = ບລ໊ອກຍອດເງິນ · ຂວາ = ສະຫຼຸບ + ປຸ່ມ (ຄືສາຂາເມືອງຮຸນ) */
@@ -548,8 +552,8 @@
   @media (max-width:760px){
     .ps-table th,.ps-table td{padding:8px 4px;font-size:13px;}
     .ps-table-sell th:nth-child(4),.ps-table-sell td:nth-child(4){display:none;}
-    .ps-table-rcv th:nth-child(5),.ps-table-rcv td:nth-child(5){display:none;}
     .ps-table-rcv td:nth-child(3){word-break:break-all;}
+    .ps-table .rc-cost{width:88px;font-size:12.5px;padding:5px 6px;}
     .ps-table-rcv td.r{white-space:normal;}
     .ps-table-ap th:nth-child(3),.ps-table-ap td:nth-child(3),
     .ps-table-ap th:nth-child(5),.ps-table-ap td:nth-child(5){display:none;}
@@ -2866,7 +2870,8 @@ function renderReceiveCart(){
     `<td>${it.model_name}${it.cost_currency==='THB' && canSeeCost ? ' <span class="muted" style="font-size:11px;">(ຊື້ '+fmtMoney(it.unit_cost_thb)+' ບາດ @'+it.exchange_rate+')</span>' : ''}</td>`+
     `<td class="mono muted">${it.serial_no || '—'}</td>`+
     `<td class="c mono b">${it.quantity}</td>`+
-    (canSeeCost ? `<td class="r mono">${fmtMoney(it.unit_cost)}</td><td class="r mono b">${fmtMoney(it.amount)} ກີບ</td>` : '')+
+    (canSeeCost ? `<td class="r"><input class="rc-cost mono" type="text" inputmode="numeric" data-idx="${idx}" value="${fmtMoney(it.unit_cost)}" title="ພິມແກ້ຕົ້ນທຶນ/ໜ່ວຍ (ກີບ) ໄດ້ເລີຍ"></td>`+
+                   `<td class="r mono b" data-amt="${idx}">${fmtMoney(it.amount)} ກີບ</td>` : '')+
     `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
   return head + rows + '</tbody></table>';
 }
@@ -2885,6 +2890,38 @@ function updateReceiveCount(){
 }
 function bindReceiveCartRemove(){
   updateReceiveCount();
+  /* ແກ້ຕົ້ນທຶນ/ໜ່ວຍ ໄດ້ໂດຍກົງໃນຕາຕະລາງ (ແອດມິນ) — ໃຊ້ໄດ້ທັງຕອນຮັບເຂົ້າໃໝ່ ແລະ ຕອນແກ້ໄຂໃບເກົ່າ
+     ພິມແລ້ວ ຈຳນວນເງິນ ແລະ ມູນຄ່າລວມ ປ່ຽນຕາມທັນທີ (ບໍ່ຕ້ອງ render ຕາຕະລາງໃໝ່ ເຄີເຊີຈຶ່ງບໍ່ກະໂດດ) */
+  document.querySelectorAll('#r_cartList .rc-cost').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      const idx = Number(el.dataset.idx);
+      const it = receiveCart[idx];
+      if(!it) return;
+      const n = Number((el.value||'').replace(/[^\d]/g,'')) || 0;
+      const pos = el.selectionStart, before = el.value.length;
+      el.value = n ? fmtMoney(n) : '';
+      if(document.activeElement === el){
+        const shift = el.value.length - before;
+        try{ el.setSelectionRange(Math.max(0,pos+shift), Math.max(0,pos+shift)); }catch(e){}
+      }
+      it.unit_cost = n;
+      it.amount = n * (Number(it.quantity)||1);
+      /* ຊື້ເປັນບາດ: ຄິດຕົ້ນທຶນບາດຄືນຕາມອັດຕາທີ່ບັນທຶກໄວ້ ເພື່ອບໍ່ໃຫ້ຕົວເລກຂັດກັນ */
+      if(it.cost_currency === 'THB'){
+        const rate = Number(it.exchange_rate)||0;
+        if(rate) it.unit_cost_thb = Math.round((n/rate)*100)/100;
+        else { it.cost_currency = 'LAK'; it.unit_cost_thb = null; }
+      }
+      const amtCell = document.querySelector(`#r_cartList [data-amt="${idx}"]`);
+      if(amtCell) amtCell.textContent = fmtMoney(it.amount) + ' ກີບ';
+      updateReceiveCount();
+    });
+    el.addEventListener('blur', ()=>{
+      const it = receiveCart[Number(el.dataset.idx)];
+      if(it) el.value = fmtMoney(it.unit_cost);
+    });
+    el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); el.blur(); } });
+  });
   document.querySelectorAll('#r_cartList .x').forEach(el=>{
     el.addEventListener('click', ()=>{
       receiveCart.splice(Number(el.dataset.idx),1);
