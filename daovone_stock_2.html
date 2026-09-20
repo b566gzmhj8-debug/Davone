@@ -431,7 +431,9 @@
   .ap-title .dv-icon{width:22px;height:22px;color:#a57a36;}
   .ap-sec{margin:4px 0 8px;font-size:12px;font-weight:700;letter-spacing:.3px;color:#8a6224;text-transform:uppercase;}
   .ap-sec:not(:first-child){margin-top:16px;}
-  .ps-entry-row .ap-code{flex:0 0 280px;}
+  .ps-entry-row .ap-code{flex:0 0 320px;}
+  .ps-entry-row .ap-code textarea{margin:0;min-height:44px;resize:vertical;line-height:1.5;}
+  .ap-code-hint{display:block;margin-top:4px;font-size:11.5px;color:#5b6275;line-height:1.5;}
   .ap-row2{margin-top:10px;}
   .ps-entry-row .ap-cat{flex:1 1 260px;min-width:0;}
   .ps-entry-row .ap-unit{flex:0 0 180px;}
@@ -2261,7 +2263,11 @@ async function renderAddProduct(main){
         <p class="ap-sec">ຂໍ້ມູນສິນຄ້າ</p>
         <div class="ps-entry-row">
           <div class="f f-model"><label>ຊື່ສິນຄ້າ *</label><input id="ap_name" placeholder="ເຊັ່ນ ແທັກເຕີ M6040" autocomplete="off"></div>
-          <div class="f ap-code"><label>ລະຫັດ (code)</label><input id="ap_code" placeholder="ເຊັ່ນ W9500-95511" autocomplete="off"></div>
+          <div class="f ap-code">
+            <label>ລະຫັດ (code) — ໃສ່ໄດ້ຫຼາຍລະຫັດພ້ອມກັນ</label>
+            <textarea id="ap_code" rows="2" placeholder="ເຊັ່ນ W9500-95511&#10;ຂຶ້ນແຖວໃໝ່ ຫຼື ວັກດ້ວຍ , ເພື່ອໃສ່ຫຼາຍລະຫັດ" autocomplete="off"></textarea>
+            <small class="ap-code-hint" id="ap_codeHint">ຊື່ດຽວກັນ ໃສ່ຫຼາຍລະຫັດເທື່ອດຽວ — ບັນທຶກແລ້ວຈະແຍກເປັນສິນຄ້າລະລາຍການ</small>
+          </div>
         </div>
         <div class="ps-entry-row ap-row2">
           <div class="f ap-cat"><label>ໝວດໝູ່</label><input id="ap_cat" list="ap_catList" placeholder="ແທັກເຕີ / ອາໄຫລ່ / ຢາງ" autocomplete="off"></div>
@@ -2312,26 +2318,39 @@ async function renderAddProduct(main){
   const $ = id=> document.getElementById(id);
   ['ap_price','ap_price_thb'].concat(canSeeCost ? ['ap_cost','ap_cost_thb'] : []).forEach(id=> attachMoneyInput(id, ''));
   const norm = v=> (v||'').trim().toLowerCase();
+  /* ແຍກລະຫັດຫຼາຍໆອັນ: ຂຶ້ນແຖວໃໝ່ / , / ; / tab — ຕັດອັນຊ້ຳກັນເອງອອກ */
+  function codeList(){
+    const raw = ($('ap_code').value||'').split(/[\n,;\t]+/).map(v=> v.trim()).filter(Boolean);
+    const seen = new Set(), out = [], dup = [];
+    raw.forEach(c=>{ const k=c.toLowerCase(); if(seen.has(k)){ dup.push(c); } else { seen.add(k); out.push(c); } });
+    return { codes: out, dupInInput: [...new Set(dup)] };
+  }
   /* ຕົວຢ່າງດ້ານລຸ່ມ + ເຕືອນຊື່/ລະຫັດຊ້ຳກັບສິນຄ້າທີ່ມີແລ້ວ */
   function refreshPreview(){
     const name = $('ap_name').value.trim();
-    $('ap_prevName').textContent = name || '—';
+    const { codes, dupInInput } = codeList();
+    const n = Math.max(1, codes.length);
+    $('ap_prevName').textContent = name ? (name + (codes.length > 1 ? ` × ${codes.length}` : '')) : '—';
     const bits = [];
     const lak = moneyValue('ap_price'), thb = moneyValue('ap_price_thb');
     if(lak) bits.push(fmtMoney(lak)+' ກີບ');
     if(thb) bits.push(fmtMoney(thb)+' ບາດ');
     const unit = $('ap_unit').value.trim();
-    $('ap_prevSub').textContent = bits.length ? bits.join(' · ') + (unit ? ' / '+unit : '') : '';
+    const sub = bits.length ? bits.join(' · ') + (unit ? ' / '+unit : '') : '';
+    $('ap_prevSub').textContent = codes.length > 1 ? (sub ? sub + ' · ' : '') + `ຈະສ້າງ ${codes.length} ລາຍການ` : sub;
+    $('ap_codeHint').textContent = codes.length > 1
+      ? `ຈະສ້າງ ${codes.length} ລາຍການ ຊື່ດຽວກັນ: ${codes.slice(0,4).join(' · ')}${codes.length>4 ? ' …' : ''}`
+      : 'ຊື່ດຽວກັນ ໃສ່ຫຼາຍລະຫັດເທື່ອດຽວ — ບັນທຶກແລ້ວຈະແຍກເປັນສິນຄ້າລະລາຍການ';
     const warn = [];
+    if(dupInInput.length) warn.push(`ລະຫັດຊ້ຳກັນເອງ (ຈະໃສ່ໃຫ້ອັນດຽວ): ${dupInInput.join(', ')}`);
+    const dupCodes = codes.filter(c=> all.some(m=> norm(m.code) === norm(c)));
+    if(dupCodes.length) warn.push(`ລະຫັດນີ້ມີໃນລະບົບແລ້ວ: ${dupCodes.slice(0,5).join(', ')}${dupCodes.length>5?' …':''}`);
     const dupName = name && all.find(m=> norm(m.name) === norm(name));
-    const code = $('ap_code').value.trim();
-    const dupCode = code && all.find(m=> norm(m.code) === norm(code));
-    if(dupName) warn.push(`ມີຊື່ "${dupName.name}" ໃນລະບົບແລ້ວ${dupName.active===false ? ' (ປິດໃຊ້ຢູ່)' : ''}`);
-    if(dupCode) warn.push(`ລະຫັດ ${code} ເປັນຂອງ "${dupCode.name}" ແລ້ວ`);
+    if(dupName && !codes.length) warn.push(`ມີຊື່ "${dupName.name}" ໃນລະບົບແລ້ວ${dupName.active===false ? ' (ປິດໃຊ້ຢູ່)' : ''} ແລະ ຍັງບໍ່ໄດ້ໃສ່ລະຫັດ`);
     $('ap_warn').hidden = !warn.length;
     $('ap_warn').textContent = warn.length ? '⚠ ' + warn.join(' · ') : '';
   }
-  main.querySelectorAll('input').forEach(el=> el.addEventListener('input', refreshPreview));
+  main.querySelectorAll('input, textarea').forEach(el=> el.addEventListener('input', refreshPreview));
   const order = ['ap_name','ap_code','ap_cat','ap_unit','ap_threshold','ap_price','ap_price_thb'];
   if(canSeeCost) order.push('ap_cost','ap_cost_thb');
   bindEnterAdvance(order, 'ap_save');
@@ -2341,14 +2360,13 @@ async function renderAddProduct(main){
     if(btn.disabled) return;
     const name = $('ap_name').value.trim();
     if(!name){ toast('ກະລຸນາໃສ່ຊື່ສິນຄ້າ'); $('ap_name').focus(); return; }
-    const code = $('ap_code').value.trim();
+    const { codes } = codeList();
+    const dupCodes = codes.filter(c=> all.some(m=> norm(m.code) === norm(c)));
     const dupName = all.find(m=> norm(m.name) === norm(name));
-    const dupCode = code && all.find(m=> norm(m.code) === norm(code));
-    if((dupName || dupCode) && !confirm('ມີສິນຄ້າຊື່ ຫຼື ລະຫັດນີ້ໃນລະບົບແລ້ວ\n\n' + $('ap_warn').textContent.replace(/^⚠ /,'') + '\n\nຍັງຈະເພີ່ມເປັນສິນຄ້າໃໝ່ອີກລາຍການບໍ?')) return;
-    const payload = {
-      id: uid(),
+    const needAsk = dupCodes.length || (!codes.length && dupName);
+    if(needAsk && !confirm('ມີສິນຄ້າຊື່ ຫຼື ລະຫັດນີ້ໃນລະບົບແລ້ວ\n\n' + $('ap_warn').textContent.replace(/^⚠ /,'') + '\n\nຍັງຈະເພີ່ມອີກບໍ?')) return;
+    const base = {
       name,
-      code,
       category: $('ap_cat').value.trim(),
       unit: $('ap_unit').value.trim() || 'ອັນ',
       sale_price: moneyValue('ap_price'),
@@ -2357,13 +2375,15 @@ async function renderAddProduct(main){
       has_serial: $('ap_serial').checked
     };
     if(canSeeCost){
-      payload.cost_price = moneyValue('ap_cost');
-      payload.cost_price_thb = moneyValue('ap_cost_thb');
+      base.cost_price = moneyValue('ap_cost');
+      base.cost_price_thb = moneyValue('ap_cost_thb');
     }
+    /* ໃສ່ຫຼາຍລະຫັດ = ສ້າງຫຼາຍລາຍການ ຊື່ດຽວກັນ (ສົ່ງເທື່ອດຽວ) · ບໍ່ໃສ່ລະຫັດ = 1 ລາຍການຄືເກົ່າ */
+    const list = (codes.length ? codes : ['']).map(c=> Object.assign({ id: uid(), code: c }, base));
     btn.disabled = true;
     try{
-      await sb('stock_product_models', { method:'POST', body: payload });
-      toast(`ເພີ່ມ "${name}" ສຳເລັດ`);
+      await sb('stock_product_models', { method:'POST', body: list });
+      toast(list.length > 1 ? `ເພີ່ມ "${name}" ${list.length} ລາຍການສຳເລັດ` : `ເພີ່ມ "${name}" ສຳເລັດ`);
       tabDrafts.addproduct = {};
       await renderTab();
       const nameEl = document.getElementById('ap_name');
