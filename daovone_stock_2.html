@@ -494,6 +494,9 @@
     border:1px solid #d9cdb0;background:#f8f3e9;color:#8a6224;}
   .rc-cur:hover{border-color:#a57a36;}
   .rc-cur.thb{background:#0b1a3d;border-color:#0b1a3d;color:#f6dc9c;}
+  .rc-fill{flex:none;font:inherit;font-size:13px;font-weight:700;line-height:1;padding:6px 8px;border-radius:8px;cursor:pointer;
+    border:1px solid #cfd4de;background:#fff;color:#0b1a3d;}
+  .rc-fill:hover{border-color:#0b1a3d;background:#eef1f7;}
   .ps-table .rc-cost{width:110px;margin:0;padding:6px 8px;text-align:right;font-size:13.5px;
     border:1px solid transparent;border-bottom:1px dashed #c3c9d5;border-radius:4px;background:transparent;color:#1b2437;}
   .ps-table .rc-cost:hover{border-color:#cfd4de;background:#fafbfc;}
@@ -2906,6 +2909,9 @@ function renderReceiveCart(){
   if(!receiveCart.length){
     return head + '<tr class="ps-empty"><td colspan="'+cols+'">ຍັງບໍ່ມີລາຍການ — ເລືອກສິນຄ້າຂ້າງເທິງ ແລ້ວກົດ + ເພີ່ມ</td></tr></tbody></table>';
   }
+  /* ນັບວ່າສິນຄ້າແຕ່ລະຮຸ່ນມີຈັກແຖວ — ຖ້າຫຼາຍກວ່າ 1 ຈຶ່ງໂຊວ໌ປຸ່ມ "ໃສ່ໃຫ້ໝົດ" */
+  const sameCount = {};
+  receiveCart.forEach(i=> sameCount[i.model_id] = (sameCount[i.model_id]||0) + 1);
   /* ຮຽງລຳດັບ 1, 2, 3 ... ໃຫ້ ບໍ່ຕ້ອງນັບເອງ */
   const rows = receiveCart.map((it,idx)=>
     `<tr><td class="c mono">${idx+1}</td>`+
@@ -2915,6 +2921,8 @@ function renderReceiveCart(){
     (canSeeCost ? `<td class="r"><div class="rc-cost-wrap">`+
                      `<input class="rc-cost mono" type="text" inputmode="numeric" data-idx="${idx}" value="${fmtMoney(it.cost_currency==='THB' ? (it.unit_cost_thb||0) : it.unit_cost)}" title="ພິມແກ້ຕົ້ນທຶນ/ໜ່ວຍ ໄດ້ເລີຍ">`+
                      `<button type="button" class="rc-cur${it.cost_currency==='THB'?' thb':''}" data-idx="${idx}" title="ກົດເພື່ອສະຫຼັບ ກີບ ↔ ບາດ">${it.cost_currency==='THB'?'ບາດ':'ກີບ'}</button>`+
+                     (sameCount[it.model_id] > 1
+                       ? `<button type="button" class="rc-fill" data-idx="${idx}" title="ໃສ່ຕົ້ນທຶນນີ້ໃຫ້ທຸກແຖວຂອງ ${escHtml(it.model_name)} (${sameCount[it.model_id]} ແຖວ)">⇩</button>` : '')+
                    `</div></td>`+
                    `<td class="r mono b" data-amt="${idx}">${fmtMoney(it.amount)} ກີບ${it.cost_currency==='THB' ? '<div class="muted" style="font-size:11px;font-weight:400;">'+fmtMoney(it.unit_cost_thb||0)+' ບາດ @'+(it.exchange_rate||'—')+'</div>' : ''}</td>` : '')+
     `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
@@ -2995,6 +3003,27 @@ function bindReceiveCartRemove(){
         const rateEl = document.getElementById('r_rate');
         if(rateEl) rateEl.focus();
       }
+    });
+  });
+  /* ⇩ = ເອົາຕົ້ນທຶນ ແລະ ສະກຸນຂອງແຖວນີ້ ໄປໃສ່ໃຫ້ທຸກແຖວຂອງສິນຄ້າຮຸ່ນດຽວກັນ (ຊື້ມາລາຄາດຽວກັນ ບໍ່ຕ້ອງພິມທີລະເຄື່ອງ) */
+  document.querySelectorAll('#r_cartList .rc-fill').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const src = receiveCart[Number(el.dataset.idx)];
+      if(!src) return;
+      let n = 0;
+      receiveCart.forEach(it=>{
+        if(it === src || it.model_id !== src.model_id) return;
+        it.cost_currency = src.cost_currency || 'LAK';
+        it.unit_cost = Number(src.unit_cost)||0;
+        it.unit_cost_thb = src.unit_cost_thb;
+        it.exchange_rate = src.exchange_rate;
+        it.amount = (Number(it.unit_cost)||0) * (Number(it.quantity)||1);
+        n++;
+      });
+      const list = document.getElementById('r_cartList');
+      list.innerHTML = renderReceiveCart();
+      bindReceiveCartRemove();
+      toast(n ? `ໃສ່ຕົ້ນທຶນໃຫ້ ${src.model_name} ອີກ ${n} ແຖວແລ້ວ` : 'ບໍ່ມີແຖວອື່ນຂອງສິນຄ້ານີ້');
     });
   });
   document.querySelectorAll('#r_cartList .rc-cost').forEach(el=>{
