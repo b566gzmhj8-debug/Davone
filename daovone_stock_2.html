@@ -434,6 +434,8 @@
   .ps-entry-row .ap-code{flex:0 0 320px;}
   .ps-entry-row .ap-code textarea{margin:0;min-height:44px;resize:vertical;line-height:1.5;}
   .ap-code-hint{display:block;margin-top:4px;font-size:11.5px;color:#5b6275;line-height:1.5;}
+  .r-serial-count{margin-top:6px;font-size:12px;font-weight:600;color:#2f7d57;}
+  .r-serial-count.warn{color:#b3382a;}
   .ap-row2{margin-top:10px;}
   .ps-entry-row .ap-cat{flex:1 1 260px;min-width:0;}
   .ps-entry-row .ap-unit{flex:0 0 180px;}
@@ -2464,8 +2466,9 @@ async function renderReceive(main){
             <div class="muted ps-rate-note" id="r_lockedPreview"></div>
           </div>` : ''}
           <div id="r_serialBlock" style="display:none;">
-            <label style="display:block;margin:12px 0 4px;font-size:12.5px;color:#57607a;">ເລກເຄື່ອງ (ພິມແລ້ວກົດ Enter ເພື່ອເພີ່ມເຂົ້າລາຍການທັນທີ)</label>
-            <textarea id="r_serials" rows="3" placeholder="W95TD-00011&#10;W95TD-00012"></textarea>
+            <label style="display:block;margin:12px 0 4px;font-size:12.5px;color:#57607a;">ເລກເຄື່ອງ — ໃສ່ໄດ້ຫຼາຍເຄື່ອງພ້ອມກັນ (ຂຶ້ນແຖວໃໝ່ ຫຼື ວັກດ້ວຍ , ) ແລ້ວກົດ <b>+ ເພີ່ມ</b> ເທື່ອດຽວ</label>
+            <textarea id="r_serials" rows="6" placeholder="W95TD-00011&#10;W95TD-00012&#10;W95TD-00013&#10;… ວາງ (paste) ຈາກ Excel ຫຼື ສະແກນບາໂຄດຕິດກັນໄດ້ເລີຍ"></textarea>
+            <div class="r-serial-count" id="r_serialCount">ຍັງບໍ່ໄດ້ໃສ່ເລກເຄື່ອງ</div>
           </div>
         </div>
         <p class="ps-list-head">ລາຍການທີ່ຈະຮັບເຂົ້າ</p>
@@ -2572,7 +2575,7 @@ async function renderReceive(main){
     }
     let addedCount = 0;
     if(isSerial){
-      const rawSerials = document.getElementById('r_serials').value.split('\n').map(s=>s.trim()).filter(Boolean);
+      const rawSerials = document.getElementById('r_serials').value.split(/[\n,;\t]+/).map(s=>s.trim()).filter(Boolean);
       if(!rawSerials.length){ toast('ໃສ່ເລກເຄື່ອງຢ່າງໜ້ອຍ 1 ຕົວ'); return; }
 
       /* ກັນເລກເຄື່ອງຊ້ຳກັນເອງໃນລາຍການທີ່ພິມ/ວາງເຂົ້າມາຄັ້ງນີ້ */
@@ -2609,6 +2612,8 @@ async function renderReceive(main){
       });
       addedCount = serials.length;
       document.getElementById('r_serials').value = '';
+      const cntEl = document.getElementById('r_serialCount');
+      if(cntEl) cntEl.textContent = 'ຍັງບໍ່ໄດ້ໃສ່ເລກເຄື່ອງ';
     } else {
       const qty = Number(document.getElementById('r_qty').value)||1;
       receiveCart.push({ model_id: opt.value, model_name: opt.textContent, serial_no:null, quantity:qty, unit_cost:cost, amount: qty*cost, cost_currency:currency, unit_cost_thb:costThb, exchange_rate:exchangeRate });
@@ -2639,7 +2644,7 @@ async function renderReceive(main){
     const canSeeCost2 = currentRole === 'admin';
     const serialBlock = document.getElementById('r_serialBlock');
     const isSerialVisible = serialBlock && serialBlock.style.display !== 'none';
-    const chain = [isSerialVisible ? 'r_serials' : 'r_qty'];
+    const chain = isSerialVisible ? [] : ['r_qty'];
     if(canSeeCost2){
       chain.push('r_currency', 'r_cost');
       const currencyEl = document.getElementById('r_currency');
@@ -2673,19 +2678,25 @@ async function renderReceive(main){
     });
   });
   bindEnterAdvance(['r_supplier','r_date'], 'r_model_search');
-  document.getElementById('r_serials').addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      const val = e.target.value.trim();
-      if(!val){
-        /* ไม่มีเลขเครื่องเหลือให้เพิ่มแล้ว = พิมพ์เสร็จหมดแล้ว กด Enter ครั้งนี้จึงบันทึกเข้าระบบทั้งใบ */
-        document.getElementById('r_submit').click();
-      } else {
-        /* พิมพ์เลขเครื่องแล้วกด Enter ครั้งแรก = ไล่ลงช่องถัดไปตามลำดับจริง (สกุลเงิน → ต้นทุน → อัตราแลกเปลี่ยน → เพิ่มเข้ารายการ) */
-        handleReceiveFieldEnter('r_serials');
-      }
-    }
+  /* ກ່ອງເລກເຄື່ອງ: Enter = ຂຶ້ນແຖວໃໝ່ (ສະແກນບາໂຄດຫຼາຍເຄື່ອງຕິດກັນໄດ້ ບໍ່ຕ້ອງກົດຫຍັງລະຫວ່າງກາງ)
+     ໃສ່ຄົບແລ້ວຄ່ອຍກົດ "+ ເພີ່ມ" ເທື່ອດຽວ → ແຍກເປັນລາຍການລະເຄື່ອງໃຫ້ເອງ
+     ຢາກເພີ່ມດ້ວຍແປ້ນພິມ: Ctrl+Enter (ຫຼື ⌘+Enter) */
+  const serialsEl0 = document.getElementById('r_serials');
+  function updateSerialCount(){
+    const el = document.getElementById('r_serialCount');
+    if(!el) return;
+    const list = serialsEl0.value.split(/[\n,;\t]+/).map(v=> v.trim()).filter(Boolean);
+    const uniq = [...new Set(list.map(v=> v.toUpperCase()))];
+    const dup = list.length - uniq.length;
+    el.textContent = !list.length ? 'ຍັງບໍ່ໄດ້ໃສ່ເລກເຄື່ອງ'
+      : `ນັບໄດ້ ${uniq.length} ເລກເຄື່ອງ${dup ? ` (ຊ້ຳກັນເອງ ${dup} — ຕ້ອງເອົາອອກກ່ອນ)` : ''} · ກົດ + ເພີ່ມ ເພື່ອແຍກເປັນລາຍການ`;
+    el.classList.toggle('warn', !!dup);
+  }
+  serialsEl0.addEventListener('input', updateSerialCount);
+  serialsEl0.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); document.getElementById('r_addItem').click(); }
   });
+  updateSerialCount();
   bindReceiveCartRemove();
   document.getElementById('r_submit').addEventListener('click', async (e)=>{
     if(!receiveCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
