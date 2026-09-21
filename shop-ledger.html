@@ -215,6 +215,11 @@
   .tool-btn.on{background:var(--brown);border-color:var(--brown);color:#FBF7EF;}
   .tool-btn.del:hover{border-color:var(--red);color:var(--red);}
   .tool-btn.del.on{background:var(--red);border-color:var(--red);color:#FFFFFF;}
+  .edit-bill-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    margin:0 0 12px;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:600;
+    background:#f7ecd4;border:1px solid #d9cdb0;color:#7a5a1e;}
+  .edit-bill-bar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;vertical-align:-3px;}
+  .edit-bill-bar b{font-family:var(--font-mono,monospace);}
   .pick-hint{
     display:none;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;padding:8px 12px;
     border-radius:8px;background:var(--green-bg);color:var(--green);font-size:13.5px;font-weight:600;
@@ -1022,6 +1027,10 @@
     </div>
 
     <div id="saleNewView">
+    <div class="edit-bill-bar" id="editBillBar" style="display:none;">
+      <span><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg> ກຳລັງແກ້ໄຂບິນ <b id="editBillNo"></b> · ບັນທຶກແລ້ວສະຕັອກຈະຄິດໃໝ່ໃຫ້</span>
+      <button type="button" class="link-btn" id="btnCancelEditBill">ຍົກເລີກການແກ້ໄຂ</button>
+    </div>
     <div class="card pos-sheet">
 
       <div class="pos-head">
@@ -1110,6 +1119,7 @@
             <button data-range="custom"><svg viewBox="0 0 24 24"><path d="M11.5 21H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4.5"/><path d="M16 3v4M8 3v4M4 11h16"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M19.5 19.5L22 22"/></svg><span>ກຳນົດເອງ</span></button>
           </div>
           <div class="list-tools stmt-tools" data-list="histBillList">
+            <button class="tool-btn" data-act="edit" title="ແກ້ໄຂບິນ" aria-label="ແກ້ໄຂບິນ"><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>ແກ້ໄຂ</span></button>
             <button class="tool-btn" data-act="print" title="ພິມບິນ" aria-label="ພິມບິນ"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></svg><span>ພິມ</span></button>
             <button class="tool-btn del" data-act="delete" title="ລຶບບິນ" aria-label="ລຶບບິນ"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg><span>ລຶບ</span></button>
           </div>
@@ -1758,6 +1768,7 @@
   var DATA = loadData();
   var viewDate = todayStr();
   var cart = [];
+  var editingBill = null;   // ບິນເກົ່າທີ່ກຳລັງແກ້ໄຂຢູ່ (null = ບິນໃໝ່)
   var selectedStockId = null;
 
   // ---------- EDIT PRICE ----------
@@ -2654,8 +2665,10 @@
   }
   // next bill number and the time, shown in the sheet header like on a till
   function updatePosMeta(){
-    document.getElementById("posBillNo").textContent = "INV-" + String((DATA.billCounter || 0) + 1).padStart(5,"0");
-    document.getElementById("posDateTime").textContent = nowStamp();
+    document.getElementById("posBillNo").textContent = editingBill
+      ? editingBill.billNo : "INV-" + String((DATA.billCounter || 0) + 1).padStart(5,"0");
+    document.getElementById("posDateTime").textContent = editingBill
+      ? fmtDMY(editingBill.date)+" "+editingBill.time : nowStamp();
   }
   setInterval(function(){ updatePosMeta(); updatePoMeta(); updateTrMeta(); }, 30000);
 
@@ -2829,6 +2842,9 @@
   });
 
   document.getElementById("btnCommitSale").addEventListener("click", openPayModal);
+  document.getElementById("btnCancelEditBill").addEventListener("click", function(){
+    if(confirm("ຍົກເລີກການແກ້ໄຂບິນ "+(editingBill ? editingBill.billNo : "")+" ? ບິນເດີມຈະຄືເກົ່າ")){ cancelEditBill(); }
+  });
 
   function nextBillNo(){
     DATA.billCounter = (DATA.billCounter || 0) + 1;
@@ -2839,11 +2855,12 @@
     if(cart.length === 0){ return; }
     var subtotals = cartTotals();
     var discounts = disc ? disc.amounts : {};
+    var old = editingBill;   // ກຳລັງແກ້ບິນເກົ່າ → ໃຊ້ເລກບິນ/ວັນທີ/ເວລາ ອັນເກົ່າ
     var bill = {
-      id: uid(),
-      billNo: nextBillNo(),
-      date: todayStr(),
-      time: nowTime(),
+      id: old ? old.id : uid(),
+      billNo: old ? old.billNo : nextBillNo(),
+      date: old ? old.date : todayStr(),
+      time: old ? old.time : nowTime(),
       customer: {
         name: document.getElementById("custName").value.trim(),
         phone: document.getElementById("custPhone").value.trim(),
@@ -2859,21 +2876,38 @@
       payment: payment
     };
 
+    // ສະຕັອກ: ຄືນຈຳນວນເກົ່າຂອງບິນນີ້ກ່ອນ (ຖ້າແກ້ໄຂ) ແລ້ວຄ່ອຍຕັດຕາມລາຍການໃໝ່
+    if(old){
+      old.items.forEach(function(it){
+        var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
+        if(s){ s.qty = s.qty + it.qty; }
+      });
+    }
     cart.forEach(function(c){
       var item = DATA.stock.find(function(s){ return s.id === c.stockId; });
       if(item){ item.qty = item.qty - c.qty; }
     });
-    DATA.bills.push(bill);
+    if(old){
+      var i = DATA.bills.findIndex(function(b){ return b.id === old.id; });
+      if(i >= 0){ DATA.bills[i] = bill; } else { DATA.bills.push(bill); }
+      editingBill = null;
+    } else {
+      DATA.bills.push(bill);
+    }
     saveData();
 
     cart = [];
     renderCart();
     renderStockLists();
     renderSummary();
+    if(old){ renderHistory(); }
+    showEditBillBar();
 
     document.getElementById("custName").value = "";
     document.getElementById("custPhone").value = "";
     document.getElementById("custAddress").value = "";
+    cartDiscountEl.value = "";
+    setCartDiscUnit("percent");
 
     printBill(bill);
   }
@@ -3963,18 +3997,20 @@
     var hint = card.querySelector('.pick-hint[data-list="'+listId+'"]');
     hint.style.display = mode ? "flex" : "none";
     hint.classList.toggle("danger", mode === "delete");
-    hint.querySelector("span").textContent = mode === "print" ? "ກົດເລືອກບິນທີ່ຈະພິມ" : "ກົດເລືອກບິນທີ່ຈະລຶບ";
+    hint.querySelector("span").textContent = mode === "print" ? "ກົດເລືອກບິນທີ່ຈະພິມ"
+      : (mode === "edit" ? "ກົດເລືອກບິນທີ່ຈະແກ້ໄຂ" : "ກົດເລືອກບິນທີ່ຈະລຶບ");
   }
   function clearPickModes(){
     Object.keys(pickModes).forEach(function(id){ if(pickModes[id]){ setPickMode(id, null); } });
   }
 
   // a tap on a bill row acts on it when a tool is armed, otherwise it opens or closes the details
-  function onBillRowTap(listId, detail, onPrint, onDelete){
+  function onBillRowTap(listId, detail, onPrint, onDelete, onEdit){
     var mode = pickModes[listId];
     if(mode){
+      if(mode === "edit" && !onEdit){ return; }   // ລາຍການນີ້ຍັງແກ້ບໍ່ໄດ້
       setPickMode(listId, null);
-      (mode === "print" ? onPrint : onDelete)();
+      (mode === "print" ? onPrint : (mode === "edit" ? onEdit : onDelete))();
       return;
     }
     detail.style.display = detail.style.display !== "none" ? "none" : (detail.tagName === "TR" ? "table-row" : "block");
@@ -4021,7 +4057,7 @@
       det.className = "st-detail";
       det.style.display = "none";
       det.innerHTML = '<td colspan="6">'+r.detail+'</td>';
-      tr.addEventListener("click", function(){ onBillRowTap(listId, det, r.onPrint, r.onDelete); });
+      tr.addEventListener("click", function(){ onBillRowTap(listId, det, r.onPrint, r.onDelete, r.onEdit); });
       body.appendChild(tr);
       body.appendChild(det);
     });
@@ -4128,6 +4164,57 @@
             (hideVehMoney() && billHasVehicle(bill) ? "ກຳໄລອາໄຫຼ່ໃນບິນນີ້" : "ກຳໄລບິນນີ້")+
             (bc.missing ? " (ບໍ່ຄົບລາຄາທຶນ)" : "")+'</span><span>'+
             moneyMap(subMap(billRevenueForProfit(bill), bc.cost), " · ")+'</span></div>');
+  }
+
+  // ---------- ແກ້ໄຂບິນທີ່ອອກໄປແລ້ວ ----------
+  // ເປີດບິນເກົ່າກັບຄືນມາໃສ່ໜ້າຂາຍ: ແກ້ລາຍການ / ຈຳນວນ / ລາຄາ / ສ່ວນລດ / ການຊຳລະ ໄດ້ຄືບິນໃໝ່
+  // ບັນທຶກແລ້ວ: ເລກບິນ ວັນທີ ເວລາ ຄືເກົ່າ · ສະຕັອກຄິດໃໝ່ສະເພາະສ່ວນທີ່ປ່ຽນ
+  function startEditBill(bill){
+    if(cart.length && !confirm("ມີລາຍການຄ້າງຢູ່ໃນໜ້າຂາຍ "+cart.length+" ລາຍການ\nເປີດແກ້ໄຂບິນ "+bill.billNo+" ຈະລ້າງລາຍການເຫຼົ່ານັ້ນອອກ ດຳເນີນຕໍ່ບໍ?")){ return; }
+    editingBill = bill;
+    cart = bill.items.map(function(it){
+      var s = DATA.stock.find(function(x){ return x.id === it.stockId; }) || {};
+      return { stockId: it.stockId, code: it.code, name: it.name, unit: it.unit, qty: it.qty,
+               price: it.price, total: it.total, cost: it.cost, cur: curOf(it),
+               brand: it.brand || s.brand, engineNo: it.engineNo, chassisNo: it.chassisNo };
+    });
+    document.getElementById("custName").value = (bill.customer && bill.customer.name) || "";
+    document.getElementById("custPhone").value = (bill.customer && bill.customer.phone) || "";
+    document.getElementById("custAddress").value = (bill.customer && bill.customer.address) || "";
+    // ສ່ວນລດເດີມ: ເປັນ % ຫຼື ເປັນຈຳນວນເງິນ
+    if(bill.discountRate){ setCartDiscUnit("percent"); cartDiscountEl.value = numFmt(bill.discountRate); }
+    else {
+      var d = billDiscounts(bill), dc = CURS.filter(function(c){ return Math.abs(d[c]||0) > 0.0001; })[0];
+      if(dc){ setCartDiscUnit(dc); cartDiscountEl.value = numFmt(d[dc]); }
+      else { setCartDiscUnit("percent"); cartDiscountEl.value = ""; }
+    }
+    document.querySelector('#saleSeg button[data-view="new"]').click();
+    renderCart();
+    showEditBillBar();
+    window.scrollTo(0, 0);
+  }
+  function showEditBillBar(){
+    var bar = document.getElementById("editBillBar");
+    if(!bar){ return; }
+    bar.style.display = editingBill ? "flex" : "none";
+    if(editingBill){
+      document.getElementById("editBillNo").textContent = editingBill.billNo;
+      document.getElementById("btnCommitSale").textContent = "ບັນທຶກການແກ້ໄຂບິນ";
+    } else {
+      document.getElementById("btnCommitSale").textContent = "ຮັບເງິນ ແລະ ບັນທຶກບິນ";
+    }
+    updatePosMeta();
+  }
+  function cancelEditBill(){
+    editingBill = null;
+    cart = [];
+    document.getElementById("custName").value = "";
+    document.getElementById("custPhone").value = "";
+    document.getElementById("custAddress").value = "";
+    cartDiscountEl.value = "";
+    setCartDiscUnit("percent");
+    renderCart();
+    showEditBillBar();
   }
 
   function deleteBill(bill){
@@ -4521,7 +4608,8 @@
           confirmDelete("ລຶບບິນ "+bill.billNo+"?",
             "ຍອດ "+moneyMap(billTotals(bill))+" · "+fmtDMY(bill.date)+" "+bill.time+"\nສິນຄ້າໃນບິນຈະຖືກຄືນເຂົ້າສະຕັອກ",
             function(){ deleteBill(bill); });
-        }
+        },
+        onEdit: function(){ startEditBill(bill); }
       };
     });
   }
