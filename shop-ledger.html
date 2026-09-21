@@ -2089,7 +2089,13 @@
         '<button class="row-del" data-id="'+item.id+'" title="ລຶບລາຍການ">&times;</button>';
       row.querySelector(".row-edit").addEventListener("click", function(){ openPriceEdit(item); });
       row.querySelector(".row-del").addEventListener("click", function(){
-        confirmDelete('ລຶບ "'+item.name+'" ອອກຈາກສະຕັອກ?', "ຄົງເຫຼືອ "+numFmt(item.qty)+" "+(item.unit||""), function(){
+        var kit = bundleForName(item.name);
+        var kitNote = (kit && item.qty > 0)
+          ? "\nເຄື່ອງທີ່ມາພ້ອມຊຸດຈະຖືກຫັກອອກນຳ: "+kit.components.map(function(c){ return numFmt(c.qty*item.qty)+" "+c.name; }).join(", ")
+          : "";
+        confirmDelete('ລຶບ "'+item.name+'" ອອກຈາກສະຕັອກ?', "ຄົງເຫຼືອ "+numFmt(item.qty)+" "+(item.unit||"")+kitNote, function(){
+          // ລຶບໂຕຫຼັກຂອງຊຸດ (ເຊັ່ນ ໂຄງ 4 ເກຍ) → ຫັກເຄື່ອງທີ່ມາພ້ອມຊຸດອອກຕາມຈຳນວນນຳ ຈຳນວນຈຶ່ງບໍ່ຄ້າງ
+          applyBundleStock(item.name, item.qty, -1);
           DATA.stock = DATA.stock.filter(function(s){ return s.id !== item.id; });
           saveData();
           renderStockLists();
