@@ -220,6 +220,8 @@
     background:#f7ecd4;border:1px solid #d9cdb0;color:#7a5a1e;}
   .edit-bill-bar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;vertical-align:-3px;}
   .edit-bill-bar b{font-family:var(--font-mono,monospace);}
+  .bundle-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:20px;font-size:11px;font-weight:700;
+    background:#eef1f7;color:#1c3264;vertical-align:1px;}
   .pick-hint{
     display:none;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;padding:8px 12px;
     border-radius:8px;background:var(--green-bg);color:var(--green);font-size:13.5px;font-weight:600;
@@ -1767,6 +1769,69 @@
 
   var DATA = loadData();
   var viewDate = todayStr();
+  // ---------- ສິນຄ້າທີ່ມາພ້ອມກັນເປັນຊຸດ ----------
+  // ແກັດອຸປະກອນ ບໍ່ໄດ້ຊື້ມາຕ່າງຫາກ — ມັນມາພ້ອມ ໂຄງ 4 ເກຍ ສະເໝີ
+  // ຊື້ເຂົ້າ/ເພີ່ມສະຕັອກ ໂຄງ 10 ຊຸດ → ແກັດອຸປະກອນ +10 · ຂາຍ/ໂອນ ໂຄງ 1 ຊຸດ → ແກັດອຸປະກອນ −1
+  // ຢາກເພີ່ມຊຸດອື່ນ: ເພີ່ມ 1 ວົງເລັບ { } ໃນລາຍການນີ້
+  var BUNDLES = [
+    { parent: "ໂຄງ 4 ເກຍ", components: [ { name: "ແກັດອຸປະກອນ", qty: 1 } ] }
+  ];
+  var BUNDLE_TAG = "ມາພ້ອມຊຸດ";
+  function bundleKey(v){ return String(v == null ? "" : v).replace(/\s+/g, "").toLowerCase(); }
+  // ຊື່ສິນຄ້ານີ້ເປັນ "ໂຕຫຼັກ" ຂອງຊຸດບໍ? (ຊື່ຂຶ້ນຕົ້ນດ້ວຍຊື່ໂຕຫຼັກ ເຊັ່ນ "ໂຄງ 4 ເກຍ NC131")
+  function bundleForName(name){
+    var k = bundleKey(name);
+    if(!k) return null;
+    return BUNDLES.find(function(b){ return k.indexOf(bundleKey(b.parent)) === 0; }) || null;
+  }
+  function stockByName(name){
+    var k = bundleKey(name);
+    return DATA.stock.find(function(s){ return bundleKey(s.name) === k; }) || null;
+  }
+  // ບວກ/ລົບ ຈຳນວນຂອງເຄື່ອງທີ່ມາພ້ອມຊຸດ ຕາມຈຳນວນໂຕຫຼັກທີ່ເຂົ້າ/ອອກ
+  function applyBundleStock(name, parentQty, sign){
+    var b = bundleForName(name);
+    if(!b || !parentQty) return [];
+    var done = [];
+    b.components.forEach(function(c){
+      var s = stockByName(c.name);
+      if(!s) return;   // ຍັງບໍ່ມີສິນຄ້ານີ້ໃນສະຕັອກ — ຂ້າມໄປ ບໍ່ສ້າງໃຫ້ເອງ
+      s.qty = s.qty + sign * c.qty * parentQty;
+      done.push(c.qty * parentQty + " " + s.name);
+    });
+    return done;
+  }
+
+  // ລົດໃຫຍ່ທີ່ມີເລກຖັງ/ເລກຈັກ = ມີຄັນດຽວ ຂາຍ ຫຼື ໂອນອອກໄປແລ້ວ (ເຫຼືອ 0) ບໍ່ຕ້ອງຄ້າງຢູ່ໃນລາຍການສິນຄ້າອີກ
+  function isSerialVehicle(s){ return !!(s && s.category === "vehicle" && (s.chassisNo || s.engineNo)); }
+  // ລຶບລົດທີ່ມີເລກຖັງ/ເລກຈັກ ແລະ ເຫຼືອ 0 ອອກທັງໝົດ (ໃຊ້ຕອນເປີດລະບົບ ເພື່ອລ້າງອັນທີ່ຄ້າງມາແຕ່ກ່ອນ)
+  function pruneAllSoldVehicles(){
+    return pruneSoldVehicles(DATA.stock.filter(function(s){ return isSerialVehicle(s) && s.qty <= 0; })
+                                       .map(function(s){ return s.id; }));
+  }
+  function pruneSoldVehicles(ids){
+    var removed = [];
+    DATA.stock = DATA.stock.filter(function(s){
+      if(ids.indexOf(s.id) < 0) return true;
+      if(isSerialVehicle(s) && s.qty <= 0){ removed.push(s.name + (s.chassisNo ? " · "+s.chassisNo : "")); return false; }
+      return true;
+    });
+    return removed;
+  }
+  // ຄືນເຄື່ອງເຂົ້າສະຕັອກ (ລຶບບິນ / ແກ້ໄຂບິນ / ລຶບໃບໂອນ): ຖ້າແຖວຖືກລຶບໄປແລ້ວ ໃຫ້ສ້າງກັບຄືນດ້ວຍ id ເດີມ
+  function stockRowForReturn(it){
+    var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
+    if(s) return s;
+    if(!it.stockId) return null;
+    s = { id: it.stockId, name: it.name, code: it.code || "", unit: it.unit || "ອັນ", qty: 0, min: null,
+          costPrice: it.cost != null ? it.cost : null, sellPrice: it.price != null ? it.price : null,
+          currency: it.cur || "LAK",
+          category: (it.chassisNo || it.engineNo || it.brand) ? "vehicle" : "part",
+          brand: it.brand || "", engineNo: it.engineNo || "", chassisNo: it.chassisNo || "" };
+    DATA.stock.push(s);
+    return s;
+  }
+
   var cart = [];
   var editingBill = null;   // ບິນເກົ່າທີ່ກຳລັງແກ້ໄຂຢູ່ (null = ບິນໃໝ່)
   var selectedStockId = null;
@@ -2064,10 +2129,17 @@
         return (entry.engineNo && s.engineNo === entry.engineNo) || (entry.chassisNo && s.chassisNo === entry.chassisNo);
       });
       if(dup){ alert('ເລກຈັກ ຫຼື ເລກຖັງນີ້ມີຢູ່ໃນລະບົບແລ້ວ: "'+dup.name+'"'); return; }
+      if((entry.engineNo || entry.chassisNo) && qty <= 0){
+        alert("ລົດທີ່ມີເລກຖັງ/ເລກຈັກ ຕ້ອງໃສ່ຈຳນວນຢ່າງໜ້ອຍ 1 ຄັນ\n(ຖ້າເຫຼືອ 0 ລະບົບຖືວ່າຂາຍໄປແລ້ວ ແລ້ວຈະລຶບອອກຈາກລາຍການ)");
+        document.getElementById("newStockQty").focus();
+        return;
+      }
     }
     DATA.stock.push(entry);
+    var withKit = applyBundleStock(entry.name, entry.qty, +1);
     saveData();
     renderStockLists();
+    if(withKit.length){ alert("ເພີ່ມ "+entry.name+" ແລ້ວ\nລະບົບເພີ່ມເຄື່ອງທີ່ມາພ້ອມຊຸດໃຫ້ນຳ: "+withKit.join(", ")); }
 
     document.getElementById("newStockName").value = "";
     document.getElementById("newStockCode").value = "";
@@ -2314,7 +2386,7 @@
       tr.innerHTML =
         '<td class="col-no num">'+(idx+1)+'</td>'+
         '<td class="col-code"><span class="row-code">'+escapeHtml(c.code || "-")+'</span></td>'+
-        '<td><div class="pos-name">'+escapeHtml(c.name)+'</div>'+
+        '<td><div class="pos-name">'+escapeHtml(c.name)+(c.bundleOf ? ' <span class="bundle-tag">'+BUNDLE_TAG+'</span>' : "")+'</div>'+
           '<div class="pos-name-meta">'+(c.code ? escapeHtml(c.code)+" · " : "")+money(c.price, c.cur)+" / "+escapeHtml(c.unit||"")+'</div></td>'+
         '<td class="num"><div class="qty-ctl">'+
           '<button type="button" data-act="dec" aria-label="ຫຼຸດຈຳນວນ"'+(c.qty <= 1 ? " disabled" : "")+'>−</button>'+
@@ -2380,8 +2452,25 @@
                   cost: item.costPrice != null ? item.costPrice : null, cur: curOf(item),
                   brand: item.brand || "", engineNo: item.engineNo || "", chassisNo: item.chassisNo || "" });
     }
+    addBundleLines(item, qty);
     renderCart();
     return true;
+  }
+  // ຂາຍ ໂຄງ 4 ເກຍ → ໃສ່ ແກັດອຸປະກອນ ລົງບິນໃຫ້ນຳ (ລາຄາ 0 ບໍ່ຄິດເງິນ) ເພື່ອໃຫ້ສະຕັອກຫຼຸດພ້ອມກັນ
+  function addBundleLines(item, parentQty){
+    var b = bundleForName(item.name);
+    if(!b) return;
+    b.components.forEach(function(c){
+      var s = stockByName(c.name);
+      if(!s) return;
+      var need = c.qty * parentQty;
+      var line = cart.find(function(x){ return x.stockId === s.id && x.bundleOf; });
+      if(line){ line.qty += need; line.total = 0; return; }
+      cart.push({ stockId: s.id, code: s.code || "", name: s.name, unit: s.unit, qty: need,
+                  price: 0, total: 0, cost: s.costPrice != null ? s.costPrice : null, cur: curOf(s),
+                  brand: s.brand || "", engineNo: s.engineNo || "", chassisNo: s.chassisNo || "",
+                  bundleOf: item.name });
+    });
   }
 
   document.getElementById("btnAddToCart").addEventListener("click", function(){
@@ -2868,7 +2957,7 @@
       },
       // cost is saved per item so later changes to the stock cost price don't rewrite past profit
       items: cart.map(function(c){ return { stockId:c.stockId, code:c.code, name:c.name, unit:c.unit, qty:c.qty, price:c.price, total:c.total, cost:c.cost, cur:c.cur,
-                                           brand:c.brand, engineNo:c.engineNo, chassisNo:c.chassisNo }; }),
+                                           brand:c.brand, engineNo:c.engineNo, chassisNo:c.chassisNo, bundleOf:c.bundleOf || null }; }),
       subtotals: subtotals,
       discounts: discounts,
       discountRate: disc && disc.rate ? disc.rate : null,
@@ -2879,7 +2968,7 @@
     // ສະຕັອກ: ຄືນຈຳນວນເກົ່າຂອງບິນນີ້ກ່ອນ (ຖ້າແກ້ໄຂ) ແລ້ວຄ່ອຍຕັດຕາມລາຍການໃໝ່
     if(old){
       old.items.forEach(function(it){
-        var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
+        var s = stockRowForReturn(it);
         if(s){ s.qty = s.qty + it.qty; }
       });
     }
@@ -2887,6 +2976,7 @@
       var item = DATA.stock.find(function(s){ return s.id === c.stockId; });
       if(item){ item.qty = item.qty - c.qty; }
     });
+    pruneSoldVehicles(cart.map(function(c){ return c.stockId; }));
     if(old){
       var i = DATA.bills.findIndex(function(b){ return b.id === old.id; });
       if(i >= 0){ DATA.bills[i] = bill; } else { DATA.bills.push(bill); }
@@ -3158,6 +3248,7 @@
         s.costPrice = Math.round((onHand*s.costPrice + it.qty*it.cost) / (onHand + it.qty) * 100) / 100;
       }
       s.qty = s.qty + it.qty;
+      applyBundleStock(s.name, it.qty, +1);   // ໂຄງ 4 ເກຍ ເຂົ້າມາ → ແກັດອຸປະກອນ ເຂົ້າມານຳ
     });
     DATA.purchases.push(po);
     saveData();
@@ -3197,7 +3288,7 @@
     // take the received quantities back out of stock (the cost price is left as it is)
     po.items.forEach(function(it){
       var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
-      if(s){ s.qty = s.qty - it.qty; }
+      if(s){ s.qty = s.qty - it.qty; applyBundleStock(s.name, it.qty, -1); }
     });
     DATA.purchases = DATA.purchases.filter(function(p){ return p.id !== po.id; });
     saveData();
@@ -3410,8 +3501,9 @@
     // only the stock count changes; bills, expenses and profit are left alone
     t.items.forEach(function(it){
       var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
-      if(s){ s.qty = s.qty - it.qty; }
+      if(s){ s.qty = s.qty - it.qty; applyBundleStock(s.name, it.qty, -1); }
     });
+    pruneSoldVehicles(t.items.map(function(it){ return it.stockId; }));
     DATA.transfers.push(t);
     saveData();
 
@@ -3476,8 +3568,8 @@
   function deleteTransfer(t){
     // the goods come back into this branch's stock
     t.items.forEach(function(it){
-      var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
-      if(s){ s.qty = s.qty + it.qty; }
+      var s = stockRowForReturn(it);
+      if(s){ s.qty = s.qty + it.qty; applyBundleStock(s.name, it.qty, +1); }
     });
     DATA.transfers = DATA.transfers.filter(function(x){ return x.id !== t.id; });
     saveData();
@@ -4153,7 +4245,9 @@
   function billDetailHtml(bill){
     var bc = billCost(bill);
     return bill.items.map(function(it){
-        return '<div class="bill-detail-line"><span>'+(it.code? '<span class="row-code">'+escapeHtml(it.code)+'</span> · ':"")+escapeHtml(it.name)+" × "+numFmt(it.qty)+'</span><span>'+money(it.total, curOf(it))+"</span></div>";
+        return '<div class="bill-detail-line"><span>'+(it.code? '<span class="row-code">'+escapeHtml(it.code)+'</span> · ':"")+escapeHtml(it.name)+
+          (it.bundleOf ? ' <span class="bundle-tag">'+BUNDLE_TAG+'</span>' : "")+" × "+numFmt(it.qty)+'</span><span>'+
+          (it.bundleOf ? '<span class="st-doc">–</span>' : money(it.total, curOf(it)))+"</span></div>";
       }).join("")+
       (hasAmounts(billDiscounts(bill)) ? '<div class="bill-detail-line"><span>ສ່ວນລດ'+(bill.discountRate ? " "+numFmt(bill.discountRate)+"%" : "")+'</span><span>'+moneyMap(negMap(billDiscounts(bill)), " ")+'</span></div>' : '')+
       (bill.payment ? '<div class="bill-detail-line"><span>ການຊຳລະ</span><span>'+payText(bill)+'</span></div>' : '')+
@@ -4176,7 +4270,7 @@
       var s = DATA.stock.find(function(x){ return x.id === it.stockId; }) || {};
       return { stockId: it.stockId, code: it.code, name: it.name, unit: it.unit, qty: it.qty,
                price: it.price, total: it.total, cost: it.cost, cur: curOf(it),
-               brand: it.brand || s.brand, engineNo: it.engineNo, chassisNo: it.chassisNo };
+               brand: it.brand || s.brand, engineNo: it.engineNo, chassisNo: it.chassisNo, bundleOf: it.bundleOf || null };
     });
     document.getElementById("custName").value = (bill.customer && bill.customer.name) || "";
     document.getElementById("custPhone").value = (bill.customer && bill.customer.phone) || "";
@@ -4218,9 +4312,9 @@
   }
 
   function deleteBill(bill){
-    // put the sold items back into stock
+    // put the sold items back into stock (a vehicle row removed when it sold out is created again)
     bill.items.forEach(function(it){
-      var s = DATA.stock.find(function(x){ return x.id === it.stockId; });
+      var s = stockRowForReturn(it);
       if(s){ s.qty = s.qty + it.qty; }
     });
     DATA.bills = DATA.bills.filter(function(b){ return b.id !== bill.id; });
@@ -4674,9 +4768,11 @@
         syncedSettings = JSON.stringify(settingsPayload());
       }
       migrate(DATA);
+      var cleared = pruneAllSoldVehicles();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
       syncReady = true;
       renderEverything();
+      if(cleared.length){ pushCloud(); }
       setSyncNote("ຂໍ້ມູນຖືກເກັບຢູ່ເຊີບເວີ (Supabase) · ໂຫຼດຄົບແລ້ວ", "ok");
     }).catch(function(err){
       // offline: keep using the cache, and push as soon as the line is back
