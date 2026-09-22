@@ -651,7 +651,8 @@
 
     .grid-2{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:start;}
     .grid-side{display:grid;grid-template-columns:minmax(340px,400px) 1fr;column-gap:20px;align-items:start;}
-    .grid-side > :first-child{position:sticky;top:24px;}
+    .grid-side > .side-col{min-width:0;}
+    .grid-side > .side-col > .card:last-child{margin-bottom:0;}
     /* sale + purchase pages: bigger controls */
     #saleNewView input,#poNewView input,#tab-transfer input{font-size:16px;padding:12px;}
     #saleNewView #itemSearchInput,#poNewView #poSearch,#tab-transfer #trSearch{font-size:18px;padding:14px;}
@@ -1358,6 +1359,7 @@
   <!-- ===== TAB: ລາຍຈ່າຍ ===== -->
   <div class="tab-panel" id="tab-expense">
   <div class="grid-side">
+    <div class="side-col"><!-- ຟອມບັນທຶກ -->
     <div class="card">
       <p class="card-title">ຮັບເງິນອື່ນ (ນອກຈາກການຂາຍ)</p>
       <div class="form-grid">
@@ -1461,6 +1463,9 @@
       <p class="tr-note">ເງິນທີ່ມອບເຂົ້າທະນາຄານບໍ່ແມ່ນລາຍຈ່າຍ ຈຶ່ງບໍ່ຫັກກຳໄລ ແຕ່ຈະຫັກອອກຈາກເງິນສົດທີ່ຮັບມາ</p>
     </div>
 
+    </div><!-- /side-col -->
+
+    <div class="side-col"><!-- ລາຍການມື້ນີ້ -->
     <div class="card">
       <p class="card-title">ຮັບເງິນອື່ນມື້ນີ້</p>
       <div id="incomeTabList"></div>
@@ -1475,6 +1480,7 @@
       <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານມື້ນີ້</p>
       <div id="depositTabList"></div>
     </div>
+    </div><!-- /side-col -->
   </div><!-- /grid-side -->
   </div>
 
