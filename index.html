@@ -2524,6 +2524,11 @@ function bentoDashHTML(o){
   const CURS = ["LAK","THB","USD"];
   const LBL = { LAK:"ກີບ", THB:"ບາດ", USD:"USD" }, SYM = { LAK:"₭", THB:"฿", USD:"$" };
   const FMT = { LAK:n=>(n||0).toLocaleString("lo-LA"), THB:n=>(n||0).toLocaleString("th-TH"), USD:n=>(n||0).toLocaleString("en-US") };
+  if (!cashCachesReady()) {
+    /* ຍັງໂຫຼດ ຝາກທະນາຄານ/ເບີກ/ປັບຍອດ ບໍ່ຄົບ — ຢ່າໂຊວ໌ຕົວເລກ (ຈະຜິດ) ໂຫຼດແລ້ວ render ຄືນ */
+    ensureCashCaches().then(ok => { if(ok) renderAdmin(); });
+    return `<div class="bn-top"><div class="av-empty">ກຳລັງໂຫຼດຍອດເງິນ...</div></div>`;
+  }
   const bal = {}; CURS.forEach(c => bal[c] = calcCashBalance(adminRecords, c));
   let active = CURS.filter(c => bal[c].cashRecords>0 || bal[c].toBoss>0 || bal[c].withdrawn>0 || bal[c].adjust!==0);
   if (!active.length) active = ["LAK"];
@@ -2982,7 +2987,7 @@ async function fetchBankDeposits() {
     if (error) throw error;
     _bankDepositsCache = data || [];
     return _bankDepositsCache;
-  } catch { _bankDepositsCache = _bankDepositsCache || []; return _bankDepositsCache; }
+  } catch { return _bankDepositsCache; }   // null = ຍັງໂຫຼດບໍ່ໄດ້ (ຢ່າຖືວ່າຫວ່າງ)
 }
 
 function getBankDeposits() {
@@ -2994,7 +2999,8 @@ async function addBankDeposit(dep) {
   try {
     const { error } = await getSupa().from("bank_deposits").insert([dep]);
     if (error) throw error;
-    _bankDepositsCache = null; // invalidate cache
+    // ບໍ່ລ້າງ cache ໃນນີ້! ຜູ້ເອີ້ນໃສ່ແຖວນີ້ເຂົ້າ cache ໄວ້ແລ້ວ (optimistic).
+    // ຖ້າຕັ້ງເປັນ null ຍອດເງິນສົດຈະຄິດຄືນໂດຍບໍ່ມີລາຍການຝາກ/ປັບຍອດເລີຍ ຈົນຮອບ poll ຕໍ່ໄປ (30 ວິນາທີ)
   } catch(e) { alert("ບັນທຶກບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
 
@@ -3024,7 +3030,7 @@ async function fetchWithdrawals() {
     if (error) throw error;
     _withdrawalsCache = data || [];
     return _withdrawalsCache;
-  } catch { _withdrawalsCache = _withdrawalsCache || []; return _withdrawalsCache; }
+  } catch { return _withdrawalsCache; }
 }
 
 function getWithdrawals() { return _withdrawalsCache || []; }
@@ -3033,7 +3039,7 @@ async function addWithdrawal(w) {
   try {
     const { error } = await getSupa().from("withdrawals").insert([w]);
     if (error) throw error;
-    _withdrawalsCache = null; // invalidate cache
+    // ບໍ່ລ້າງ cache (ເບິ່ງຄຳອະທິບາຍໃນ addBankDeposit)
   } catch(e) { alert("ບັນທຶກບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
 
@@ -3056,16 +3062,27 @@ async function fetchAdjustments() {
     if (error) throw error;
     _adjustmentsCache = data || [];
     return _adjustmentsCache;
-  } catch { _adjustmentsCache = _adjustmentsCache || []; return _adjustmentsCache; }
+  } catch { return _adjustmentsCache; }
 }
 
 function getAdjustments() { return _adjustmentsCache || []; }
+
+// ຂໍ້ມູນ 3 ຢ່າງ (ຝາກທະນາຄານ / ເບີກ / ປັບຍອດ) ຕ້ອງໂຫຼດຄົບກ່ອນ ຈຶ່ງຄິດຍອດເງິນສົດໄດ້ຖືກ
+// ຖ້າຂາດອັນໃດ ຍອດຈະຜິດແບບບໍ່ຮູ້ຕົວ (ເຊັ່ນ ຂາດ "ຍອດຍົກມາ" ແລ້ວເງິນສົດຕິດລົບ)
+function cashCachesReady() {
+  return !!(_bankDepositsCache && _withdrawalsCache && _adjustmentsCache);
+}
+async function ensureCashCaches() {
+  if (cashCachesReady()) return true;
+  await Promise.all([fetchBankDeposits(), fetchWithdrawals(), fetchAdjustments()]);
+  return cashCachesReady();
+}
 
 async function addAdjustment(a) {
   try {
     const { error } = await getSupa().from("cash_adjustments").insert([a]);
     if (error) throw error;
-    _adjustmentsCache = null;
+    // ບໍ່ລ້າງ cache — ຖ້າລ້າງ ຍອດຍົກມາ (carry) ຈະຫາຍ ແລະ ເງິນສົດຈະຕິດລົບຊົ່ວຄາວ
   } catch(e) { alert("ບັນທຶກບໍ່ສຳເລັດ: " + e.message); throw e; }
 }
 
@@ -3096,6 +3113,11 @@ function calcCashBalance(records, currency) {
 }
 
 function bankCashSummaryHTML(records) {
+  if (!cashCachesReady()) {
+    /* ຢ່າໂຊວ໌ຕົວເລກຕອນຂໍ້ມູນຍັງບໍ່ຄົບ — ຍອດຈະຜິດ (ຂາດຝາກທະນາຄານ/ເບີກ/ຍອດຍົກມາ) */
+    ensureCashCaches().then(ok => { if(ok) renderAdmin(); });
+    return `<div class="av-empty">ກຳລັງໂຫຼດຍອດເງິນສົດ...</div>`;
+  }
   const bal = { LAK:calcCashBalance(records,"LAK"), THB:calcCashBalance(records,"THB"), USD:calcCashBalance(records,"USD") };
   const fmtN = { LAK:n=>(n||0).toLocaleString("lo-LA"), THB:n=>(n||0).toLocaleString("th-TH"), USD:n=>(n||0).toLocaleString("en-US") };
   const label = { LAK:"ກີບ", THB:"ບາດ", USD:"USD" };
@@ -3176,7 +3198,8 @@ function openBankHistoryModal() {
   document.body.appendChild(overlay);
 }
 
-function openBankModal() {
+async function openBankModal() {
+  if (!await ensureCashCaches()) { alert("ໂຫຼດຂໍ້ມູນຍອດເງິນສົດບໍ່ສຳເລັດ — ກວດອິນເຕີເນັດແລ້ວລອງໃໝ່"); return; }
   const lakBal = calcCashBalance(adminRecords, "LAK");
   const thbBal = calcCashBalance(adminRecords, "THB");
   const usdBal = calcCashBalance(adminRecords, "USD");
@@ -3327,7 +3350,8 @@ async function deleteBankDeposit(id, btn) {
 }
 
 // ── WITHDRAW / ເບີກເງິນ MODAL ─────────────────────────────────────────
-function openWithdrawModal() {
+async function openWithdrawModal() {
+  if (!await ensureCashCaches()) { alert("ໂຫຼດຂໍ້ມູນຍອດເງິນສົດບໍ່ສຳເລັດ — ກວດອິນເຕີເນັດແລ້ວລອງໃໝ່"); return; }
   const lakBal = calcCashBalance(adminRecords, "LAK");
   const thbBal = calcCashBalance(adminRecords, "THB");
   const usdBal = calcCashBalance(adminRecords, "USD");
@@ -3503,7 +3527,8 @@ async function deleteWithdrawal(id, btn) {
 // ── ADJUST / ປັບຍອດເງິນສົດຄ້າງ MODAL ──────────────────────────────────
 // The boss types the REAL cash they physically have; the system records the
 // difference from the computed figure so the two match. Nothing is deleted.
-function openAdjustModal() {
+async function openAdjustModal() {
+  if (!await ensureCashCaches()) { alert("ໂຫຼດຂໍ້ມູນຍອດເງິນສົດບໍ່ສຳເລັດ — ກວດອິນເຕີເນັດແລ້ວລອງໃໝ່"); return; }
   const lakBal = calcCashBalance(adminRecords, "LAK");
   const thbBal = calcCashBalance(adminRecords, "THB");
   const usdBal = calcCashBalance(adminRecords, "USD");
