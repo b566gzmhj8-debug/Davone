@@ -197,6 +197,9 @@
     color:var(--ink-soft);border-radius:var(--radius-chip);cursor:pointer;font-family:inherit;
   }
   .seg button.active{background:var(--brown);color:#FBF7EF;border-color:var(--brown);}
+  .seg button{display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1.35;}
+  .seg button > svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.85;}
+  .seg button.active > svg{opacity:1;}
 
   .bill-row{cursor:pointer;}
   .bill-detail{padding:2px 0 10px 2px;}
@@ -862,8 +865,8 @@
   #tab-expense .form-grid > div.amt-field .amt-cur-row input{font-size:25px;font-weight:600;text-align:right;border:none;background:none;padding:2px 4px;font-variant-numeric:tabular-nums;}
   #tab-expense .form-grid > div.amt-field .amt-cur-row input:focus{outline:none;background:rgba(255,255,255,.7);}
   #tab-expense .form-grid > div.amt-field .amt-cur-row select{border:1px solid var(--rule);background:#fff;border-radius:0;font-size:14px;}
-  #tab-expense .btn-brown{border-radius:0;background:linear-gradient(#b98c44,#8a6224);border:1px solid var(--brown-deep);letter-spacing:.06em;font-weight:700;margin-top:14px;}
-  #tab-expense .btn-brown:hover{background:linear-gradient(#a87e3b,#795420);}
+  #tab-expense .btn-brown{border-radius:0;background:var(--hub-grad);color:#1a1405;border:1px solid #c19a4e;letter-spacing:.05em;font-weight:700;font-size:16px;padding:14px;margin-top:14px;box-shadow:0 6px 16px rgba(165,122,54,.28);}
+  #tab-expense .btn-brown:hover{filter:brightness(1.05);}
   #tab-expense .tr-note{font-size:11.5px;color:var(--ink-faint);line-height:1.8;margin:12px 0 0;}
   #tab-expense .doc-signs{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:16px -16px -6px;padding:18px 16px 6px;border-top:1px solid var(--rule);}
   #tab-expense .doc-signs div{text-align:center;font-size:11.5px;color:var(--ink-soft);}
@@ -1076,8 +1079,8 @@
   <!-- ===== TAB: ຂາຍ (POS) ===== -->
   <div class="tab-panel" id="tab-sale">
     <div class="seg" id="saleSeg">
-      <button data-view="new" class="active">ຂາຍສິນຄ້າ</button>
-      <button data-view="history">ປະຫວັດການຂາຍ</button>
+      <button data-view="new" class="active"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M2 3h2l2.6 12.6a2 2 0 0 0 2 1.6h8a2 2 0 0 0 2-1.6L22 7H6"/></svg>ຂາຍສິນຄ້າ</button>
+      <button data-view="history"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>ປະຫວັດການຂາຍ</button>
     </div>
 
     <div id="saleNewView">
@@ -1205,8 +1208,8 @@
   <!-- ===== TAB: ຊື້ເຂົ້າ ===== -->
   <div class="tab-panel" id="tab-purchase">
     <div class="seg" id="poSeg">
-      <button data-view="new" class="active">ຊື້ສິນຄ້າເຂົ້າ</button>
-      <button data-view="history">ປະຫວັດການຊື້ເຂົ້າ</button>
+      <button data-view="new" class="active"><svg viewBox="0 0 24 24"><path d="M12 3v10"/><path d="M8 11l4 4 4-4"/><path d="M4 17v3h16v-3"/></svg>ຊື້ສິນຄ້າເຂົ້າ</button>
+      <button data-view="history"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>ປະຫວັດການຊື້ເຂົ້າ</button>
     </div>
 
     <div id="poNewView">
@@ -1316,9 +1319,9 @@
   <!-- ===== TAB: ໂອນສາຂາ ===== -->
   <div class="tab-panel" id="tab-transfer">
     <div class="seg" id="trSeg">
-      <button data-view="new" class="active">ສ້າງໃບໂອນ</button>
-      <button data-view="history">ປະຫວັດການໂອນ</button>
-      <button data-view="inbox">ຮັບເຂົ້າຈາກສາຂາ <span class="inbox-dot" id="inboxCount"></span></button>
+      <button data-view="new" class="active"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>ສ້າງໃບໂອນ</button>
+      <button data-view="history"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>ປະຫວັດການໂອນ</button>
+      <button data-view="inbox"><svg viewBox="0 0 24 24"><path d="M3 12h5l1.5 3h5L16 12h5"/><path d="M4.5 6h15L21 12v6H3v-6z"/></svg>ຮັບເຂົ້າຈາກສາຂາ <span class="inbox-dot" id="inboxCount"></span></button>
     </div>
 
     <div id="trNewView">
@@ -1418,9 +1421,9 @@
     </div>
     <div class="doc-rule"></div>
     <div class="seg" id="expSeg">
-      <button data-view="expense" class="active">ລາຍຈ່າຍ</button>
-      <button data-view="income">ຮັບເງິນອື່ນ</button>
-      <button data-view="deposit">ມອບທະນາຄານ</button>
+      <button data-view="expense" class="active"><svg viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></svg>ລາຍຈ່າຍ</button>
+      <button data-view="income"><svg viewBox="0 0 24 24"><path d="M17 7 7 17"/><path d="M15 17H7V9"/></svg>ຮັບເງິນອື່ນ</button>
+      <button data-view="deposit"><svg viewBox="0 0 24 24"><path d="M3 10l9-5 9 5"/><path d="M5 10v8M19 10v8M9 10v8M15 10v8"/><path d="M3 20h18"/></svg>ມອບທະນາຄານ</button>
     </div>
 
     <div id="expExpenseView">
