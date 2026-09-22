@@ -1359,6 +1359,51 @@
   <div class="tab-panel" id="tab-expense">
   <div class="grid-side">
     <div class="card">
+      <p class="card-title">ຮັບເງິນອື່ນ (ນອກຈາກການຂາຍ)</p>
+      <div class="form-grid">
+        <div>
+          <label for="incDesc">ລາຍການ</label>
+          <input type="text" id="incDesc" list="incDescList" placeholder="ເຊັ່ນ ຊຳລະໜີ້ຄ່າລົດ, ຮັບເງິນມັດຈຳ" autocomplete="off">
+          <datalist id="incDescList">
+            <option value="ຊຳລະໜີ້ຄ່າລົດ"></option>
+            <option value="ຊຳລະໜີ້ຄ່າອາໄຫຼ່"></option>
+            <option value="ຮັບເງິນມັດຈຳ"></option>
+            <option value="ຄ່າສ້ອມແປງ"></option>
+          </datalist>
+        </div>
+        <div>
+          <label for="incPayer">ຜູ້ຈ່າຍເງິນ / ລູກຄ້າ</label>
+          <input type="text" id="incPayer" placeholder="ຊື່ລູກຄ້າທີ່ເອົາເງິນມາຈ່າຍ">
+        </div>
+        <div>
+          <label for="incAmount">ຈຳນວນເງິນທີ່ຮັບ</label>
+          <div class="amt-cur-row">
+            <input type="text" inputmode="decimal" id="incAmount" placeholder="0">
+            <select id="incCur" aria-label="ສະກຸນເງິນ">
+              <option value="LAK" selected>₭ ກີບ</option>
+              <option value="THB">฿ ບາດ</option>
+              <option value="USD">$ ໂດລາ</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="incMethod">ຮັບເປັນ</label>
+          <select id="incMethod">
+            <option value="cash" selected>ເງິນສົດ (ຢູ່ໃນມື)</option>
+            <option value="transfer">ເງິນໂອນ (ເຂົ້າບັນຊີ)</option>
+          </select>
+        </div>
+        <div>
+          <label for="incNote">ໝາຍເຫດ</label>
+          <input type="text" id="incNote" placeholder="ບໍ່ບັງຄັບ ເຊັ່ນ ເລກບິນເກົ່າ / ຄັນລົດ">
+        </div>
+        <button class="btn btn-brown" id="btnAddIncome">ບັນທຶກການຮັບເງິນ</button>
+      </div>
+      <p class="tr-note">ໃຊ້ສຳລັບເງິນທີ່ຮັບມາແຕ່ບໍ່ແມ່ນການຂາຍໃນລະບົບ ເຊັ່ນ ລູກຄ້າເອົາເງິນມາຊຳລະໜີ້ຄ່າລົດ —
+        ຮັບສົດ ຈະເພີ່ມເຂົ້າເງິນສົດໃນມື, ຮັບໂອນ ຈະໄປຢູ່ຖັນເງິນໂອນ ແລະ ບໍ່ນັບເປັນກຳໄລ</p>
+    </div>
+
+    <div class="card">
       <p class="card-title">ບັນທຶກລາຍຈ່າຍ</p>
       <div class="form-grid">
         <div>
@@ -1414,6 +1459,11 @@
         <button class="btn btn-brown" id="btnAddDeposit">ບັນທຶກການມອບເງິນ</button>
       </div>
       <p class="tr-note">ເງິນທີ່ມອບເຂົ້າທະນາຄານບໍ່ແມ່ນລາຍຈ່າຍ ຈຶ່ງບໍ່ຫັກກຳໄລ ແຕ່ຈະຫັກອອກຈາກເງິນສົດທີ່ຮັບມາ</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title">ຮັບເງິນອື່ນມື້ນີ້</p>
+      <div id="incomeTabList"></div>
     </div>
 
     <div class="card">
@@ -1749,6 +1799,8 @@
     if(!d.deposits) d.deposits = [];
     if(!d.opening) d.opening = [];     // cash already on hand when the branch started using the system
     if(d.depositCounter == null) d.depositCounter = 0;
+    if(!d.incomes) d.incomes = [];     // ເງິນທີ່ຮັບມາແຕ່ບໍ່ແມ່ນການຂາຍ (ຊຳລະໜີ້ ຄ່າລົດ ຄ່າສ້ອມແປງ ...)
+    if(d.incomeCounter == null) d.incomeCounter = 0;
     if(!d.rates) d.rates = { USD: null, THB: null, date: null };   // kip per dollar / per baht
     return d;
   }
@@ -4022,13 +4074,13 @@
     var f = cashFlow(from, to);
     var nz = function(v){ return Math.abs(v || 0) > 0.0001; };
     var curs = CURS.filter(function(c){
-      return nz(f.opening[c]) || nz(f.cash[c]) || nz(f.unknown[c]) || nz(f.dep[c]) || nz(f.exp[c]) || nz(f.transfer[c]);
+      return nz(f.opening[c]) || nz(f.cash[c]) || nz(f.unknown[c]) || nz(f.other[c]) || nz(f.dep[c]) || nz(f.exp[c]) || nz(f.transfer[c]);
     });
     var cell = function(v, c, neg){ return nz(v) ? (neg ? "-" : "")+money(v, c) : "-"; };
     var recRows = curs.map(function(c){
       return "<tr><td>"+CUR[c].sym+" "+CUR[c].name+"</td>"+
         '<td class="num">'+cell(f.opening[c], c)+"</td>"+
-        '<td class="num">'+cell((f.cash[c] || 0) + (f.unknown[c] || 0), c)+"</td>"+
+        '<td class="num">'+cell(((f.cash[c] || 0) + (f.unknown[c] || 0) + (f.other[c] || 0)), c)+"</td>"+
         '<td class="num">'+cell(f.dep[c], c, true)+"</td>"+
         '<td class="num">'+cell(f.exp[c], c, true)+"</td>"+
         '<td class="num"><b>'+money(f.closing[c] || 0, c)+"</b></td>"+
@@ -4180,7 +4232,7 @@
   // then cash sales come in and bank deposits and expenses go out. Transfers are kept apart —
   // that money is already in the boss's account, so it is never part of the cash and cannot be drawn.
   function cashFlow(from, to){
-    var f = { opening:{}, cash:{}, transfer:{}, unknown:{}, dep:{}, exp:{}, closing:{} };
+    var f = { opening:{}, cash:{}, transfer:{}, unknown:{}, other:{}, dep:{}, exp:{}, closing:{} };
     // money the staff already held before the system was used: it is carried into every period from its date on
     (DATA.opening || []).forEach(function(o){
       if(o.date && o.date > to){ return; }
@@ -4198,6 +4250,14 @@
         mergeInto(f.unknown, r.unknown);
       }
     });
+    (DATA.incomes || []).forEach(function(e){
+      if(e.date > to){ return; }
+      if(e.method === "transfer"){
+        if(e.date >= from){ addTo(f.transfer, curOf(e), e.amount); }
+        return;   // ເງິນໂອນເຂົ້າບັນຊີແລ້ວ ບໍ່ແມ່ນເງິນສົດໃນມື
+      }
+      addTo(e.date < from ? f.opening : f.other, curOf(e), e.amount);
+    });
     DATA.deposits.forEach(function(d){
       if(d.date > to){ return; }
       addTo(d.date < from ? f.opening : f.dep, curOf(d), d.date < from ? -d.amount : d.amount);
@@ -4207,7 +4267,7 @@
       addTo(e.date < from ? f.opening : f.exp, curOf(e), e.date < from ? -e.amount : e.amount);
     });
     CURS.forEach(function(c){
-      var v = (f.opening[c] || 0) + (f.cash[c] || 0) + (f.unknown[c] || 0) - (f.dep[c] || 0) - (f.exp[c] || 0);
+      var v = (f.opening[c] || 0) + (f.cash[c] || 0) + (f.unknown[c] || 0) + (f.other[c] || 0) - (f.dep[c] || 0) - (f.exp[c] || 0);
       if(Math.abs(v) > 0.0001){ f.closing[c] = v; }
     });
     return f;
@@ -4216,18 +4276,19 @@
   function cashFlowHtml(f, note){
     var nz = function(v){ return Math.abs(v || 0) > 0.0001; };
     var curs = CURS.filter(function(c){
-      return nz(f.opening[c]) || nz(f.cash[c]) || nz(f.unknown[c]) || nz(f.dep[c]) || nz(f.exp[c]) || nz(f.transfer[c]);
+      return nz(f.opening[c]) || nz(f.cash[c]) || nz(f.unknown[c]) || nz(f.other[c]) || nz(f.dep[c]) || nz(f.exp[c]) || nz(f.transfer[c]);
     });
     if(!curs.length){ return ""; }
     var cell = function(v, c, neg){ return nz(v) ? (neg ? "-" : "")+money(v, c) : '<span class="st-doc">–</span>'; };
     return '<p class="cash-head">ເງິນສົດໃນມື'+(note ? '<span>'+note+'</span>' : "")+'</p>'+
       '<table class="cash-tab"><thead><tr><th>ສະກຸນເງິນ</th><th class="r">ຍົກມາ</th><th class="r">ຮັບສົດ</th>'+
-      '<th class="r">ມອບທະນາຄານ</th><th class="r">ລາຍຈ່າຍ</th><th class="r">ຄົງເຫຼືອ</th>'+
+      '<th class="r">ຮັບອື່ນ</th><th class="r">ມອບທະນາຄານ</th><th class="r">ລາຍຈ່າຍ</th><th class="r">ຄົງເຫຼືອ</th>'+
       '<th class="r tr-col">ເງິນໂອນ</th></tr></thead><tbody>'+
       curs.map(function(c){
         return '<tr><td>'+CUR[c].sym+' '+CUR[c].name+'</td>'+
           '<td class="r">'+cell(f.opening[c], c)+'</td>'+
           '<td class="r">'+cell((f.cash[c] || 0) + (f.unknown[c] || 0), c)+'</td>'+
+          '<td class="r">'+cell(f.other[c], c)+'</td>'+
           '<td class="r">'+cell(f.dep[c], c, true)+'</td>'+
           '<td class="r exp-col">'+cell(f.exp[c], c, true)+'</td>'+
           '<td class="r"><b>'+money(f.closing[c] || 0, c)+'</b></td>'+
@@ -4383,6 +4444,83 @@
       }
       el.appendChild(row);
     });
+  }
+
+  // ---------- ຮັບເງິນອື່ນ (ບໍ່ແມ່ນການຂາຍ) ----------
+  // ເງິນທີ່ຮັບມາຈາກລູກຄ້າແຕ່ບໍ່ໄດ້ອອກບິນຂາຍ ເຊັ່ນ ມາຊຳລະໜີ້ຄ່າລົດທີ່ຊື້ໄປແລ້ວ
+  // ຮັບສົດ → ເພີ່ມເງິນສົດໃນມື · ຮັບໂອນ → ເຂົ້າຖັນເງິນໂອນ · ບໍ່ນັບເປັນຍອດຂາຍ ແລະ ບໍ່ນັບເປັນກຳໄລ
+  document.getElementById("btnAddIncome").addEventListener("click", function(){
+    var desc = document.getElementById("incDesc").value.trim();
+    var amount = parseNum(document.getElementById("incAmount").value);
+    if(isNaN(amount)) amount = 0;
+    if(!desc){ alert("ກະລຸນາໃສ່ລາຍການ (ເງິນນີ້ຮັບມາຈາກຫຍັງ)"); return; }
+    if(amount <= 0){ alert("ຈຳນວນເງິນຕ້ອງຫຼາຍກວ່າ 0"); return; }
+    DATA.incomeCounter = (DATA.incomeCounter || 0) + 1;
+    DATA.incomes.push({ id: uid(), incNo: "RC-" + String(DATA.incomeCounter).padStart(5,"0"),
+                        date: todayStr(), time: nowTime(), desc: desc, amount: amount,
+                        cur: document.getElementById("incCur").value,
+                        method: document.getElementById("incMethod").value,
+                        payer: document.getElementById("incPayer").value.trim(),
+                        note: document.getElementById("incNote").value.trim() });
+    saveData();
+    document.getElementById("incDesc").value = "";
+    document.getElementById("incPayer").value = "";
+    document.getElementById("incAmount").value = "";
+    document.getElementById("incNote").value = "";
+    renderIncomeTab();
+    renderSummary();
+  });
+
+  function renderIncomeTab(){ renderIncomeListInto("incomeTabList", todayStr(), true); }
+
+  function renderIncomeListInto(elId, dateStr, deletable){
+    var el = document.getElementById(elId);
+    if(!el) return;
+    var list = (DATA.incomes || []).filter(function(e){ return e.date === dateStr; })
+                            .sort(function(a,b){ return b.time.localeCompare(a.time); });
+    el.innerHTML = "";
+    if(list.length === 0){
+      el.innerHTML = '<p class="empty-note">ຍັງບໍ່ໄດ້ຮັບເງິນອື່ນໃນມື້ນີ້</p>';
+      return;
+    }
+    list.forEach(function(e){
+      var row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<div class="row-main"><p class="row-name">'+escapeHtml(e.desc)+
+            '<span class="st-chip'+(e.method === "transfer" ? " tr" : "")+'">'+(e.method === "transfer" ? "ໂອນ" : "ສົດ")+'</span></p>'+
+          '<p class="row-meta">'+e.time+(e.payer ? " · ຈາກ "+escapeHtml(e.payer) : "")+(e.note ? " · "+escapeHtml(e.note) : "")+'</p></div>'+
+        '<span class="row-val pos">+'+money(e.amount, curOf(e))+'</span>'+
+        '<button class="row-print" title="ພິມໃບຮັບເງິນ" aria-label="ພິມໃບຮັບເງິນ"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></svg></button>'+
+        (deletable ? '<button class="row-del" data-id="'+e.id+'" title="ລຶບ">&times;</button>' : '');
+      row.querySelector(".row-print").addEventListener("click", function(){ printIncome(e); });
+      if(deletable){
+        row.querySelector(".row-del").addEventListener("click", function(){
+          confirmDelete("ລຶບການຮັບເງິນນີ້?", e.desc+" · "+money(e.amount, curOf(e)), function(){
+            DATA.incomes = DATA.incomes.filter(function(x){ return x.id !== e.id; });
+            saveData();
+            renderIncomeTab();
+            renderSummary();
+          });
+        });
+      }
+      el.appendChild(row);
+    });
+  }
+
+  function printIncome(e){
+    var blank = '<span style="display:inline-block;min-width:200px;border-bottom:1px dotted #9A927F;"></span>';
+    printDoc("ໃບຮັບເງິນ "+(e.incNo || fmtDMY(e.date)),
+      "<h1>ໃບຮັບເງິນ</h1>"+
+      '<p class="sub">'+(e.incNo ? "ເລກທີ "+e.incNo+" · " : "")+fmtDMY(e.date)+" "+e.time+"</p>"+
+      '<div class="cust">'+
+        '<div class="meta-row"><b>ລາຍການ:</b>'+escapeHtml(e.desc)+"</div>"+
+        '<div class="meta-row"><b>ຮັບຈາກ:</b>'+(e.payer ? escapeHtml(e.payer) : blank)+"</div>"+
+        '<div class="meta-row"><b>ຮັບເປັນ:</b>'+(e.method === "transfer" ? "ເງິນໂອນ" : "ເງິນສົດ")+"</div>"+
+        (e.note ? '<div class="meta-row"><b>ໝາຍເຫດ:</b>'+escapeHtml(e.note)+"</div>" : "")+
+      "</div>"+
+      '<div class="grand"><span>ຈຳນວນເງິນທີ່ຮັບ</span><span>'+money(e.amount, curOf(e))+"</span></div>"+
+      signsHtml("ຜູ້ຈ່າຍເງິນ", "", "ຜູ້ຮັບເງິນ", "("+BRANCH_NAME+")"));
   }
 
   // ---------- BANK DEPOSITS ----------
@@ -4722,7 +4860,7 @@
   // ---------- CLOUD SYNC ----------
   // Supabase holds the real books; the browser copy is only a cache so the shop keeps working when the line drops.
   // Every record is its own row, so two devices editing different bills never overwrite each other.
-  var SYNC_KINDS = ["stock","bills","purchases","expenses","deposits","transfers","opening"];
+  var SYNC_KINDS = ["stock","bills","purchases","expenses","deposits","transfers","opening","incomes"];
   var SYNC_BRANCH = "hun";
   var synced = {};            // kind -> id -> the JSON we last agreed on with the server
   var syncedSettings = null;
@@ -4731,7 +4869,7 @@
   function settingsPayload(){
     return { billCounter: DATA.billCounter, purchaseCounter: DATA.purchaseCounter,
              transferCounter: DATA.transferCounter, expenseCounter: DATA.expenseCounter,
-             depositCounter: DATA.depositCounter, rates: DATA.rates };
+             depositCounter: DATA.depositCounter, incomeCounter: DATA.incomeCounter, rates: DATA.rates };
   }
   // the sheet stays quiet while the sync is healthy; it only speaks up when something needs attention
   function setSyncNote(text, cls){
@@ -4847,13 +4985,13 @@
   function renderEverything(){
     renderRates(); renderStockLists(); renderPoList(); renderPoHistory();
     renderTrList(); renderTrHistory(); refreshBranchList(); renderCart();
-    renderExpenseTab(); renderDepositTab(); refreshBankList(); renderSummary();
+    renderExpenseTab(); renderIncomeTab(); renderDepositTab(); refreshBankList(); renderSummary();
     renderHistory && renderHistory();
   }
   window.addEventListener("online", function(){ syncReady ? pushCloud() : pullCloud(); });
 
   // ---------- init ----------
-  ["newStockCost","newStockSell","newStockQty","newStockMin","saleQty","salePrice","expAmount","poQty","poCost","payLAK","payTHB","payUSD","rateUSD","rateTHB","dayRateUSD","dayRateTHB","cartDiscount","priceInput","priceCostInput","trQty","depAmount"]
+  ["newStockCost","newStockSell","newStockQty","newStockMin","saleQty","salePrice","expAmount","incAmount","poQty","poCost","payLAK","payTHB","payUSD","rateUSD","rateTHB","dayRateUSD","dayRateTHB","cartDiscount","priceInput","priceCostInput","trQty","depAmount"]
     .forEach(function(id){ attachNumberFormat(document.getElementById(id)); });
 
   applyStockCategory();
