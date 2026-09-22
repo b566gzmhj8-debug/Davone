@@ -651,8 +651,7 @@
 
     .grid-2{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:start;}
     .grid-side{display:grid;grid-template-columns:minmax(340px,400px) 1fr;column-gap:20px;align-items:start;}
-    .grid-side > .side-col{min-width:0;}
-    .grid-side > .side-col > .card:last-child{margin-bottom:0;}
+    .grid-side > *{min-width:0;}
     /* sale + purchase pages: bigger controls */
     #saleNewView input,#poNewView input,#tab-transfer input{font-size:16px;padding:12px;}
     #saleNewView #itemSearchInput,#poNewView #poSearch,#tab-transfer #trSearch{font-size:18px;padding:14px;}
@@ -1358,130 +1357,141 @@
 
   <!-- ===== TAB: ລາຍຈ່າຍ ===== -->
   <div class="tab-panel" id="tab-expense">
-  <div class="grid-side">
-    <div class="side-col"><!-- ຟອມບັນທຶກ -->
-    <div class="card">
-      <p class="card-title">ຮັບເງິນອື່ນ (ນອກຈາກການຂາຍ)</p>
-      <div class="form-grid">
-        <div>
-          <label for="incDesc">ລາຍການ</label>
-          <input type="text" id="incDesc" list="incDescList" placeholder="ເຊັ່ນ ຊຳລະໜີ້ຄ່າລົດ, ຮັບເງິນມັດຈຳ" autocomplete="off">
-          <datalist id="incDescList">
-            <option value="ຊຳລະໜີ້ຄ່າລົດ"></option>
-            <option value="ຊຳລະໜີ້ຄ່າອາໄຫຼ່"></option>
-            <option value="ຮັບເງິນມັດຈຳ"></option>
-            <option value="ຄ່າສ້ອມແປງ"></option>
-          </datalist>
-        </div>
-        <div>
-          <label for="incPayer">ຜູ້ຈ່າຍເງິນ / ລູກຄ້າ</label>
-          <input type="text" id="incPayer" placeholder="ຊື່ລູກຄ້າທີ່ເອົາເງິນມາຈ່າຍ">
-        </div>
-        <div>
-          <label for="incAmount">ຈຳນວນເງິນທີ່ຮັບ</label>
-          <div class="amt-cur-row">
-            <input type="text" inputmode="decimal" id="incAmount" placeholder="0">
-            <select id="incCur" aria-label="ສະກຸນເງິນ">
-              <option value="LAK" selected>₭ ກີບ</option>
-              <option value="THB">฿ ບາດ</option>
-              <option value="USD">$ ໂດລາ</option>
-            </select>
+    <div class="seg" id="expSeg">
+      <button data-view="expense" class="active">ລາຍຈ່າຍ</button>
+      <button data-view="income">ຮັບເງິນອື່ນ</button>
+      <button data-view="deposit">ມອບທະນາຄານ</button>
+    </div>
+
+    <div id="expExpenseView">
+      <div class="grid-side">
+        <div class="card">
+          <p class="card-title">ບັນທຶກລາຍຈ່າຍ</p>
+          <div class="form-grid">
+            <div>
+              <label>ລາຍການ</label>
+              <input type="text" id="expDesc" placeholder="ເຊັ່ນ ຄ່ານ້ຳມັນລົດສົ່ງເຄື່ອງ, ຄ່າແຮງພະນັກງານ">
+            </div>
+            <div>
+              <label for="expPayee">ຜູ້ຮັບເງິນ</label>
+              <input type="text" id="expPayee" placeholder="ຊື່ຜູ້ຮັບເງິນ (ບໍ່ບັງຄັບ)">
+            </div>
+            <div>
+              <label for="expAmount">ຈຳນວນເງິນ</label>
+              <div class="amt-cur-row">
+                <input type="text" inputmode="decimal" id="expAmount" placeholder="0">
+                <select id="expCur" aria-label="ສະກຸນເງິນ">
+                  <option value="LAK" selected>₭ ກີບ</option>
+                  <option value="THB">฿ ບາດ</option>
+                  <option value="USD">$ ໂດລາ</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-brown" id="btnAddExpense">ບັນທຶກລາຍຈ່າຍ</button>
           </div>
         </div>
-        <div>
-          <label for="incMethod">ຮັບເປັນ</label>
-          <select id="incMethod">
-            <option value="cash" selected>ເງິນສົດ (ຢູ່ໃນມື)</option>
-            <option value="transfer">ເງິນໂອນ (ເຂົ້າບັນຊີ)</option>
-          </select>
-        </div>
-        <div>
-          <label for="incNote">ໝາຍເຫດ</label>
-          <input type="text" id="incNote" placeholder="ບໍ່ບັງຄັບ ເຊັ່ນ ເລກບິນເກົ່າ / ຄັນລົດ">
-        </div>
-        <button class="btn btn-brown" id="btnAddIncome">ບັນທຶກການຮັບເງິນ</button>
-      </div>
-      <p class="tr-note">ໃຊ້ສຳລັບເງິນທີ່ຮັບມາແຕ່ບໍ່ແມ່ນການຂາຍໃນລະບົບ ເຊັ່ນ ລູກຄ້າເອົາເງິນມາຊຳລະໜີ້ຄ່າລົດ —
-        ຮັບສົດ ຈະເພີ່ມເຂົ້າເງິນສົດໃນມື, ຮັບໂອນ ຈະໄປຢູ່ຖັນເງິນໂອນ ແລະ ບໍ່ນັບເປັນກຳໄລ</p>
-    </div>
 
-    <div class="card">
-      <p class="card-title">ບັນທຶກລາຍຈ່າຍ</p>
-      <div class="form-grid">
-        <div>
-          <label>ລາຍການ</label>
-          <input type="text" id="expDesc" placeholder="ເຊັ່ນ ຄ່ານ້ຳມັນລົດສົ່ງເຄື່ອງ, ຄ່າແຮງພະນັກງານ">
+        <div class="card">
+          <p class="card-title">ລາຍຈ່າຍມື້ນີ້</p>
+          <div id="expenseTabList"></div>
         </div>
-        <div>
-          <label for="expPayee">ຜູ້ຮັບເງິນ</label>
-          <input type="text" id="expPayee" placeholder="ຊື່ຜູ້ຮັບເງິນ (ບໍ່ບັງຄັບ)">
-        </div>
-        <div>
-          <label for="expAmount">ຈຳນວນເງິນ</label>
-          <div class="amt-cur-row">
-            <input type="text" inputmode="decimal" id="expAmount" placeholder="0">
-            <select id="expCur" aria-label="ສະກຸນເງິນ">
-              <option value="LAK" selected>₭ ກີບ</option>
-              <option value="THB">฿ ບາດ</option>
-              <option value="USD">$ ໂດລາ</option>
-            </select>
+      </div>
+    </div><!-- /expExpenseView -->
+
+    <div id="expIncomeView" style="display:none;">
+      <div class="grid-side">
+        <div class="card">
+          <p class="card-title">ຮັບເງິນອື່ນ (ນອກຈາກການຂາຍ)</p>
+          <div class="form-grid">
+            <div>
+              <label for="incDesc">ລາຍການ</label>
+              <input type="text" id="incDesc" list="incDescList" placeholder="ເຊັ່ນ ຊຳລະໜີ້ຄ່າລົດ, ຮັບເງິນມັດຈຳ" autocomplete="off">
+              <datalist id="incDescList">
+                <option value="ຊຳລະໜີ້ຄ່າລົດ"></option>
+                <option value="ຊຳລະໜີ້ຄ່າອາໄຫຼ່"></option>
+                <option value="ຮັບເງິນມັດຈຳ"></option>
+                <option value="ຄ່າສ້ອມແປງ"></option>
+              </datalist>
+            </div>
+            <div>
+              <label for="incPayer">ຜູ້ຈ່າຍເງິນ / ລູກຄ້າ</label>
+              <input type="text" id="incPayer" placeholder="ຊື່ລູກຄ້າທີ່ເອົາເງິນມາຈ່າຍ">
+            </div>
+            <div>
+              <label for="incAmount">ຈຳນວນເງິນທີ່ຮັບ</label>
+              <div class="amt-cur-row">
+                <input type="text" inputmode="decimal" id="incAmount" placeholder="0">
+                <select id="incCur" aria-label="ສະກຸນເງິນ">
+                  <option value="LAK" selected>₭ ກີບ</option>
+                  <option value="THB">฿ ບາດ</option>
+                  <option value="USD">$ ໂດລາ</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label for="incMethod">ຮັບເປັນ</label>
+              <select id="incMethod">
+                <option value="cash" selected>ເງິນສົດ (ຢູ່ໃນມື)</option>
+                <option value="transfer">ເງິນໂອນ (ເຂົ້າບັນຊີ)</option>
+              </select>
+            </div>
+            <div>
+              <label for="incNote">ໝາຍເຫດ</label>
+              <input type="text" id="incNote" placeholder="ບໍ່ບັງຄັບ ເຊັ່ນ ເລກບິນເກົ່າ / ຄັນລົດ">
+            </div>
+            <button class="btn btn-brown" id="btnAddIncome">ບັນທຶກການຮັບເງິນ</button>
           </div>
+          <p class="tr-note">ໃຊ້ສຳລັບເງິນທີ່ຮັບມາແຕ່ບໍ່ແມ່ນການຂາຍໃນລະບົບ ເຊັ່ນ ລູກຄ້າເອົາເງິນມາຊຳລະໜີ້ຄ່າລົດ —
+            ຮັບສົດ ຈະເພີ່ມເຂົ້າເງິນສົດໃນມື, ຮັບໂອນ ຈະໄປຢູ່ຖັນເງິນໂອນ ແລະ ບໍ່ນັບເປັນກຳໄລ</p>
         </div>
-        <button class="btn btn-brown" id="btnAddExpense">ບັນທຶກລາຍຈ່າຍ</button>
-      </div>
-    </div>
 
-    <div class="card">
-      <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານ</p>
-      <div class="form-grid">
-        <div>
-          <label for="depAmount">ຈຳນວນເງິນທີ່ມອບ</label>
-          <div class="amt-cur-row">
-            <input type="text" inputmode="decimal" id="depAmount" placeholder="0">
-            <select id="depCur" aria-label="ສະກຸນເງິນ">
-              <option value="LAK" selected>₭ ກີບ</option>
-              <option value="THB">฿ ບາດ</option>
-              <option value="USD">$ ໂດລາ</option>
-            </select>
+        <div class="card">
+          <p class="card-title">ຮັບເງິນອື່ນມື້ນີ້</p>
+          <div id="incomeTabList"></div>
+        </div>
+      </div>
+    </div><!-- /expIncomeView -->
+
+    <div id="expDepositView" style="display:none;">
+      <div class="grid-side">
+        <div class="card">
+          <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານ</p>
+          <div class="form-grid">
+            <div>
+              <label for="depAmount">ຈຳນວນເງິນທີ່ມອບ</label>
+              <div class="amt-cur-row">
+                <input type="text" inputmode="decimal" id="depAmount" placeholder="0">
+                <select id="depCur" aria-label="ສະກຸນເງິນ">
+                  <option value="LAK" selected>₭ ກີບ</option>
+                  <option value="THB">฿ ບາດ</option>
+                  <option value="USD">$ ໂດລາ</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label for="depBank">ທະນາຄານ / ບັນຊີ</label>
+              <input type="text" id="depBank" list="bankList" placeholder="ເຊັ່ນ BCEL ບັນຊີຮ້ານ" autocomplete="off">
+              <datalist id="bankList"></datalist>
+            </div>
+            <div>
+              <label for="depBy">ຜູ້ມອບເງິນ</label>
+              <input type="text" id="depBy" placeholder="ຊື່ຜູ້ນຳເງິນໄປມອບ (ບໍ່ບັງຄັບ)">
+            </div>
+            <div>
+              <label for="depNote">ໝາຍເຫດ</label>
+              <input type="text" id="depNote" placeholder="ບໍ່ບັງຄັບ">
+            </div>
+            <button class="btn btn-brown" id="btnAddDeposit">ບັນທຶກການມອບເງິນ</button>
           </div>
+          <p class="tr-note">ເງິນທີ່ມອບເຂົ້າທະນາຄານບໍ່ແມ່ນລາຍຈ່າຍ ຈຶ່ງບໍ່ຫັກກຳໄລ ແຕ່ຈະຫັກອອກຈາກເງິນສົດທີ່ຮັບມາ</p>
         </div>
-        <div>
-          <label for="depBank">ທະນາຄານ / ບັນຊີ</label>
-          <input type="text" id="depBank" list="bankList" placeholder="ເຊັ່ນ BCEL ບັນຊີຮ້ານ" autocomplete="off">
-          <datalist id="bankList"></datalist>
+
+        <div class="card">
+          <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານມື້ນີ້</p>
+          <div id="depositTabList"></div>
         </div>
-        <div>
-          <label for="depBy">ຜູ້ມອບເງິນ</label>
-          <input type="text" id="depBy" placeholder="ຊື່ຜູ້ນຳເງິນໄປມອບ (ບໍ່ບັງຄັບ)">
-        </div>
-        <div>
-          <label for="depNote">ໝາຍເຫດ</label>
-          <input type="text" id="depNote" placeholder="ບໍ່ບັງຄັບ">
-        </div>
-        <button class="btn btn-brown" id="btnAddDeposit">ບັນທຶກການມອບເງິນ</button>
       </div>
-      <p class="tr-note">ເງິນທີ່ມອບເຂົ້າທະນາຄານບໍ່ແມ່ນລາຍຈ່າຍ ຈຶ່ງບໍ່ຫັກກຳໄລ ແຕ່ຈະຫັກອອກຈາກເງິນສົດທີ່ຮັບມາ</p>
-    </div>
-
-    </div><!-- /side-col -->
-
-    <div class="side-col"><!-- ລາຍການມື້ນີ້ -->
-    <div class="card">
-      <p class="card-title">ຮັບເງິນອື່ນມື້ນີ້</p>
-      <div id="incomeTabList"></div>
-    </div>
-
-    <div class="card">
-      <p class="card-title">ລາຍຈ່າຍມື້ນີ້</p>
-      <div id="expenseTabList"></div>
-    </div>
-
-    <div class="card">
-      <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານມື້ນີ້</p>
-      <div id="depositTabList"></div>
-    </div>
-    </div><!-- /side-col -->
-  </div><!-- /grid-side -->
+    </div><!-- /expDepositView -->
   </div>
 
   <p class="storage-note" id="syncNote">ກຳລັງເຊື່ອມຕໍ່ເຊີບເວີ...</p>
@@ -3807,6 +3817,20 @@
   }
   setupViewSeg("saleSeg", "saleNewView", "saleHistView", function(){ renderHistory(); }, searchInput);
   setupViewSeg("poSeg", "poNewView", "poHistView", function(){ renderPoHistory(); }, poSearch);
+  // the ລາຍຈ່າຍ page has three windows of its own: ລາຍຈ່າຍ / ຮັບເງິນອື່ນ / ມອບເງິນເຂົ້າທະນາຄານ
+  var EXP_VIEWS = { expense: ["expExpenseView","expDesc"], income: ["expIncomeView","incDesc"], deposit: ["expDepositView","depAmount"] };
+  document.querySelectorAll("#expSeg button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#expSeg button").forEach(function(x){ x.classList.toggle("active", x === b); });
+      var view = b.dataset.view;
+      Object.keys(EXP_VIEWS).forEach(function(k){
+        document.getElementById(EXP_VIEWS[k][0]).style.display = k === view ? "block" : "none";
+      });
+      clearPickModes();
+      window.scrollTo(0, 0);
+      if(isDesktop()){ var el = document.getElementById(EXP_VIEWS[view][1]); if(el) el.focus(); }
+    });
+  });
   // the transfer page has three views, so it gets its own switch
   document.querySelectorAll("#trSeg button").forEach(function(b){
     b.addEventListener("click", function(){
