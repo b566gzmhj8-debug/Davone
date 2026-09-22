@@ -3362,6 +3362,9 @@ function findBundleForModel(model){
 
 let sellCart = [];
 let sellPayments = [];
+/* ສະກຸນເງິນຂອງບິນທີ່ກຳລັງອອກ — ຕ້ອງເກັບໄວ້ນອກ render ເພາະຖ້າສະຫຼັບໄປແທັບອື່ນແລ້ວກັບມາ
+   ຊ່ອງ s_currency ຈະຄືນເປັນຄ່າ default (ກີບ) ແຕ່ລາຄາໃນລາຍການຍັງເປັນບາດ → ບິນຈະອອກຜິດສະກຸນເງິນ */
+let sellCurrency = 'LAK';
 /* ບໍ່ null = ກຳລັງແກ້ໄຂບິນເກົ່າ (ບໍ່ແມ່ນອອກບິນໃໝ່): { id, inv, originalItems } */
 let editingInvoice = null;
 /* ແປງລາຍການສິນຄ້າຈາກ DB ໃຫ້ຢູ່ໃນຮູບແບບຂອງ sellCart ເພື່ອໃສ່ຄືນຕອນແກ້ໄຂ */
@@ -3394,7 +3397,7 @@ function startInvoiceEdit(invoiceId, inv, items, payments){
 /* ຍົກເລີກການແກ້ໄຂ ກັບໄປໜ້າລາຍງານ */
 function cancelInvoiceEdit(){
   editingInvoice = null;
-  sellCart = []; sellPayments = []; tabDrafts.sell = {};
+  sellCart = []; sellPayments = []; sellCurrency = 'LAK'; tabDrafts.sell = {};
   activeTab = 'report';
   buildNav();
   renderTab();
@@ -3458,8 +3461,8 @@ async function renderSell(main){
           <button class="btn" id="s_openPay"><svg class="dv-icon"><use href="#i-wallet"></use></svg>ຮັບເງິນ ແລະ ບັນທຶກບິນ →</button>
           <!-- ສະກຸນເງິນບິນເລືອກອັດຕະໂນມັດຕາມສິນຄ້າ ຈຶ່ງເຊື່ອງ dropdown ໄວ້ -->
           <select id="s_currency" style="display:none;">
-            <option value="LAK">ກີບ (LAK)</option>
-            <option value="THB">ບາດ (THB)</option>
+            <option value="LAK"${sellCurrency === 'THB' ? '' : ' selected'}>ກີບ (LAK)</option>
+            <option value="THB"${sellCurrency === 'THB' ? ' selected' : ''}>ບາດ (THB)</option>
           </select>
         </div>
       </div>
@@ -3535,10 +3538,23 @@ async function renderSell(main){
     const priceLak = Number(opt.dataset.price || 0);
     const priceThb = Number(opt.dataset.priceThb || 0);
     const currencySel = document.getElementById('s_currency');
-    if(priceLak > 0){
-      currencySel.value = 'LAK';
-    } else if(priceThb > 0){
-      currencySel.value = 'THB';
+    /* ສະຫຼັບສະກຸນເງິນໄດ້ແຕ່ຕອນບິນຍັງຫວ່າງ — ບິນທີ່ມີລາຍການແລ້ວຫ້າມສະຫຼັບ
+       ບໍ່ດັ່ງນັ້ນລາຄາເກົ່າ (ບາດ) ຈະຖືກຕິດປ້າຍເປັນອີກສະກຸນໜຶ່ງ (ກີບ) */
+    if(!sellCart.length){
+      if(priceLak > 0){
+        currencySel.value = 'LAK';
+      } else if(priceThb > 0){
+        currencySel.value = 'THB';
+      }
+      sellCurrency = currencySel.value;
+    } else {
+      const billCur = currencySel.value;
+      const mine  = billCur === 'THB' ? priceThb : priceLak;
+      const other = billCur === 'THB' ? priceLak : priceThb;
+      if(!mine && other){
+        toast('ບິນນີ້ເປັນ ' + (billCur === 'THB' ? 'ບາດ' : 'ກີບ') + ' ແຕ່ສິນຄ້ານີ້ຕັ້ງລາຄາໄວ້ເປັນ ' +
+              (billCur === 'THB' ? 'ກີບ' : 'ບາດ') + ' — ໃສ່ລາຄາເອງ ຫຼື ແຍກອອກເປັນບິນໃໝ່');
+      }
     }
     syncPayCurrencyDefault();
     fillSellPrice();
@@ -3560,7 +3576,7 @@ async function renderSell(main){
     document.getElementById('s_pay_currency').value = document.getElementById('s_currency').value;
     document.getElementById('s_pay_rateBlock').style.display = 'none';
   }
-  document.getElementById('s_currency').addEventListener('change', ()=>{ fillSellPrice(); syncPayCurrencyDefault(); });
+  document.getElementById('s_currency').addEventListener('change', ()=>{ sellCurrency = document.getElementById('s_currency').value; fillSellPrice(); syncPayCurrencyDefault(); });
   syncPayCurrencyDefault();
   document.getElementById('s_pay_currency').addEventListener('change', ()=>{
     const invCurrency = document.getElementById('s_currency').value;
@@ -3591,7 +3607,7 @@ async function renderSell(main){
     }
     /* ຖ້າສິນຄ້ານີ້ເປັນ "ຊຸດ" ໃຫ້ເພີ່ມອຸປະກອນທີ່ມາພ້ອມເຂົ້າໄປອັດຕະໂນມັດ: ຕັດສະຕັອກ + ໂຊວ໌ໃນບິນ + ບໍ່ຄິດເງິນ (amount 0) */
     if(bundle){
-      const billCur = document.getElementById('s_currency').value;
+      const billCur = sellCurrency;
       const missing = [];
       bundle.components.forEach(c=>{
         const cm = models.find(m=> (m.name||'').trim() === c.name.trim());
@@ -3726,6 +3742,7 @@ async function renderSell(main){
     document.getElementById('s_district').value = ei.district || '';
     document.getElementById('s_province').value = ei.province || '';
     document.getElementById('s_currency').value = ei.currency || 'LAK';
+    sellCurrency = document.getElementById('s_currency').value;
     syncPayCurrencyDefault();
     attachMoneyInput('s_discount', Number(ei.discount_amount||0));
     document.getElementById('s_cartList').innerHTML = renderSellCart();
@@ -3745,7 +3762,7 @@ async function renderSell(main){
     btn.disabled = true;
     /* ໂໝດແກ້ໄຂ: ບັນທຶກທັບບິນເກົ່າ (ຄືນສະຕັອກເກົ່າ → ຕັດໃໝ່) ແທນການອອກບິນໃໝ່ */
     if(editingInvoice){
-      try{ await saveInvoiceEdit(); }
+      try{ if(await saveInvoiceEdit() === false) btn.disabled = false; }
       catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
       return;
     }
@@ -3756,6 +3773,8 @@ async function renderSell(main){
       const total = subtotal - discount;
       const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
       const currency = document.getElementById('s_currency').value;
+      const curMix = mismatchedCurrencyItems(models, currency);
+      if(curMix.length && !confirm(currencyWarnText(curMix, currency))){ btn.disabled = false; return; }
       const status = paid <= 0 ? 'unpaid' : (paid >= total ? 'paid' : 'partial');
       const invNo = await nextInvoiceNo();
       await sb('sales_invoices', { method:'POST', body:{
@@ -3801,6 +3820,7 @@ async function renderSell(main){
         (w)=> printInvoiceById(invoiceId, w));
       sellCart = [];
       sellPayments = [];
+      sellCurrency = 'LAK';
       tabDrafts.sell = {};
       renderTab();
     }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
@@ -3818,6 +3838,8 @@ async function saveInvoiceEdit(){
   const total = subtotal - discount;
   const paid = sellPayments.reduce((s,p)=>s+p.converted_amount,0);
   const currency = document.getElementById('s_currency').value;
+  const curMix = mismatchedCurrencyItems(await getModels(), currency);
+  if(curMix.length && !confirm(currencyWarnText(curMix, currency))) return false;
   const status = paid <= 0 ? 'unpaid' : (paid >= total ? 'paid' : 'partial');
   const soldAt = ei.inv.invoice_date || todayStr();
   /* 1) ຄືນສະຕັອກເກົ່າ (ເລກເຄື່ອງກັບເປັນ in_stock) + ລົບ movement/ລາຍການ/ການຈ່າຍ ຂອງບິນນີ້ */
@@ -3862,10 +3884,29 @@ async function saveInvoiceEdit(){
   ]);
   toast(`ແກ້ໄຂບິນ ${ei.inv.invoice_no || ''} ສຳເລັດ · ${fmtMoney(total)}`);
   editingInvoice = null;
-  sellCart = []; sellPayments = []; tabDrafts.sell = {};
+  sellCart = []; sellPayments = []; sellCurrency = 'LAK'; tabDrafts.sell = {};
   activeTab = 'report';
   buildNav();
   renderTab();
+  return true;
+}
+/* ກັນບິນອອກຜິດສະກຸນເງິນ: ລາຍການໃດທີ່ລາຄາເທົ່າກັບລາຄາ "ອີກສະກຸນໜຶ່ງ" ຂອງສິນຄ້ານັ້ນ
+   ແລະ ສະກຸນຂອງບິນບໍ່ມີລາຄາຕັ້ງໄວ້ເລີຍ — ແປວ່າລາຄາຖືກໃສ່ໄວ້ເປັນສະກຸນອື່ນ */
+function mismatchedCurrencyItems(models, currency){
+  return sellCart.filter(it=>{
+    if(!it.unit_price) return false;
+    const m = (models || []).find(x=> x.id === it.model_id);
+    if(!m) return false;
+    const mine  = Number((currency === 'THB' ? m.sale_price_thb : m.sale_price) || 0);
+    const other = Number((currency === 'THB' ? m.sale_price : m.sale_price_thb) || 0);
+    return !mine && other > 0 && Math.abs(Number(it.unit_price) - other) < 0.01;
+  });
+}
+function currencyWarnText(items, currency){
+  const lbl   = currency === 'THB' ? 'ບາດ' : 'ກີບ';
+  const other = currency === 'THB' ? 'ກີບ' : 'ບາດ';
+  return 'ບິນນີ້ຕັ້ງໄວ້ເປັນ ' + lbl + ' ແຕ່ລາຄາຂອງ ' + items.map(i=> i.model_name).join(', ') +
+         ' ເທົ່າກັບລາຄາ' + other + 'ທີ່ຕັ້ງໄວ້ໃນສິນຄ້າ\n\nຢືນຢັນອອກບິນເປັນ ' + lbl + ' ບໍ?';
 }
 function renderPaymentList(){
   const el = document.getElementById('s_paymentList');
@@ -3885,8 +3926,9 @@ function renderPaymentList(){
 }
 /* ໜ່ວຍເງິນຂອງບິນປັດຈຸບັນ (ຕາມສະກຸນທີ່ລະບົບເລືອກໃຫ້ອັດຕະໂນມັດຕາມສິນຄ້າ) — ໃຊ້ຕໍ່ທ້າຍຍອດທຸກຈຸດ ໃຫ້ຮູ້ວ່າ ກີບ ຫຼື ບາດ */
 function sellCurUnit(){
-  const el = document.getElementById('s_currency');
-  return (el && el.value === 'THB') ? 'ບາດ' : 'ກີບ';
+  /* ອ່ານຈາກຕົວແປ ບໍ່ແມ່ນຈາກ DOM — renderSellCart() ຖືກເອີ້ນຕອນສ້າງ HTML ໃໝ່ (ຊ່ອງ s_currency ຍັງບໍ່ມີ)
+     ຖ້າອ່ານຈາກ DOM ປ້າຍຈະຕົກເປັນ "ກີບ" ທຸກເທື່ອທີ່ກັບມາໜ້າຂາຍ ເຖິງວ່າບິນເປັນບາດ */
+  return sellCurrency === 'THB' ? 'ບາດ' : 'ກີບ';
 }
 function updateSellTotals(){
   const subtotal = sellCart.reduce((s,i)=>s+i.amount,0);
