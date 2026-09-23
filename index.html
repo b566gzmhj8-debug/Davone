@@ -1455,7 +1455,7 @@ async function dbGet() {
       Promise.all([listPromise, imgIdsPromise]),
       new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
     ]);
-    if (error || !data) return getCached();
+    if (error || !data) { _cashOk.rec = false; return getCached(); }
     const hasImageSet = new Set((imgRows||[]).map(x=>x.id));
     const approvedMap = getApprovedMap();
     const records = data.map(r => ({
@@ -1467,9 +1467,11 @@ async function dbGet() {
       approvedAt: approvedMap[r.id] || null,
     }));
     try { localStorage.setItem("dv_cache", JSON.stringify(records)); } catch {}
+    _cashOk.rec = true;
     return records;
   } catch(e) {
     console.error(e);
+    _cashOk.rec = false;
     return getCached();
   }
 }
@@ -2077,6 +2079,10 @@ function showDone(entries) {
 
 // ── ADMIN ─────────────────────────────────────────────────
 let adminRecords=[], adminTab="today", adminInterval=null;
+/* ຂໍ້ມູນເງິນສົດຕ້ອງ "ສົດ" ພ້ອມກັນທັງ 4 ຢ່າງ ຈຶ່ງຄິດຍອດໄດ້
+   ຖ້າລາຍການຮັບເງິນເປັນຂອງເກົ່າໃນເຄື່ອງ (ໂຫຼດຈາກເຊີບເວີບໍ່ໄດ້) ແຕ່ "ຍອດຍົກມາ" ເປັນຂອງໃໝ່
+   ລາຍການທີ່ຖືກລຶບອອກຕອນກາງຄືນ (ເກີນ 3 ເດືອນ) ຈະຖືກນັບສອງເທື່ອ → ເງິນສົດເກີນຄວາມຈິງ */
+let _cashOk = { rec:false, dep:false, wd:false, adj:false };
 let filterMonth = null;
 let realtimeChannel = null;
 let _lastRecordCount = 0;
@@ -2527,7 +2533,7 @@ function bentoDashHTML(o){
   if (!cashCachesReady()) {
     /* ຍັງໂຫຼດ ຝາກທະນາຄານ/ເບີກ/ປັບຍອດ ບໍ່ຄົບ — ຢ່າໂຊວ໌ຕົວເລກ (ຈະຜິດ) ໂຫຼດແລ້ວ render ຄືນ */
     ensureCashCaches().then(ok => { if(ok) renderAdmin(); });
-    return `<div class="bn-top"><div class="av-empty">ກຳລັງໂຫຼດຍອດເງິນ...</div></div>`;
+    return `<div class="bn-top"><div class="av-empty">ກຳລັງໂຫຼດຍອດເງິນ... (ຖ້າຊ້າ ກວດອິນເຕີເນັດ)</div></div>`;
   }
   const bal = {}; CURS.forEach(c => bal[c] = calcCashBalance(adminRecords, c));
   let active = CURS.filter(c => bal[c].cashRecords>0 || bal[c].toBoss>0 || bal[c].withdrawn>0 || bal[c].adjust!==0);
@@ -2986,8 +2992,9 @@ async function fetchBankDeposits() {
     const { data, error } = await getSupa().from("bank_deposits").select("*").order("ts", { ascending: false });
     if (error) throw error;
     _bankDepositsCache = data || [];
+    _cashOk.dep = true;
     return _bankDepositsCache;
-  } catch { return _bankDepositsCache; }   // null = ຍັງໂຫຼດບໍ່ໄດ້ (ຢ່າຖືວ່າຫວ່າງ)
+  } catch { _cashOk.dep = false; return _bankDepositsCache; }   // null = ຍັງໂຫຼດບໍ່ໄດ້ (ຢ່າຖືວ່າຫວ່າງ)
 }
 
 function getBankDeposits() {
@@ -3029,8 +3036,9 @@ async function fetchWithdrawals() {
     const { data, error } = await getSupa().from("withdrawals").select("*").order("ts", { ascending: false });
     if (error) throw error;
     _withdrawalsCache = data || [];
+    _cashOk.wd = true;
     return _withdrawalsCache;
-  } catch { return _withdrawalsCache; }
+  } catch { _cashOk.wd = false; return _withdrawalsCache; }
 }
 
 function getWithdrawals() { return _withdrawalsCache || []; }
@@ -3061,8 +3069,9 @@ async function fetchAdjustments() {
     const { data, error } = await getSupa().from("cash_adjustments").select("*").order("ts", { ascending: false });
     if (error) throw error;
     _adjustmentsCache = data || [];
+    _cashOk.adj = true;
     return _adjustmentsCache;
-  } catch { return _adjustmentsCache; }
+  } catch { _cashOk.adj = false; return _adjustmentsCache; }
 }
 
 function getAdjustments() { return _adjustmentsCache || []; }
@@ -3070,11 +3079,14 @@ function getAdjustments() { return _adjustmentsCache || []; }
 // ຂໍ້ມູນ 3 ຢ່າງ (ຝາກທະນາຄານ / ເບີກ / ປັບຍອດ) ຕ້ອງໂຫຼດຄົບກ່ອນ ຈຶ່ງຄິດຍອດເງິນສົດໄດ້ຖືກ
 // ຖ້າຂາດອັນໃດ ຍອດຈະຜິດແບບບໍ່ຮູ້ຕົວ (ເຊັ່ນ ຂາດ "ຍອດຍົກມາ" ແລ້ວເງິນສົດຕິດລົບ)
 function cashCachesReady() {
-  return !!(_bankDepositsCache && _withdrawalsCache && _adjustmentsCache);
+  return !!(_bankDepositsCache && _withdrawalsCache && _adjustmentsCache
+            && _cashOk.rec && _cashOk.dep && _cashOk.wd && _cashOk.adj);
 }
 async function ensureCashCaches() {
   if (cashCachesReady()) return true;
-  await Promise.all([fetchBankDeposits(), fetchWithdrawals(), fetchAdjustments()]);
+  const jobs = [fetchBankDeposits(), fetchWithdrawals(), fetchAdjustments()];
+  if (!_cashOk.rec) jobs.push(dbGet().then(rs => { if (_cashOk.rec) adminRecords = rs; }));
+  await Promise.all(jobs);
   return cashCachesReady();
 }
 
@@ -3116,7 +3128,7 @@ function bankCashSummaryHTML(records) {
   if (!cashCachesReady()) {
     /* ຢ່າໂຊວ໌ຕົວເລກຕອນຂໍ້ມູນຍັງບໍ່ຄົບ — ຍອດຈະຜິດ (ຂາດຝາກທະນາຄານ/ເບີກ/ຍອດຍົກມາ) */
     ensureCashCaches().then(ok => { if(ok) renderAdmin(); });
-    return `<div class="av-empty">ກຳລັງໂຫຼດຍອດເງິນສົດ...</div>`;
+    return `<div class="av-empty">ກຳລັງໂຫຼດຍອດເງິນສົດ... (ຖ້າຊ້າ ກວດອິນເຕີເນັດ)</div>`;
   }
   const bal = { LAK:calcCashBalance(records,"LAK"), THB:calcCashBalance(records,"THB"), USD:calcCashBalance(records,"USD") };
   const fmtN = { LAK:n=>(n||0).toLocaleString("lo-LA"), THB:n=>(n||0).toLocaleString("th-TH"), USD:n=>(n||0).toLocaleString("en-US") };
