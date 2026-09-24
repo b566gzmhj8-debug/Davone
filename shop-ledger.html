@@ -957,7 +957,7 @@
       </div>
       <div class="sum-net-box">
         <div class="sum-net">
-          <span class="sum-net-label">ກຳໄລສຸດທິ</span>
+          <span class="sum-net-label">ກຳໄລ</span>
           <div class="net-rows" id="heroNet"></div>
         </div>
         <p class="sum-note" id="heroNote"></p>
@@ -966,7 +966,7 @@
         <div><p>ຍອດຂາຍ</p><b id="heroIncome">0</b></div>
         <div><p>ຕົ້ນທຶນສິນຄ້າ</p><b id="heroCost">0</b></div>
         <div><p>ກຳໄລຈາກການຂາຍ</p><b class="pos" id="heroGross">0</b></div>
-        <div><p>ລາຍຈ່າຍ</p><b class="neg" id="heroExpense">0</b></div>
+        <div><p>ລາຍຈ່າຍ <small style="font-weight:400;opacity:.8">· ຫັກຈາກເງິນສົດ</small></p><b class="neg" id="heroExpense">0</b></div>
       </div>
       <div class="stmt-cash" id="paySummary"></div>
     </div>
@@ -5398,9 +5398,10 @@
       missing += bc.missing;
     });
     dayExpenses.forEach(function(e){ addTo(expense, curOf(e), e.amount); });
-    // net profit = sales − cost of the goods sold − other expenses, kept apart per currency
+    // ກຳໄລ = ຍອດຂາຍ − ຕົ້ນທຶນສິນຄ້າ (ແຍກຕາມສະກຸນເງິນ)
+    // ລາຍຈ່າຍ/ເງິນເບີກ ບໍ່ຫັກຈາກກຳໄລ — ມັນຫັກຈາກ "ເງິນສົດໃນມື" ທີ່ພະນັກງານຖືຢູ່ (ເບິ່ງຕາຕະລາງເງິນສົດ)
     var gross = subMap(profitBase, cost);
-    var net = subMap(gross, expense);
+    var net = gross;
     var netLak = toLak(net, dayRates());
 
     /* ລາຍຈ່າຍຂອງຮ້ານເກືອບທັງໝົດເປັນກີບ ຖ້າໂຊວ໌ແຕ່ຖັນກີບ ມັນຈະເບິ່ງຄືຂາດທຶນ
@@ -5429,6 +5430,8 @@
       (showSum && netLak.lak > 0 && netCurs.some(function(c){ return net[c] < 0; })
         ? "ຖັນ "+netCurs.filter(function(c){ return net[c] < 0; }).map(function(c){ return CUR[c].sym; }).join("/")+
           " ຕິດລົບເພາະລາຍຈ່າຍລົງເປັນສະກຸນນັ້ນທັງໝົດ — ກຳໄລສະກຸນອື່ນລວມຢູ່ຍອດລວມແລ້ວ" : ""),
+      (Object.keys(expense).some(function(c){ return Math.abs(expense[c] || 0) > 0.0001; })
+        ? "ລາຍຈ່າຍ "+moneyMap(expense)+" ຫັກຈາກເງິນສົດໃນມື (ບໍ່ຫັກຈາກກຳໄລ)" : ""),
       (missing ? "⚠ "+missing+" ລາຍການບໍ່ມີລາຄາທຶນ ກຳໄລອາດສູງກວ່າຄວາມຈິງ" : "")
     ].filter(Boolean).join(" · ");
     document.getElementById("heroCount").textContent = dayBills.length;
