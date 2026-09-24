@@ -871,10 +871,25 @@
   #tab-expense .doc-signs{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:16px -16px -6px;padding:18px 16px 6px;border-top:1px solid var(--rule);}
   #tab-expense .doc-signs div{text-align:center;font-size:11.5px;color:var(--ink-soft);}
   #tab-expense .doc-signs i{display:block;border-bottom:1px dotted var(--ink-faint);height:24px;margin-bottom:6px;}
+  #tab-expense .led-date{display:flex;align-items:center;gap:8px;margin:0 -16px;padding:8px 16px;border-bottom:1px dotted var(--rule);font-size:12px;color:var(--ink-soft);}
+  #tab-expense .led-date label{margin:0;font-size:12px;}
+  #tab-expense .led-date input{width:auto;flex:none;border:1px solid var(--rule);background:#fff;border-radius:0;padding:5px 8px;font-size:13.5px;}
+  #tab-expense .led-date .link-btn{margin-left:auto;padding:0;}
   #tab-expense .led-head{display:flex;justify-content:space-between;background:#f3ece0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:0 -16px;padding:7px 16px;font-size:10.5px;letter-spacing:.12em;color:var(--ink-soft);font-weight:600;}
   #tab-expense .row{margin:0 -16px;padding:10px 16px;border-bottom:1px solid #efe8da;}
   #tab-expense .row:nth-of-type(even){background:#fcf9f2;}
-  #tab-expense .row-val{font-variant-numeric:tabular-nums;min-width:112px;text-align:right;}
+  /* ຕາຕະລາງນີ້ເປັນເອກະສານ ຈຶ່ງໃຫ້ຊື່ລາຍການຕັດແຖວໄດ້ ແທນການຕັດຄຳດ້ວຍ ... */
+  #tab-expense .row-name{white-space:normal;overflow:visible;text-overflow:clip;}
+  #tab-expense .row-meta{white-space:normal;overflow:visible;text-overflow:clip;}
+  #tab-expense .row-val{font-variant-numeric:tabular-nums;min-width:112px;text-align:right;align-self:flex-start;}
+  @media (max-width:599px){
+    /* ຈໍນ້ອຍ: ຊື່ລາຍການເຕັມແຖວ ແລ້ວຄ່ອຍລົງແຖວໃໝ່ເປັນ ຈຳນວນເງິນ + ປຸ່ມ */
+    #tab-expense .row{flex-wrap:wrap;row-gap:6px;}
+    #tab-expense .row-main{flex:1 1 100%;}
+    #tab-expense .row-val{min-width:0;margin-left:auto;}
+    #tab-expense .led-head span:last-child{min-width:0;padding-right:0;}
+    #tab-expense .led-total b{padding-right:0;}
+  }
   #tab-expense .led-head span:last-child{min-width:112px;text-align:right;padding-right:52px;}
   #tab-expense .led-total b{padding-right:52px;}
   #tab-expense .st-chip{border-radius:2px;border:1.4px solid var(--green);background:none;color:var(--green);letter-spacing:.1em;font-size:10.5px;padding:1px 7px;margin-left:6px;display:inline-block;transform:rotate(-3deg);}
@@ -886,6 +901,7 @@
     #tab-expense .card-title{margin:-18px -20px 12px;padding:11px 20px;}
     #tab-expense .form-grid > div{grid-template-columns:118px minmax(0,1fr);}
     #tab-expense .doc-signs{margin:16px -20px -8px;padding:18px 20px 6px;}
+    #tab-expense .led-date{margin:0 -20px;padding:8px 20px;}
     #tab-expense .led-head{margin:0 -20px;padding:7px 20px;}
     #tab-expense .row{margin:0 -20px;padding:11px 20px;}
     #tab-expense .led-total{margin:0 -20px -20px;padding:12px 20px;}
@@ -1430,6 +1446,7 @@
       <div class="grid-side">
         <div class="card">
           <p class="card-title">ບັນທຶກລາຍຈ່າຍ<span class="doc-tag">FORM 01</span></p>
+          <div class="edit-bill-bar" id="expEditBar" style="display:none;"><span><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg> ກຳລັງແກ້ໄຂລາຍຈ່າຍ <b id="expEditNo"></b></span><button type="button" class="link-btn" id="expCancelEdit">ຍົກເລີກການແກ້ໄຂ</button></div>
           <div class="form-grid">
             <div>
               <label>ລາຍການ</label>
@@ -1457,7 +1474,8 @@
         </div>
 
         <div class="card">
-          <p class="card-title">ລາຍຈ່າຍມື້ນີ້<span class="doc-tag">LEDGER</span></p>
+          <p class="card-title">ລາຍຈ່າຍ<span class="doc-tag">LEDGER</span></p>
+          <div class="led-date"><label for="expListDate">ວັນທີ</label><input type="date" id="expListDate"><button type="button" class="link-btn" id="expListDateToday">ມື້ນີ້</button></div>
           <div class="led-head"><span>ລາຍການ / ເວລາ / ຜູ້ຮັບເງິນ</span><span>ຈຳນວນ</span></div>
           <div id="expenseTabList"></div>
         </div>
@@ -1468,6 +1486,7 @@
       <div class="grid-side">
         <div class="card">
           <p class="card-title">ຮັບເງິນອື່ນ (ນອກຈາກການຂາຍ)<span class="doc-tag">FORM 02</span></p>
+          <div class="edit-bill-bar" id="incEditBar" style="display:none;"><span><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg> ກຳລັງແກ້ໄຂການຮັບເງິນ <b id="incEditNo"></b></span><button type="button" class="link-btn" id="incCancelEdit">ຍົກເລີກການແກ້ໄຂ</button></div>
           <div class="form-grid">
             <div>
               <label for="incDesc">ລາຍການ</label>
@@ -1513,7 +1532,8 @@
         </div>
 
         <div class="card">
-          <p class="card-title">ຮັບເງິນອື່ນມື້ນີ້<span class="doc-tag">LEDGER</span></p>
+          <p class="card-title">ຮັບເງິນອື່ນ<span class="doc-tag">LEDGER</span></p>
+          <div class="led-date"><label for="incListDate">ວັນທີ</label><input type="date" id="incListDate"><button type="button" class="link-btn" id="incListDateToday">ມື້ນີ້</button></div>
           <div class="led-head"><span>ລາຍການ / ເວລາ / ຜູ້ຈ່າຍເງິນ</span><span>ຈຳນວນ</span></div>
           <div id="incomeTabList"></div>
         </div>
@@ -1524,6 +1544,7 @@
       <div class="grid-side">
         <div class="card">
           <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານ<span class="doc-tag">FORM 03</span></p>
+          <div class="edit-bill-bar" id="depEditBar" style="display:none;"><span><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg> ກຳລັງແກ້ໄຂການມອບເງິນ <b id="depEditNo"></b></span><button type="button" class="link-btn" id="depCancelEdit">ຍົກເລີກການແກ້ໄຂ</button></div>
           <div class="form-grid">
             <div class="amt-field">
               <label for="depAmount">ຈຳນວນເງິນທີ່ມອບ</label>
@@ -1556,7 +1577,8 @@
         </div>
 
         <div class="card">
-          <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານມື້ນີ້<span class="doc-tag">LEDGER</span></p>
+          <p class="card-title">ມອບເງິນເຂົ້າທະນາຄານ<span class="doc-tag">LEDGER</span></p>
+          <div class="led-date"><label for="depListDate">ວັນທີ</label><input type="date" id="depListDate"><button type="button" class="link-btn" id="depListDateToday">ມື້ນີ້</button></div>
           <div class="led-head"><span>ທະນາຄານ / ເວລາ / ຜູ້ມອບ</span><span>ຈຳນວນ</span></div>
           <div id="depositTabList"></div>
         </div>
@@ -4493,12 +4515,44 @@
   }
 
   // ---------- EXPENSES ----------
+  var editingExp = null;
+  function startEditExpense(e){
+    editingExp = e;
+    document.getElementById("expDesc").value = e.desc || "";
+    document.getElementById("expPayee").value = e.payee || "";
+    document.getElementById("expCur").value = curOf(e);
+    setMoneyInput("expAmount", e.amount);
+    setEditBar("exp", (e.expNo || "") + " · " + fmtDMY(e.date) + " " + e.time);
+    document.getElementById("btnAddExpense").textContent = "ບັນທຶກການແກ້ໄຂ";
+    scrollFormIntoView("expDesc");
+  }
+  function cancelEditExpense(){
+    editingExp = null;
+    document.getElementById("expDesc").value = "";
+    document.getElementById("expPayee").value = "";
+    document.getElementById("expAmount").value = "";
+    setEditBar("exp", "");
+    document.getElementById("btnAddExpense").textContent = "ບັນທຶກລາຍຈ່າຍ";
+  }
+  document.getElementById("expCancelEdit").addEventListener("click", cancelEditExpense);
   document.getElementById("btnAddExpense").addEventListener("click", function(){
     var desc = document.getElementById("expDesc").value.trim();
     var amount = parseNum(document.getElementById("expAmount").value);
     if(isNaN(amount)) amount = 0;
     if(!desc){ alert("ກະລຸນາໃສ່ລາຍການລາຍຈ່າຍ"); return; }
     if(amount <= 0){ alert("ຈຳນວນເງິນຕ້ອງຫຼາຍກວ່າ 0"); return; }
+    if(editingExp){
+      /* ແກ້ໄຂລາຍການເກົ່າ: ເລກທີ/ວັນທີ/ເວລາ ຄືເກົ່າ ປ່ຽນແຕ່ເນື້ອໃນ */
+      editingExp.desc = desc;
+      editingExp.amount = amount;
+      editingExp.cur = document.getElementById("expCur").value;
+      editingExp.payee = document.getElementById("expPayee").value.trim();
+      saveData();
+      cancelEditExpense();
+      renderExpenseTab();
+      renderSummary();
+      return;
+    }
     DATA.expenseCounter = (DATA.expenseCounter || 0) + 1;
     DATA.expenses.push({ id: uid(), expNo: "EXP-" + String(DATA.expenseCounter).padStart(5,"0"),
                          date: todayStr(), time: nowTime(), desc: desc, amount: amount,
@@ -4511,6 +4565,32 @@
     renderExpenseTab();
     renderSummary();
   });
+
+  // ---------- ເບິ່ງຍ້ອນຫຼັງ + ແກ້ໄຂລາຍການ (ລາຍຈ່າຍ / ຮັບເງິນອື່ນ / ມອບທະນາຄານ) ----------
+  // ແຕ່ລະຕາຕະລາງມີຊ່ອງວັນທີຂອງຕົນເອງ — ເປີດມາເປັນມື້ນີ້ ແຕ່ຍ້ອນເບິ່ງ/ພິມ/ແກ້ ມື້ເກົ່າໄດ້
+  function ledgerDate(id){
+    var el = document.getElementById(id);
+    if(!el) return todayStr();
+    if(!el.value) el.value = todayStr();
+    return el.value;
+  }
+  function setEditBar(key, no){
+    var bar = document.getElementById(key + "EditBar");
+    var noEl = document.getElementById(key + "EditNo");
+    if(!bar) return;
+    bar.style.display = no ? "flex" : "none";
+    if(noEl) noEl.textContent = no || "";
+  }
+  function setMoneyInput(id, value){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.value = String(value == null ? "" : value);
+    el.dispatchEvent(new Event("input"));
+  }
+  function scrollFormIntoView(id){
+    var el = document.getElementById(id);
+    if(el && el.scrollIntoView) el.scrollIntoView({ behavior:"smooth", block:"center" });
+  }
 
   // ---------- ໜ້າ ລາຍຮັບ & ລາຍຈ່າຍ ແບບເອກະສານ ----------
   // ແຖວລວມທ້າຍຕາຕະລາງ ແບບປຶ້ມບັນຊີ (ແຍກຕາມສະກຸນເງິນ)
@@ -4538,7 +4618,7 @@
     document.getElementById("docNextNo").textContent = no;
   }
 
-  function renderExpenseTab(){ renderExpenseListInto("expenseTabList", todayStr(), true); renderExpDocHead(); }
+  function renderExpenseTab(){ renderExpenseListInto("expenseTabList", ledgerDate("expListDate"), true); renderExpDocHead(); }
 
   function renderExpenseListInto(elId, dateStr, deletable){
     var el = document.getElementById(elId);
@@ -4546,7 +4626,7 @@
                              .sort(function(a,b){ return b.time.localeCompare(a.time); });
     el.innerHTML = "";
     if(list.length === 0){
-      el.innerHTML = '<p class="empty-note">ຍັງບໍ່ມີລາຍຈ່າຍໃນມື້ນີ້</p>';
+      el.innerHTML = '<p class="empty-note">ບໍ່ມີລາຍຈ່າຍໃນວັນທີ ' + fmtDMY(dateStr) + '</p>';
       return;
     }
     list.forEach(function(e){
@@ -4556,9 +4636,11 @@
         '<div class="row-main"><p class="row-name">'+escapeHtml(e.desc)+'</p>'+
           '<p class="row-meta">'+e.time+(e.payee ? " · ຜູ້ຮັບ "+escapeHtml(e.payee) : "")+'</p></div>'+
         '<span class="row-val neg">-'+money(e.amount, curOf(e))+'</span>'+
+        '<button class="row-edit" title="ແກ້ໄຂ" aria-label="ແກ້ໄຂ"><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>'+
         '<button class="row-print" title="ພິມໃບຈ່າຍເງິນ" aria-label="ພິມໃບຈ່າຍເງິນ"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></svg></button>'+
         (deletable ? '<button class="row-del" data-id="'+e.id+'" title="ລຶບ">&times;</button>' : '');
       row.querySelector(".row-print").addEventListener("click", function(){ printExpense(e); });
+      row.querySelector(".row-edit").addEventListener("click", function(){ startEditExpense(e); });
       if(deletable){
         row.querySelector(".row-del").addEventListener("click", function(){
           confirmDelete("ລຶບລາຍຈ່າຍນີ້?", e.desc+" · "+money(e.amount, curOf(e)), function(){
@@ -4577,12 +4659,48 @@
   // ---------- ຮັບເງິນອື່ນ (ບໍ່ແມ່ນການຂາຍ) ----------
   // ເງິນທີ່ຮັບມາຈາກລູກຄ້າແຕ່ບໍ່ໄດ້ອອກບິນຂາຍ ເຊັ່ນ ມາຊຳລະໜີ້ຄ່າລົດທີ່ຊື້ໄປແລ້ວ
   // ຮັບສົດ → ເພີ່ມເງິນສົດໃນມື · ຮັບໂອນ → ເຂົ້າຖັນເງິນໂອນ · ບໍ່ນັບເປັນຍອດຂາຍ ແລະ ບໍ່ນັບເປັນກຳໄລ
+  var editingInc = null;
+  function startEditIncome(e){
+    editingInc = e;
+    document.getElementById("incDesc").value = e.desc || "";
+    document.getElementById("incPayer").value = e.payer || "";
+    document.getElementById("incNote").value = e.note || "";
+    document.getElementById("incCur").value = curOf(e);
+    document.getElementById("incMethod").value = e.method === "transfer" ? "transfer" : "cash";
+    setMoneyInput("incAmount", e.amount);
+    setEditBar("inc", (e.incNo || "") + " · " + fmtDMY(e.date) + " " + e.time);
+    document.getElementById("btnAddIncome").textContent = "ບັນທຶກການແກ້ໄຂ";
+    scrollFormIntoView("incDesc");
+  }
+  function cancelEditIncome(){
+    editingInc = null;
+    document.getElementById("incDesc").value = "";
+    document.getElementById("incPayer").value = "";
+    document.getElementById("incNote").value = "";
+    document.getElementById("incAmount").value = "";
+    setEditBar("inc", "");
+    document.getElementById("btnAddIncome").textContent = "ບັນທຶກການຮັບເງິນ";
+  }
+  document.getElementById("incCancelEdit").addEventListener("click", cancelEditIncome);
   document.getElementById("btnAddIncome").addEventListener("click", function(){
     var desc = document.getElementById("incDesc").value.trim();
     var amount = parseNum(document.getElementById("incAmount").value);
     if(isNaN(amount)) amount = 0;
     if(!desc){ alert("ກະລຸນາໃສ່ລາຍການ (ເງິນນີ້ຮັບມາຈາກຫຍັງ)"); return; }
     if(amount <= 0){ alert("ຈຳນວນເງິນຕ້ອງຫຼາຍກວ່າ 0"); return; }
+    if(editingInc){
+      editingInc.desc = desc;
+      editingInc.amount = amount;
+      editingInc.cur = document.getElementById("incCur").value;
+      editingInc.method = document.getElementById("incMethod").value;
+      editingInc.payer = document.getElementById("incPayer").value.trim();
+      editingInc.note = document.getElementById("incNote").value.trim();
+      saveData();
+      cancelEditIncome();
+      renderIncomeTab();
+      renderSummary();
+      return;
+    }
     DATA.incomeCounter = (DATA.incomeCounter || 0) + 1;
     DATA.incomes.push({ id: uid(), incNo: "RC-" + String(DATA.incomeCounter).padStart(5,"0"),
                         date: todayStr(), time: nowTime(), desc: desc, amount: amount,
@@ -4599,7 +4717,7 @@
     renderSummary();
   });
 
-  function renderIncomeTab(){ renderIncomeListInto("incomeTabList", todayStr(), true); renderExpDocHead(); }
+  function renderIncomeTab(){ renderIncomeListInto("incomeTabList", ledgerDate("incListDate"), true); renderExpDocHead(); }
 
   function renderIncomeListInto(elId, dateStr, deletable){
     var el = document.getElementById(elId);
@@ -4608,7 +4726,7 @@
                             .sort(function(a,b){ return b.time.localeCompare(a.time); });
     el.innerHTML = "";
     if(list.length === 0){
-      el.innerHTML = '<p class="empty-note">ຍັງບໍ່ໄດ້ຮັບເງິນອື່ນໃນມື້ນີ້</p>';
+      el.innerHTML = '<p class="empty-note">ບໍ່ມີການຮັບເງິນອື່ນໃນວັນທີ ' + fmtDMY(dateStr) + '</p>';
       return;
     }
     list.forEach(function(e){
@@ -4619,9 +4737,11 @@
             '<span class="st-chip'+(e.method === "transfer" ? " tr" : "")+'">'+(e.method === "transfer" ? "ໂອນ" : "ສົດ")+'</span></p>'+
           '<p class="row-meta">'+e.time+(e.payer ? " · ຈາກ "+escapeHtml(e.payer) : "")+(e.note ? " · "+escapeHtml(e.note) : "")+'</p></div>'+
         '<span class="row-val pos">+'+money(e.amount, curOf(e))+'</span>'+
+        '<button class="row-edit" title="ແກ້ໄຂ" aria-label="ແກ້ໄຂ"><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>'+
         '<button class="row-print" title="ພິມໃບຮັບເງິນ" aria-label="ພິມໃບຮັບເງິນ"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></svg></button>'+
         (deletable ? '<button class="row-del" data-id="'+e.id+'" title="ລຶບ">&times;</button>' : '');
       row.querySelector(".row-print").addEventListener("click", function(){ printIncome(e); });
+      row.querySelector(".row-edit").addEventListener("click", function(){ startEditIncome(e); });
       if(deletable){
         row.querySelector(".row-del").addEventListener("click", function(){
           confirmDelete("ລຶບການຮັບເງິນນີ້?", e.desc+" · "+money(e.amount, curOf(e)), function(){
@@ -4665,9 +4785,44 @@
   }
   function depositsIn(from, to){ return DATA.deposits.filter(function(d){ return d.date >= from && d.date <= to; }); }
 
+  var editingDep = null;
+  function startEditDeposit(d){
+    editingDep = d;
+    document.getElementById("depBank").value = d.bank || "";
+    document.getElementById("depBy").value = d.by || "";
+    document.getElementById("depNote").value = d.note || "";
+    document.getElementById("depCur").value = curOf(d);
+    setMoneyInput("depAmount", d.amount);
+    setEditBar("dep", (d.depNo || "") + " · " + fmtDMY(d.date) + " " + d.time);
+    document.getElementById("btnAddDeposit").textContent = "ບັນທຶກການແກ້ໄຂ";
+    scrollFormIntoView("depAmount");
+  }
+  function cancelEditDeposit(){
+    editingDep = null;
+    document.getElementById("depAmount").value = "";
+    document.getElementById("depBank").value = "";
+    document.getElementById("depBy").value = "";
+    document.getElementById("depNote").value = "";
+    setEditBar("dep", "");
+    document.getElementById("btnAddDeposit").textContent = "ບັນທຶກການມອບເງິນ";
+  }
+  document.getElementById("depCancelEdit").addEventListener("click", cancelEditDeposit);
   document.getElementById("btnAddDeposit").addEventListener("click", function(){
     var amount = parseNum(document.getElementById("depAmount").value);
     if(isNaN(amount) || amount <= 0){ alert("ຈຳນວນເງິນທີ່ມອບຕ້ອງຫຼາຍກວ່າ 0"); return; }
+    if(editingDep){
+      editingDep.amount = amount;
+      editingDep.cur = document.getElementById("depCur").value;
+      editingDep.bank = document.getElementById("depBank").value.trim();
+      editingDep.by = document.getElementById("depBy").value.trim();
+      editingDep.note = document.getElementById("depNote").value.trim();
+      saveData();
+      cancelEditDeposit();
+      renderDepositTab();
+      refreshBankList();
+      renderSummary();
+      return;
+    }
     DATA.depositCounter = (DATA.depositCounter || 0) + 1;
     DATA.deposits.push({
       id: uid(),
@@ -4687,7 +4842,7 @@
     renderSummary();
   });
 
-  function renderDepositTab(){ renderDepositListInto("depositTabList", todayStr(), true); renderExpDocHead(); }
+  function renderDepositTab(){ renderDepositListInto("depositTabList", ledgerDate("depListDate"), true); renderExpDocHead(); }
 
   function renderDepositListInto(elId, dateStr, deletable){
     var el = document.getElementById(elId);
@@ -4695,7 +4850,7 @@
                             .sort(function(a,b){ return b.time.localeCompare(a.time); });
     el.innerHTML = "";
     if(list.length === 0){
-      el.innerHTML = '<p class="empty-note">ຍັງບໍ່ໄດ້ມອບເງິນເຂົ້າທະນາຄານໃນມື້ນີ້</p>';
+      el.innerHTML = '<p class="empty-note">ບໍ່ມີການມອບເງິນເຂົ້າທະນາຄານໃນວັນທີ ' + fmtDMY(dateStr) + '</p>';
       return;
     }
     list.forEach(function(dp){
@@ -4705,9 +4860,11 @@
         '<div class="row-main"><p class="row-name">'+escapeHtml(dp.bank || "ມອບເງິນເຂົ້າທະນາຄານ")+'</p>'+
           '<p class="row-meta">'+dp.time+(dp.depNo ? " · "+dp.depNo : "")+(dp.by ? " · ຜູ້ມອບ "+escapeHtml(dp.by) : "")+'</p></div>'+
         '<span class="row-val">-'+money(dp.amount, curOf(dp))+'</span>'+
+        '<button class="row-edit" title="ແກ້ໄຂ" aria-label="ແກ້ໄຂ"><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>'+
         '<button class="row-print" title="ພິມໃບມອບເງິນ" aria-label="ພິມໃບມອບເງິນ"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></svg></button>'+
         (deletable ? '<button class="row-del" title="ລຶບ">&times;</button>' : '');
       row.querySelector(".row-print").addEventListener("click", function(){ printDeposit(dp); });
+      row.querySelector(".row-edit").addEventListener("click", function(){ startEditDeposit(dp); });
       if(deletable){
         row.querySelector(".row-del").addEventListener("click", function(){
           confirmDelete("ລຶບລາຍການມອບເງິນນີ້?", (dp.bank ? dp.bank+" · " : "")+money(dp.amount, curOf(dp)), function(){
@@ -5112,6 +5269,16 @@
     clearTimeout(syncTimer);
     syncTimer = setTimeout(pushCloud, 800);   // let a burst of edits settle into one request
   }
+  // ຊ່ອງວັນທີຂອງແຕ່ລະຕາຕະລາງ + ປຸ່ມ "ມື້ນີ້"
+  [["expListDate", function(){ renderExpenseTab(); }],
+   ["incListDate", function(){ renderIncomeTab(); }],
+   ["depListDate", function(){ renderDepositTab(); }]].forEach(function(pair){
+    var input = document.getElementById(pair[0]);
+    var today = document.getElementById(pair[0] + "Today");
+    if(input){ input.value = todayStr(); input.addEventListener("change", pair[1]); }
+    if(today){ today.addEventListener("click", function(){ if(input) input.value = todayStr(); pair[1](); }); }
+  });
+
   function renderEverything(){
     renderRates(); renderStockLists(); renderPoList(); renderPoHistory();
     renderTrList(); renderTrHistory(); refreshBranchList(); renderCart();
