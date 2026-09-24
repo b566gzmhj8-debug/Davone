@@ -302,6 +302,10 @@
   .net-cell b{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;}
   .net-cell b.pos{color:var(--green);}
   .net-cell b.neg{color:var(--red);}
+  /* ເມື່ອມີຫຼາຍສະກຸນເງິນ: ຍອດລວມ (ແປງເປັນກີບແລ້ວ) ເປັນຕົວຫຼັກ ສ່ວນແຕ່ລະສະກຸນເປັນຕົວຮອງ */
+  .net-cell.net-sum b{font-size:30px;}
+  .net-rows.has-sum .net-cell:not(.net-sum) b{font-size:19px;opacity:.85;}
+  .net-rows.has-sum .net-cell:not(.net-sum) i{font-size:12.5px;}
   /* every statement sheet carries the same brown document header and black type */
   .stmt .stmt-head{background:var(--brown);color:#FBF7EF;border-bottom:none;padding:12px 16px;}
   .stmt .stmt-title{color:#FBF7EF;}
@@ -5399,7 +5403,16 @@
     var net = subMap(gross, expense);
     var netLak = toLak(net, dayRates());
 
-    document.getElementById("heroNet").innerHTML = netRowsHtml(net);
+    /* ລາຍຈ່າຍຂອງຮ້ານເກືອບທັງໝົດເປັນກີບ ຖ້າໂຊວ໌ແຕ່ຖັນກີບ ມັນຈະເບິ່ງຄືຂາດທຶນ
+       ທັງທີ່ກຳໄລບາດຍັງບໍ່ທັນລວມ — ຈຶ່ງໃຫ້ "ຍອດລວມ" (ແປງເປັນກີບ) ເປັນຕົວເລກຫຼັກ */
+    var netCurs = CURS.filter(function(c){ return Math.abs(net[c] || 0) > 0.0001; });
+    var showSum = netCurs.length > 1 && !netLak.missing;
+    var netEl = document.getElementById("heroNet");
+    netEl.className = "net-rows" + (showSum ? " has-sum" : "");
+    netEl.innerHTML =
+      (showSum ? '<span class="net-cell net-sum"><i>ລວມ ≈ '+CUR.LAK.sym+'</i><b class="'+
+                 (netLak.lak < 0 ? "neg" : "pos")+'">'+amountOnly(netLak.lak, "LAK")+'</b></span>' : "") +
+      netRowsHtml(net);
     document.getElementById("heroIncome").innerHTML = moneyMap(income, "<br>");
     document.getElementById("heroCost").innerHTML = moneyMap(cost, "<br>");
     document.getElementById("heroGross").innerHTML = moneyMap(gross, "<br>");
@@ -5411,7 +5424,11 @@
     document.getElementById("heroExpense").innerHTML = moneyMap(expense, "<br>");
     document.getElementById("heroNote").textContent = [
       sumRange === "day" ? "" : fmtDMY(from)+" – "+fmtDMY(to),
-      (Object.keys(net).some(function(c){ return c !== "LAK"; }) && !netLak.missing ? "ລວມ ≈ "+money(netLak.lak, "LAK")+" ຕາມອັດຕາມື້ນີ້" : ""),
+      (showSum ? "ຕາມອັດຕາມື້ນີ້" : ""),
+      /* ອະທິບາຍເມື່ອຖັນໃດຖັນໜຶ່ງຕິດລົບ ແຕ່ຮວມແລ້ວຍັງໄດ້ກຳໄລ */
+      (showSum && netLak.lak > 0 && netCurs.some(function(c){ return net[c] < 0; })
+        ? "ຖັນ "+netCurs.filter(function(c){ return net[c] < 0; }).map(function(c){ return CUR[c].sym; }).join("/")+
+          " ຕິດລົບເພາະລາຍຈ່າຍລົງເປັນສະກຸນນັ້ນທັງໝົດ — ກຳໄລສະກຸນອື່ນລວມຢູ່ຍອດລວມແລ້ວ" : ""),
       (missing ? "⚠ "+missing+" ລາຍການບໍ່ມີລາຄາທຶນ ກຳໄລອາດສູງກວ່າຄວາມຈິງ" : "")
     ].filter(Boolean).join(" · ");
     document.getElementById("heroCount").textContent = dayBills.length;
