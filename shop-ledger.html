@@ -1426,6 +1426,91 @@
     </div>
   </div>
 
+  <!-- ===== TAB: ເບີກເຄື່ອງແຖມ (ຕັດສະຕັອກຢ່າງດຽວ ບໍ່ຄິດເງິນ ບໍ່ຕັດກຳໄລ) ===== -->
+  <div class="tab-panel" id="tab-giveaway">
+    <div class="seg" id="gvSeg">
+      <button data-view="new" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="1.5"/><path d="M3 12h18"/><path d="M12 8v13"/></svg>ເບີກເຄື່ອງແຖມ</button>
+      <button data-view="history"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>ປະຫວັດການເບີກ</button>
+    </div>
+
+    <div id="gvNewView">
+      <div class="card pos-sheet">
+        <div class="pos-head">
+          <input type="text" id="gvCustomer" placeholder="ຊື່ລູກຄ້າ / ຜູ້ຮັບເຄື່ອງແຖມ (ບໍ່ບັງຄັບ)">
+          <input type="text" id="gvRef" placeholder="ອ້າງອີງບິນຂາຍ (ບໍ່ບັງຄັບ)">
+          <input type="text" id="gvNote" placeholder="ໝາຍເຫດ (ບໍ່ບັງຄັບ)">
+          <div class="pos-meta">
+            <span>ເລກທີ <b id="gvNoLabel">GV-00001</b></span>
+            <span id="gvDateTime"></span>
+          </div>
+        </div>
+
+        <div class="pos-entry">
+          <div class="pos-entry-row">
+            <div class="search-wrap">
+              <label for="gvSearch">ລະຫັດ / ຊື່ສິນຄ້າ — ກົດ Enter ເພື່ອເພີ່ມ</label>
+              <input type="text" id="gvSearch" placeholder="ເຊັ່ນ A-001 ຫຼື ນ້ຳມັນເຄື່ອງ" autocomplete="off">
+              <div class="search-suggestions" id="gvSuggestions"></div>
+            </div>
+            <div><label for="gvQty">ຈຳນວນ</label><input type="text" inputmode="numeric" id="gvQty" value="1"></div>
+            <button class="btn btn-outline" id="gvAdd" disabled>+ ເພີ່ມ</button>
+          </div>
+          <div id="gvSelectedWrap" style="display:none;">
+            <div class="selected-chip">
+              <span id="gvSelectedLabel"></span>
+              <button id="gvClearSelected" title="ຍົກເລີກການເລືອກ">&times;</button>
+            </div>
+          </div>
+          <p class="computed-total">ລາຍການນີ້ບໍ່ຄິດເງິນ — ຕັດແຕ່ສະຕັອກ</p>
+        </div>
+
+        <div class="pos-list-head">ລາຍການເຄື່ອງແຖມ <span class="count" id="gvCount"></span></div>
+        <div class="pos-table-wrap">
+          <table class="pos-table">
+            <thead>
+              <tr>
+                <th class="col-no num">ລຳດັບ</th>
+                <th class="col-code">ລະຫັດ</th>
+                <th>ຊື່ສິນຄ້າ</th>
+                <th class="num">ຈຳນວນ</th>
+                <th class="col-unit">ໜ່ວຍ</th>
+                <th class="col-stock num">ຄົງເຫຼືອ</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="gvCartList"></tbody>
+          </table>
+        </div>
+
+        <div class="pos-foot">
+          <div class="pos-big">
+            <p class="pos-big-label">ລວມເຄື່ອງແຖມ</p>
+            <p class="pos-big-amount" id="gvBigQty">0</p>
+            <p class="pos-big-eq">ບໍ່ຕັດຕົ້ນທຶນ · ບໍ່ຕັດກຳໄລ · ຕັດແຕ່ສະຕັອກ</p>
+          </div>
+          <div class="pos-sum">
+            <div class="sum-line"><span>ຈຳນວນລາຍການ</span><b id="gvLineCount">0</b></div>
+            <div class="sum-line sum-total"><span>ລວມຈຳນວນເຄື່ອງ</span><b id="gvTotalQty">0</b></div>
+            <button class="btn btn-brown" id="gvCommit">ບັນທຶກ ແລະ ພິມໃບເບີກ →</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /gvNewView -->
+
+    <div id="gvHistView" style="display:none;">
+      <div class="card">
+        <p class="card-title">ປະຫວັດການເບີກເຄື່ອງແຖມ <span class="count" id="gvHistCount"></span></p>
+        <div class="date-row">
+          <input type="date" id="gvFrom">
+          <span style="font-size:13px;color:var(--ink-soft);">ຫາ</span>
+          <input type="date" id="gvTo">
+          <button class="today-btn" id="gvThisMonth">ເດືອນນີ້</button>
+        </div>
+        <div id="gvHistList"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== TAB: ລາຍຮັບ & ລາຍຈ່າຍ ===== -->
   <div class="tab-panel" id="tab-expense">
     <div class="doc-head">
@@ -1715,6 +1800,10 @@
     <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M8 15h4"/></svg>
     <span>ລາຍຮັບ & ລາຍຈ່າຍ</span>
   </button>
+  <button class="nav-btn" data-tab="giveaway" data-title="ເບີກເຄື່ອງແຖມໃຫ້ລູກຄ້າ">
+    <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="1.5"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 3.5 8 4.2 8.8 8 12 8zM12 8s1.5-4.5 4-3.8S15.2 8 12 8z"/></svg>
+    <span>ເບີກເຄື່ອງແຖມ</span>
+  </button>
 </nav>
 
 <script>
@@ -1909,6 +1998,8 @@
     if(d.depositCounter == null) d.depositCounter = 0;
     if(!d.incomes) d.incomes = [];     // ເງິນທີ່ຮັບມາແຕ່ບໍ່ແມ່ນການຂາຍ (ຊຳລະໜີ້ ຄ່າລົດ ຄ່າສ້ອມແປງ ...)
     if(d.incomeCounter == null) d.incomeCounter = 0;
+    if(!d.giveaways) d.giveaways = [];   // ເຄື່ອງແຖມທີ່ເບີກໃຫ້ລູກຄ້າ: ຕັດສະຕັອກຢ່າງດຽວ ບໍ່ແມ່ນການຂາຍ
+    if(d.giveawayCounter == null) d.giveawayCounter = 0;
     if(!d.rates) d.rates = { USD: null, THB: null, date: null };   // kip per dollar / per baht
     return d;
   }
@@ -4514,6 +4605,314 @@
     renderHistory();
   }
 
+  // ---------- ເບີກເຄື່ອງແຖມ (ເຄື່ອງທີ່ແຖມໃຫ້ລູກຄ້າ) ----------
+  // ບໍ່ແມ່ນການຂາຍ: ບໍ່ເຂົ້າຍອດຂາຍ ບໍ່ຕັດກຳໄລ ບໍ່ຕັດຕົ້ນທຶນ — ຕັດແຕ່ຈຳນວນໃນສະຕັອກ
+  var gvCart = [], gvSelectedId = null;
+  var gvSearchEl = document.getElementById("gvSearch");
+  var gvSuggestBox = document.getElementById("gvSuggestions");
+
+  function gvNextNo(){ return "GV-" + String((DATA.giveawayCounter || 0) + 1).padStart(5, "0"); }
+  function gvUpdateMeta(){
+    document.getElementById("gvNoLabel").textContent = gvNextNo();
+    document.getElementById("gvDateTime").textContent = fmtDMY(todayStr()) + " " + nowTime();
+  }
+  function gvReserved(stockId){
+    return gvCart.filter(function(c){ return c.stockId === stockId; })
+                 .reduce(function(sum, c){ return sum + c.qty; }, 0);
+  }
+  function gvRenderSuggestions(query){
+    query = (query || "").trim().toLowerCase();
+    if(!query){ gvSuggestBox.style.display = "none"; gvSuggestBox.innerHTML = ""; return; }
+    var matches = DATA.stock.filter(function(s){ return stockMatches(s, query); }).slice(0, 8);
+    gvSuggestBox.innerHTML = "";
+    if(matches.length === 0){
+      gvSuggestBox.innerHTML = '<div class="ssi" style="color:var(--ink-faint);">ບໍ່ພົບສິນຄ້າທີ່ກົງກັບຄຳຄົ້ນຫາ</div>';
+      gvSuggestBox.style.display = "block";
+      return;
+    }
+    matches.forEach(function(st){
+      var row = document.createElement("div");
+      row.className = "ssi";
+      row.innerHTML =
+        '<div class="ssi-name">'+(st.code ? '<span class="row-code">'+escapeHtml(st.code)+'</span> ' : "")+escapeHtml(st.name)+'</div>'+
+        '<div class="ssi-meta">ເຫຼືອ '+numFmt(st.qty)+' '+escapeHtml(st.unit || "")+(vehInfo(st) ? " · "+escapeHtml(vehInfo(st)) : "")+'</div>';
+      row.addEventListener("click", function(){
+        gvSelect(st);
+        document.getElementById("gvAdd").click();
+        gvSearchEl.focus();
+      });
+      gvSuggestBox.appendChild(row);
+    });
+    gvSuggestBox.style.display = "block";
+  }
+  function gvSelect(item){
+    gvSelectedId = item.id;
+    gvSearchEl.value = item.code ? item.code : item.name;
+    gvSuggestBox.style.display = "none";
+    gvSuggestBox.innerHTML = "";
+    document.getElementById("gvQty").value = "1";
+    document.getElementById("gvSelectedWrap").style.display = "block";
+    document.getElementById("gvSelectedLabel").textContent =
+      "ເລືອກແລ້ວ: " + (item.code ? item.code + " · " : "") + item.name +
+      " (ເຫຼືອ " + numFmt(item.qty) + " " + (item.unit || "") + ")";
+    document.getElementById("gvAdd").disabled = false;
+  }
+  function gvClearSelected(){
+    gvSelectedId = null;
+    gvSearchEl.value = "";
+    document.getElementById("gvSelectedWrap").style.display = "none";
+    document.getElementById("gvAdd").disabled = true;
+  }
+  gvSearchEl.addEventListener("input", function(){
+    if(gvSelectedId){ gvSelectedId = null; document.getElementById("gvAdd").disabled = true; }
+    gvRenderSuggestions(this.value);
+  });
+  gvSearchEl.addEventListener("focus", function(){ if(this.value.trim()) gvRenderSuggestions(this.value); });
+  gvSearchEl.addEventListener("keydown", function(e){
+    if(e.key !== "Enter") return;
+    e.preventDefault();
+    if(gvSelectedId){ document.getElementById("gvAdd").click(); return; }
+    var first = gvSuggestBox.querySelector(".ssi");
+    if(first) first.click();
+  });
+  document.addEventListener("click", function(e){
+    if(!gvSuggestBox.contains(e.target) && e.target !== gvSearchEl){ gvSuggestBox.style.display = "none"; }
+  });
+  document.getElementById("gvClearSelected").addEventListener("click", gvClearSelected);
+
+  // ຊຸດທີ່ມາພ້ອມກັນ (ເຊັ່ນ ໂຄງ 4 ເກຍ → ແກັດອຸປະກອນ) ໃຫ້ຕັດສະຕັອກຕາມນຳ
+  function gvAddBundleLines(item, parentQty){
+    var b = bundleForName(item.name);
+    if(!b) return;
+    b.components.forEach(function(c){
+      var st = stockByName(c.name);
+      if(!st) return;
+      var need = c.qty * parentQty;
+      var line = gvCart.find(function(x){ return x.stockId === st.id && x.bundleOf; });
+      if(line){ line.qty += need; return; }
+      gvCart.push({ stockId: st.id, code: st.code || "", name: st.name, unit: st.unit, qty: need,
+                    brand: st.brand || "", engineNo: st.engineNo || "", chassisNo: st.chassisNo || "",
+                    bundleOf: item.name });
+    });
+  }
+  function gvAddItem(item, qty){
+    var left = item.qty - gvReserved(item.id);
+    if(isSerialVehicle(item) && qty > 1){ alert("ລົດທີ່ມີເລກຖັງ ເບີກໄດ້ເທື່ອລະ 1 ຄັນ"); return false; }
+    if(qty > left){
+      if(!confirm("ສະຕັອກເຫຼືອ " + numFmt(left) + " " + (item.unit || "") + " ເທົ່ານັ້ນ\n\nຈະເບີກ " + numFmt(qty) + " ຢູ່ບໍ?")) return false;
+    }
+    var line = gvCart.find(function(x){ return x.stockId === item.id && !x.bundleOf; });
+    if(line){ line.qty += qty; }
+    else {
+      gvCart.push({ stockId: item.id, code: item.code || "", name: item.name, unit: item.unit, qty: qty,
+                    brand: item.brand || "", engineNo: item.engineNo || "", chassisNo: item.chassisNo || "",
+                    bundleOf: null });
+    }
+    gvAddBundleLines(item, qty);
+    gvRenderCart();
+    return true;
+  }
+  document.getElementById("gvAdd").addEventListener("click", function(){
+    var qty = parseNum(document.getElementById("gvQty").value);
+    if(isNaN(qty)) qty = 0;
+    if(!gvSelectedId){ alert("ກະລຸນາຄົ້ນຫາ ແລະ ເລືອກສິນຄ້າກ່ອນ"); return; }
+    if(qty <= 0){ alert("ຈຳນວນທີ່ເບີກຕ້ອງຫຼາຍກວ່າ 0"); return; }
+    var item = DATA.stock.find(function(s){ return s.id === gvSelectedId; });
+    if(!item) return;
+    if(gvAddItem(item, qty) !== false){
+      gvClearSelected();
+      document.getElementById("gvQty").value = "1";
+    }
+  });
+
+  function gvRenderCart(){
+    var el = document.getElementById("gvCartList");
+    if(!el) return;
+    var lines = gvCart.length;
+    var totalQty = gvCart.reduce(function(sum, c){ return sum + c.qty; }, 0);
+    document.getElementById("gvCount").textContent = lines ? lines + " ລາຍການ" : "";
+    document.getElementById("gvLineCount").textContent = numFmt(lines);
+    document.getElementById("gvTotalQty").textContent = numFmt(totalQty);
+    document.getElementById("gvBigQty").textContent = numFmt(totalQty);
+    gvUpdateMeta();
+    if(!lines){
+      el.innerHTML = '<tr class="pos-empty"><td colspan="7">ຍັງບໍ່ມີເຄື່ອງແຖມ — ພິມລະຫັດ ຫຼື ຊື່ສິນຄ້າຂ້າງເທິງ ແລ້ວກົດ Enter</td></tr>';
+      return;
+    }
+    el.innerHTML = "";
+    gvCart.forEach(function(c, idx){
+      var st = DATA.stock.find(function(s){ return s.id === c.stockId; });
+      var left = st ? st.qty : null;
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="col-no num">'+(idx+1)+'</td>'+
+        '<td class="col-code"><span class="row-code">'+escapeHtml(c.code || "-")+'</span></td>'+
+        '<td><div class="pos-name">'+escapeHtml(c.name)+(c.bundleOf ? ' <span class="bundle-tag">'+BUNDLE_TAG+'</span>' : "")+'</div>'+
+          '<div class="pos-name-meta">'+(c.code ? escapeHtml(c.code)+" · " : "")+escapeHtml(vehInfo(c) || c.unit || "")+'</div></td>'+
+        '<td class="num"><div class="qty-ctl">'+
+          '<button type="button" data-act="dec" aria-label="ຫຼຸດຈຳນວນ"'+(c.qty <= 1 ? " disabled" : "")+'>−</button>'+
+          '<input type="text" inputmode="decimal" value="'+numFmt(c.qty)+'" aria-label="ຈຳນວນ">'+
+          '<button type="button" data-act="inc" aria-label="ເພີ່ມຈຳນວນ">+</button>'+
+        '</div></td>'+
+        '<td class="col-unit">'+escapeHtml(c.unit || "")+'</td>'+
+        '<td class="col-stock num'+(left != null && c.qty > left ? " stock-over" : "")+'">'+(left != null ? numFmt(left) : "-")+'</td>'+
+        '<td class="num"><button class="row-del" title="ເອົາອອກ">&times;</button></td>';
+      var setQty = function(q){
+        if(!isNaN(q) && q > 0){ c.qty = q; }
+        gvRenderCart();
+      };
+      var qtyIn = tr.querySelector(".qty-ctl input");
+      tr.querySelector('[data-act="dec"]').addEventListener("click", function(){ setQty(c.qty - 1); });
+      tr.querySelector('[data-act="inc"]').addEventListener("click", function(){ setQty(c.qty + 1); });
+      qtyIn.addEventListener("change", function(){ setQty(parseNum(qtyIn.value)); });
+      tr.querySelector(".row-del").addEventListener("click", function(){
+        var removed = gvCart[idx];
+        gvCart.splice(idx, 1);
+        // ເອົາລາຍການຫຼັກອອກ → ເອົາຂອງແຖມທີ່ມາພ້ອມກັນອອກນຳ
+        if(removed && !removed.bundleOf){
+          gvCart = gvCart.filter(function(x){ return x.bundleOf !== removed.name; });
+        }
+        gvRenderCart();
+      });
+      el.appendChild(tr);
+    });
+  }
+
+  document.getElementById("gvCommit").addEventListener("click", function(){
+    if(!gvCart.length){ alert("ຍັງບໍ່ມີລາຍການເຄື່ອງແຖມ"); return; }
+    DATA.giveawayCounter = (DATA.giveawayCounter || 0) + 1;
+    var rec = {
+      id: uid(),
+      gvNo: "GV-" + String(DATA.giveawayCounter).padStart(5, "0"),
+      date: todayStr(), time: nowTime(),
+      customer: document.getElementById("gvCustomer").value.trim(),
+      ref: document.getElementById("gvRef").value.trim(),
+      note: document.getElementById("gvNote").value.trim(),
+      items: gvCart.map(function(c){
+        return { stockId: c.stockId, code: c.code, name: c.name, unit: c.unit, qty: c.qty,
+                 brand: c.brand || "", engineNo: c.engineNo || "", chassisNo: c.chassisNo || "",
+                 bundleOf: c.bundleOf || null };
+      })
+    };
+    // ຕັດສະຕັອກຢ່າງດຽວ (ບໍ່ແຕະເງິນ)
+    gvCart.forEach(function(c){
+      var st = DATA.stock.find(function(s){ return s.id === c.stockId; });
+      if(st){ st.qty = st.qty - c.qty; }
+    });
+    pruneSoldVehicles(gvCart.map(function(c){ return c.stockId; }));
+    DATA.giveaways.push(rec);
+    saveData();
+    gvCart = [];
+    gvClearSelected();
+    document.getElementById("gvCustomer").value = "";
+    document.getElementById("gvRef").value = "";
+    document.getElementById("gvNote").value = "";
+    gvRenderCart();
+    renderStockLists();
+    renderSummary();
+    gvRenderHistory();
+    printGiveaway(rec);
+  });
+
+  // ໃບເບີກເຄື່ອງແຖມ A5 (ບໍ່ມີລາຄາ — ບໍ່ແມ່ນບິນຂາຍ)
+  function printGiveaway(g){
+    var blank = '<span style="display:inline-block;min-width:200px;border-bottom:1px dotted #9A927F;"></span>';
+    var rows = g.items.map(function(it, i){
+      var detail = [it.code || "", vehInfo(it) || ""].filter(Boolean).join(" · ");
+      return "<tr><td>"+(i+1)+"</td><td>"+escapeHtml(it.name)+(it.bundleOf ? ' <small>('+BUNDLE_TAG+')</small>' : "")+
+             (detail ? "<br><small>"+escapeHtml(detail)+"</small>" : "")+"</td>"+
+             "<td class='num'>"+numFmt(it.qty)+"</td><td>"+escapeHtml(it.unit || "")+"</td></tr>";
+    }).join("");
+    var totalQty = g.items.reduce(function(sum, it){ return sum + it.qty; }, 0);
+    /* ເກີນ 4 ແຖວ A5 ຈະລົ້ນເປັນ 2 ໜ້າ (ສູງພິມໄດ້ ~204mm) ຈຶ່ງສະຫຼັບເປັນ A4 ໃຫ້ອັດຕະໂນມັດ */
+    printDoc("ໃບເບີກເຄື່ອງແຖມ " + (g.gvNo || fmtDMY(g.date)),
+      /* ບີບໃຫ້ພໍດີ 1 ໜ້າ A5 (ສະເພາະໃບນີ້) */
+      "<style>h1{margin:0 0 2px;font-size:17px}.sub{margin:0 0 4px}"+
+      ".cust{margin:8px 0 0;padding:7px 10px;line-height:1.6}"+
+      ".items th,.items td{padding:4px 6px}.grand{margin-top:8px;padding:8px 12px}"+
+      ".signs{margin-top:26px}</style>"+
+      "<h1>ໃບເບີກເຄື່ອງແຖມ</h1>"+
+      '<p class="sub">ເລກທີ '+escapeHtml(g.gvNo || "")+' · '+fmtDMY(g.date)+" "+g.time+" · ບໍ່ຄິດເງິນ (ບໍ່ແມ່ນບິນຂາຍ)</p>"+
+      '<div class="cust">'+
+        '<div class="meta-row"><b>ຜູ້ຮັບເຄື່ອງແຖມ:</b>'+(g.customer ? escapeHtml(g.customer) : blank)+"</div>"+
+        ((g.ref || g.note) ? '<div class="meta-row"><b>ໝາຍເຫດ:</b>'+
+            [g.ref ? "ອ້າງອີງບິນ "+escapeHtml(g.ref) : "", g.note ? escapeHtml(g.note) : ""].filter(Boolean).join(" · ")+"</div>" : "")+
+      "</div>"+
+      '<table class="items"><thead><tr><th>ລຳດັບ</th><th>ລາຍການ</th><th class="num">ຈຳນວນ</th><th>ໜ່ວຍ</th></tr></thead>'+
+      "<tbody>"+rows+"</tbody></table>"+
+      '<div class="grand"><span>ລວມເຄື່ອງແຖມ</span><span>'+numFmt(totalQty)+" ໜ່ວຍ</span></div>"+
+      signsHtml("ຜູ້ຮັບເຄື່ອງ", "", "ຜູ້ເບີກ / ຜູ້ອະນຸມັດ", "("+BRANCH_NAME+")"),
+      g.items.length > 4 ? { page:"A4" } : undefined);
+  }
+
+  // ປະຫວັດການເບີກ (ເລືອກຊ່ວງວັນທີ · ພິມຄືນ · ລຶບແລ້ວຄືນສະຕັອກ)
+  function gvRenderHistory(){
+    var el = document.getElementById("gvHistList");
+    if(!el) return;
+    var from = document.getElementById("gvFrom").value || todayStr().slice(0,7)+"-01";
+    var to = document.getElementById("gvTo").value || todayStr();
+    var list = (DATA.giveaways || []).filter(function(g){ return g.date >= from && g.date <= to; })
+      .sort(function(a, b){ return (b.date + b.time).localeCompare(a.date + a.time); });
+    document.getElementById("gvHistCount").textContent = list.length ? list.length + " ໃບ" : "";
+    el.innerHTML = "";
+    if(!list.length){
+      el.innerHTML = '<p class="empty-note">ບໍ່ມີການເບີກເຄື່ອງແຖມໃນຊ່ວງນີ້</p>';
+      return;
+    }
+    list.forEach(function(g){
+      var totalQty = g.items.reduce(function(sum, it){ return sum + it.qty; }, 0);
+      var names = g.items.map(function(it){ return it.name; }).join(", ");
+      var row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<div class="row-main"><p class="row-name"><span class="row-code">'+escapeHtml(g.gvNo || "")+'</span> '+
+          escapeHtml(g.customer || "ລູກຄ້າທົ່ວໄປ")+'</p>'+
+        '<p class="row-meta">'+fmtDMY(g.date)+" "+g.time+" · "+escapeHtml(names)+(g.note ? " · "+escapeHtml(g.note) : "")+'</p></div>'+
+        '<span class="row-val">'+numFmt(totalQty)+' ໜ່ວຍ</span>'+
+        '<button class="row-print" title="ພິມໃບເບີກ" aria-label="ພິມໃບເບີກ"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></svg></button>'+
+        '<button class="row-del" title="ລຶບ ແລະ ຄືນສະຕັອກ">&times;</button>';
+      row.querySelector(".row-print").addEventListener("click", function(){ printGiveaway(g); });
+      row.querySelector(".row-del").addEventListener("click", function(){
+        confirmDelete("ລຶບໃບເບີກເຄື່ອງແຖມນີ້?",
+          (g.gvNo || "") + " · " + numFmt(totalQty) + " ໜ່ວຍ · ສະຕັອກຈະຄືນໃຫ້ອັດຕະໂນມັດ", function(){
+          g.items.forEach(function(it){
+            var st = stockRowForReturn(it);
+            if(st){ st.qty = st.qty + it.qty; }
+          });
+          DATA.giveaways = DATA.giveaways.filter(function(x){ return x.id !== g.id; });
+          saveData();
+          renderStockLists();
+          renderSummary();
+          gvRenderHistory();
+        });
+      });
+      el.appendChild(row);
+    });
+  }
+  document.getElementById("gvFrom").value = todayStr().slice(0,7)+"-01";
+  document.getElementById("gvTo").value = todayStr();
+  ["gvFrom","gvTo"].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("change", gvRenderHistory);
+  });
+  document.getElementById("gvThisMonth").addEventListener("click", function(){
+    document.getElementById("gvFrom").value = todayStr().slice(0,7)+"-01";
+    document.getElementById("gvTo").value = todayStr();
+    gvRenderHistory();
+  });
+  document.querySelectorAll("#gvSeg button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#gvSeg button").forEach(function(x){ x.classList.toggle("active", x === b); });
+      var hist = b.dataset.view === "history";
+      document.getElementById("gvNewView").style.display = hist ? "none" : "block";
+      document.getElementById("gvHistView").style.display = hist ? "block" : "none";
+      clearPickModes();
+      window.scrollTo(0, 0);
+      if(hist){ gvRenderHistory(); }
+      else if(isDesktop()){ gvSearchEl.focus(); }
+    });
+  });
+
   // ---------- EXPENSES ----------
   var editingExp = null;
   function startEditExpense(e){
@@ -5147,7 +5546,7 @@
   // ---------- CLOUD SYNC ----------
   // Supabase holds the real books; the browser copy is only a cache so the shop keeps working when the line drops.
   // Every record is its own row, so two devices editing different bills never overwrite each other.
-  var SYNC_KINDS = ["stock","bills","purchases","expenses","deposits","transfers","opening","incomes"];
+  var SYNC_KINDS = ["stock","bills","purchases","expenses","deposits","transfers","opening","incomes","giveaways"];
   var SYNC_BRANCH = "hun";
   var synced = {};            // kind -> id -> the JSON we last agreed on with the server
   var syncedSettings = null;
@@ -5156,7 +5555,8 @@
   function settingsPayload(){
     return { billCounter: DATA.billCounter, purchaseCounter: DATA.purchaseCounter,
              transferCounter: DATA.transferCounter, expenseCounter: DATA.expenseCounter,
-             depositCounter: DATA.depositCounter, incomeCounter: DATA.incomeCounter, rates: DATA.rates };
+             depositCounter: DATA.depositCounter, incomeCounter: DATA.incomeCounter,
+             giveawayCounter: DATA.giveawayCounter, rates: DATA.rates };
   }
   // the sheet stays quiet while the sync is healthy; it only speaks up when something needs attention
   function setSyncNote(text, cls){
@@ -5284,6 +5684,7 @@
     renderTrList(); renderTrHistory(); refreshBranchList(); renderCart();
     renderExpenseTab(); renderIncomeTab(); renderDepositTab(); refreshBankList(); renderSummary();
     renderExpDocHead();
+    gvRenderCart(); gvRenderHistory();
     renderHistory && renderHistory();
   }
   window.addEventListener("online", function(){ syncReady ? pushCloud() : pullCloud(); });
