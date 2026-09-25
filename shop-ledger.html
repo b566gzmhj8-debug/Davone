@@ -3319,8 +3319,7 @@
         alert("ຜ່ອນໄດ້ແຕ່ຄ່າລົດໃຫຍ່\n\nຄ່າອາໄຫຼ່ຍັງຂາດ " + moneyMap(over, " + ") + " — ກະລຸນາຮັບເງິນເພີ່ມກ່ອນ");
         return;
       }
-      var got = moneyMap(readPaid(), " + ");
-      if(!confirm("ອອກບິນເປັນຜ່ອນ?\n\nຮັບແລ້ວ " + got + "\nຍັງຄ້າງ " + moneyMap(owed.map, " + "))) return;
+      /* ປຸ່ມບອກຢູ່ແລ້ວວ່າ "ບັນທຶກເປັນຜ່ອນ · ຄ້າງ ..." ຈຶ່ງບໍ່ຕ້ອງຖາມຊ້ຳ */
       closePayModal();
       commitSale({ parts: parts, change: 0, owed: owed.map, credit: true,
                    rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
