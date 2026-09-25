@@ -3047,12 +3047,53 @@
     /* ລູກຄ້າຊື້ລົດແລ້ວຜ່ອນ: ຈ່າຍບໍ່ຄົບກໍ່ອອກບິນໄດ້ ແລ້ວຈົດຍອດຄ້າງໄວ້ໃນບິນ
        (ພາຍຫຼັງມາຊຳລະ ໃຫ້ລົງທີ່ໜ້າ "ຮັບເງິນອື່ນ" → ຊຳລະໜີ້ຄ່າລົດ) */
     var owed = payOwedMap();
+    var lim = payCreditLimit();
     var creditBtn = document.getElementById("payCredit");
-    var canCredit = !disc.err && !st.ok && owed.ok && hasAmounts(owed.map);
-    creditBtn.style.display = canCredit ? "inline-flex" : "none";
-    creditBtn.textContent = canCredit
-      ? "ບັນທຶກເປັນຜ່ອນ · ຄ້າງ " + moneyMap(owed.map, " + ")
-      : "ບັນທຶກເປັນຜ່ອນ";
+    var shortPaid = !disc.err && !st.ok && owed.ok && hasAmounts(owed.map);
+    creditBtn.style.display = shortPaid ? "inline-flex" : "none";
+    if(shortPaid){
+      if(!lim.hasVeh){
+        /* ບິນອາໄຫຼ່ລ້ວນ: ຫ້າມຜ່ອນ */
+        creditBtn.disabled = true;
+        creditBtn.textContent = "ອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມ (ຜ່ອນໄດ້ແຕ່ລົດໃຫຍ່)";
+      } else {
+        var over = {};
+        Object.keys(owed.map).forEach(function(c){
+          var x = owed.map[c] - (lim.cap[c] || 0);
+          if(x > 0.0001){ over[c] = x; }
+        });
+        if(hasAmounts(over)){
+          /* ຄ້າງເກີນຄ່າລົດ = ຄ່າອາໄຫຼ່ຍັງບໍ່ຄົບ */
+          creditBtn.disabled = true;
+          creditBtn.textContent = "ຄ່າອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມ · ຮັບເພີ່ມ " + moneyMap(over, " + ");
+        } else {
+          creditBtn.disabled = false;
+          creditBtn.textContent = "ບັນທຶກເປັນຜ່ອນ · ຄ້າງ " + moneyMap(owed.map, " + ");
+        }
+      }
+    } else {
+      creditBtn.disabled = false;
+      creditBtn.textContent = "ບັນທຶກເປັນຜ່ອນ";
+    }
+  }
+
+  // ຜ່ອນໄດ້ແຕ່ "ຄ່າລົດໃຫຍ່" — ຄ່າອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມ
+  // ສ່ວນລດຫັກຕາມສ່ວນ ຈຶ່ງໄດ້ເພດານທີ່ຄ້າງໄດ້ຕໍ່ສະກຸນເງິນ
+  function payCreditLimit(){
+    var gross = {}, veh = {};
+    cart.forEach(function(c){
+      addTo(gross, c.cur, c.total);
+      if(isVehicleItem(c)){ addTo(veh, c.cur, c.total); }
+    });
+    var disc = readDiscount().amounts || {};
+    var cap = {};
+    Object.keys(veh).forEach(function(c){
+      var g = gross[c] || 0;
+      if(!(g > 0)){ return; }
+      var net = g - (disc[c] || 0);
+      cap[c] = Math.max(0, net * (veh[c] / g));
+    });
+    return { cap: cap, hasVeh: hasAmounts(veh) };
   }
 
   // ຍອດທີ່ຍັງຄ້າງ ແຍກຕາມສະກຸນເງິນ — ໃຊ້ໄດ້ສະເພາະເມື່ອຈ່າຍເປັນສະກຸນທີ່ຢູ່ໃນບິນ (ບໍ່ຕ້ອງໃຊ້ອັດຕາ)
@@ -3221,6 +3262,17 @@
     if(disc.err) return;
     var owed = payOwedMap();
     if(!owed.ok || !hasAmounts(owed.map)) return;
+    var lim = payCreditLimit();
+    if(!lim.hasVeh){ alert("ບິນນີ້ບໍ່ມີລົດໃຫຍ່ — ຄ່າອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມຈຳນວນ"); return; }
+    var over = {};
+    Object.keys(owed.map).forEach(function(c){
+      var x = owed.map[c] - (lim.cap[c] || 0);
+      if(x > 0.0001){ over[c] = x; }
+    });
+    if(hasAmounts(over)){
+      alert("ຜ່ອນໄດ້ແຕ່ຄ່າລົດໃຫຍ່\n\nຄ່າອາໄຫຼ່ຍັງຂາດ " + moneyMap(over, " + ") + " — ກະລຸນາຮັບເງິນເພີ່ມກ່ອນ");
+      return;
+    }
     var st = readPayment();
     var parts = payParts.map(function(p){ return { cur: p.cur, amount: p.amount, method: p.method }; });
     CURS.forEach(function(c){
