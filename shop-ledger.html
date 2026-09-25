@@ -417,11 +417,13 @@
   .pos-sum{padding:14px 16px 16px;}
   .sum-line{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;font-size:14px;color:var(--ink-soft);}
   .sum-line b{color:var(--ink);font-variant-numeric:tabular-nums;}
-  .sum-disc{display:flex;align-items:stretch;gap:8px;padding:6px 0;}
+  /* ແຖວສ່ວນລດ: ຊ່ອງໃສ່ເລກຕ້ອງກວ້າງພໍໃຫ້ເຫັນຕົວເລກເຕັມ ຖ້າບໍ່ພໍໃຫ້ຕົກແຖວໃໝ່ ບໍ່ໃຫ້ທັບກັນ */
+  .sum-disc{display:flex;align-items:stretch;gap:8px;padding:6px 0;flex-wrap:wrap;row-gap:6px;}
   .sum-disc label{margin:0;align-self:center;font-size:14px;color:var(--ink-soft);white-space:nowrap;}
-  .sum-disc input{flex:1;min-width:0;text-align:right;}
+  .sum-disc input{flex:1 1 120px;min-width:104px;text-align:right;}
+  .sum-disc .pay-unit{flex:none;}
   .sum-disc .pay-unit button{min-width:40px;font-size:15px;}
-  .sum-disc b{align-self:center;min-width:74px;text-align:right;color:var(--red);font-variant-numeric:tabular-nums;}
+  .sum-disc b{align-self:center;min-width:74px;margin-left:auto;text-align:right;color:var(--red);font-variant-numeric:tabular-nums;white-space:nowrap;}
   .sum-total{margin-top:6px;padding-top:10px;border-top:1px solid var(--line);color:var(--ink);font-size:15px;}
   .sum-total b{font-size:22px;}
   .pos-sum .btn{margin-top:10px;white-space:nowrap;}
@@ -454,6 +456,7 @@
   .pos-big-eq:empty,.pay-eq:empty{display:none;}
   .sum-disc .pay-unit button{min-width:34px;padding:0 6px;}
   .sum-disc b{min-width:0;}
+  .sum-disc input{flex:1 1 104px;min-width:96px;}
   .amt-cur-row{display:flex;gap:8px;}
   .amt-cur-row select{width:auto;flex:none;}
   #priceModal .modal{max-width:440px;}
