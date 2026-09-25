@@ -286,6 +286,8 @@
   .st-chip{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11.5px;white-space:nowrap;background:var(--green-bg);color:var(--green);}
   .st-chip.tr{background:#F3E9DC;color:var(--brown-deep);}
   .st-chip.mx{background:var(--surface-alt);color:var(--ink-soft);border:1px solid var(--line);}
+  .st-chip.owe{background:var(--red-bg);color:var(--red);margin-left:4px;}
+  .st-owe{font-size:11.5px;color:var(--red);margin-top:2px;white-space:nowrap;}
   .st-detail td{background:var(--surface-alt);padding:4px 16px 10px 74px;}
   .stmt-table td.empty-note{text-align:center;padding:24px 10px;}
   /* money actually taken in, split by currency and by cash / transfer */
@@ -1213,7 +1215,7 @@
           <div><p class="stmt-title">ລາຍງານການຂາຍ</p><p class="stmt-sub" id="histPeriod"></p></div>
           <span class="count" id="histListCount"></span>
         </div>
-        <div class="stmt-sum"><div><p>ຈຳນວນບິນ</p><b id="histBillCount">0</b></div><div><p>ຍອດຂາຍລວມ</p><b id="histTotal">0</b></div><div><p>ກຳໄລຈາກການຂາຍ</p><b class="pos" id="histProfit">0</b></div></div>
+        <div class="stmt-sum"><div><p>ຈຳນວນບິນ</p><b id="histBillCount">0</b></div><div><p>ຍອດຂາຍລວມ</p><b id="histTotal">0</b></div><div><p>ກຳໄລຈາກການຂາຍ</p><b class="pos" id="histProfit">0</b></div><div id="histOwedBox" style="display:none;"><p>ຄ້າງຊຳລະ</p><b class="neg" id="histOwed">0</b></div></div>
         <div class="stmt-cash" id="histCash"></div>
         <div class="pick-hint" data-list="histBillList"><span></span><button class="link-btn">ຍົກເລີກ</button></div>
         <table class="stmt-table">
@@ -1754,6 +1756,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" id="payCancel">ກັບຄືນ</button>
+      <button class="btn btn-outline" id="payCredit" style="display:none;" title="ອອກບິນໄວ້ ແລ້ວລູກຄ້າມາຜ່ອນຕໍ່ພາຍຫຼັງ">ບັນທຶກເປັນຜ່ອນ</button>
       <button class="btn btn-brown" id="payConfirm" disabled>ບັນທຶກ ແລະ ພິມບິນ</button>
     </div>
   </div>
@@ -2827,6 +2830,7 @@
       if(p.transfer > 0){ out.push("ຮັບເງິນໂອນ "+money(p.transfer, "THB")); }
       if(p.change > 0){ out.push("ເງິນທອນ "+money(p.change, "THB")); }
     }
+    if(hasAmounts(billOwed(bill))){ out.push("ຄ້າງຊຳລະ "+moneyMap(billOwed(bill), " + ")); }
     return out.length ? out.join(" · ") : "ຮັບເງິນສົດ 0";
   }
 
@@ -3040,6 +3044,28 @@
     row.classList.toggle("good", st.ok);
     row.classList.toggle("bad", !st.ok);
     payConfirm.disabled = !st.ok || !!disc.err;
+    /* ລູກຄ້າຊື້ລົດແລ້ວຜ່ອນ: ຈ່າຍບໍ່ຄົບກໍ່ອອກບິນໄດ້ ແລ້ວຈົດຍອດຄ້າງໄວ້ໃນບິນ
+       (ພາຍຫຼັງມາຊຳລະ ໃຫ້ລົງທີ່ໜ້າ "ຮັບເງິນອື່ນ" → ຊຳລະໜີ້ຄ່າລົດ) */
+    var owed = payOwedMap();
+    var creditBtn = document.getElementById("payCredit");
+    var canCredit = !disc.err && !st.ok && owed.ok && hasAmounts(owed.map);
+    creditBtn.style.display = canCredit ? "inline-flex" : "none";
+    creditBtn.textContent = canCredit
+      ? "ບັນທຶກເປັນຜ່ອນ · ຄ້າງ " + moneyMap(owed.map, " + ")
+      : "ບັນທຶກເປັນຜ່ອນ";
+  }
+
+  // ຍອດທີ່ຍັງຄ້າງ ແຍກຕາມສະກຸນເງິນ — ໃຊ້ໄດ້ສະເພາະເມື່ອຈ່າຍເປັນສະກຸນທີ່ຢູ່ໃນບິນ (ບໍ່ຕ້ອງໃຊ້ອັດຕາ)
+  function payOwedMap(){
+    var paid = readPaid();
+    var extra = Object.keys(paid).some(function(c){ return !(Math.abs(payDueMap[c] || 0) > 0.0001); });
+    var owed = {};
+    Object.keys(payDueMap).forEach(function(c){
+      var left = (payDueMap[c] || 0) - (paid[c] || 0);
+      if(left > 0.0001){ owed[c] = left; }
+    });
+    var over = Object.keys(payDueMap).some(function(c){ return (paid[c] || 0) - (payDueMap[c] || 0) > 0.0001; });
+    return { map: owed, ok: !extra && !over };
   }
 
   function setPayMethod(cur, m){
@@ -3188,6 +3214,27 @@
     closePayModal();
     // rates are kept only when the bill needed them (paid in another currency, or change in kip)
     commitSale({ parts: parts, change: st.change, rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
+  });
+
+  document.getElementById("payCredit").addEventListener("click", function(){
+    var disc = readDiscount();
+    if(disc.err) return;
+    var owed = payOwedMap();
+    if(!owed.ok || !hasAmounts(owed.map)) return;
+    var st = readPayment();
+    var parts = payParts.map(function(p){ return { cur: p.cur, amount: p.amount, method: p.method }; });
+    CURS.forEach(function(c){
+      var v = parseNum(payInputs[c].value) || 0;
+      if(!(v > 0)){ return; }
+      var m = payMethods[c];
+      var same = parts.find(function(x){ return x.cur === c && x.method === m; });
+      if(same){ same.amount += v; } else { parts.push({ cur: c, amount: v, method: m }); }
+    });
+    if(!confirm("ອອກບິນເປັນ \u0e84\u0ec9\u0eb2\u0e87\u0e8a\u0eb3\u0ea5\u0eb0? \n\nຮັບແລ້ວ " + (moneyMap(readPaid(), " + ") === "0" ? "0" : moneyMap(readPaid(), " + ")) +
+                 "\nຍັງຄ້າງ " + moneyMap(owed.map, " + "))) return;
+    closePayModal();
+    commitSale({ parts: parts, change: 0, owed: owed.map, credit: true,
+                 rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
   });
 
   document.getElementById("btnCommitSale").addEventListener("click", openPayModal);
@@ -4228,6 +4275,10 @@
           '<div class="sub-total"><span>ສ່ວນລດ'+(bill.discountRate ? " "+numFmt(bill.discountRate)+"%" : "")+'</span><span>'+moneyMap(negMap(discs), "<br>")+"</span></div>"
         : "")+
       '<div class="grand"><span>ຍອດລວມທັງໝົດ</span><span>'+moneyMap(billTotals(bill), "<br>")+"</span></div>"+
+      (billIsCredit(bill)
+        ? '<div class="sub-total"><span>ຈ່າຍແລ້ວ</span><span>'+moneyMap(mergeInto(mergeInto({}, billReceipts(bill).cash), billReceipts(bill).transfer), "<br>")+"</span></div>"+
+          '<div class="grand" style="background:linear-gradient(135deg,#8A2A20 0%,#B3382A 100%);"><span>ຍັງຄ້າງຊຳລະ</span><span>'+moneyMap(billOwed(bill), "<br>")+"</span></div>"
+        : "")+
       (hasVehicle(bill.items)
         ? signsHtml("ຜູ້ຈ່າຍເງິນ ແລະ ຮັບລົດ", "(ໄດ້ຮັບລົດຮຽບຮ້ອຍແລ້ວ)", "ຜູ້ປ່ອຍລົດ ແລະ ຮັບເງິນ", "")
         : signsHtml("ຜູ້ຈ່າຍເງິນ ແລະ ຮັບອາໄຫລ່", "(ໄດ້ຮັບເຄື່ອງຄົບແລ້ວ)", "ຜູ້ຈ່າຍອາໄຫລ່ ແລະ ຮັບເງິນ", ""))+
@@ -4482,6 +4533,12 @@
     return BRANCH_NAME+" · "+(from === to ? "ວັນທີ "+fmtDMY(from) : fmtDMY(from)+" – "+fmtDMY(to));
   }
   // how a bill was paid, for the statement's ຊຳລະ column
+  // ຍອດທີ່ລູກຄ້າຍັງຄ້າງຂອງບິນນັ້ນ (ບິນຜ່ອນ) — ວ່າງເປົ່າ = ຈ່າຍຄົບແລ້ວ
+  function billOwed(bill){
+    var p = bill && bill.payment;
+    return (p && p.owed) ? p.owed : {};
+  }
+  function billIsCredit(bill){ return hasAmounts(billOwed(bill)); }
   var PAY_KIND = { cash: ["ສົດ", ""], transfer: ["ໂອນ", " tr"], mixed: ["ສົດ+ໂອນ", " mx"] };
   function billPayKind(bill){
     var p = bill.payment;
@@ -4566,9 +4623,14 @@
     var r = billReceipts(bill);
     var got = mergeInto(mergeInto({}, r.cash), r.transfer);
     var txt = moneyMap(got, " + ");
+    var owed = billOwed(bill);
+    var owedTxt = hasAmounts(owed) ? moneyMap(owed, " + ") : "";
     return {
-      html: '<span class="st-chip'+PAY_KIND[kind][1]+'">'+PAY_KIND[kind][0]+'</span>'+(txt !== "0" ? '<div class="st-got">'+txt+'</div>' : ""),
-      text: PAY_KIND[kind][0]+(txt !== "0" ? " "+txt : "")
+      html: '<span class="st-chip'+PAY_KIND[kind][1]+'">'+PAY_KIND[kind][0]+'</span>'+
+            (owedTxt ? '<span class="st-chip owe">ຄ້າງ</span>' : "")+
+            (txt !== "0" ? '<div class="st-got">'+txt+'</div>' : "")+
+            (owedTxt ? '<div class="st-owe">ຄ້າງ '+owedTxt+'</div>' : ""),
+      text: PAY_KIND[kind][0]+(txt !== "0" ? " "+txt : "")+(owedTxt ? " · ຄ້າງ "+owedTxt : "")
     };
   }
 
@@ -5576,6 +5638,11 @@
     document.getElementById("histBillCount").textContent = bills.length;
     document.getElementById("histTotal").innerHTML = moneyMap(total, "<br>");
     document.getElementById("histProfit").innerHTML = moneyMap(profit, "<br>");
+    /* ຍອດທີ່ລູກຄ້າຍັງຄ້າງ (ບິນຜ່ອນ) ໃນຊ່ວງນີ້ */
+    var owedAll = {};
+    bills.forEach(function(b){ mergeInto(owedAll, billOwed(b)); });
+    document.getElementById("histOwedBox").style.display = hasAmounts(owedAll) ? "block" : "none";
+    document.getElementById("histOwed").innerHTML = moneyMap(owedAll, "<br>");
     if(hideVehMoney()){ document.querySelector("#histProfit").previousElementSibling.textContent = "ກຳໄລອາໄຫຼ່"; }
     document.getElementById("histListCount").textContent = bills.length ? bills.length+" ບິນ" : "";
     document.getElementById("histPeriod").textContent = periodText(from, to);
