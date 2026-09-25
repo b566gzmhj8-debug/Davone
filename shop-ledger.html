@@ -4081,6 +4081,7 @@
       ".rep th:nth-child(2),.rep td:nth-child(2){width:1%;white-space:nowrap;}"+
       ".rep th:nth-child(5),.rep td:nth-child(5){width:auto;}"+
       ".rec th,.rec td{font-size:12px;padding:6px 6px;}"+
+      "tfoot td{font-weight:700;background:#FBF7EC;border-top:1.5px solid #122A55;}"+
       ".sec{font-size:13.5px;font-weight:700;color:#122A55;margin:20px 0 2px;padding-left:9px;border-left:3px solid #C9A227;}"+
       ".rep-sum{display:flex;gap:26px;margin:14px 0 2px;font-size:11px;color:#6B6455;}"+
       ".rep-sum b{display:block;margin-top:3px;font-size:15px;color:#122A55;}"+
@@ -4268,7 +4269,13 @@
 
   // every bill of the chosen range on one A4 sheet: who bought, what they took, and the money actually received
   function printDayReport(bills, from, to){
-    if(!bills.length){ alert("ບໍ່ມີບິນຂາຍໃນຊ່ວງນີ້"); return; }
+    var inRange = function(x){ return x.date >= from && x.date <= to; };
+    var incList = (DATA.incomes || []).filter(inRange).sort(function(a2,b2){ return (a2.date+a2.time).localeCompare(b2.date+b2.time); });
+    var expList = (DATA.expenses || []).filter(inRange).sort(function(a2,b2){ return (a2.date+a2.time).localeCompare(b2.date+b2.time); });
+    var gvList  = (DATA.giveaways || []).filter(inRange).sort(function(a2,b2){ return (a2.date+a2.time).localeCompare(b2.date+b2.time); });
+    if(!bills.length && !incList.length && !expList.length && !gvList.length){
+      alert("ບໍ່ມີລາຍການໃນຊ່ວງນີ້"); return;
+    }
     var sorted = bills.slice().sort(function(a,b){ return (a.date+a.time).localeCompare(b.date+b.time); });
     var total = {}, profit = {}, names = {}, walkIns = 0;
     sorted.forEach(function(b){
@@ -4297,7 +4304,8 @@
     var recRows = curs.map(function(c){
       return "<tr><td>"+CUR[c].sym+" "+CUR[c].name+"</td>"+
         '<td class="num">'+cell(f.opening[c], c)+"</td>"+
-        '<td class="num">'+cell(((f.cash[c] || 0) + (f.unknown[c] || 0) + (f.other[c] || 0)), c)+"</td>"+
+        '<td class="num">'+cell(((f.cash[c] || 0) + (f.unknown[c] || 0)), c)+"</td>"+
+        '<td class="num">'+cell(f.other[c], c)+"</td>"+
         '<td class="num">'+cell(f.dep[c], c, true)+"</td>"+
         '<td class="num">'+cell(f.exp[c], c, true)+"</td>"+
         '<td class="num"><b>'+money(f.closing[c] || 0, c)+"</b></td>"+
@@ -4309,6 +4317,43 @@
         "<td>"+escapeHtml(d.by || "-")+"</td>"+
         '<td class="num">'+money(d.amount, curOf(d))+"</td></tr>";
     }).join("");
+
+    var stamp = function(x){ return from === to ? x.time : x.date.slice(8,10)+"/"+x.date.slice(5,7)+" "+x.time; };
+    /* ບອກໃຫ້ຮູ້ວ່າເງິນສົດມື້ນັ້ນມາຈາກໃສ ນອກຈາກການຂາຍ (ເຊັ່ນ ລູກຄ້າມາຊຳລະໜີ້ຄ່າລົດ) */
+    var incSection = !incList.length ? "" :
+      '<p class="sec">ຮັບເງິນອື່ນ (ນອກຈາກການຂາຍ)</p>'+
+      '<table class="rec"><thead><tr><th>ເວລາ</th><th>ເລກທີ</th><th>ລາຍການ</th><th>ຮັບຈາກ</th><th>ຮັບເປັນ</th><th class="num">ຈຳນວນເງິນ</th></tr></thead><tbody>'+
+      incList.map(function(e){
+        return "<tr><td>"+stamp(e)+"</td><td>"+escapeHtml(e.incNo || "-")+"</td>"+
+          "<td>"+escapeHtml(e.desc || "-")+(e.note ? " <small>("+escapeHtml(e.note)+")</small>" : "")+"</td>"+
+          "<td>"+escapeHtml(e.payer || "-")+"</td>"+
+          "<td>"+(e.method === "transfer" ? "ເງິນໂອນ" : "ເງິນສົດ")+"</td>"+
+          '<td class="num">'+money(e.amount, curOf(e))+"</td></tr>";
+      }).join("")+
+      '</tbody><tfoot><tr><td colspan="5">ລວມຮັບເງິນອື່ນ</td><td class="num">'+
+        moneyMap(incList.reduce(function(m,e){ return addTo(m, curOf(e), e.amount); }, {}), "<br>")+"</td></tr></tfoot></table>";
+    var expSection = !expList.length ? "" :
+      '<p class="sec">ລາຍຈ່າຍ / ເງິນເບີກ (ຫັກຈາກເງິນສົດໃນມື)</p>'+
+      '<table class="rec"><thead><tr><th>ເວລາ</th><th>ເລກທີ</th><th>ລາຍການ</th><th>ຜູ້ຮັບເງິນ</th><th class="num">ຈຳນວນເງິນ</th></tr></thead><tbody>'+
+      expList.map(function(e){
+        return "<tr><td>"+stamp(e)+"</td><td>"+escapeHtml(e.expNo || "-")+"</td>"+
+          "<td>"+escapeHtml(e.desc || "-")+"</td><td>"+escapeHtml(e.payee || "-")+"</td>"+
+          '<td class="num">'+money(e.amount, curOf(e))+"</td></tr>";
+      }).join("")+
+      '</tbody><tfoot><tr><td colspan="4">ລວມລາຍຈ່າຍ</td><td class="num">'+
+        moneyMap(expList.reduce(function(m,e){ return addTo(m, curOf(e), e.amount); }, {}), "<br>")+"</td></tr></tfoot></table>";
+    /* ເຄື່ອງແຖມ: ບໍ່ມີເງິນ ແຕ່ສະຕັອກຫຼຸດ ຈຶ່ງຕ້ອງມີໃນລາຍງານ */
+    var gvSection = !gvList.length ? "" :
+      '<p class="sec">ເບີກເຄື່ອງແຖມໃຫ້ລູກຄ້າ (ຕັດສະຕັອກ · ບໍ່ຄິດເງິນ)</p>'+
+      '<table class="rec"><thead><tr><th>ເວລາ</th><th>ເລກທີ</th><th>ຜູ້ຮັບ</th><th>ລາຍການ</th><th class="num">ຈຳນວນ</th></tr></thead><tbody>'+
+      gvList.map(function(g){
+        return "<tr><td>"+stamp(g)+"</td><td>"+escapeHtml(g.gvNo || "-")+"</td>"+
+          "<td>"+escapeHtml(g.customer || "ລູກຄ້າທົ່ວໄປ")+(g.ref ? " <small>("+escapeHtml(g.ref)+")</small>" : "")+"</td>"+
+          "<td>"+g.items.map(function(it){ return escapeHtml(it.name)+" × "+numFmt(it.qty)+" "+escapeHtml(it.unit || ""); }).join("<br>")+"</td>"+
+          '<td class="num">'+numFmt(g.items.reduce(function(sum,it){ return sum + it.qty; }, 0))+"</td></tr>";
+      }).join("")+
+      '</tbody><tfoot><tr><td colspan="4">ລວມເຄື່ອງແຖມ</td><td class="num">'+
+        numFmt(gvList.reduce(function(sum,g){ return sum + g.items.reduce(function(t,it){ return t + it.qty; }, 0); }, 0))+" ໜ່ວຍ</td></tr></tfoot></table>";
 
     printDoc("ລາຍງານການຂາຍ "+fmtDMY(from)+(from === to ? "" : " – "+fmtDMY(to)),
       "<h1>"+(from === to ? "ລາຍງານການຂາຍປະຈຳວັນ" : "ລາຍງານການຂາຍ")+"</h1>"+
@@ -4322,10 +4367,12 @@
       '<table class="rep"><thead><tr><th>ລ/ດ</th><th>ເວລາ</th><th>ເລກທີບິນ</th><th>ລູກຄ້າ</th><th>ລາຍການ</th><th>ການຊຳລະ</th><th class="num">ຍອດບິນ</th></tr></thead>'+
       "<tbody>"+rows+"</tbody></table>"+
       '<div class="grand"><span>ຍອດຂາຍລວມ '+sorted.length+" ບິນ</span><span>"+moneyMap(total, "<br>")+"</span></div>"+
-      '<p class="sec">ເງິນສົດໃນມື (ຍົກມາ + ຮັບສົດ − ມອບທະນາຄານ − ລາຍຈ່າຍ)</p>'+
-      '<table class="rec"><thead><tr><th>ສະກຸນເງິນ</th><th class="num">ຍົກມາ</th><th class="num">ຮັບສົດ</th>'+
+      '<p class="sec">ເງິນສົດໃນມື (ຍົກມາ + ຮັບສົດຈາກການຂາຍ + ຮັບເງິນອື່ນ − ມອບທະນາຄານ − ລາຍຈ່າຍ)</p>'+
+      '<table class="rec"><thead><tr><th>ສະກຸນເງິນ</th><th class="num">ຍົກມາ</th><th class="num">ຮັບສົດ (ຂາຍ)</th>'+
+        '<th class="num">ຮັບເງິນອື່ນ</th>'+
         '<th class="num">ມອບທະນາຄານ</th><th class="num">ລາຍຈ່າຍ</th><th class="num">ຄົງເຫຼືອ</th><th class="num">ເງິນໂອນ</th></tr></thead>'+
       "<tbody>"+recRows+"</tbody></table>"+
+      incSection + expSection + gvSection +
       (depRows ? '<p class="sec">ມອບເງິນເຂົ້າທະນາຄານ</p>'+
         '<table class="rec"><thead><tr><th>ເວລາ</th><th>ທະນາຄານ / ບັນຊີ</th><th>ຜູ້ມອບ</th><th class="num">ຈຳນວນເງິນ</th></tr></thead>'+
         "<tbody>"+depRows+"</tbody></table>" : "")+
