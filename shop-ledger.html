@@ -502,6 +502,7 @@
   .pay-cur-row .btn{width:auto;margin:0;padding:0 12px;font-size:14px;white-space:nowrap;}
   /* amounts already taken in on this bill, each one added with Enter */
   .pay-tip{margin:0 0 6px;font-size:12px;color:var(--ink-faint);line-height:1.6;}
+  .pay-tip.hint{color:#8A5A00;font-weight:700;}
   .pay-lines{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px;}
   .pay-line{display:inline-flex;align-items:center;gap:6px;background:var(--surface-alt);border:1px solid var(--line);
     border-radius:999px;padding:5px 6px 5px 12px;font-size:13.5px;font-variant-numeric:tabular-nums;}
@@ -1734,7 +1735,7 @@
       <span class="rate-pair"><label for="rateTHB">1 ฿ =</label><input type="text" inputmode="decimal" id="rateTHB" placeholder="0" autocomplete="off"><span>₭</span></span>
       <button class="link-btn" id="btnSaveRates">ຕັ້ງເປັນອັດຕາມື້ນີ້</button>
     </div>
-    <p class="pay-tip">ພິມຈຳນວນເງິນ ແລ້ວກົດ <b>ສົດ</b> ຫຼື <b>ໂອນ</b> — ຮັບໄດ້ຫຼາຍເທື່ອ ຍອດຈະບວກກັນ</p>
+    <p class="pay-tip" id="payTip">ພິມຈຳນວນເງິນ ແລ້ວກົດ <b>ສົດ</b> ຫຼື <b>ໂອນ</b> — ຮັບໄດ້ຫຼາຍເທື່ອ ຍອດຈະບວກກັນ</p>
     <div class="pay-lines" id="payLines" style="display:none;"></div>
     <div class="pay-cur-row">
       <span class="pay-cur-tag">₭ ກີບ</span>
@@ -3142,6 +3143,7 @@
     rateThbEl.value = r.THB ? formatNumStr(String(r.THB)) : "";
     payParts = [];
     renderPayLines();
+    setPayTip("");
     CURS.forEach(function(c){ payInputs[c].value = ""; setPayMethod(c, "cash"); });
     document.getElementById("btnSaveRates").textContent = "ຕັ້ງເປັນອັດຕາມື້ນີ້";
     updatePayCalc();
@@ -3201,17 +3203,35 @@
   document.querySelectorAll("#payModal .pay-fill").forEach(function(b){
     b.addEventListener("click", function(){ fillPay(b.dataset.fill); });
   });
+  // ແຖວຄຳແນະນຳຢູ່ຫົວຊ່ອງຮັບເງິນ — ປ່ຽນເປັນຄຳເຕືອນຊົ່ວຄາວໄດ້
+  var payTipEl = document.getElementById("payTip");
+  var PAY_TIP = payTipEl.innerHTML;
+  function setPayTip(html){
+    payTipEl.innerHTML = html || PAY_TIP;
+    payTipEl.classList.toggle("hint", !!html);
+  }
   document.querySelectorAll("#payModal .pay-method button").forEach(function(b){
     b.addEventListener("click", function(){
       /* ພິມຈຳນວນ ແລ້ວກົດ ສົດ / ໂອນ = ຮັບເງິນຈຳນວນນັ້ນເຂົ້າບິນເລີຍ
          ຮັບໄດ້ຫຼາຍເທື່ອໃນບິນດຽວ (ເຊັ່ນ ສົດ ₭14,400,000 + ໂອນ ₭260,000,000) ຍອດຈະບວກກັນ */
       var cur = b.parentNode.dataset.cur;
       var transfer = b.dataset.m === "transfer";
+      var typed = parseNum(payInputs[cur].value) > 0;
       setPayMethod(cur, b.dataset.m);
       if(transfer){
-        if(!(parseNum(payInputs[cur].value) > 0)){ fillPay(cur); }
+        /* ບິນລົດໃຫຍ່: ກົດ ໂອນ ກ່ອນ → ພິມຈຳນວນທີ່ຈະໂອນ → ກົດ ໂອນ ອີກເທື່ອ QR ຈຶ່ງຂຶ້ນຕາມຈຳນວນນັ້ນ
+           (ລູກຄ້າຜ່ອນ ຈຶ່ງບໍ່ຄວນຂຶ້ນ QR ເຕັມຍອດອັດຕະໂນມັດ)
+           ບິນອາໄຫຼ່: ຄືເກົ່າ — ກົດ ໂອນ ແລ້ວ QR ຂຶ້ນເຕັມຍອດທີ່ຍັງຄ້າງທັນທີ */
+        if(!typed && payCreditLimit().hasVeh){
+          setPayTip("ພິມຈຳນວນເງິນທີ່ຈະໂອນ ແລ້ວກົດ <b>ໂອນ</b> ອີກເທື່ອ — QR ຈະຂຶ້ນຕາມຈຳນວນນັ້ນ");
+          updatePayCalc();
+          payInputs[cur].focus();
+          return;
+        }
+        if(!typed){ fillPay(cur); }
         showPayQr(cur);            // QR ຕາມຈຳນວນທີ່ຢູ່ໃນຊ່ອງ
       }
+      setPayTip("");
       commitPayLine(cur);          // ເກັບເປັນລາຍການທີ່ຮັບແລ້ວ (ລຶບອອກໄດ້ດ້ວຍ ✕)
       updatePayCalc();
       if(qrModal.style.display === "flex"){ document.getElementById("qrClose").focus(); }
@@ -3223,7 +3243,14 @@
       if(e.key !== "Enter"){ return; }
       e.preventDefault();
       // Enter takes in what is typed; on an empty box it saves the bill
-      if(commitPayLine(c)){ return; }
+      if(parseNum(payInputs[c].value) > 0){
+        setPayTip("");
+        if(payMethods[c] === "transfer"){ showPayQr(c); }   // ໂອນ: ໃຫ້ລູກຄ້າສະແກນຕາມຈຳນວນນີ້
+      }
+      if(commitPayLine(c)){
+        if(qrModal.style.display === "flex"){ document.getElementById("qrClose").focus(); }
+        return;
+      }
       if(!payConfirm.disabled){ payConfirm.click(); }
     });
   });
