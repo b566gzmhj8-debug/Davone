@@ -1759,7 +1759,6 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" id="payCancel">ກັບຄືນ</button>
-      <button class="btn btn-outline" id="payCredit" style="display:none;" title="ອອກບິນໄວ້ ແລ້ວລູກຄ້າມາຜ່ອນຕໍ່ພາຍຫຼັງ">ບັນທຶກເປັນຜ່ອນ</button>
       <button class="btn btn-brown" id="payConfirm" disabled>ບັນທຶກ ແລະ ພິມບິນ</button>
     </div>
   </div>
@@ -2796,6 +2795,7 @@
   // kip, baht and dollars, cash or transfer for each one. Change is always given in kip.
   var payModal = document.getElementById("payModal");
   var payConfirm = document.getElementById("payConfirm");
+  var payMode = "full";   // "credit" = ບິນລົດໃຫຍ່ທີ່ລູກຄ້າຜ່ອນ
   var rateUsdEl = document.getElementById("rateUSD");
   var rateThbEl = document.getElementById("rateTHB");
   var payInputs = { LAK: document.getElementById("payLAK"), THB: document.getElementById("payTHB"), USD: document.getElementById("payUSD") };
@@ -3049,34 +3049,27 @@
     payConfirm.disabled = !st.ok || !!disc.err;
     /* ລູກຄ້າຊື້ລົດແລ້ວຜ່ອນ: ຈ່າຍບໍ່ຄົບກໍ່ອອກບິນໄດ້ ແລ້ວຈົດຍອດຄ້າງໄວ້ໃນບິນ
        (ພາຍຫຼັງມາຊຳລະ ໃຫ້ລົງທີ່ໜ້າ "ຮັບເງິນອື່ນ" → ຊຳລະໜີ້ຄ່າລົດ) */
+    /* ປຸ່ມດຽວ: ຈ່າຍຄົບ = ບັນທຶກປົກກະຕິ · ລົດໃຫຍ່ຈ່າຍບໍ່ຄົບ = ບັນທຶກເປັນຜ່ອນ (ອາໄຫຼ່ບໍ່ໃຫ້ຜ່ອນ) */
     var owed = payOwedMap();
     var lim = payCreditLimit();
-    var creditBtn = document.getElementById("payCredit");
     var shortPaid = !disc.err && !st.ok && owed.ok && hasAmounts(owed.map);
-    creditBtn.style.display = shortPaid ? "inline-flex" : "none";
-    if(shortPaid){
-      if(!lim.hasVeh){
-        /* ບິນອາໄຫຼ່ລ້ວນ: ຫ້າມຜ່ອນ */
-        creditBtn.disabled = true;
-        creditBtn.textContent = "ອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມ (ຜ່ອນໄດ້ແຕ່ລົດໃຫຍ່)";
-      } else {
-        var over = {};
-        Object.keys(owed.map).forEach(function(c){
-          var x = owed.map[c] - (lim.cap[c] || 0);
-          if(x > 0.0001){ over[c] = x; }
-        });
-        if(hasAmounts(over)){
-          /* ຄ້າງເກີນຄ່າລົດ = ຄ່າອາໄຫຼ່ຍັງບໍ່ຄົບ */
-          creditBtn.disabled = true;
-          creditBtn.textContent = "ຄ່າອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມ · ຮັບເພີ່ມ " + moneyMap(over, " + ");
-        } else {
-          creditBtn.disabled = false;
-          creditBtn.textContent = "ບັນທຶກເປັນຜ່ອນ · ຄ້າງ " + moneyMap(owed.map, " + ");
-        }
-      }
+    var over = {};
+    if(shortPaid && lim.hasVeh){
+      Object.keys(owed.map).forEach(function(c){
+        var x = owed.map[c] - (lim.cap[c] || 0);
+        if(x > 0.0001){ over[c] = x; }
+      });
+    }
+    payMode = (shortPaid && lim.hasVeh && !hasAmounts(over)) ? "credit" : "full";
+    if(payMode === "credit"){
+      payConfirm.disabled = false;
+      payConfirm.textContent = "ບັນທຶກເປັນຜ່ອນ · ຄ້າງ " + moneyMap(owed.map, " + ");
     } else {
-      creditBtn.disabled = false;
-      creditBtn.textContent = "ບັນທຶກເປັນຜ່ອນ";
+      payConfirm.textContent = "ບັນທຶກ ແລະ ພິມບິນ";
+      /* ບອກເຫດຜົນຢູ່ແຖວ "ຍັງຂາດ" ແທນການເພີ່ມປຸ່ມ */
+      if(shortPaid && lim.hasVeh && hasAmounts(over)){
+        document.getElementById("payResultLabel").textContent = "ຍັງຂາດ · ຄ່າອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມ";
+      }
     }
   }
 
@@ -3255,41 +3248,30 @@
       var same = parts.find(function(x){ return x.cur === c && x.method === m; });
       if(same){ same.amount += v; } else { parts.push({ cur: c, amount: v, method: m }); }
     });
+    if(payMode === "credit"){
+      /* ບິນຜ່ອນ: ຈົດຍອດຄ້າງໄວ້ໃນບິນ (ລູກຄ້າມາຊຳລະຕໍ່ ໃຫ້ລົງທີ່ ຮັບເງິນອື່ນ → ຊຳລະໜີ້ຄ່າລົດ) */
+      var owed = payOwedMap();
+      var lim = payCreditLimit();
+      if(!owed.ok || !hasAmounts(owed.map) || !lim.hasVeh){ return; }
+      var over = {};
+      Object.keys(owed.map).forEach(function(c){
+        var x = owed.map[c] - (lim.cap[c] || 0);
+        if(x > 0.0001){ over[c] = x; }
+      });
+      if(hasAmounts(over)){
+        alert("ຜ່ອນໄດ້ແຕ່ຄ່າລົດໃຫຍ່\n\nຄ່າອາໄຫຼ່ຍັງຂາດ " + moneyMap(over, " + ") + " — ກະລຸນາຮັບເງິນເພີ່ມກ່ອນ");
+        return;
+      }
+      var got = moneyMap(readPaid(), " + ");
+      if(!confirm("ອອກບິນເປັນຜ່ອນ?\n\nຮັບແລ້ວ " + got + "\nຍັງຄ້າງ " + moneyMap(owed.map, " + "))) return;
+      closePayModal();
+      commitSale({ parts: parts, change: 0, owed: owed.map, credit: true,
+                   rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
+      return;
+    }
     closePayModal();
     // rates are kept only when the bill needed them (paid in another currency, or change in kip)
     commitSale({ parts: parts, change: st.change, rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
-  });
-
-  document.getElementById("payCredit").addEventListener("click", function(){
-    var disc = readDiscount();
-    if(disc.err) return;
-    var owed = payOwedMap();
-    if(!owed.ok || !hasAmounts(owed.map)) return;
-    var lim = payCreditLimit();
-    if(!lim.hasVeh){ alert("ບິນນີ້ບໍ່ມີລົດໃຫຍ່ — ຄ່າອາໄຫຼ່ຕ້ອງຈ່າຍເຕັມຈຳນວນ"); return; }
-    var over = {};
-    Object.keys(owed.map).forEach(function(c){
-      var x = owed.map[c] - (lim.cap[c] || 0);
-      if(x > 0.0001){ over[c] = x; }
-    });
-    if(hasAmounts(over)){
-      alert("ຜ່ອນໄດ້ແຕ່ຄ່າລົດໃຫຍ່\n\nຄ່າອາໄຫຼ່ຍັງຂາດ " + moneyMap(over, " + ") + " — ກະລຸນາຮັບເງິນເພີ່ມກ່ອນ");
-      return;
-    }
-    var st = readPayment();
-    var parts = payParts.map(function(p){ return { cur: p.cur, amount: p.amount, method: p.method }; });
-    CURS.forEach(function(c){
-      var v = parseNum(payInputs[c].value) || 0;
-      if(!(v > 0)){ return; }
-      var m = payMethods[c];
-      var same = parts.find(function(x){ return x.cur === c && x.method === m; });
-      if(same){ same.amount += v; } else { parts.push({ cur: c, amount: v, method: m }); }
-    });
-    if(!confirm("ອອກບິນເປັນ \u0e84\u0ec9\u0eb2\u0e87\u0e8a\u0eb3\u0ea5\u0eb0? \n\nຮັບແລ້ວ " + (moneyMap(readPaid(), " + ") === "0" ? "0" : moneyMap(readPaid(), " + ")) +
-                 "\nຍັງຄ້າງ " + moneyMap(owed.map, " + "))) return;
-    closePayModal();
-    commitSale({ parts: parts, change: 0, owed: owed.map, credit: true,
-                 rates: st.rates ? { USD: st.rates.USD || null, THB: st.rates.THB || null } : null }, disc);
   });
 
   document.getElementById("btnCommitSale").addEventListener("click", openPayModal);
