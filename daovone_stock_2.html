@@ -1687,6 +1687,19 @@ function itemUnitCostForInvoice(it, invCurrency){
   if(model.cost_currency === 'THB' && model.cost_price == null) return null;
   return model.cost_price != null ? (Number(model.cost_price)||0) : 0;
 }
+/* ສະກຸນເງິນຫຼັກຂອງສິນຄ້າ (ຊື້ເຂົ້າ-ຂາຍອອກ): ຊື້ເປັນບາດ = ຕັ້ງລາຄາຂາຍເປັນບາດ, ບິນຂາຍເປັນບາດ, ລູກຄ້າຈ່າຍກີບຄ່ອຍໃສ່ອັດຕາຕອນຮັບເງິນ */
+function modelMainCur(m){
+  if(!m) return 'LAK';
+  if(m.cost_currency === 'THB') return 'THB';
+  return (!Number(m.sale_price) && Number(m.sale_price_thb)) ? 'THB' : 'LAK';
+}
+function modelPriceText(m, empty){
+  const thb = modelMainCur(m) === 'THB';
+  if(thb && Number(m.sale_price_thb)) return fmtMoney(m.sale_price_thb) + ' ບາດ';
+  if(Number(m.sale_price)) return fmtMoney(m.sale_price) + ' ກີບ';
+  if(Number(m.sale_price_thb)) return fmtMoney(m.sale_price_thb) + ' ບາດ';
+  return empty;
+}
 /* ຕົ້ນທຶນຂອງເຄື່ອງ 1 ໜ່ວຍ ສະແດງຕາມສະກຸນທີ່ຊື້ຈິງ (ບໍ່ແປງ) */
 function unitCostText(u){
   if(u.cost_currency === 'THB') return u.cost_thb != null ? fmtMoney(u.cost_thb) + ' ບາດ' : '-';
@@ -1876,7 +1889,7 @@ async function renderProducts(main){
         </span>
         <span class="row-actions">
           <span style="text-align:right;">
-            <div class="gold mono">${m.sale_price ? fmtMoney(m.sale_price)+' ກີບ' : (m.sale_price_thb ? fmtMoney(m.sale_price_thb)+' ບາດ' : fmtMoney(0))}</div>
+            <div class="gold mono">${modelPriceText(m, fmtMoney(0))}</div>
             <div class="muted" style="font-size:11px;">ເຫຼືອ ${qty} ${m.unit||''}${m.has_serial ? ' <span class="muted" style="font-size:10px;">(ກົດເບິ່ງ)</span>' : ''}</div>
           </span>
           ${isAdmin ? `<button class="icon-btn" data-adjust="${m.id}"><svg class="dv-icon"><use href="#i-gear"></use></svg>ປรับສะຕັອກ</button><button class="icon-btn" data-edit="${m.id}"><svg class="dv-icon"><use href="#i-pencil"></use></svg>ແກ້ໄຂ</button><button class="icon-btn" data-del="${m.id}" style="color:var(--danger);border-color:var(--danger);"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບ</button>` : ''}
@@ -2235,16 +2248,21 @@ function openModelModal(existing){
       <input id="m_cat" placeholder="ເຊັ່ນ ແທັກເຕີ / ອາໄຫລ່ / ຢາງ" value="${isEdit ? (existing.category||'').replace(/"/g,'&quot;') : ''}">
       <label>ຫົວໜ່ວຍ</label>
       <input id="m_unit" placeholder="ຖັງ / ອັນ / ຄູ່ / ໃບ" value="${isEdit ? (existing.unit||'ອັນ') : 'ອັນ'}">
+      <label>ສະກຸນເງິນຫຼັກ (ຊື້ເຂົ້າ-ຂາຍອອກ)</label>
+      <select id="m_cur">
+        <option value="LAK">ກີບ (LAK)</option>
+        <option value="THB">ບາດ (THB) — ລາຄາຊື້/ຂາຍເປັນບາດ, ຮັບເງິນກີບຄ່ອຍໃສ່ອັດຕາຕອນຂາຍ</option>
+      </select>
       <label>ລາຄາຂາຍ</label>
-      <div class="grid2">
-        <div><input id="m_price" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ກີບ (LAK)</div></div>
-        <div><input id="m_price_thb" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ບາດ (THB)</div></div>
+      <div class="grid2 cur-pair">
+        <div class="cur-LAK"><input id="m_price" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ກີບ (LAK)</div></div>
+        <div class="cur-THB"><input id="m_price_thb" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ບາດ (THB)</div></div>
       </div>
       ${canSeeCost ? `
       <label>ຕົ້ນທຶນ</label>
-      <div class="grid2">
-        <div><input id="m_cost" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ກີບ (LAK)</div></div>
-        <div><input id="m_cost_thb" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ບາດ (THB)</div></div>
+      <div class="grid2 cur-pair">
+        <div class="cur-LAK"><input id="m_cost" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ກີບ (LAK)</div></div>
+        <div class="cur-THB"><input id="m_cost_thb" type="text" placeholder="0"><div class="muted" style="font-size:11px;margin-top:3px;">ບາດ (THB)</div></div>
       </div>` : `
       <div class="muted" style="font-size:11px;margin-top:2px;">* ຕົ້ນທຶນຈະໃສ່ໂດຍແອດມິນທີ່ຫຼັງ</div>`}
       <label>ແຈ້ງເຕືອນເມື່ອເຫຼືອ ≤</label>
@@ -2257,6 +2275,15 @@ function openModelModal(existing){
   document.body.appendChild(bg);
   attachMoneyInput('m_price', isEdit ? existing.sale_price : '');
   attachMoneyInput('m_price_thb', isEdit ? existing.sale_price_thb : '');
+  /* ສະກຸນຫຼັກ: ບາດ → ໂຊວ໌ແຕ່ຊ່ອງບາດ (ບໍ່ຕ້ອງແປງເປັນກີບ), ກີບ → ໂຊວ໌ແຕ່ຊ່ອງກີບ; ຄ່າຂອງຊ່ອງທີ່ເຊື່ອງໄວ້ບໍ່ຖືກລ້າງ */
+  const mCurSel = document.getElementById('m_cur');
+  mCurSel.value = isEdit ? modelMainCur(existing) : 'LAK';
+  const syncMCur = ()=> bg.querySelectorAll('.cur-pair').forEach(pair=>{
+    pair.querySelector('.cur-LAK').style.display = mCurSel.value === 'LAK' ? '' : 'none';
+    pair.querySelector('.cur-THB').style.display = mCurSel.value === 'THB' ? '' : 'none';
+  });
+  mCurSel.addEventListener('change', syncMCur);
+  syncMCur();
   if(canSeeCost){
     attachMoneyInput('m_cost', isEdit ? existing.cost_price : '');
     attachMoneyInput('m_cost_thb', isEdit ? existing.cost_price_thb : '');
@@ -2280,6 +2307,7 @@ function openModelModal(existing){
       unit: document.getElementById('m_unit').value.trim() || 'ອັນ',
       sale_price: moneyValue('m_price'),
       sale_price_thb: moneyValue('m_price_thb'),
+      cost_currency: document.getElementById('m_cur').value,
       low_stock_threshold: Number(document.getElementById('m_threshold').value)||0,
       has_serial: document.getElementById('m_serial').checked
     };
@@ -2346,11 +2374,12 @@ async function renderAddProduct(main){
         </label>
         <p class="ap-sec">ລາຄາ</p>
         <div class="ap-prices">
-          <div class="f"><label>ລາຄາຂາຍ (ກີບ)</label><input id="ap_price" type="text" placeholder="0"></div>
-          <div class="f"><label>ລາຄາຂາຍ (ບາດ)</label><input id="ap_price_thb" type="text" placeholder="0"></div>
+          <div class="f"><label>ສະກຸນເງິນຫຼັກ (ຊື້-ຂາຍ)</label><select id="ap_cur"><option value="LAK">ກີບ (LAK)</option><option value="THB">ບາດ (THB)</option></select></div>
+          <div class="f cur-LAK"><label>ລາຄາຂາຍ (ກີບ)</label><input id="ap_price" type="text" placeholder="0"></div>
+          <div class="f cur-THB"><label>ລາຄາຂາຍ (ບາດ)</label><input id="ap_price_thb" type="text" placeholder="0"></div>
           ${canSeeCost ? `
-          <div class="f"><label>ຕົ້ນທຶນ (ກີບ)</label><input id="ap_cost" type="text" placeholder="0"></div>
-          <div class="f"><label>ຕົ້ນທຶນ (ບາດ)</label><input id="ap_cost_thb" type="text" placeholder="0"></div>` : ''}
+          <div class="f cur-LAK"><label>ຕົ້ນທຶນ (ກີບ)</label><input id="ap_cost" type="text" placeholder="0"></div>
+          <div class="f cur-THB"><label>ຕົ້ນທຶນ (ບາດ)</label><input id="ap_cost_thb" type="text" placeholder="0"></div>` : ''}
         </div>
         ${canSeeCost ? '' : '<p class="ps-note" style="margin:8px 0 0;">* ຕົ້ນທຶນຈະໃສ່ໂດຍແອດມິນທີຫຼັງ</p>'}
         <p class="ap-warn" id="ap_warn" hidden></p>
@@ -2361,7 +2390,7 @@ async function renderAddProduct(main){
         ${recent.length ? recent.map((m,i)=> `<tr><td class="c mono">${i+1}</td>`+
           `<td class="b">${esc(m.name)}${m.has_serial ? ' <span class="tag ok">ມີເລກເຄື່ອງ</span>' : ''}${m.active===false ? ' <span class="muted" style="font-size:11px;">(ປິດໃຊ້)</span>' : ''}</td>`+
           `<td class="mono muted">${esc(m.code)||'—'}</td><td>${esc(m.category)||'—'}</td><td class="c">${esc(m.unit)||''}</td>`+
-          `<td class="r mono">${m.sale_price ? fmtMoney(m.sale_price)+' ກີບ' : (m.sale_price_thb ? fmtMoney(m.sale_price_thb)+' ບາດ' : '—')}</td></tr>`).join('')
+          `<td class="r mono">${modelPriceText(m, '—')}</td></tr>`).join('')
           : '<tr class="ps-empty"><td colspan="6">ຍັງບໍ່ມີສິນຄ້າ</td></tr>'}
         </tbody></table>
       </div>
@@ -2381,6 +2410,13 @@ async function renderAddProduct(main){
   `;
   const $ = id=> document.getElementById(id);
   ['ap_price','ap_price_thb'].concat(canSeeCost ? ['ap_cost','ap_cost_thb'] : []).forEach(id=> attachMoneyInput(id, ''));
+  /* ສະກຸນຫຼັກ: ໂຊວ໌ແຕ່ຊ່ອງລາຄາ/ຕົ້ນທຶນຂອງສະກຸນນັ້ນ (ສິນຄ້າທີ່ຊື້ເປັນບາດ ບໍ່ຕ້ອງໃສ່ລາຄາກີບ) */
+  const apCur = document.getElementById('ap_cur');
+  const syncApCur = ()=> main.querySelectorAll('.ap-prices .cur-LAK, .ap-prices .cur-THB').forEach(el=>{
+    el.style.display = el.classList.contains('cur-' + apCur.value) ? '' : 'none';
+  });
+  apCur.addEventListener('change', syncApCur);
+  syncApCur();
   const norm = v=> (v||'').trim().toLowerCase();
   /* ແຍກລະຫັດຫຼາຍໆອັນ: ຂຶ້ນແຖວໃໝ່ / , / ; / tab — ຕັດອັນຊ້ຳກັນເອງອອກ */
   function codeList(){
@@ -2435,6 +2471,7 @@ async function renderAddProduct(main){
       unit: $('ap_unit').value.trim() || 'ອັນ',
       sale_price: moneyValue('ap_price'),
       sale_price_thb: moneyValue('ap_price_thb'),
+      cost_currency: $('ap_cur').value,
       low_stock_threshold: Number($('ap_threshold').value)||0,
       has_serial: $('ap_serial').checked
     };
@@ -2505,7 +2542,7 @@ async function renderReceive(main){
               <label>ລະຫັດ / ຊື່ສິນຄ້າ — ເລືອກເພື່ອເພີ່ມ</label>
               <select id="r_model">
                 <option value="">-- ເລືອກສິນຄ້າ --</option>
-                ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
+                ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cur="${modelMainCur(m)}" data-cost="${m.cost_price||0}" data-cost-thb="${m.cost_price_thb||0}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
               </select>
             </div>
             <div class="f f-qty" id="r_qtyBlock"><label>ຈຳນວນ</label><input id="r_qty" type="number" value="1" min="1"></div>
@@ -2617,7 +2654,8 @@ async function renderReceive(main){
     document.getElementById('r_qtyBlock').style.display = isSerial ? 'none' : 'block';
     document.getElementById('r_serialBlock').style.display = isSerial ? 'block' : 'none';
     if(canSeeCost){
-      /* ຄົງສະກຸນທີ່ເລືອກໄວ້ (ບໍ່ບັງຄັບກັບເປັນກີບ) ແລ້ວດຶງຕົ້ນທຶນທີ່ເຄີຍບັນທຶກໄວ້ຕາມສະກຸນນັ້ນມາເຕີມ */
+      /* ເລືອກສະກຸນຕາມສະກຸນຫຼັກຂອງສິນຄ້າ (ຊື້ເປັນບາດ → ບາດ) ແລ້ວດຶງຕົ້ນທຶນທີ່ເຄີຍບັນທຶກໄວ້ຕາມສະກຸນນັ້ນມາເຕີມ */
+      if(opt && opt.dataset.cur) document.getElementById('r_currency').value = opt.dataset.cur;
       updateReceiveCostLabel();
     }
   });
@@ -3479,7 +3517,7 @@ async function renderSell(main){
             <label>ລະຫັດ / ຊື່ສິນຄ້າ — ເລືອກເພື່ອເພີ່ມ</label>
             <select id="s_model">
               <option value="">-- ເລືອກສິນຄ້າ --</option>
-              ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
+              ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-cur="${modelMainCur(m)}" data-price="${m.sale_price||0}" data-price-thb="${m.sale_price_thb||0}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
             </select>
           </div>
           <div class="f f-unit" id="s_unitBlock" style="display:none;">
@@ -3589,7 +3627,10 @@ async function renderSell(main){
     /* ສະຫຼັບສະກຸນເງິນໄດ້ແຕ່ຕອນບິນຍັງຫວ່າງ — ບິນທີ່ມີລາຍການແລ້ວຫ້າມສະຫຼັບ
        ບໍ່ດັ່ງນັ້ນລາຄາເກົ່າ (ບາດ) ຈະຖືກຕິດປ້າຍເປັນອີກສະກຸນໜຶ່ງ (ກີບ) */
     if(!sellCart.length){
-      if(priceLak > 0){
+      /* ສິນຄ້າທີ່ຊື້-ຂາຍເປັນບາດ → ບິນເປັນບາດ (ລູກຄ້າຈ່າຍກີບ ໃສ່ອັດຕາແລກປ່ຽນເອງຕອນຮັບເງິນ) */
+      if(opt.dataset.cur === 'THB' && priceThb > 0){
+        currencySel.value = 'THB';
+      } else if(priceLak > 0){
         currencySel.value = 'LAK';
       } else if(priceThb > 0){
         currencySel.value = 'THB';
