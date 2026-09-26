@@ -1094,14 +1094,16 @@ function receiveDocBody(receipt, items, opts){
     '<tr><td>' + (i+1) + '</td>' +
     '<td>' + escHtml(it.serial_no || codeOf(it) || '-') + '</td>' +
     '<td>' + escHtml(nameOf(it)) +
-      (it.cost_currency === 'THB' && showCost && it.unit_cost_thb
-        ? '<div class="c">ຊື້ ' + fmtMoney(it.unit_cost_thb) + ' ບາດ @' + escHtml(it.exchange_rate || '') + '</div>' : '') + '</td>' +
+      (it.cost_currency === 'THB' && showCost && it.exchange_rate
+        ? '<div class="c">ຊື້ເປັນບາດ · ອັດຕາອ້າງອິງ @' + escHtml(it.exchange_rate) + '</div>' : '') + '</td>' +
     '<td class="num">' + fmtMoney(it.quantity) + ' ' + escHtml(unitOf(it)) + '</td>' +
-    (showCost ? '<td class="num">' + moneyCur(it.unit_cost, 'LAK') + '</td>' +
-                '<td class="num">' + moneyCur(it.amount, 'LAK') + '</td>' : '') +
+    (showCost ? (it.cost_currency === 'THB'
+                  ? '<td class="num">' + moneyCur(it.unit_cost_thb, 'THB') + '</td>' +
+                    '<td class="num">' + moneyCur((Number(it.unit_cost_thb)||0) * (Number(it.quantity)||1), 'THB') + '</td>'
+                  : '<td class="num">' + moneyCur(it.unit_cost, 'LAK') + '</td>' +
+                    '<td class="num">' + moneyCur(it.amount, 'LAK') + '</td>') : '') +
     '</tr>').join('');
   const totalQty = items.reduce((s, it)=> s + (Number(it.quantity) || 0), 0);
-  const totalAmt = items.reduce((s, it)=> s + (Number(it.amount) || 0), 0);
   return '<h1>ໃບຮັບສິນຄ້າເຂົ້າສະຕັອກ</h1>' +
     '<p class="sub">ເລກທີ ' + escHtml(receipt.receipt_no || '-') + ' · ' + escHtml(fmtDateDMY(receipt.receipt_date)) + '</p>' +
     '<div class="cust">' +
@@ -1113,7 +1115,7 @@ function receiveDocBody(receipt, items, opts){
       (showCost ? '<th class="num">ຕົ້ນທຶນ/ຫົວໜ່ວຍ</th><th class="num">ລວມ</th>' : '') +
     '</tr></thead><tbody>' + rows + '</tbody></table>' +
     (showCost ? '<div class="sub-total"><span>ລວມຈຳນວນ</span><span>' + fmtMoney(totalQty) + '</span></div>' +
-                '<div class="grand"><span>ມູນຄ່າລວມ (ຕົ້ນທຶນ)</span><span>' + moneyCur(totalAmt, 'LAK') + '</span></div>'
+                '<div class="grand"><span>ມູນຄ່າລວມ (ຕົ້ນທຶນ)</span><span>' + costTotalsText(costTotalsByCurrency(items), '<br>') + '</span></div>'
               : '<div class="grand"><span>ລວມຈຳນວນ</span><span>' + fmtMoney(totalQty) + '</span></div>') +
     printSigns('ຜູ້ສົ່ງເຄື່ອງ', escHtml(receipt.supplier_name || ''), 'ຜູ້ຮັບເຄື່ອງເຂົ້າສະຕັອກ', '(ກວດເຄື່ອງຄົບແລ້ວ)') +
     '<p class="note">ໝາຍເຫດ: ໃບນີ້ຢືນຢັນວ່າສິນຄ້າຕາມລາຍການຂ້າງເທິງ ໄດ້ຮັບເຂົ້າສະຕັອກຂອງຮ້ານແລ້ວ</p>';
@@ -1667,15 +1669,72 @@ async function renderDashboard(main){
 }
 
 /* ต้นทุนที่บันทึกไว้ (cost_lak ของแต่ละเครื่อง / cost_price ของรุ่นสินค้า) เป็นเงินกีบเสมอ ถ้าบิลขายเป็นสกุลบาทต้องเทียบกับ cost_price_thb ของรุ่นสินค้าแทน ไม่งั้นเอากีบไปลบบาทตรงๆ กำไรจะผิดเพี้ยนมหาศาล (ติดลบทั้งที่จริงกำไรอยู่) ถ้าบิลเป็นบาทแต่ยังไม่ได้ตั้ง cost_price_thb ไว้ ให้ถือว่าไม่ทราบต้นทุน (คืนค่า null) แล้วไม่รวมรายการนั้นในการคิดกำไร แทนที่จะโชว์ตัวเลขผิดๆ */
+/* ອັບເດດ: ເຄື່ອງທີ່ມີເລກເຄື່ອງເກັບຕົ້ນທຶນຕາມສະກຸນທີ່ຊື້ຈິງ (cost_currency + cost_thb / cost_lak)
+   ຊື້ເປັນບາດ → ບິນບາດໃຊ້ cost_thb ໂດຍກົງ, ບິນກີບໃຊ້ cost_lak ໄດ້ສະເພາະເມື່ອຕອນຮັບເຂົ້າໃສ່ອັດຕາແລກປ່ຽນໄວ້ (ບໍ່ດັ່ງນັ້ນ = ບໍ່ຮູ້ຕົ້ນທຶນ) */
 function itemUnitCostForInvoice(it, invCurrency){
   const model = it.stock_product_models || {};
+  const unit = it.unit_id ? it.stock_product_units : null;
+  if(unit && unit.cost_currency === 'THB'){
+    if(invCurrency === 'THB') return unit.cost_thb != null ? Number(unit.cost_thb) : null;
+    return unit.cost_lak != null ? Number(unit.cost_lak) : null;
+  }
   if(invCurrency === 'THB'){
     return model.cost_price_thb ? Number(model.cost_price_thb) : null;
   }
-  if(it.unit_id && it.stock_product_units && it.stock_product_units.cost_lak != null){
-    return Number(it.stock_product_units.cost_lak);
+  if(unit && unit.cost_lak != null){
+    return Number(unit.cost_lak);
   }
+  if(model.cost_currency === 'THB' && model.cost_price == null) return null;
   return model.cost_price != null ? (Number(model.cost_price)||0) : 0;
+}
+/* ຕົ້ນທຶນຂອງເຄື່ອງ 1 ໜ່ວຍ ສະແດງຕາມສະກຸນທີ່ຊື້ຈິງ (ບໍ່ແປງ) */
+function unitCostText(u){
+  if(u.cost_currency === 'THB') return u.cost_thb != null ? fmtMoney(u.cost_thb) + ' ບາດ' : '-';
+  return u.cost_lak != null ? fmtMoney(u.cost_lak) + ' ກີບ' : '-';
+}
+/* ຊ່ອງຕົ້ນທຶນຂອງ stock_product_units ຈາກລາຍການຮັບເຂົ້າ: ບາດເກັບເປັນບາດ, cost_lak ຂອງເຄື່ອງບາດມີຄ່າສະເພາະເມື່ອໃສ່ອັດຕາ */
+function unitCostFields(item){
+  const thb = item.cost_currency === 'THB';
+  return {
+    cost_currency: thb ? 'THB' : 'LAK',
+    cost_thb: thb ? (item.unit_cost_thb != null ? Number(item.unit_cost_thb) : null) : null,
+    cost_lak: thb ? (item.exchange_rate ? item.unit_cost : null) : item.unit_cost
+  };
+}
+/* ຕົ້ນທຶນອ້າງອິງຂອງຮຸ່ນສິນຄ້າ (ໃຫ້ຄັ້ງໜ້າດຶງມາເຕີມ): ຈື່ສະກຸນທີ່ຊື້ຫຼ້າສຸດ, ບໍ່ຂຽນທັບ cost_price ກີບດ້ວຍ 0 ເມື່ອຊື້ເປັນບາດແບບບໍ່ມີອັດຕາ */
+function applyModelCostPatch(patch, item){
+  if(item.cost_currency === 'THB'){
+    patch.cost_currency = 'THB';
+    if(item.unit_cost_thb) patch.cost_price_thb = item.unit_cost_thb;
+    if(item.exchange_rate && item.unit_cost) patch.cost_price = item.unit_cost;
+  } else {
+    patch.cost_currency = 'LAK';
+    patch.cost_price = item.unit_cost;
+  }
+}
+/* ລວມມູນຄ່າຕົ້ນທຶນແຍກຕາມສະກຸນທີ່ຊື້ (ກີບ/ບາດ) — ບໍ່ເອົາມາບວກກັນ */
+function costTotalsByCurrency(items){
+  const t = { LAK:0, THB:0 };
+  (items||[]).forEach(it=>{
+    if(it.cost_currency === 'THB') t.THB += (Number(it.unit_cost_thb)||0) * (Number(it.quantity)||1);
+    else t.LAK += Number(it.amount)||0;
+  });
+  return t;
+}
+function costTotalsText(t, sep){
+  const parts = [];
+  if(t.LAK || !t.THB) parts.push(fmtMoney(t.LAK) + ' ກີບ');
+  if(t.THB) parts.push(fmtMoney(t.THB) + ' ບາດ');
+  return parts.join(sep || ' + ');
+}
+/* ຈຳນວນເງິນຂອງ 1 ແຖວໃນກະຕ່າຮັບເຂົ້າ: ບາດສະແດງເປັນບາດ (ກີບອ້າງອິງຂຶ້ນນ້ອຍໆ ຖ້າໃສ່ອັດຕາ) */
+function receiveRowAmountHtml(it){
+  if(it.cost_currency === 'THB'){
+    const thb = (Number(it.unit_cost_thb)||0) * (Number(it.quantity)||1);
+    return fmtMoney(thb) + ' ບາດ' + (it.exchange_rate
+      ? '<div class="muted" style="font-size:11px;font-weight:400;">≈ ' + fmtMoney(it.amount) + ' ກີບ @' + it.exchange_rate + '</div>' : '');
+  }
+  return fmtMoney(it.amount) + ' ກີບ';
 }
 /* รวมกำไรของรายการสินค้าทั้งหมดในบิลเดียว คิดเป็นสกุลเงินของบิลนั้น (ยังไม่แปลงเป็นสกุลที่รับจ่ายจริง) */
 function computeInvoiceItemProfit(items, invCurrency){
@@ -1779,7 +1838,7 @@ async function getPeriodProfit(start, end){
   if(!invoices.length) return {};
   const ids = invoices.map(i=>i.id).join(',');
   const [items, payments] = await Promise.all([
-    sb(`sales_invoice_items?select=amount,quantity,unit_id,invoice_id,stock_product_models(cost_price,cost_price_thb),stock_product_units(cost_lak)&invoice_id=in.(${ids})`),
+    sb(`sales_invoice_items?select=amount,quantity,unit_id,invoice_id,stock_product_models(cost_price,cost_price_thb,cost_currency),stock_product_units(cost_lak,cost_currency,cost_thb)&invoice_id=in.(${ids})`),
     sb(`sales_payments?select=invoice_id,currency,amount,converted_amount&invoice_id=in.(${ids})`)
   ]);
   const itemsByInvoice = {};
@@ -2075,7 +2134,7 @@ async function openUnitsModal(model){
           <span class="row-actions">
             <span style="text-align:right;">
               <div class="muted" style="font-size:11px;">${fmtDateDMY(u.received_at)}</div>
-              ${isAdmin ? `<div class="gold mono" style="font-size:12px;">${u.cost_lak!=null ? fmtMoney(u.cost_lak)+' ກີບ' : '-'}</div>` : ''}
+              ${isAdmin ? `<div class="gold mono" style="font-size:12px;">${unitCostText(u)}</div>` : ''}
             </span>
             ${isAdmin ? `<button class="icon-btn" data-edit="${idx}" style="color:var(--orange);border-color:var(--orange);">✎</button>` : ''}
             ${isAdmin ? `<button class="icon-btn" data-rm="${idx}" style="color:var(--danger);border-color:var(--danger);">✕</button>` : ''}
@@ -2463,8 +2522,8 @@ async function renderReceive(main){
           ${canSeeCost ? `
           <div class="ps-rate" id="r_rateBlock" style="display:none;">
             <div class="ps-rate-in">
-              <label>ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)</label>
-              <input id="r_rate" type="text" placeholder="ເຊັ່ນ 620">
+              <label>ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ) — ບໍ່ບັງຄັບ</label>
+              <input id="r_rate" type="text" placeholder="ເວັ້ນວ່າງໄດ້">
             </div>
             <div class="muted ps-rate-note" id="r_lockedPreview"></div>
           </div>` : ''}
@@ -2484,7 +2543,7 @@ async function renderReceive(main){
           <div class="ps-sum">
             <div class="ps-line"><span>ຈຳນວນລາຍການ</span><b class="mono" id="r_lineCount">0</b></div>
             <div class="ps-line"><span>ຈຳນວນໜ່ວຍລວມ</span><b class="mono" id="r_unitCount">0</b></div>
-            <p class="ps-note">ບັນທຶກແລ້ວສິນຄ້າຈະເຂົ້າສະຕັອກທັນທີ${canSeeCost ? ' — ຕົ້ນທຶນຈະຖືກລ໋ອກໄວ້ຕາມອັດຕາມື້ນີ້' : ''}</p>
+            <p class="ps-note">ບັນທຶກແລ້ວສິນຄ້າຈະເຂົ້າສະຕັອກທັນທີ${canSeeCost ? ' — ຕົ້ນທຶນບັນທຶກຕາມສະກຸນທີ່ຊື້ຈິງ (ບາດເປັນບາດ, ກີບເປັນກີບ)' : ''}</p>
             <button class="btn" id="r_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>${editingReceipt ? 'ບັນທຶກການແກ້ໄຂ →' : 'ບັນທຶກຮັບເຂົ້າ →'}</button>
           </div>
         </div>
@@ -2518,7 +2577,7 @@ async function renderReceive(main){
   if(canSeeCost) attachMoneyInput('r_cost', 0);
   const modelSel = document.getElementById('r_model');
   enableSearchableSelect(modelSel);
-  /* ອັດຕາຕ້ອງພິມໃໝ່ທຸກຄັ້ງທີ່ຮັບເຂົ້າ (ບໍ່ຈື່ອັດຕາເກົ່າໄວ້) ​ຕົ້ນທຶນກີບຈະລ໋ອກຕາມມື້ນີ້ ບໍ່ປ່ຽນຕາມພາຍຫຼັງ */
+  /* ຊື້ເປັນບາດ: ຕົ້ນທຶນເກັບເປັນບາດ, ອັດຕາແລກປ່ຽນບໍ່ບັງຄັບ (ໃສ່ໄວ້ = ມີກີບອ້າງອິງສຳລັບຄິດກຳໄລບິນກີບ) */
   /* ດຶງຕົ້ນທຶນທີ່ເຄີຍບັນທຶກໄວ້ຂອງສິນຄ້ານີ້ (ຕາມສະກຸນທີ່ເລືອກ: ບາດ→cost_price_thb, ກີບ→cost_price) ມາເຕີມໃຫ້ ບໍ່ຕ້ອງພິມໃໝ່ທຸກຄັ້ງ */
   function fillReceiveCostFromModel(){
     if(!canSeeCost) return;
@@ -2544,8 +2603,8 @@ async function renderReceive(main){
     if(currency !== 'THB'){ preview.textContent=''; return; }
     const costThb = moneyValue('r_cost');
     const rate = Number((document.getElementById('r_rate').value||'').replace(/,/g,''));
-    if(costThb && rate) preview.textContent = `≈ ${fmtMoney(costThb*rate)} ກີບ/ໜ່ວຍ (ລ໋ອກຕົ້ນທຶນນີ້ໄວ້)`;
-    else preview.textContent = 'ໃສ່ອັດຕາແລກປ່ຽນເພື່ອລ໋ອກຕົ້ນທຶນເປັນກີບ';
+    if(costThb && rate) preview.textContent = `ບັນທຶກເປັນ ${fmtMoney(costThb)} ບາດ · ≈ ${fmtMoney(costThb*rate)} ກີບ ໃຊ້ຄິດກຳໄລເມື່ອຂາຍເປັນກີບ`;
+    else preview.textContent = 'ບັນທຶກຕົ້ນທຶນເປັນບາດ — ອັດຕາເວັ້ນໄດ້ (ຖ້າບໍ່ໃສ່ ບິນທີ່ຂາຍເປັນກີບຈະຍັງບໍ່ຮູ້ກຳໄລຂອງເຄື່ອງນີ້)';
   }
   if(canSeeCost){
     document.getElementById('r_currency').addEventListener('change', updateReceiveCostLabel);
@@ -2571,10 +2630,10 @@ async function renderReceive(main){
     let cost = costInput; // locked LAK unit cost, used everywhere below
     let costThb = null, exchangeRate = null;
     if(canSeeCost && currency === 'THB'){
-      exchangeRate = Number((document.getElementById('r_rate').value||'').replace(/,/g,''));
-      if(!exchangeRate){ toast('ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)'); return; }
+      /* ຕົ້ນທຶນເກັບເປັນບາດ; ອັດຕາບໍ່ບັງຄັບ — ຖ້າໃສ່ ຈະຄິດກີບໄວ້ອ້າງອິງ (ໃຊ້ຄິດກຳໄລບິນກີບ) */
+      exchangeRate = Number((document.getElementById('r_rate').value||'').replace(/,/g,'')) || null;
       costThb = costInput;
-      cost = costThb * exchangeRate; // ລ໋ອກເປັນກີບຕາມອັດຕາມື້ນີ້
+      cost = exchangeRate ? Math.round(costThb * exchangeRate) : 0;
     }
     let addedCount = 0;
     if(isSerial){
@@ -2703,12 +2762,6 @@ async function renderReceive(main){
   bindReceiveCartRemove();
   document.getElementById('r_submit').addEventListener('click', async (e)=>{
     if(!receiveCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
-    /* ມີລາຍການຊື້ເປັນບາດ ແຕ່ຍັງບໍ່ໃສ່ອັດຕາແລກປ່ຽນ → ຕົ້ນທຶນກີບຈະເປັນ 0 ຈຶ່ງບໍ່ໃຫ້ບັນທຶກກ່ອນ */
-    if(receiveCart.some(i=> i.cost_currency === 'THB') && !receiveRate()){
-      toast('ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ) ກ່ອນບັນທຶກ');
-      const rateEl = document.getElementById('r_rate'); if(rateEl) rateEl.focus();
-      return;
-    }
     const btn = e.currentTarget;
     if(btn.disabled) return; // กันกดซ้ำระหว่างกำลังบันทึก
     btn.disabled = true;
@@ -2729,7 +2782,7 @@ async function renderReceive(main){
       const receiptDate = document.getElementById('r_date').value || todayStr();
       const unitsBody = receiveCart.filter(item=> item.serial_no).map(item=> ({
         id: uid(), model_id: item.model_id, serial_no: item.serial_no, status:'in_stock',
-        received_at: receiptDate, cost_lak: item.unit_cost
+        received_at: receiptDate, ...unitCostFields(item)
       }));
       if(unitsBody.length) await sb('stock_product_units', { method:'POST', body: unitsBody });
       const unitIdBySerial = {};
@@ -2748,11 +2801,7 @@ async function renderReceive(main){
       if(currentRole==='admin'){
         receiveCart.forEach(item=> {
           const patch = costPatchByModel[item.model_id] || (costPatchByModel[item.model_id] = {});
-          patch.cost_price = item.unit_cost; /* ຕົ້ນທຶນກີບ (ລ໋ອກຕາມອັດຕາມື້ນີ້) */
-          /* ຖ້າຊື້ເປັນບາດ ໃຫ້ຈື່ຕົ້ນທຶນບາດທີ່ຫາກໍຊື້ໄວ້ນຳ ເພື່ອຄັ້ງໜ້າຊື້ຮຸ່ນເກົ່າຈະດຶງມາເຕີມໃຫ້ອັດຕະໂນມັດ */
-          if(item.cost_currency === 'THB' && item.unit_cost_thb){
-            patch.cost_price_thb = item.unit_cost_thb;
-          }
+          applyModelCostPatch(patch, item);
         });
       }
       await Promise.all([
@@ -2840,13 +2889,13 @@ async function saveReceiptEdit(btn){
     /* 4) ເລກເຄື່ອງໃໝ່ທີ່ຫາກໍ່ເພີ່ມ */
     const newUnits = receiveCart.filter(i=> i.serial_no && !i.srcUnitId).map(i=> ({
       id: uid(), model_id: i.model_id, serial_no: i.serial_no, status:'in_stock',
-      received_at: date, cost_lak: i.unit_cost
+      received_at: date, ...unitCostFields(i)
     }));
     if(newUnits.length) await sb('stock_product_units', { method:'POST', body:newUnits });
     /* 5) ໜ່ວຍເກົ່າທີ່ຍັງຢູ່: ອັບເດດຕົ້ນທຶນ/ວັນທີ່ຮັບ */
     const keepRows = receiveCart.filter(i=> i.srcUnitId);
     if(keepRows.length) await Promise.all(keepRows.map(i=>
-      sb(`stock_product_units?id=eq.${i.srcUnitId}`, { method:'PATCH', body:{ cost_lak: i.unit_cost, received_at: date } })));
+      sb(`stock_product_units?id=eq.${i.srcUnitId}`, { method:'PATCH', body:{ ...unitCostFields(i), received_at: date } })));
     /* 6) ການເຄື່ອນໄຫວໃໝ່ (ໜ່ວຍໃໝ່ + ລາຍການບໍ່ມີເລກເຄື່ອງ) */
     const moves = newUnits.map(u=> ({
       id: uid(), model_id: u.model_id, unit_id: u.id, movement_type:'in', quantity:1,
@@ -2874,10 +2923,9 @@ async function saveReceiptEdit(btn){
     if(currentRole === 'admin'){
       const patchByModel = {};
       receiveCart.forEach(i=>{
-        if(!i.unit_cost) return;
+        if(!i.unit_cost && !i.unit_cost_thb) return;
         const patch = patchByModel[i.model_id] || (patchByModel[i.model_id] = {});
-        patch.cost_price = i.unit_cost;
-        if(i.cost_currency === 'THB' && i.unit_cost_thb) patch.cost_price_thb = i.unit_cost_thb;
+        applyModelCostPatch(patch, i);
       });
       await Promise.all(Object.entries(patchByModel).map(([modelId, patch])=>
         sb(`stock_product_models?id=eq.${modelId}`, { method:'PATCH', body: patch })));
@@ -2924,7 +2972,7 @@ function renderReceiveCart(){
                      (sameCount[it.model_id] > 1
                        ? `<button type="button" class="rc-fill" data-idx="${idx}" title="ໃສ່ຕົ້ນທຶນນີ້ໃຫ້ທຸກແຖວຂອງ ${escHtml(it.model_name)} (${sameCount[it.model_id]} ແຖວ)">⇩</button>` : '')+
                    `</div></td>`+
-                   `<td class="r mono b" data-amt="${idx}">${fmtMoney(it.amount)} ກີບ${it.cost_currency==='THB' ? '<div class="muted" style="font-size:11px;font-weight:400;">'+fmtMoney(it.unit_cost_thb||0)+' ບາດ @'+(it.exchange_rate||'—')+'</div>' : ''}</td>` : '')+
+                   `<td class="r mono b" data-amt="${idx}">${receiveRowAmountHtml(it)}</td>` : '')+
     `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
   return head + rows + '</tbody></table>';
 }
@@ -2966,7 +3014,7 @@ function updateReceiveCount(){
   const canSeeCost = currentRole === 'admin';
   const units = receiveCart.reduce((s,i)=> s + (Number(i.quantity)||0), 0);
   const total = receiveCart.reduce((s,i)=> s + (Number(i.amount)||0), 0);
-  big.textContent = canSeeCost ? (fmtMoney(total) + ' ກີບ') : fmtMoney(units);
+  big.textContent = canSeeCost ? costTotalsText(costTotalsByCurrency(receiveCart)) : fmtMoney(units);
   const line = document.getElementById('r_lineCount');
   if(line) line.textContent = receiveCart.length;
   const unit = document.getElementById('r_unitCount');
@@ -2998,11 +3046,6 @@ function bindReceiveCartRemove(){
       const list = document.getElementById('r_cartList');
       list.innerHTML = renderReceiveCart();
       bindReceiveCartRemove();
-      if(it.cost_currency === 'THB' && !rate){
-        toast('ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ) ຢູ່ຂ້າງເທິງກ່ອນ');
-        const rateEl = document.getElementById('r_rate');
-        if(rateEl) rateEl.focus();
-      }
     });
   });
   /* ⇩ = ເອົາຕົ້ນທຶນ ແລະ ສະກຸນຂອງແຖວນີ້ ໄປໃສ່ໃຫ້ທຸກແຖວຂອງສິນຄ້າຮຸ່ນດຽວກັນ (ຊື້ມາລາຄາດຽວກັນ ບໍ່ຕ້ອງພິມທີລະເຄື່ອງ) */
@@ -3039,7 +3082,7 @@ function bindReceiveCartRemove(){
         try{ el.setSelectionRange(Math.max(0,pos+shift), Math.max(0,pos+shift)); }catch(e){}
       }
       if(it.cost_currency === 'THB'){
-        /* ຕົວເລກທີ່ພິມ = ບາດ → ລ໋ອກເປັນກີບຕາມອັດຕາຂອງໃບນີ້ */
+        /* ຕົວເລກທີ່ພິມ = ບາດ (ເກັບເປັນບາດ) · ກີບຄິດໄວ້ອ້າງອິງສະເພາະເມື່ອມີອັດຕາ */
         const rate = receiveRate();
         it.unit_cost_thb = n;
         it.exchange_rate = rate || null;
@@ -3051,8 +3094,7 @@ function bindReceiveCartRemove(){
       }
       it.amount = (Number(it.unit_cost)||0) * (Number(it.quantity)||1);
       const amtCell = document.querySelector(`#r_cartList [data-amt="${idx}"]`);
-      if(amtCell) amtCell.innerHTML = fmtMoney(it.amount) + ' ກີບ' +
-        (it.cost_currency === 'THB' ? '<div class="muted" style="font-size:11px;font-weight:400;">'+fmtMoney(it.unit_cost_thb||0)+' ບາດ @'+(it.exchange_rate||'—')+'</div>' : '');
+      if(amtCell) amtCell.innerHTML = receiveRowAmountHtml(it);
       updateReceiveCount();
     });
     el.addEventListener('blur', ()=>{
@@ -3089,6 +3131,14 @@ async function loadReceiveHistory(month){
     const endDate = new Date(start); endDate.setMonth(endDate.getMonth()+1);
     const end = endDate.toISOString().slice(0,10);
     const receipts = await getPurchaseReceipts(start, end);
+    /* ຍອດຕົ້ນທຶນຂອງແຕ່ລະໃບ ແຍກກີບ/ບາດ (total_amount ເປັນກີບຢ່າງດຽວ ໃຊ້ບໍ່ໄດ້ກັບໃບທີ່ຊື້ເປັນບາດ) */
+    const totalsByReceipt = {};
+    if(canSeeCost && receipts.length){
+      const its = await sb(`stock_purchase_receipt_items?select=receipt_id,cost_currency,amount,unit_cost_thb,quantity&receipt_id=in.(${receipts.map(r=>r.id).join(',')})`);
+      const grouped = {};
+      its.forEach(it=> (grouped[it.receipt_id] = grouped[it.receipt_id] || []).push(it));
+      Object.entries(grouped).forEach(([id, list])=> totalsByReceipt[id] = costTotalsText(costTotalsByCurrency(list), ' · '));
+    }
     el.innerHTML = `
       ${canSeeCost && receipts.length ? `
         <div class="row" style="padding:6px 0;">
@@ -3107,7 +3157,7 @@ async function loadReceiveHistory(month){
             <div class="muted" style="font-size:11px;">${fmtDateDMY(r.receipt_date)}</div>
           </span>
         </span>
-        ${canSeeCost ? `<span class="gold mono">${fmtMoney(r.total_amount)}</span>` : ''}
+        ${canSeeCost ? `<span class="gold mono">${totalsByReceipt[r.id] || fmtMoney(r.total_amount)}</span>` : ''}
       </div>`).join('') : '<div class="empty">ບໍ່ມີການຮັບເຂົ້າໃນເດືອນນີ້</div>'}`;
     el.querySelectorAll('.row[data-rcv]').forEach(row=>{
       row.addEventListener('click', (e)=>{
@@ -3202,7 +3252,7 @@ async function openReceiptDetail(receiptId, receipt){
 async function openReceiptCostEditor(bg, receiptId, receipt, items){
   bg.querySelector('.modal').innerHTML = `
     <h3><svg class="dv-icon"><use href="#i-pencil"></use></svg>ໃສ່/ແກ້ໄຂຕົ້ນທຶນ · <span class="mono">${receipt.receipt_no||''}</span></h3>
-    <div class="muted" style="font-size:12px;margin-bottom:8px;">ໃສ່ຕົ້ນທຶນຕໍ່ໜ່ວຍຂອງແຕ່ລະລາຍການ. ຖ້າຊື້ເປັນເງິນບາດ ໃຫ້ປ່ຽນສະກຸນເປັນ ບາດ ແລ້ວໃສ່ອັດຕາແລກປ່ຽນ.</div>
+    <div class="muted" style="font-size:12px;margin-bottom:8px;">ໃສ່ຕົ້ນທຶນຕໍ່ໜ່ວຍຂອງແຕ່ລະລາຍການ. ຖ້າຊື້ເປັນເງິນບາດ ໃຫ້ປ່ຽນສະກຸນເປັນ ບາດ — ຕົ້ນທຶນບັນທຶກເປັນບາດ, ອັດຕາແລກປ່ຽນບໍ່ບັງຄັບ.</div>
     <hr class="sep">
     ${items.map((it, idx)=> {
       const isThb = it.cost_currency === 'THB';
@@ -3225,8 +3275,8 @@ async function openReceiptCostEditor(bg, receiptId, receipt, items){
           </div>
         </div>
         <div id="ec_rateBlock_${idx}" style="display:${isThb?'block':'none'};margin-top:6px;">
-          <label style="font-size:11px;">ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)</label>
-          <input id="ec_rate_${idx}" type="text" value="${it.exchange_rate||''}">
+          <label style="font-size:11px;">ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ) — ບໍ່ບັງຄັບ</label>
+          <input id="ec_rate_${idx}" type="text" value="${it.exchange_rate||''}" placeholder="ເວັ້ນວ່າງໄດ້">
           <div class="muted" id="ec_preview_${idx}" style="font-size:11px;margin-top:3px;"></div>
         </div>
       </div>`;
@@ -3244,8 +3294,8 @@ async function openReceiptCostEditor(bg, receiptId, receipt, items){
       if(!p) return;
       const cost = moneyValue('ec_cost_'+idx);
       const rate = Number((document.getElementById('ec_rate_'+idx).value||'').replace(/[^\d.]/g,''));
-      if(cost && rate) p.textContent = `≈ ${fmtMoney(cost*rate)} ກີບ/ໜ່ວຍ (ລ໋ອກຕົ້ນທຶນນີ້ໄວ້)`;
-      else p.textContent = 'ໃສ່ອັດຕາແລກປ່ຽນເພື່ອລ໋ອກຕົ້ນທຶນເປັນກີບ';
+      if(cost && rate) p.textContent = `ບັນທຶກເປັນ ${fmtMoney(cost)} ບາດ · ≈ ${fmtMoney(cost*rate)} ກີບ ໃຊ້ຄິດກຳໄລເມື່ອຂາຍເປັນກີບ`;
+      else p.textContent = 'ບັນທຶກຕົ້ນທຶນເປັນບາດ — ອັດຕາເວັ້ນໄດ້';
     };
     curSel.addEventListener('change', ()=>{
       const thb = curSel.value === 'THB';
@@ -3267,10 +3317,9 @@ async function openReceiptCostEditor(bg, receiptId, receipt, items){
       const input = moneyValue('ec_cost_'+idx);
       let unitCost = input, unitCostThb = null, exchangeRate = null;
       if(currency === 'THB'){
-        exchangeRate = Number((document.getElementById('ec_rate_'+idx).value||'').replace(/[^\d.]/g,''));
-        if(!exchangeRate){ toast(`ລາຍການທີ ${idx+1}: ໃສ່ອັດຕາແລກປ່ຽນ (1 ບາດ = ? ກີບ)`); return; }
+        exchangeRate = Number((document.getElementById('ec_rate_'+idx).value||'').replace(/[^\d.]/g,'')) || null;
         unitCostThb = input;
-        unitCost = Math.round(input * exchangeRate); /* ລ໋ອກເປັນກີບ */
+        unitCost = exchangeRate ? Math.round(input * exchangeRate) : 0; /* ກີບອ້າງອິງ (ສະເພາະເມື່ອມີອັດຕາ) */
       }
       computed.push({ it, currency, unitCost, unitCostThb, exchangeRate, amount: unitCost * Number(it.quantity||1) });
     }
@@ -3288,13 +3337,12 @@ async function openReceiptCostEditor(bg, receiptId, receipt, items){
         /* ໜ່ວຍທີ່ມີເລກເຄື່ອງ: ອັບເດດ cost_lak ໃຫ້ກົງ (ໃຊ້ໃນການຄິດກຳໄລ) */
         if(c.it.serial_no){
           reqs.push(sb(`stock_product_units?serial_no=eq.${encodeURIComponent(c.it.serial_no)}&model_id=eq.${c.it.model_id}`, {
-            method:'PATCH', body:{ cost_lak: c.unitCost }
+            method:'PATCH', body: unitCostFields({ cost_currency: c.currency, unit_cost: c.unitCost, unit_cost_thb: c.unitCostThb, exchange_rate: c.exchangeRate })
           }));
         }
         /* ຕົ້ນທຶນອ້າງອິງຂອງຮຸ່ນ (ໜຶ່ງຄຳຂໍຕໍ່ 1 ຮຸ່ນ) */
         const patch = costPatchByModel[c.it.model_id] || (costPatchByModel[c.it.model_id] = {});
-        patch.cost_price = c.unitCost;
-        if(c.currency === 'THB' && c.unitCostThb) patch.cost_price_thb = c.unitCostThb;
+        applyModelCostPatch(patch, { cost_currency: c.currency, unit_cost: c.unitCost, unit_cost_thb: c.unitCostThb, exchange_rate: c.exchangeRate });
       }
       reqs.push(sb(`stock_purchase_receipts?id=eq.${receiptId}`, { method:'PATCH', body:{ total_amount: totalAmount } }));
       for(const [modelId, patch] of Object.entries(costPatchByModel)){
@@ -4780,7 +4828,7 @@ function statusTag(inv){
 }
 
 async function getInvoiceItems(invoiceId){
-  return await sb(`sales_invoice_items?select=*,stock_product_models(name,unit,code,cost_price,cost_price_thb),stock_product_units(cost_lak)&invoice_id=eq.${invoiceId}`);
+  return await sb(`sales_invoice_items?select=*,stock_product_models(name,unit,code,cost_price,cost_price_thb,cost_currency),stock_product_units(cost_lak,cost_currency,cost_thb)&invoice_id=eq.${invoiceId}`);
 }
 async function getInvoicePayments(invoiceId){
   return await sb(`sales_payments?select=*&invoice_id=eq.${invoiceId}&order=payment_date.asc`);
