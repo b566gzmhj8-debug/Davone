@@ -198,6 +198,17 @@
   }
   .modal-backdrop.open { display: flex; }
 
+  /* ກົດນອກກ່ອງ: ກ່ອງຂໍ້ມູນຈະບໍ່ປິດ ແຕ່ຈະ "ສັ່ນ" ບອກວ່າຕ້ອງກົດ ✕ ຫຼື ຍົກເລີກ */
+  @keyframes modal-nudge {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+  }
+  .modal-box.nudge { animation: modal-nudge .32s ease; }
+  @media (prefers-reduced-motion: reduce) { .modal-box.nudge { animation: none; } }
+
   .modal-box {
     background: white; border-radius: 14px;
     width: 100%; max-width: 620px;
@@ -2036,15 +2047,25 @@ async function exportSelectedPDFs() {
 document.getElementById('slip-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('slip-modal')) closeSlip();
 });
-document.getElementById('bonus-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('bonus-modal')) closeBonus();
-});
+/* ລາຍຮັບພິເສດ / ບັນຊີທະນາຄານ = ກ່ອງປ້ອນຂໍ້ມູນ — ກົດຖືກນອກກ່ອງຈະບໍ່ປິດອີກຕໍ່ໄປ
+   (ເມື່ອກ່ອນພິມຫຼາຍລາຍການແລ້ວກົດພາດ ຂໍ້ມູນຫາຍໝົດ) ຕ້ອງກົດ ✕ ຫຼື ຍົກເລີກ ເທົ່ານັ້ນ */
+function guardModal(id){
+  const bd = document.getElementById(id);
+  bd.addEventListener('click', e => {
+    if (e.target !== bd) return;
+    const box = bd.querySelector('.modal-box');
+    if (!box) return;
+    box.classList.remove('nudge');
+    void box.offsetWidth;            // restart the animation
+    box.classList.add('nudge');
+    setTimeout(() => box.classList.remove('nudge'), 400);
+  });
+}
+guardModal('bonus-modal');
 document.getElementById('select-pdf-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('select-pdf-modal')) closeSelectPDF();
 });
-document.getElementById('bank-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('bank-modal')) closeBankModal();
-});
+guardModal('bank-modal');
 document.getElementById('wa-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('wa-modal')) closeWAModal();
 });
