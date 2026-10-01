@@ -143,6 +143,10 @@
   .toast{background:var(--ink);border:none;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;box-shadow:0 10px 24px -8px rgba(0,0,0,.45);text-align:center;max-width:440px;animation:toastIn .18s ease-out;display:flex;align-items:center;gap:7px;justify-content:center;font-family:var(--font-body);}
   .toast .dv-icon{color:#8fd0a0;width:15px;height:15px;flex:none;}
   @keyframes toastIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  /* ກ່ອງປ້ອນຂໍ້ມູນ: ກົດຖືກນອກກ່ອງຈະບໍ່ປິດ ແຕ່ຈະສັ່ນບອກ (ຕ້ອງກົດ ຍົກເລີກ / ✕) */
+  @keyframes modalNudge{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(2px);}}
+  .nudge{animation:modalNudge .32s ease;}
+  @media (prefers-reduced-motion: reduce){ .nudge{animation:none;} }
   .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:50;}
   .modal{background:var(--panel);border-top:1px solid var(--border);border-radius:16px 16px 0 0;padding:16px;width:100%;max-width:520px;margin:0 auto;max-height:85vh;overflow-y:auto;}
   .modal h3{margin-top:0;color:var(--orange-soft);display:flex;align-items:center;gap:7px;}
@@ -2061,6 +2065,20 @@ async function openAdjustHistoryModal(){
 
 /* ປรับສະຕັອກສິນຄ້າ (ບໍ່ມີເລກເຄື່ອງ) ໃຫ້ເປັນຈຳນວນທີ່ຖືກຕ້ອງ — ສະເພາະແອດມິນ
    ບໍ່ໄດ້ໄປລົບບິນ/ຮັບເຂົ້າເກົ່າ ແຕ່ບັນທຶກ movement ‘adjust’ ຊົດເຊີຍໃຫ້ຍອດເທົ່າທີ່ຕ້ອງການ (stock_balance ຄິດໃໝ່ໃຫ້ເອງ) */
+// ກ່ອງທີ່ມີການພິມຂໍ້ມູນ (ປັບສະຕັອກ / ເພີ່ມ-ແກ້ສິນຄ້າ) ຕ້ອງບໍ່ປິດຍ້ອນກົດພາດນອກກ່ອງ
+// ພິມຫຼາຍຊ່ອງແລ້ວກົດພາດ ຂໍ້ມູນຫາຍໝົດ — ດຽວນີ້ກ່ອງຈະສັ່ນບອກເທົ່ານັ້ນ
+function lockModalBg(bg){
+  bg.addEventListener('click', (e)=>{
+    if(e.target !== bg) return;
+    const box = bg.querySelector('.modal') || bg.firstElementChild;
+    if(!box) return;
+    box.classList.remove('nudge');
+    void box.offsetWidth;                       // restart the animation
+    box.classList.add('nudge');
+    setTimeout(()=> box.classList.remove('nudge'), 400);
+  });
+}
+
 function openAdjustStockModal(model, currentQty){
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
@@ -2079,7 +2097,7 @@ function openAdjustStockModal(model, currentQty){
       </div>
     </div>`;
   document.body.appendChild(bg);
-  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  lockModalBg(bg);
   bg.querySelector('#adj_cancel').addEventListener('click', ()=> bg.remove());
   bg.querySelector('#adj_save').addEventListener('click', async (e)=>{
     const btn = e.currentTarget;
@@ -2295,7 +2313,7 @@ function openModelModal(existing){
     modelFieldOrder.push('m_threshold');
     bindEnterAdvance(modelFieldOrder, 'm_save');
   }
-  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  lockModalBg(bg);
   document.getElementById('m_cancel').addEventListener('click', ()=> bg.remove());
   document.getElementById('m_save').addEventListener('click', async ()=>{
     const name = document.getElementById('m_name').value.trim();

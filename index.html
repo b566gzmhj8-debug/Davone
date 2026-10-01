@@ -157,6 +157,10 @@
   .card-sub { font-size:13px; opacity:0.8; margin-top:2px; }
   .sync-note { margin-top:32px;font-size:11px;letter-spacing:1.5px;color:rgba(255,255,255,0.18);text-align:center;text-transform:uppercase;display:flex;align-items:center;gap:8px;justify-content:center;position:relative;z-index:1; }
   @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(-10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+  /* ກ່ອງປ້ອນຂໍ້ມູນ: ກົດຖືກນອກກ່ອງຈະບໍ່ປິດ ແຕ່ຈະສັ່ນບອກ (ຕ້ອງກົດ ✕ / ຍົກເລີກ) */
+  @keyframes modalNudge { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-7px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(2px);} }
+  .nudge { animation: modalNudge .32s ease; }
+  @media (prefers-reduced-motion: reduce) { .nudge { animation:none; } }
   .theme-btn { position:fixed; bottom:20px; right:20px; width:48px; height:48px; border-radius:50%; border:none; font-size:22px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); z-index:999; display:flex; align-items:center; justify-content:center; }
   .theme-btn.dark { background:#16213e; color:#ffd700; }
   .theme-btn.light { background:#fff; color:#1a1a2e; }
@@ -3277,7 +3281,7 @@ async function openBankModal() {
       <button class="btn-bank-confirm" style="flex:1.5" id="bank-confirm-btn" onclick="confirmBankDeposit(this)" disabled><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> ຢືນຢັນ</button>
     </div>
   </div>`;
-  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  lockOverlay(overlay);
   document.body.appendChild(overlay);
   window._bankCur = "LAK";
   window._bankBalLAK = lakBal.balance;
@@ -3430,7 +3434,7 @@ async function openWithdrawModal() {
       <button class="btn-bank-confirm" style="flex:1.5;background:linear-gradient(135deg,#c0392b,#e74c3c)" id="wd-confirm-btn" onclick="confirmWithdraw(this)" disabled><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> ຢືນຢັນເບີກ</button>
     </div>
   </div>`;
-  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  lockOverlay(overlay);
   document.body.appendChild(overlay);
   window._wdCur = "LAK";
   window._wdBalLAK = lakBal.balance;
@@ -3606,7 +3610,7 @@ async function openAdjustModal() {
       <button class="btn-bank-confirm" style="flex:1.5" id="adj-confirm-btn" onclick="confirmAdjust(this)" disabled><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> ຢືນຢັນປັບຍອດ</button>
     </div>
   </div>`;
-  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  lockOverlay(overlay);
   document.body.appendChild(overlay);
   window._adjCur = "LAK";
   window._adjCurLAK = lakBal.withAdmin;
@@ -3958,6 +3962,20 @@ document.addEventListener("keydown", function (e) {
     tapPin("DEL", state.pin);
   }
 });
+
+// ກ່ອງທີ່ມີການພິມຂໍ້ມູນ (ມອບເຂົ້າທະນາຄານ / ເບີກເງິນ / ປັບຍອດ) ຕ້ອງບໍ່ປິດຍ້ອນກົດພາດນອກກ່ອງ
+// ເມື່ອກ່ອນພິມຈຳນວນ+ໝາຍເຫດແລ້ວກົດພາດ ຂໍ້ມູນຫາຍໝົດ — ດຽວນີ້ກ່ອງຈະສັ່ນບອກເທົ່ານັ້ນ
+function lockOverlay(overlay) {
+  overlay.onclick = e => {
+    if (e.target !== overlay) return;
+    const box = overlay.firstElementChild;
+    if (!box) return;
+    box.classList.remove("nudge");
+    void box.offsetWidth;                       // restart the animation
+    box.classList.add("nudge");
+    setTimeout(() => box.classList.remove("nudge"), 400);
+  };
+}
 
 function showImgFull(src) {
   const overlay = document.createElement("div");
