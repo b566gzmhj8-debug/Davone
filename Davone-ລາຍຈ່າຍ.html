@@ -394,6 +394,15 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .btn-pdf{background:var(--gold-dim);border:1px solid var(--border-gold);color:var(--gold-lt);border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;white-space:nowrap;transition:all .15s}
 .btn-pdf:hover{background:rgba(232,200,116,0.2)}
 .btn-pdf:disabled{opacity:.55;cursor:default}
+.rpt-bar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:12px 0 0;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+.rpt-lb{font-size:12px;font-weight:700;color:var(--gold-lt);letter-spacing:.04em;padding-bottom:7px}
+.rpt-d{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted)}
+.rpt-d input[type=date]{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 10px;font-family:var(--mono);font-size:13px;outline:none;-webkit-appearance:none}
+.rpt-d input[type=date]:focus{border-color:var(--border-gold)}
+.rpt-q{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:7px 12px;font-size:11.5px;font-family:var(--font);cursor:pointer}
+.rpt-q:hover{border-color:var(--border-gold);color:var(--gold-lt)}
+.rpt-bar .btn-pdf{margin-left:auto}
+@media(max-width:640px){.rpt-bar .btn-pdf{margin-left:0;width:100%;justify-content:center}}
 .kind-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kind-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.14);color:#ffffff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;border-radius:8px;transition:all .15s}
 .kind-btn:hover{border-color:rgba(255,255,255,0.28)}
@@ -1805,10 +1814,38 @@ function buildBalance() {
     const l = new Date(m+'-01').toLocaleDateString('lo-LA',{year:'numeric',month:'long'});
     h += `<button class="mtab ${m===cur?'active':''}" onclick="swBal('${m}')">${l}</button>`;
   });
-  h += '</div><button class="btn-pdf" onclick="downloadBudgetPDF(this)" title="ບົດສະຫຼຸບ A4 ສຳລັບສົ່ງໃຫ້ຫົວໜ້າ"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ດາວໂຫຼດ PDF (A4)</button>';
-  h += '</div><div id="balDet"></div>';
+  h += '</div></div>';
+  // ── ເລືອກວັນທີ່ຈະອອກບົດສະຫຼຸບ (ຕັ້ງຕົ້ນ = ທັງເດືອນທີ່ເລືອກ) ──
+  h += `<div class="rpt-bar">
+      <span class="rpt-lb">ອອກບົດສະຫຼຸບ</span>
+      <label class="rpt-d">ຈາກວັນທີ<input type="date" id="rptFrom" value="${monthStartStr(cur)}"></label>
+      <label class="rpt-d">ຫາວັນທີ<input type="date" id="rptTo" value="${monthEndStr(cur)}"></label>
+      <button class="rpt-q" onclick="rptSetMonth('${cur}')">ທັງເດືອນ</button>
+      <button class="rpt-q" onclick="rptSetToday()">ມື້ນີ້</button>
+      <button class="btn-pdf" onclick="downloadBudgetPDF(this)" title="ບົດສະຫຼຸບ A4 ສຳລັບສົ່ງໃຫ້ຫົວໜ້າ"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ດາວໂຫຼດ PDF (A4)</button>
+    </div>`;
+  h += '<div id="balDet"></div>';
   body.innerHTML = h;
   renderBalDet(cur);
+}
+
+function monthStartStr(m){ return m + '-01'; }
+function monthEndStr(m){
+  const p = m.split('-');
+  const last = new Date(Number(p[0]), Number(p[1]), 0).getDate();   // ວັນສຸດທ້າຍຂອງເດືອນ
+  return m + '-' + String(last).padStart(2,'0');
+}
+function rptSetMonth(m){
+  const f=document.getElementById('rptFrom'), t=document.getElementById('rptTo');
+  if(f) f.value = monthStartStr(m);
+  if(t) t.value = monthEndStr(m);
+}
+function rptSetToday(){
+  const d = new Date();
+  const s = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const f=document.getElementById('rptFrom'), t=document.getElementById('rptTo');
+  if(f) f.value = s;
+  if(t) t.value = s;
 }
 
 function swBal(m) { window._balMonth = m; buildBalance(); }
@@ -1841,23 +1878,33 @@ let RPT_LOGO = null;
   img.src = 'assets/icon-512.png';
 })();
 
-function budgetReportData(m){
-  const depM  = deposits.filter(d => d.date.slice(0,7)===m).slice()
+function budgetReportData(from, to){
+  const depM  = deposits.filter(d => d.date >= from && d.date <= to).slice()
                         .sort((a,b)=> a.date===b.date ? 0 : (a.date<b.date?-1:1));
   const ins   = depM.filter(d => (d.kind||'in')==='in');
   const outs  = depM.filter(d => d.kind==='out');
   const moneyIn  = ins.reduce((t,d)=>t+Number(d.amount),0);
   const moneyOut = outs.reduce((t,d)=>t+Number(d.amount),0);
-  const carry = deposits.filter(d => d.date.slice(0,7) < m)
+  // ຍອດຍົກມາ = ທຸກລາຍການກ່ອນ "ຈາກວັນທີ" (ເງິນເຂົ້າ ລົບ ເງິນອອກ)
+  const carry = deposits.filter(d => d.date < from)
     .reduce((t,d)=> t + ((d.kind||'in')==='in' ? Number(d.amount) : -Number(d.amount)), 0);
   const avail = carry + moneyIn;
   return { depM, ins, outs, moneyIn, moneyOut, carry, avail, left: avail - moneyOut,
            pct: avail > 0 ? Math.min(100, Math.round(moneyOut/avail*100)) : (moneyOut>0?100:0) };
 }
 
-function budgetReportHTML(m){
-  const d = budgetReportData(m);
-  const per = laoMonthLabel(m);
+// ປ້າຍບອກຮອບ: ເຕັມເດືອນ → ຊື່ເດືອນ · ຖ້າບໍ່ແມ່ນ → ວັນທີ່ ຫາ ວັນທີ່
+function dmy(s){ const p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function rangeLabel(from, to){
+  const m = from.slice(0,7);
+  if (from === monthStartStr(m) && to === monthEndStr(m)) return laoMonthLabel(m);
+  if (from === to) return 'ວັນທີ ' + dmy(from);
+  return dmy(from) + ' ຫາ ' + dmy(to);
+}
+
+function budgetReportHTML(from, to){
+  const d = budgetReportData(from, to);
+  const per = rangeLabel(from, to);
   const today = new Date();
   const printed = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
   const NAVY='#0b1a3d', GOLD='#d4a85a', INK='#1b2233', MUT='#6b7484', LINE='#e2e0d8';
@@ -1911,7 +1958,7 @@ function budgetReportHTML(m){
         </div>
       </div>
       <div style="background:#16295a;border:1.5px solid ${GOLD};border-radius:8px;padding:9px 16px;text-align:center;flex-shrink:0">
-        <div style="font-size:10.5px;color:#c9cfdc">ຮອບເດືອນ</div>
+        <div style="font-size:10.5px;color:#c9cfdc">ຮອບບົດສະຫຼຸບ</div>
         <div style="font-size:14px;font-weight:800;color:#f3d99b;white-space:nowrap">${per}</div>
       </div>
     </div>
@@ -1923,13 +1970,13 @@ function budgetReportHTML(m){
 
     <div style="padding:14px 32px 0">
       <table style="width:100%;border-collapse:collapse;border:1px solid ${LINE}">
-        ${d.carry!==0 ? sumRow('ຍອດຍົກມາຈາກເດືອນກ່ອນ', (d.carry<0?'−':'+')+money(d.carry), d.carry<0?'#b3382a':'#1d7a4d') : ''}
-        ${sumRow('ເງິນໂອນເຂົ້າເດືອນນີ້', '+'+money(d.moneyIn), '#1d7a4d')}
+        ${d.carry!==0 ? sumRow('ຍອດຍົກມາ (ກ່ອນ '+dmy(from)+')', (d.carry<0?'−':'+')+money(d.carry), d.carry<0?'#b3382a':'#1d7a4d') : ''}
+        ${sumRow('ເງິນໂອນເຂົ້າໃນຮອບນີ້', '+'+money(d.moneyIn), '#1d7a4d')}
         ${sumRow('ລວມເງິນທີ່ໃຊ້ໄດ້', money(d.avail), INK, true)}
         ${sumRow('ເງິນທີ່ໃຊ້ຈ່າຍອອກ', '−'+money(d.moneyOut), '#b3382a')}
       </table>
       <div style="display:flex;justify-content:space-between;align-items:center;background:${NAVY};color:#f3d99b;padding:11px 14px;margin-top:-1px">
-        <b style="font-size:13.5px">ຍອດເຫຼືອປາຍເດືອນ · BALANCE</b>
+        <b style="font-size:13.5px">ຍອດເຫຼືອ · BALANCE</b>
         <b style="font-size:18px;white-space:nowrap">${d.left<0?'−':''}${money(d.left)}</b>
       </div>
       <div style="margin-top:7px;height:7px;background:#ece8dc;border-radius:4px;overflow:hidden">
@@ -1963,17 +2010,22 @@ function budgetReportHTML(m){
 async function downloadBudgetPDF(btn){
   const m = window._balMonth;
   if (!m) { toast('ຍັງບໍ່ມີຂໍ້ມູນເດືອນນີ້', true); return; }
+  // ວັນທີ່ທີ່ເລືອກໄວ້ໃນແຖບ (ຖ້າບໍ່ມີ → ທັງເດືອນທີ່ເລືອກ)
+  const fEl = document.getElementById('rptFrom'), tEl = document.getElementById('rptTo');
+  const from = (fEl && fEl.value) || monthStartStr(m);
+  const to   = (tEl && tEl.value) || monthEndStr(m);
+  if (from > to) { toast('ວັນທີ່ເລີ່ມຕ້ອງບໍ່ເກີນວັນທີ່ສຸດທ້າຍ', true); return; }
   const label = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.textContent = 'ກຳລັງສ້າງ PDF…'; }
 
   const box = document.createElement('div');
   box.style.cssText = 'position:fixed;top:0;left:-9999px;width:794px;background:#fff;z-index:-1';
-  box.innerHTML = budgetReportHTML(m);
+  box.innerHTML = budgetReportHTML(from, to);
   document.body.appendChild(box);
 
   try {
     // ຖ້າ CDN ໂຫຼດບໍ່ໄດ້ (ເນັດຮ້ານ) → ເປີດໜ້າພິມ A4 ແທນ ແລ້ວເລືອກ "Save as PDF"
-    if (!window.html2canvas || !window.jspdf) { printBudgetFallback(m); return; }
+    if (!window.html2canvas || !window.jspdf) { printBudgetFallback(from, to); return; }
     await new Promise(r => setTimeout(r, 250));
     const canvas = await html2canvas(box.firstElementChild, {
       scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false,
@@ -1991,13 +2043,13 @@ async function downloadBudgetPDF(btn){
       pdf.setFillColor(255, 255, 255);        // ປິດສ່ວນທີ່ລົ້ນ ແລ້ວວາງເລກໜ້າ
       pdf.rect(0, usable, pw, foot, 'F');
       pdf.setFontSize(8); pdf.setTextColor(130, 130, 130);
-      pdf.text('DAVONE · BUDGET REPORT ' + m, 12, ph - 4);
+      pdf.text('DAVONE - BUDGET REPORT  ' + from + '  -  ' + to, 12, ph - 4);
       pdf.text(String(i + 1) + ' / ' + pages, pw - 12, ph - 4, { align: 'right' });
     }
-    pdf.save('ສະຫຼຸບງົບປະມານ-' + m + '.pdf');
+    pdf.save('ສະຫຼຸບງົບປະມານ-' + (from === monthStartStr(m) && to === monthEndStr(m) ? m : from + '-ຫາ-' + to) + '.pdf');
     toast('ດາວໂຫຼດ PDF ແລ້ວ');
   } catch(e) {
-    printBudgetFallback(m);
+    printBudgetFallback(from, to);
   } finally {
     box.remove();
     if (btn) { btn.disabled = false; btn.innerHTML = label; }
@@ -2005,12 +2057,12 @@ async function downloadBudgetPDF(btn){
 }
 
 // ສຳຮອງ: ເປີດໜ້າຕ່າງພິມຂະໜາດ A4 (ໃນ Safari ເລືອກ PDF → Save as PDF ກໍ່ໄດ້ໄຟລ໌ຄືກັນ)
-function printBudgetFallback(m){
+function printBudgetFallback(from, to){
   const w = window.open('', '_blank');
   if (!w) { toast('ເປີດໜ້າພິມບໍ່ໄດ້ — ອະນຸຍາດ pop-up ກ່ອນ', true); return; }
-  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>ສະຫຼຸບງົບປະມານ ' + m + '</title>'
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>ສະຫຼຸບງົບປະມານ ' + from + ' ຫາ ' + to + '</title>'
     + '<style>@page{size:A4;margin:0}body{margin:0}</style></head><body>'
-    + budgetReportHTML(m) + '</body></html>');
+    + budgetReportHTML(from, to) + '</body></html>');
   w.document.close();
   setTimeout(()=>{ w.focus(); w.print(); }, 600);
 }
