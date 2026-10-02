@@ -402,6 +402,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .rpt-q{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:7px 12px;font-size:11.5px;font-family:var(--font);cursor:pointer}
 .rpt-q:hover{border-color:var(--border-gold);color:var(--gold-lt)}
 .rpt-bar .btn-pdf{margin-left:auto}
+.rpt-bar .rpt-print{padding:9px 14px;font-size:12px}
 @media(max-width:640px){.rpt-bar .btn-pdf{margin-left:0;width:100%;justify-content:center}}
 .kind-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kind-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.14);color:#ffffff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;border-radius:8px;transition:all .15s}
@@ -1823,6 +1824,7 @@ function buildBalance() {
       <button class="rpt-q" onclick="rptSetMonth('${cur}')">ທັງເດືອນ</button>
       <button class="rpt-q" onclick="rptSetToday()">ມື້ນີ້</button>
       <button class="btn-pdf" onclick="downloadBudgetPDF(this)" title="ບົດສະຫຼຸບ A4 ສຳລັບສົ່ງໃຫ້ຫົວໜ້າ"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ດາວໂຫຼດ PDF (A4)</button>
+      <button class="rpt-q rpt-print" onclick="openBudgetPrint(this)" title="ເປີດໃບ A4 ແລ້ວພິມ ຫຼື ບັນທຶກເປັນ PDF ເອງ">ເປີດເບິ່ງ / ພິມ</button>
     </div>`;
   h += '<div id="balDet"></div>';
   body.innerHTML = h;
@@ -2046,8 +2048,9 @@ async function downloadBudgetPDF(btn){
       pdf.text('DAVONE - BUDGET REPORT  ' + from + '  -  ' + to, 12, ph - 4);
       pdf.text(String(i + 1) + ' / ' + pages, pw - 12, ph - 4, { align: 'right' });
     }
-    pdf.save('ສະຫຼຸບງົບປະມານ-' + (from === monthStartStr(m) && to === monthEndStr(m) ? m : from + '-ຫາ-' + to) + '.pdf');
-    toast('ດາວໂຫຼດ PDF ແລ້ວ');
+    const fname = 'ສະຫຼຸບງົບປະມານ-' + (from === monthStartStr(m) && to === monthEndStr(m) ? m : from + '-ຫາ-' + to) + '.pdf';
+    savePdfFile(pdf, fname);
+    toast('ດາວໂຫຼດ PDF ແລ້ວ · ຖ້າບໍ່ເຫັນໄຟລ໌ ໃຫ້ກົດ \u201Cເປີດເບິ່ງ / ພິມ\u201D');
   } catch(e) {
     printBudgetFallback(from, to);
   } finally {
@@ -2057,6 +2060,33 @@ async function downloadBudgetPDF(btn){
 }
 
 // ສຳຮອງ: ເປີດໜ້າຕ່າງພິມຂະໜາດ A4 (ໃນ Safari ເລືອກ PDF → Save as PDF ກໍ່ໄດ້ໄຟລ໌ຄືກັນ)
+// pdf.save() ຂອງ jsPDF ໃນ Safari ຈະ window.open(blob:…) ແທນການດາວໂຫຼດ
+// ແລ້ວຂຶ້ນ "Safari Can't Open the Page … WebKitBlobResource error 1"
+// ຈຶ່ງເຮັດເອງ: ສ້າງ blob ແລ້ວກົດລິ້ງທີ່ມີ download (Safari ຮອງຮັບ) ຢ່າລືມວາງ a ລົງ DOM ກ່ອນ
+function savePdfFile(pdf, filename){
+  const blob = pdf.output('blob');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 60000);  // ຢ່າລຶບໄວ ບໍ່ດັ່ງນັ້ນ Safari ດຶງບໍ່ທັນ
+}
+
+// ເປີດໜ້າ A4 ໃຫ້ເບິ່ງ/ພິມ (Safari: ປຸ່ມ PDF → Save as PDF ກໍ່ໄດ້ໄຟລ໌ຄືກັນ)
+function openBudgetPrint(btn){
+  const m = window._balMonth;
+  if (!m) { toast('ຍັງບໍ່ມີຂໍ້ມູນເດືອນນີ້', true); return; }
+  const fEl = document.getElementById('rptFrom'), tEl = document.getElementById('rptTo');
+  const from = (fEl && fEl.value) || monthStartStr(m);
+  const to   = (tEl && tEl.value) || monthEndStr(m);
+  if (from > to) { toast('ວັນທີ່ເລີ່ມຕ້ອງບໍ່ເກີນວັນທີ່ສຸດທ້າຍ', true); return; }
+  printBudgetFallback(from, to);
+}
+
 function printBudgetFallback(from, to){
   const w = window.open('', '_blank');
   if (!w) { toast('ເປີດໜ້າພິມບໍ່ໄດ້ — ອະນຸຍາດ pop-up ກ່ອນ', true); return; }
