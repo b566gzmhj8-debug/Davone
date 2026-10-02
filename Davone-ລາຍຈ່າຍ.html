@@ -403,6 +403,12 @@ textarea{resize:vertical;min-height:60px;line-height:1.55}
 .rpt-q:hover{border-color:var(--border-gold);color:var(--gold-lt)}
 .rpt-bar .btn-pdf{margin-left:auto}
 .rpt-bar .rpt-print{padding:9px 14px;font-size:12px}
+.rpt-sep{width:1px;height:26px;background:var(--border);margin:0 2px}
+.rpt-lb2{font-size:11.5px;color:var(--muted);padding-bottom:8px}
+.rpt-seg{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.rpt-seg button{background:transparent;border:none;color:var(--muted);padding:8px 13px;font-size:11.5px;font-family:var(--font);cursor:pointer;border-right:1px solid var(--border)}
+.rpt-seg button:last-child{border-right:none}
+.rpt-seg button.on{background:var(--gold-dim);color:var(--gold-lt);font-weight:700}
 @media(max-width:640px){.rpt-bar .btn-pdf{margin-left:0;width:100%;justify-content:center}}
 .kind-group{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kind-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.14);color:#ffffff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;border-radius:8px;transition:all .15s}
@@ -1584,7 +1590,14 @@ function buildM() {
       <label class="rpt-d">ຈາກວັນທີ<input type="date" id="exFrom"></label>
       <label class="rpt-d">ຫາວັນທີ<input type="date" id="exTo"></label>
       <button class="rpt-q" onclick="exSetMonth()">ທັງເດືອນ</button>
-      <button class="btn-pdf" onclick="downloadExpensePDF(this)" title="ບົດສະຫຼຸບ A4 ແຍກ ບໍລິຫານ / ຄ່າສິນຄ້າ"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ດາວໂຫຼດ PDF (A4)</button>
+      <span class="rpt-sep"></span>
+      <span class="rpt-lb2">ສະຫຼຸບລາຍການ</span>
+      <div class="rpt-seg" id="exTypeSeg">
+        <button data-t="all" class="on" onclick="exPickType(this)">ທັງໝົດ</button>
+        <button data-t="admin" onclick="exPickType(this)">ບໍລິຫານ</button>
+        <button data-t="goods" onclick="exPickType(this)">ຄ່າສິນຄ້າ</button>
+      </div>
+      <button class="btn-pdf" onclick="downloadExpensePDF(this)" title="ບົດສະຫຼຸບ A4 — ເລືອກໄດ້ວ່າຈະເອົາປະເພດໃດ"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ດາວໂຫຼດ PDF (A4)</button>
       <button class="rpt-q rpt-print" onclick="openExpensePrint()" title="ເປີດໃບ A4 ແລ້ວພິມ ຫຼື ບັນທຶກເປັນ PDF ເອງ">ເປີດເບິ່ງ / ພິມ</button>
     </div>
     <div class="es-months" id="esMonths"></div>
@@ -2079,7 +2092,7 @@ async function downloadBudgetPDF(btn){
 //  ບົດສະຫຼຸບລາຍຈ່າຍ A4 → PDF — ແຍກ "ຈ່າຍບໍລິຫານ" ກັບ "ຈ່າຍຄ່າສິນຄ້າ"
 //  ດຶງຈາກຕາຕະລາງລາຍຈ່າຍຫຼັກ (ລົງລາຍຈ່າຍ) ບໍ່ແມ່ນກະເປົາງົບປະມານ
 // ═══════════════════════════════════════════════
-function expenseReportHTML(from, to, cur){
+function expenseReportHTML(from, to, cur, type){
   const list = records.filter(r => r.date >= from && r.date <= to && r.currency === cur && Number(r.amount) > 0)
                       .slice().sort((a,b)=> a.date===b.date ? Number(b.amount)-Number(a.amount) : (a.date<b.date?-1:1));
   const admin = list.filter(r => r.type === 'admin');
@@ -2131,6 +2144,9 @@ function expenseReportHTML(from, to, cur){
       </table>
     </div>`;
 
+  type = type || 'all';
+  const wantA = type !== 'goods', wantG = type !== 'admin';
+  const shown = (wantA ? tA : 0) + (wantG ? tG : 0);   // ຍອດຂອງສ່ວນທີ່ເລືອກອອກ
   const share = (v) => tot ? Math.round(v/tot*100) : 0;
   const card = (title, note, v, color) => `
     <div style="flex:1;border:1px solid ${LINE};border-top:3px solid ${color};padding:10px 12px">
@@ -2149,6 +2165,7 @@ function expenseReportHTML(from, to, cur){
         <div>
           <div style="font-size:19px;font-weight:900;color:#f3d99b;letter-spacing:.5px">ບົດສະຫຼຸບລາຍຈ່າຍ</div>
           <div style="font-size:11px;color:#c9cfdc;letter-spacing:1.6px">EXPENSE REPORT · ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ</div>
+          ${type!=='all' ? `<div style="display:inline-block;margin-top:5px;background:${type==='admin'?BLUE:GREEN};color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px">ສະເພາະ ${type==='admin'?'ຈ່າຍບໍລິຫານ':'ຈ່າຍຄ່າສິນຄ້າ'}</div>` : ''}
         </div>
       </div>
       <div style="background:#16295a;border:1.5px solid ${GOLD};border-radius:8px;padding:9px 16px;text-align:center;flex-shrink:0">
@@ -2164,19 +2181,20 @@ function expenseReportHTML(from, to, cur){
 
     <div style="padding:14px 32px 0">
       <div style="display:flex;gap:12px">
-        ${card('ຈ່າຍບໍລິຫານ', 'ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', tA, BLUE)}
-        ${card('ຈ່າຍຄ່າສິນຄ້າ', 'ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', tG, GREEN)}
+        ${wantA ? card('ຈ່າຍບໍລິຫານ', 'ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', tA, BLUE) : ''}
+        ${wantG ? card('ຈ່າຍຄ່າສິນຄ້າ', 'ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', tG, GREEN) : ''}
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background:${NAVY};color:#f3d99b;padding:11px 14px;margin-top:12px">
-        <b style="font-size:13.5px">ລາຍຈ່າຍລວມທັງໝົດ</b>
-        <b style="font-size:18px;white-space:nowrap">${money(tot)}</b>
+        <b style="font-size:13.5px">${type==='all' ? 'ລາຍຈ່າຍລວມທັງໝົດ' : 'ລວມ' + (type==='admin' ? 'ຈ່າຍບໍລິຫານ' : 'ຈ່າຍຄ່າສິນຄ້າ')}</b>
+        <b style="font-size:18px;white-space:nowrap">${money(shown)}</b>
       </div>
+      ${type!=='all' ? `<div style="font-size:11px;color:${MUT};margin-top:6px">ຄິດເປັນ ${share(shown)}% ຂອງລາຍຈ່າຍລວມທັງໝົດ ${money(tot)} ໃນຮອບນີ້</div>` : ''}
       ${others ? `<div style="font-size:11px;color:${MUT};margin-top:6px">ໝາຍເຫດ: ໃນຮອບນີ້ຍັງມີລາຍຈ່າຍສະກຸນອື່ນ ${others} (ບໍ່ໄດ້ລວມໃນໃບນີ້)</div>` : ''}
     </div>
 
     <div style="padding:0 32px">
-      ${table('ຈ່າຍບໍລິຫານ', '· ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', admin, BLUE, tA)}
-      ${table('ຈ່າຍຄ່າສິນຄ້າ', '· ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', goods, GREEN, tG)}
+      ${wantA ? table('ຈ່າຍບໍລິຫານ', '· ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', admin, BLUE, tA) : ''}
+      ${wantG ? table('ຈ່າຍຄ່າສິນຄ້າ', '· ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', goods, GREEN, tG) : ''}
     </div>
 
     <div style="padding:26px 32px 30px;display:flex;justify-content:space-around;text-align:center">
@@ -2192,12 +2210,20 @@ function expenseReportHTML(from, to, cur){
   </div>`;
 }
 
+// ເລືອກວ່າຈະອອກສະເພາະປະເພດໃດ: ທັງໝົດ / ບໍລິຫານ / ຄ່າສິນຄ້າ
+window._exType = window._exType || 'all';
+function exPickType(btn){
+  window._exType = btn.dataset.t;
+  btn.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+}
+const EX_TNAME = { all:'ທັງໝົດ', admin:'ຈ່າຍບໍລິຫານ', goods:'ຈ່າຍຄ່າສິນຄ້າ' };
+
 function exRange(){
   const f = document.getElementById('exFrom'), t = document.getElementById('exTo');
   const from = (f && f.value) || monthStartStr(ES.month);
   const to   = (t && t.value) || monthEndStr(ES.month);
   if (from > to) { toast('ວັນທີ່ເລີ່ມຕ້ອງບໍ່ເກີນວັນທີ່ສຸດທ້າຍ', true); return null; }
-  return { from, to, cur: ES.cur };
+  return { from, to, cur: ES.cur, type: window._exType || 'all' };
 }
 
 async function downloadExpensePDF(btn){
@@ -2206,7 +2232,7 @@ async function downloadExpensePDF(btn){
   if (btn) { btn.disabled = true; btn.textContent = 'ກຳລັງສ້າງ PDF…'; }
   const box = document.createElement('div');
   box.style.cssText = 'position:fixed;top:0;left:-9999px;width:794px;background:#fff;z-index:-1';
-  box.innerHTML = expenseReportHTML(r.from, r.to, r.cur);
+  box.innerHTML = expenseReportHTML(r.from, r.to, r.cur, r.type);
   document.body.appendChild(box);
   try {
     if (!window.html2canvas || !window.jspdf) { printExpenseFallback(r); return; }
@@ -2225,11 +2251,12 @@ async function downloadExpensePDF(btn){
       pdf.addImage(data, 'JPEG', 0, -(i * usable), pw, imgH);
       pdf.setFillColor(255,255,255); pdf.rect(0, usable, pw, foot, 'F');
       pdf.setFontSize(8); pdf.setTextColor(130,130,130);
-      pdf.text('DAVONE - EXPENSE REPORT  ' + r.from + '  -  ' + r.to + '  (' + r.cur + ')', 12, ph - 4);
+      pdf.text('DAVONE - EXPENSE REPORT  ' + r.from + '  -  ' + r.to + '  (' + r.cur + (r.type==='all' ? '' : ', ' + r.type) + ')', 12, ph - 4);
       pdf.text(String(i+1) + ' / ' + pages, pw - 12, ph - 4, { align: 'right' });
     }
     const full = r.from === monthStartStr(ES.month) && r.to === monthEndStr(ES.month);
-    savePdfFile(pdf, 'ສະຫຼຸບລາຍຈ່າຍ-' + (full ? ES.month : r.from + '-ຫາ-' + r.to) + '-' + r.cur + '.pdf');
+    const tag = r.type==='admin' ? '-ບໍລິຫານ' : r.type==='goods' ? '-ຄ່າສິນຄ້າ' : '';
+    savePdfFile(pdf, 'ສະຫຼຸບລາຍຈ່າຍ' + tag + '-' + (full ? ES.month : r.from + '-ຫາ-' + r.to) + '-' + r.cur + '.pdf');
     toast('ດາວໂຫຼດ PDF ແລ້ວ · ຖ້າບໍ່ເຫັນໄຟລ໌ ໃຫ້ກົດ “ເປີດເບິ່ງ / ພິມ”');
   } catch(e) {
     printExpenseFallback(r);
@@ -2246,7 +2273,7 @@ function printExpenseFallback(r){
   if (!w) { toast('ເປີດໜ້າພິມບໍ່ໄດ້ — ອະນຸຍາດ pop-up ກ່ອນ', true); return; }
   w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>ສະຫຼຸບລາຍຈ່າຍ ' + r.from + ' ຫາ ' + r.to + '</title>'
     + '<style>@page{size:A4;margin:0}body{margin:0}</style></head><body>'
-    + expenseReportHTML(r.from, r.to, r.cur) + '</body></html>');
+    + expenseReportHTML(r.from, r.to, r.cur, r.type) + '</body></html>');
   w.document.close();
   setTimeout(()=>{ w.focus(); w.print(); }, 600);
 }
