@@ -1579,6 +1579,14 @@ function buildM() {
   window._esM = months; window._esK = keys;
 
   body.innerHTML = `
+    <div class="rpt-bar">
+      <span class="rpt-lb">ອອກບົດສະຫຼຸບ</span>
+      <label class="rpt-d">ຈາກວັນທີ<input type="date" id="exFrom"></label>
+      <label class="rpt-d">ຫາວັນທີ<input type="date" id="exTo"></label>
+      <button class="rpt-q" onclick="exSetMonth()">ທັງເດືອນ</button>
+      <button class="btn-pdf" onclick="downloadExpensePDF(this)" title="ບົດສະຫຼຸບ A4 ແຍກ ບໍລິຫານ / ຄ່າສິນຄ້າ"><svg class="bic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>ດາວໂຫຼດ PDF (A4)</button>
+      <button class="rpt-q rpt-print" onclick="openExpensePrint()" title="ເປີດໃບ A4 ແລ້ວພິມ ຫຼື ບັນທຶກເປັນ PDF ເອງ">ເປີດເບິ່ງ / ພິມ</button>
+    </div>
     <div class="es-months" id="esMonths"></div>
     <div class="es-curs" id="esCurs"><i class="es-pill"></i>${ES_C.map(c=>`<button data-c="${c}">${SYM[c]} ${c==='LAK'?'ກີບ':c==='THB'?'ບາດ':'USD'}</button>`).join('')}</div>
     <div class="es-tile es-hero">
@@ -1615,7 +1623,15 @@ function buildM() {
     b.classList.toggle('on', b.dataset.c===ES.cur);
     b.onclick = () => { ES.cur = b.dataset.c; curs.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); esPill(); esRender(); };
   });
+  exSetMonth();
   esPill(); esRender();
+}
+
+// ປຸ່ມ "ທັງເດືອນ" ຂອງໜ້າສະຫຼຸບ — ອີງເດືອນທີ່ກຳລັງເບິ່ງຢູ່
+function exSetMonth(){
+  const f=document.getElementById('exFrom'), t=document.getElementById('exTo');
+  if(f) f.value = monthStartStr(ES.month);
+  if(t) t.value = monthEndStr(ES.month);
 }
 function esPill(){ const c=document.getElementById('esCurs'); if(!c) return; const on=c.querySelector('button.on')||c.querySelector('button');
   const p=c.querySelector('.es-pill'); p.style.width=on.offsetWidth+'px'; p.style.transform=`translateX(${on.offsetLeft-5}px)`; }
@@ -2057,6 +2073,182 @@ async function downloadBudgetPDF(btn){
     box.remove();
     if (btn) { btn.disabled = false; btn.innerHTML = label; }
   }
+}
+
+// ═══════════════════════════════════════════════
+//  ບົດສະຫຼຸບລາຍຈ່າຍ A4 → PDF — ແຍກ "ຈ່າຍບໍລິຫານ" ກັບ "ຈ່າຍຄ່າສິນຄ້າ"
+//  ດຶງຈາກຕາຕະລາງລາຍຈ່າຍຫຼັກ (ລົງລາຍຈ່າຍ) ບໍ່ແມ່ນກະເປົາງົບປະມານ
+// ═══════════════════════════════════════════════
+function expenseReportHTML(from, to, cur){
+  const list = records.filter(r => r.date >= from && r.date <= to && r.currency === cur && Number(r.amount) > 0)
+                      .slice().sort((a,b)=> a.date===b.date ? Number(b.amount)-Number(a.amount) : (a.date<b.date?-1:1));
+  const admin = list.filter(r => r.type === 'admin');
+  const goods = list.filter(r => r.type === 'goods');
+  const sum = l => l.reduce((t,r)=>t+Number(r.amount),0);
+  const tA = sum(admin), tG = sum(goods), tot = tA + tG;
+  const sym = SYM[cur], curName = cur==='LAK' ? 'ກີບ (LAK)' : cur==='THB' ? 'ບາດ (THB)' : 'ໂດລາ (USD)';
+  const per = rangeLabel(from, to);
+  const today = new Date();
+  const printed = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+  const NAVY='#0b1a3d', GOLD='#d4a85a', INK='#1b2233', MUT='#6b7484', LINE='#e2e0d8';
+  const BLUE='#2f5fa8', GREEN='#2f7d57';
+  const money = n => fmt(Math.abs(n)) + ' ' + sym;
+
+  // ສະກຸນອື່ນໃນຮອບດຽວກັນ (ບອກໄວ້ໃຫ້ຮູ້ວ່າຍັງມີ)
+  const others = ES_C.filter(c => c !== cur).map(c => {
+    const t = records.filter(r => r.date>=from && r.date<=to && r.currency===c).reduce((x,r)=>x+Number(r.amount),0);
+    return t > 0 ? SYM[c] + ' ' + fmt(t) : null;
+  }).filter(Boolean).join('  ·  ');
+
+  const rows = (l, color) => l.length ? l.map((x,i)=>`
+      <tr style="background:${i%2?'#faf8f2':'#ffffff'}">
+        <td style="padding:7px 8px;border-bottom:1px solid ${LINE};text-align:center;color:${MUT};font-size:11.5px">${String(i+1).padStart(2,'0')}</td>
+        <td style="padding:7px 8px;border-bottom:1px solid ${LINE};text-align:center;color:${INK};font-size:11.5px;white-space:nowrap">${x.date}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid ${LINE};color:${INK};font-size:12.5px">${x.description ? escHtml(x.description) : '—'}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid ${LINE};text-align:right;font-weight:700;color:${color};font-size:12.5px;white-space:nowrap">${money(x.amount)}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="4" style="padding:14px;text-align:center;color:${MUT};font-size:12px">ບໍ່ມີລາຍການ</td></tr>`;
+
+  const table = (title, note, l, color, total) => `
+    <div style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid ${color};padding-bottom:5px">
+        <b style="font-size:13.5px;color:${color}">${title} <span style="font-weight:400;font-size:11px;color:${MUT}">${note}</span></b>
+        <span style="font-size:11.5px;color:${MUT}">${l.length} ລາຍການ</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+        <colgroup><col style="width:34px"><col style="width:86px"><col><col style="width:150px"></colgroup>
+        <thead><tr style="background:${color}">
+          <th style="padding:7px 8px;color:#fff;font-size:11px;font-weight:700">#</th>
+          <th style="padding:7px 8px;color:#fff;font-size:11px;font-weight:700">ວັນທີ</th>
+          <th style="padding:7px 10px;color:#fff;font-size:11px;font-weight:700;text-align:left">ລາຍລະອຽດ</th>
+          <th style="padding:7px 10px;color:#fff;font-size:11px;font-weight:700;text-align:right">ຈຳນວນເງິນ</th>
+        </tr></thead>
+        <tbody>${rows(l, color)}</tbody>
+        <tfoot><tr style="background:#f3efe3">
+          <td colspan="3" style="padding:8px 10px;font-weight:700;color:${NAVY};font-size:12.5px">ລວມ${title}</td>
+          <td style="padding:8px 10px;text-align:right;font-weight:800;color:${color};font-size:13px;white-space:nowrap">${money(total)}</td>
+        </tr></tfoot>
+      </table>
+    </div>`;
+
+  const share = (v) => tot ? Math.round(v/tot*100) : 0;
+  const card = (title, note, v, color) => `
+    <div style="flex:1;border:1px solid ${LINE};border-top:3px solid ${color};padding:10px 12px">
+      <div style="font-size:12px;font-weight:700;color:${color}">${title}</div>
+      <div style="font-size:10.5px;color:${MUT};margin-top:1px">${note}</div>
+      <div style="font-size:18px;font-weight:800;color:${INK};margin-top:6px;white-space:nowrap">${money(v)}</div>
+      <div style="margin-top:6px;height:6px;background:#ece8dc;border-radius:3px;overflow:hidden"><div style="height:100%;width:${share(v)}%;background:${color}"></div></div>
+      <div style="font-size:10.5px;color:${MUT};margin-top:3px">${share(v)}% ຂອງລາຍຈ່າຍລວມ</div>
+    </div>`;
+
+  return `
+  <div style="width:794px;background:#fff;font-family:'Lao MN','Lao Sangam MN',system-ui,sans-serif;color:${INK}">
+    <div style="background:linear-gradient(135deg,#0b1a3d,#1c3264);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid ${GOLD}">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="${RPT_LOGO || 'assets/icon-512.png'}" alt="" style="width:54px;height:54px;display:block;flex-shrink:0">
+        <div>
+          <div style="font-size:19px;font-weight:900;color:#f3d99b;letter-spacing:.5px">ບົດສະຫຼຸບລາຍຈ່າຍ</div>
+          <div style="font-size:11px;color:#c9cfdc;letter-spacing:1.6px">EXPENSE REPORT · ບໍລິສັດດາວອນ ພັດທະນາກະສິກຳ</div>
+        </div>
+      </div>
+      <div style="background:#16295a;border:1.5px solid ${GOLD};border-radius:8px;padding:9px 16px;text-align:center;flex-shrink:0">
+        <div style="font-size:10.5px;color:#c9cfdc">ຮອບບົດສະຫຼຸບ</div>
+        <div style="font-size:14px;font-weight:800;color:#f3d99b;white-space:nowrap">${per}</div>
+      </div>
+    </div>
+
+    <div style="padding:16px 32px 10px;display:flex;justify-content:space-between;font-size:11.5px;color:${MUT};border-bottom:1px solid ${LINE}">
+      <span>ວັນທີອອກບົດສະຫຼຸບ: <b style="color:${INK}">${printed}</b></span>
+      <span>ສະກຸນເງິນ: <b style="color:${INK}">${curName}</b></span>
+    </div>
+
+    <div style="padding:14px 32px 0">
+      <div style="display:flex;gap:12px">
+        ${card('ຈ່າຍບໍລິຫານ', 'ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', tA, BLUE)}
+        ${card('ຈ່າຍຄ່າສິນຄ້າ', 'ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', tG, GREEN)}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;background:${NAVY};color:#f3d99b;padding:11px 14px;margin-top:12px">
+        <b style="font-size:13.5px">ລາຍຈ່າຍລວມທັງໝົດ</b>
+        <b style="font-size:18px;white-space:nowrap">${money(tot)}</b>
+      </div>
+      ${others ? `<div style="font-size:11px;color:${MUT};margin-top:6px">ໝາຍເຫດ: ໃນຮອບນີ້ຍັງມີລາຍຈ່າຍສະກຸນອື່ນ ${others} (ບໍ່ໄດ້ລວມໃນໃບນີ້)</div>` : ''}
+    </div>
+
+    <div style="padding:0 32px">
+      ${table('ຈ່າຍບໍລິຫານ', '· ຂອງໃຊ້ · ເງິນເດືອນ · ສ້ອມແປງ', admin, BLUE, tA)}
+      ${table('ຈ່າຍຄ່າສິນຄ້າ', '· ຊື້ລົດ · ສິນຄ້າ · ອາໄຫຼ່', goods, GREEN, tG)}
+    </div>
+
+    <div style="padding:26px 32px 30px;display:flex;justify-content:space-around;text-align:center">
+      <div style="width:230px">
+        <div style="border-bottom:1px solid ${INK};height:46px"></div>
+        <div style="font-size:12px;margin-top:6px;color:${INK}">ຜູ້ສະຫຼຸບ</div>
+      </div>
+      <div style="width:230px">
+        <div style="border-bottom:1px solid ${INK};height:46px"></div>
+        <div style="font-size:12px;margin-top:6px;color:${INK}">ຜູ້ອຳນວຍການ / ຫົວໜ້າ</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function exRange(){
+  const f = document.getElementById('exFrom'), t = document.getElementById('exTo');
+  const from = (f && f.value) || monthStartStr(ES.month);
+  const to   = (t && t.value) || monthEndStr(ES.month);
+  if (from > to) { toast('ວັນທີ່ເລີ່ມຕ້ອງບໍ່ເກີນວັນທີ່ສຸດທ້າຍ', true); return null; }
+  return { from, to, cur: ES.cur };
+}
+
+async function downloadExpensePDF(btn){
+  const r = exRange(); if (!r) return;
+  const label = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'ກຳລັງສ້າງ PDF…'; }
+  const box = document.createElement('div');
+  box.style.cssText = 'position:fixed;top:0;left:-9999px;width:794px;background:#fff;z-index:-1';
+  box.innerHTML = expenseReportHTML(r.from, r.to, r.cur);
+  document.body.appendChild(box);
+  try {
+    if (!window.html2canvas || !window.jspdf) { printExpenseFallback(r); return; }
+    await new Promise(x => setTimeout(x, 250));
+    const canvas = await html2canvas(box.firstElementChild, {
+      scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false,
+    });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pw = 210, ph = 297, foot = 10, usable = ph - foot;
+    const imgH = canvas.height * pw / canvas.width;
+    const data = canvas.toDataURL('image/jpeg', 0.95);
+    const pages = Math.max(1, Math.ceil((imgH - 0.5) / usable));
+    for (let i = 0; i < pages; i++) {
+      if (i) pdf.addPage();
+      pdf.addImage(data, 'JPEG', 0, -(i * usable), pw, imgH);
+      pdf.setFillColor(255,255,255); pdf.rect(0, usable, pw, foot, 'F');
+      pdf.setFontSize(8); pdf.setTextColor(130,130,130);
+      pdf.text('DAVONE - EXPENSE REPORT  ' + r.from + '  -  ' + r.to + '  (' + r.cur + ')', 12, ph - 4);
+      pdf.text(String(i+1) + ' / ' + pages, pw - 12, ph - 4, { align: 'right' });
+    }
+    const full = r.from === monthStartStr(ES.month) && r.to === monthEndStr(ES.month);
+    savePdfFile(pdf, 'ສະຫຼຸບລາຍຈ່າຍ-' + (full ? ES.month : r.from + '-ຫາ-' + r.to) + '-' + r.cur + '.pdf');
+    toast('ດາວໂຫຼດ PDF ແລ້ວ · ຖ້າບໍ່ເຫັນໄຟລ໌ ໃຫ້ກົດ “ເປີດເບິ່ງ / ພິມ”');
+  } catch(e) {
+    printExpenseFallback(r);
+  } finally {
+    box.remove();
+    if (btn) { btn.disabled = false; btn.innerHTML = label; }
+  }
+}
+
+function openExpensePrint(){ const r = exRange(); if (r) printExpenseFallback(r); }
+
+function printExpenseFallback(r){
+  const w = window.open('', '_blank');
+  if (!w) { toast('ເປີດໜ້າພິມບໍ່ໄດ້ — ອະນຸຍາດ pop-up ກ່ອນ', true); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>ສະຫຼຸບລາຍຈ່າຍ ' + r.from + ' ຫາ ' + r.to + '</title>'
+    + '<style>@page{size:A4;margin:0}body{margin:0}</style></head><body>'
+    + expenseReportHTML(r.from, r.to, r.cur) + '</body></html>');
+  w.document.close();
+  setTimeout(()=>{ w.focus(); w.print(); }, 600);
 }
 
 // ສຳຮອງ: ເປີດໜ້າຕ່າງພິມຂະໜາດ A4 (ໃນ Safari ເລືອກ PDF → Save as PDF ກໍ່ໄດ້ໄຟລ໌ຄືກັນ)
