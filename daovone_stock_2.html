@@ -740,6 +740,7 @@ body.sx-3 .sx-chip.on{background:linear-gradient(135deg,#f6dc9c,#d4a85a 55%,#a57
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
 <symbol id="i-home" viewBox="0 0 24 24"><polyline points="3 11 12 4 21 11"></polyline><path d="M5 10v9a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1v-9"></path></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5l9-4 9 4-9 4-9-4z"></path><path d="M3 7.5v9l9 4 9-4v-9"></path><path d="M12 11.5v9"></path></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/><path d="M12 8v13"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5h-4z"/></symbol>
 <symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="7" width="13" height="9" rx="1"></rect><path d="M14 10h4l3 3v3h-7z"></path><circle cx="5.5" cy="18.2" r="1.6"></circle><circle cx="17" cy="18.2" r="1.6"></circle></symbol>
 <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20V3z"></path><line x1="8.5" y1="8" x2="15.5" y2="8"></line><line x1="8.5" y1="11.5" x2="15.5" y2="11.5"></line><line x1="8.5" y1="15" x2="13" y2="15"></line></symbol>
 <symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 9V3h10v6"></path><path d="M7 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="7" y="14" width="10" height="7"></rect></symbol>
@@ -1502,6 +1503,7 @@ const TABS = [
   { id:'receive',   label:'ຮັບເຂົ້າ', icon:'i-truck',   roles:['staff','admin'] },
   { id:'sell',      label:'ອອກບິນຂາຍ', icon:'i-receipt', roles:['staff','admin'] },
   { id:'transfer',  label:'ໂອນສາຂາ',  icon:'i-truck',   roles:['staff','admin','manager'] },
+  { id:'giveaway',  label:'ເບີກ & ແຖມ', icon:'i-gift',   roles:['staff','admin','manager'] },
   { id:'report',    label:'ລາຍງານ',  icon:'i-chart',   roles:['staff','admin','viewer','manager'] },
   { id:'yearly',    label:'ສະຫຼຸບປີ', icon:'i-chart',   roles:['staff','admin','viewer','manager'] },
 ];
@@ -1511,10 +1513,10 @@ let activeTab = 'dashboard';
    ຮັກສາຄ່າໃນຊ່ອງຕ່າງໆ (ຊື່ຜູ້ສະໜອງ/ລູກຄ້າ, ວັນທີ, ຈຳນວນ, ລາຄາ...) ເມື່ອສະຫຼັບແທັບ ບໍ່ໃຫ້ຫາຍ
    ບັນທຶກ (submit) ສຳເລັດຄ່ອຍລ້າງ. ບໍ່ເກັບ: ຊ່ອງເລືອກສິນຄ້າ (auto-fill ລາຄາເອງ), ຊ່ອງຈ່າຍເງິນ (ຊົ່ວຄາວ),
    ຕົວເລືອກເດືອນປະຫວັດ (ຈື່ໄວ້ໃນ dataset ຢູ່ແລ້ວ) */
-const tabDrafts = { receive:{}, sell:{}, transfer:{}, addproduct:{} };
+const tabDrafts = { receive:{}, sell:{}, transfer:{}, giveaway:{}, addproduct:{} };
 /* ຊ່ອງເງິນ: ໃສ່ຄືນ "ຫຼັງສຸດ" ເພາະ dispatch change ຊ່ອງສະກຸນເງິນ ຈະ auto-fill ຄ່າພວກນີ້ທັບ */
 const DRAFT_MONEY_LAST = ['r_cost','r_rate','s_price','s_discount'];
-const DRAFT_SKIP = new Set(['r_model','s_model','tr_model','s_unitSelect','rcv_month','tr_month',
+const DRAFT_SKIP = new Set(['r_model','s_model','tr_model','gv_model','s_unitSelect','rcv_month','tr_month','gv_month',
   's_pay_amount','s_pay_currency','s_pay_rate','s_pay_method']);
 let draftRestoring = false;
 function draftSkip(id){
@@ -1589,6 +1591,7 @@ async function renderTab(){
     else if(activeTab === 'receive') await renderReceive(main);
     else if(activeTab === 'sell') await renderSell(main);
     else if(activeTab === 'transfer') await renderTransfer(main);
+    else if(activeTab === 'giveaway') await renderGiveaway(main);
     else if(activeTab === 'report') await renderReport(main);
     else if(activeTab === 'yearly') await renderYearly(main);
     /* ໃສ່ຄ່າທີ່ພິມຄ້າງໄວ້ຄືນ ຫຼັງ render + ຕິດ event ຄົບແລ້ວ */
@@ -2239,7 +2242,7 @@ async function openDuplicateSerialsModal(models){
       ${dupGroups.length ? dupGroups.map(g=> `
         <div style="margin-bottom:10px;">
           <div class="mono" style="font-weight:700;color:var(--danger);">${g[0].serial_no}</div>
-          ${g.map(u=> `<div class="row" style="padding:4px 0;"><span style="font-size:12px;">${modelName(u.model_id)}</span><span class="muted" style="font-size:11px;">${u.status==='in_stock'?'ຄົງຄັງ':(u.status==='transferred'?'ໂອນສາຂາແລ້ວ':'ຂາຍແລ້ວ')} · ${fmtDateDMY(u.received_at)}</span></div>`).join('')}
+          ${g.map(u=> `<div class="row" style="padding:4px 0;"><span style="font-size:12px;">${modelName(u.model_id)}</span><span class="muted" style="font-size:11px;">${u.status==='in_stock'?'ຄົງຄັງ':(u.status==='transferred'?'ໂອນສາຂາແລ້ວ':(u.status==='giveaway'?'ເບີກ/ແຖມແລ້ວ':'ຂາຍແລ້ວ'))} · ${fmtDateDMY(u.received_at)}</span></div>`).join('')}
         </div>`).join('') : ''}
       <button class="btn secondary" id="dupClose" style="margin-top:8px;">ປິດ</button>
     `;
@@ -4097,6 +4100,394 @@ function bindSellCartRemove(){
       updateSellTotals();
     });
   });
+}
+
+/* ============================================================
+   ເບີກ & ແຖມ (GIVEAWAY) — ເບີກເຄື່ອງອອກ / ແຖມໃຫ້ລູກຄ້າ
+   ຕັດແຕ່ "ສະຕັອກ" ຢ່າງດຽວ — ບໍ່ນັບເປັນຍອດຂາຍ ບໍ່ຕັດຕົ້ນທຶນ ບໍ່ກະທົບກຳໄລ
+   (ບໍ່ແຕະຕາຕະລາງບິນຂາຍເລີຍ ຈຶ່ງບໍ່ເຂົ້າໄປໃນລາຍງານຍອດຂາຍ/ກຳໄລ)
+   ============================================================ */
+let giveawayCart = [];
+async function renderGiveaway(main){
+  const models = await getModels();
+  const historyMonth = main.dataset.gvMonth || todayStr().slice(0,7);
+  const canGive = currentRole === 'staff' || currentRole === 'admin';
+  main.innerHTML = `
+    ${!canGive ? '<div class="card"><div class="muted" style="font-size:12px;">ທ່ານເບິ່ງໄດ້ຢ່າງດຽວ · ເບິ່ງປະຫວັດການເບີກ/ແຖມລຸ່ມນີ້</div></div>' : ''}
+    ${canGive ? `
+    <div class="ps-seg" id="gvSeg">
+      <button type="button" class="on" data-v="new">ອອກໃບເບີກ / ແຖມ</button>
+      <button type="button" data-v="hist">ປະຫວັດການເບີກ / ແຖມ</button>
+    </div>
+    <div id="gvNewView">
+      <div class="card ps-sheet">
+        <div class="ps-head ps-head-tr">
+          <input id="gv_to" placeholder="ຜູ້ຮັບ / ຊື່ລູກຄ້າ (ຕ້ອງໃສ່)">
+          <input id="gv_note" placeholder="ເຫດຜົນ ເຊັ່ນ: ແຖມຕາມໂປຣໂມຊັນ / ເບີກໃຊ້ພາຍໃນ">
+          <input id="gv_date" type="date" value="${todayStr()}">
+          <div class="ps-meta">
+            <span>ໃບເບີກ / ແຖມສິນຄ້າ</span>
+            <span class="mono">${fmtDateDMY(todayStr())}</span>
+          </div>
+        </div>
+        <div class="ps-entry">
+          <div class="ps-entry-row tr">
+            <div class="f f-model">
+              <label>ລະຫັດ / ຊື່ສິນຄ້າ — ເລືອກເພື່ອເພີ່ມ</label>
+              <select id="gv_model">
+                <option value="">-- ເລືອກສິນຄ້າ --</option>
+                ${models.map(m=> `<option value="${m.id}" data-serial="${m.has_serial}" data-unit="${m.unit||''}" data-code="${(m.code||'').replace(/"/g,'&quot;')}" data-cat="${(m.category||'').replace(/"/g,'&quot;')}">${m.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="f f-qty" id="gv_qtyBlock"><label>ຈຳນວນ</label><input id="gv_qty" type="number" value="1" min="1"></div>
+            <div class="f f-add"><label>&nbsp;</label><button class="btn secondary" id="gv_addItem">+ ເພີ່ມ</button></div>
+          </div>
+          <div id="gv_serialBlock" style="display:none;">
+            <label style="display:block;margin:12px 0 4px;font-size:12.5px;color:#57607a;">ເລືອກເລກເຄື່ອງທີ່ຈະເບີກ (ເລືອກໄດ້ຫຼາຍລາຍການ)</label>
+            <input id="gv_serialSearch" placeholder="ພິມເລກເຄື່ອງເພື່ອຄົ້ນຫາ..." autocomplete="off">
+            <div id="gv_serialList" class="tr-serials"></div>
+          </div>
+        </div>
+        <p class="ps-list-head">ລາຍການສິນຄ້າທີ່ເບີກ / ແຖມ</p>
+        <div class="ps-table-wrap" id="gv_cartList">${renderGiveawayCart()}</div>
+        <div class="ps-foot">
+          <div class="ps-big">
+            <p class="ps-big-label">ຈຳນວນທີ່ເບີກ</p>
+            <p class="ps-big-amount mono" id="gv_bigCount">0</p>
+          </div>
+          <div class="ps-sum">
+            <div class="ps-line"><span>ຈຳນວນລາຍການ</span><b class="mono" id="gv_lineCount">0</b></div>
+            <button class="btn" id="gv_submit"><svg class="dv-icon"><use href="#i-check-circle"></use></svg>ບັນທຶກການເບີກ (ຕັດສະຕັອກ) →</button>
+          </div>
+        </div>
+      </div>
+    </div>` : ''}
+    <div id="gvHistView"${canGive ? ' style="display:none;"' : ''}>
+      <div class="card">
+        <h3><svg class="dv-icon"><use href="#i-gift"></use></svg>ປະຫວັດການເບີກ / ແຖມ <span class="muted" style="font-weight:400;font-size:11px;">(ກົດເພື່ອເບິ່ງລາຍການ)</span></h3>
+        <label>ເລືອກເດືອນ</label>
+        <input type="month" id="gv_month" value="${historyMonth}">
+        <div id="gv_history" style="margin-top:8px;"><div class="empty">ກຳລັງໂຫລດ...</div></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('gv_month').addEventListener('change', (e)=>{
+    main.dataset.gvMonth = e.target.value;
+    loadGiveawayHistory(e.target.value);
+  });
+  loadGiveawayHistory(historyMonth);
+  const gvSeg = document.getElementById('gvSeg');
+  if(gvSeg){
+    gvSeg.addEventListener('click', (e)=>{
+      const b = e.target.closest('button'); if(!b) return;
+      Array.from(gvSeg.children).forEach(x=> x.classList.remove('on'));
+      b.classList.add('on');
+      document.getElementById('gvNewView').style.display = b.dataset.v === 'new' ? '' : 'none';
+      document.getElementById('gvHistView').style.display = b.dataset.v === 'hist' ? '' : 'none';
+    });
+  }
+  if(!canGive) return;
+  const modelSel = document.getElementById('gv_model');
+  enableSearchableSelect(modelSel);
+  function filterGiveawaySerials(){
+    const q = (document.getElementById('gv_serialSearch').value||'').trim().toLowerCase();
+    document.querySelectorAll('#gv_serialList > div').forEach(row=>{
+      const cb = row.querySelector('input[type=checkbox]');
+      if(!cb) return;
+      row.style.display = (!q || (cb.dataset.serial||'').toLowerCase().includes(q)) ? '' : 'none';
+    });
+  }
+  document.getElementById('gv_serialSearch').addEventListener('input', filterGiveawaySerials);
+  async function refreshGvSerialList(){
+    const opt = modelSel.selectedOptions[0];
+    const listEl = document.getElementById('gv_serialList');
+    if(!opt || !opt.value){ listEl.innerHTML = ''; return; }
+    const units = await getInStockUnits(opt.value);
+    const cartSerialIds = new Set(giveawayCart.filter(i=> i.model_id===opt.value && i.unit_id).map(i=> i.unit_id));
+    const available = units.filter(u=> !cartSerialIds.has(u.id));
+    listEl.innerHTML = available.length
+      ? available.map(u=> `
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--border);">
+          <input type="checkbox" id="gvchk_${u.id}" value="${u.id}" data-serial="${(u.serial_no||'').replace(/"/g,'&quot;')}" style="width:17px;height:17px;flex:none;margin:0;">
+          <label for="gvchk_${u.id}" style="display:inline-block;margin:0;font-size:14px;font-weight:600;color:var(--ink);">${u.serial_no || '(ບໍ່ມີເລກ)'}</label>
+        </div>`).join('')
+      : '<div class="empty">ບໍ່ມີເລກເຄື່ອງໃນສະຕັອກ (ຫຼືເລືອກໝົດແລ້ວ)</div>';
+    filterGiveawaySerials();
+  }
+  modelSel.addEventListener('change', async ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value) return;
+    const isSerial = opt.dataset.serial === 'true';
+    document.getElementById('gv_qtyBlock').style.display = isSerial ? 'none' : 'block';
+    document.getElementById('gv_serialBlock').style.display = isSerial ? 'block' : 'none';
+    if(isSerial) await refreshGvSerialList();
+  });
+  document.getElementById('gv_addItem').addEventListener('click', async ()=>{
+    const opt = modelSel.selectedOptions[0];
+    if(!opt || !opt.value){ toast('ເລືອກສິນຄ້າກ່ອນ'); return; }
+    const isSerial = opt.dataset.serial === 'true';
+    if(isSerial){
+      const checked = Array.from(document.querySelectorAll('#gv_serialList input:checked'));
+      if(!checked.length){ toast('ເລືອກເລກເຄື່ອງຢ່າງໜ້ອຍ 1 ຕົວ'); return; }
+      checked.forEach(cb=>{
+        giveawayCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id: cb.value, serial_no: cb.dataset.serial, quantity:1 });
+      });
+      await refreshGvSerialList();
+    } else {
+      const qty = Number(document.getElementById('gv_qty').value)||1;
+      giveawayCart.push({ model_id: opt.value, model_name: opt.textContent, unit_id:null, serial_no:null, quantity: qty });
+    }
+    document.getElementById('gv_cartList').innerHTML = renderGiveawayCart();
+    bindGiveawayCartRemove();
+    toast(`ເພີ່ມ ${opt.textContent} ເຂົ້າລາຍການແລ້ວ`);
+  });
+  bindGiveawayCartRemove();
+  ['gv_qty','gv_note'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown', (e)=>{
+      if(e.key !== 'Enter') return;
+      e.preventDefault();
+      const serialBlock = document.getElementById('gv_serialBlock');
+      const serialVisible = serialBlock && serialBlock.style.display !== 'none';
+      if(id === 'gv_qty' && !serialVisible){ const n = document.getElementById('gv_note'); if(n){ n.focus(); n.select(); } return; }
+      document.getElementById('gv_addItem').click();
+      setTimeout(()=>{ const b = document.getElementById('gv_submit'); if(b) b.focus(); }, 0);
+    });
+  });
+  bindEnterAdvance(['gv_to','gv_date'], 'gv_model_search');
+  document.getElementById('gv_submit').addEventListener('click', async (e)=>{
+    if(!giveawayCart.length){ toast('ຍັງບໍ່ມີລາຍການ'); return; }
+    const to = document.getElementById('gv_to').value.trim();
+    if(!to){ toast('ໃສ່ຊື່ຜູ້ຮັບກ່ອນ'); return; }
+    const btn = e.currentTarget;
+    if(btn.disabled) return;
+    btn.disabled = true;
+    try{
+      const note = document.getElementById('gv_note').value.trim();
+      const date = document.getElementById('gv_date').value || todayStr();
+      const fullNote = `ເບີກ/ແຖມໃຫ້: ${to}${note ? ' - '+note : ''}`;
+      const giveawayId = uid();
+      const movementsBody = giveawayCart.map(item=> ({
+        id: uid(), model_id: item.model_id, unit_id: item.unit_id, movement_type:'out',
+        quantity: item.quantity, ref_type:'giveaway', ref_id: giveawayId, note: fullNote, created_by: currentUsername
+      }));
+      const unitIds = giveawayCart.filter(item=> item.unit_id).map(item=> item.unit_id);
+      await Promise.all([
+        sb('stock_movements', { method:'POST', body: movementsBody }),
+        unitIds.length ? sb(`stock_product_units?id=in.(${unitIds.join(',')})`, { method:'PATCH', body:{ status:'giveaway', note: fullNote } }) : Promise.resolve()
+      ]);
+      /* ຂໍ້ມູນສຳລັບພິມໃບ A5 — ເອົາລະຫັດ/ຫົວໜ່ວຍຈາກລາຍການສິນຄ້າ */
+      const models = await sb(`stock_product_models?select=id,code,name,unit&id=in.(${[...new Set(giveawayCart.map(i=> i.model_id))].join(',')})`);
+      const modelById = {}; (models||[]).forEach(m=> { modelById[m.id] = m; });
+      const printItems = giveawayCart.map(item=> {
+        const m = modelById[item.model_id] || {};
+        return { code: m.code || '', name: m.name || item.model_name, unit: m.unit || '',
+                 serial_no: item.serial_no || '', quantity: item.quantity };
+      });
+      const gvDoc = { to_name: to, note: note || '', created_by: currentUsername, date: date };
+      toast(`ບັນທຶກການເບີກ/ແຖມສຳເລັດ · ${giveawayCart.length} ລາຍການ`);
+      askPrint('ບັນທຶກການເບີກ / ແຖມສຳເລັດ', `ໃຫ້ ${to} · ${printItems.length} ລາຍການ · ພິມໃບເບີກ A5 ບໍ່?`,
+        (w)=> printGiveawayDoc(gvDoc, printItems, { win: w }));
+      giveawayCart = [];
+      tabDrafts.giveaway = {};
+      renderTab();
+    }catch(err){ toast('ຜິດພາດ: '+err.message); btn.disabled = false; }
+  });
+}
+function renderGiveawayCart(){
+  const head = '<table class="ps-table ps-table-tr"><thead><tr><th class="c">ລຳດັບ</th><th>ຊື່ສິນຄ້າ</th>'+
+    '<th>ເລກເຄື່ອງ</th><th class="c">ຈຳນວນ</th><th></th></tr></thead><tbody>';
+  if(!giveawayCart.length){
+    return head + '<tr class="ps-empty"><td colspan="5">ຍັງບໍ່ມີລາຍການ — ເລືອກສິນຄ້າຂ້າງເທິງ ແລ້ວກົດ + ເພີ່ມ</td></tr></tbody></table>';
+  }
+  const rows = giveawayCart.map((it,idx)=>
+    `<tr><td class="c mono">${idx+1}</td><td>${it.model_name}</td>`+
+    `<td class="mono muted">${it.serial_no || '—'}</td>`+
+    `<td class="c mono b">${it.quantity}</td>`+
+    `<td class="c"><span class="x" data-idx="${idx}">✕</span></td></tr>`).join('');
+  return head + rows + '</tbody></table>';
+}
+function updateGiveawayCount(){
+  const big = document.getElementById('gv_bigCount');
+  if(!big) return;
+  big.textContent = fmtMoney(giveawayCart.reduce((s,i)=> s + (Number(i.quantity)||0), 0));
+  const line = document.getElementById('gv_lineCount');
+  if(line) line.textContent = giveawayCart.length;
+}
+function bindGiveawayCartRemove(){
+  updateGiveawayCount();
+  document.querySelectorAll('#gv_cartList .x').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      giveawayCart.splice(Number(el.dataset.idx),1);
+      document.getElementById('gv_cartList').innerHTML = renderGiveawayCart();
+      bindGiveawayCartRemove();
+    });
+  });
+}
+/* ໃບ A5 — ບໍ່ມີລາຄາ ແລະ ຍອດເງິນ ເພາະເປັນການເບີກ/ແຖມ */
+function giveawayDocBody(t, items){
+  const rows = items.map((it, i)=>
+    '<tr><td>' + (i+1) + '</td>' +
+    '<td>' + escHtml(it.code || '-') + '</td>' +
+    '<td>' + escHtml(it.name || '-') +
+      (it.serial_no ? '<div class="c">ເລກເຄື່ອງ ' + escHtml(it.serial_no) + '</div>' : '') + '</td>' +
+    '<td class="num">' + fmtMoney(it.quantity) + ' ' + escHtml(it.unit || '') + '</td></tr>'
+  ).join('');
+  const totalQty = items.reduce((s, it)=> s + (Number(it.quantity) || 0), 0);
+  return '<h1>ໃບເບີກ / ແຖມສິນຄ້າ</h1>' +
+    '<p class="sub">' + escHtml(fmtDateDMY(t.date)) + '</p>' +
+    '<div class="cust">' +
+      '<div class="meta-row"><b>ຈາກ:</b>' + escHtml(PRINT_FROM_BRANCH) + '</div>' +
+      '<div class="meta-row"><b>ຜູ້ຮັບ:</b>' + escHtml(t.to_name || '-') + '</div>' +
+      (t.created_by ? '<div class="meta-row"><b>ຜູ້ອອກໃບ:</b>' + escHtml(t.created_by) + '</div>' : '') +
+      (t.note ? '<div class="meta-row"><b>ເຫດຜົນ:</b>' + escHtml(t.note) + '</div>' : '') +
+    '</div>' +
+    '<table><thead><tr><th>ລຳດັບ</th><th>ລະຫັດສິນຄ້າ</th><th>ລາຍການ</th><th class="num">ຈຳນວນ</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody></table>' +
+    '<div class="grand"><span>ລວມຈຳນວນ</span><span>' + fmtMoney(totalQty) + '</span></div>' +
+    printSigns('ຜູ້ມອບເຄື່ອງ', '(' + PRINT_FROM_BRANCH + ')', 'ຜູ້ຮັບເຄື່ອງ', '(' + escHtml(t.to_name || '') + ') ໄດ້ຮັບເຄື່ອງຄົບແລ້ວ');
+}
+function printGiveawayDoc(t, items, opts){
+  printDoc('ໃບເບີກ-ແຖມ ' + (t.to_name || ''), giveawayDocBody(t, items), opts);
+}
+/* ປະກອບໃບຈາກກຸ່ມ movement ໃນປະຫວັດ (ໝາຍເຫດຮູບແບບ "ເບີກ/ແຖມໃຫ້: ຜູ້ຮັບ - ເຫດຜົນ") */
+function giveawayDocFromGroup(group){
+  const noteStr = group.note || '';
+  const m = /^ເບີກ\/ແຖມໃຫ້:\s*([^-]+?)(?:\s*-\s*([\s\S]*))?$/.exec(noteStr);
+  const t = {
+    to_name: m ? m[1].trim() : '',
+    note: m ? (m[2] || '').trim() : noteStr,
+    created_by: group.created_by || '',
+    date: (group.date || '').slice(0,10)
+  };
+  const items = (group.items || []).map(it=> ({
+    code: (it.stock_product_models && it.stock_product_models.code) || '',
+    name: (it.stock_product_models && it.stock_product_models.name) || '-',
+    unit: (it.stock_product_models && it.stock_product_models.unit) || '',
+    serial_no: (it.stock_product_units && it.stock_product_units.serial_no) || '',
+    quantity: it.quantity
+  }));
+  return { t, items };
+}
+async function loadGiveawayHistory(month){
+  const el = document.getElementById('gv_history');
+  if(!el) return;
+  const isAdmin = currentRole === 'admin';
+  try{
+    const start = month + '-01';
+    const endDate = new Date(start); endDate.setMonth(endDate.getMonth()+1);
+    const end = endDate.toISOString().slice(0,10);
+    const rows = await sb(`stock_movements?select=*,stock_product_models(name,unit,code),stock_product_units(serial_no)&ref_type=eq.giveaway&created_at=gte.${start}&created_at=lt.${end}&order=created_at.desc`);
+    const groups = {};
+    rows.forEach(r=>{
+      const key = r.ref_id || r.id;
+      if(!groups[key]) groups[key] = { key, note: r.note, date: r.created_at, created_by: r.created_by, items: [] };
+      groups[key].items.push(r);
+    });
+    const groupList = Object.values(groups);
+    const totalQty = rows.reduce((s,r)=> s + (Number(r.quantity)||0), 0);
+    el.innerHTML = `
+      ${groupList.length ? `<div class="row" style="padding:6px 0;"><span class="muted" style="font-size:12px;">ເດືອນນີ້ເບີກ/ແຖມອອກ</span><b class="mono">${fmtMoney(totalQty)} ອັນ/ຄັນ</b></div>` : ''}
+      ${isAdmin && groupList.length ? `
+        <div class="row" style="padding:6px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);margin:0;">
+            <input type="checkbox" id="gv_selectAll" style="width:17px;height:17px;margin:0;">ເລືອກທັງໝົດ
+          </label>
+          <button class="btn danger" id="gv_deleteSelected" style="display:none;padding:6px 12px;font-size:12px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບທີ່ເລືອກ (<span id="gv_selectedCount">0</span>)</button>
+        </div>
+      ` : ''}
+      ${groupList.length ? groupList.map(g=> `
+      <div class="row clickable" data-gvgroup="${g.key}">
+        <span style="display:flex;align-items:center;gap:10px;">
+          ${isAdmin ? `<input type="checkbox" class="gv-check" value="${g.key}" style="width:17px;height:17px;flex:none;margin:0;" onclick="event.stopPropagation()">` : ''}
+          <span>
+            <div>${g.note || 'ເບີກ / ແຖມ'}</div>
+            <div class="muted" style="font-size:11px;">${fmtDateDMY((g.date||'').slice(0,10))} · ${g.items.length} ລາຍການ</div>
+          </span>
+        </span>
+      </div>`).join('') : '<div class="empty">ບໍ່ມີການເບີກ / ແຖມໃນເດືອນນີ້</div>'}`;
+    el.querySelectorAll('.row[data-gvgroup]').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if(e.target.closest('.gv-check')) return;
+        openGiveawayDetail(groups[row.dataset.gvgroup]);
+      });
+    });
+    if(isAdmin && groupList.length){
+      const selectAllEl = document.getElementById('gv_selectAll');
+      const deleteBtn = document.getElementById('gv_deleteSelected');
+      const countEl = document.getElementById('gv_selectedCount');
+      const checks = ()=> Array.from(el.querySelectorAll('.gv-check'));
+      function refreshSelection(){
+        const selected = checks().filter(c=> c.checked);
+        countEl.textContent = selected.length;
+        deleteBtn.style.display = selected.length ? 'inline-flex' : 'none';
+        selectAllEl.checked = selected.length === checks().length;
+      }
+      selectAllEl.addEventListener('change', ()=>{
+        checks().forEach(c=> c.checked = selectAllEl.checked);
+        refreshSelection();
+      });
+      checks().forEach(c=> c.addEventListener('change', refreshSelection));
+      deleteBtn.addEventListener('click', async ()=>{
+        const keys = checks().filter(c=> c.checked).map(c=> c.value);
+        if(!keys.length) return;
+        if(!await confirmDelete(`ລົບການເບີກ/ແຖມ ${keys.length} ລາຍການທີ່ເລືອກ?`, 'ສະຕັອກທີ່ເບີກອອກໄປຈະຖືກຄືນກັບມາ')) return;
+        if(deleteBtn.disabled) return;
+        deleteBtn.disabled = true;
+        try{
+          await voidGiveawayGroups(keys.map(k=> groups[k]));
+          toast(`ລົບສຳເລັດ ${keys.length} ລາຍການ ຄືນສະຕັອກແລ້ວ`);
+          renderTab();
+        }catch(err){ toast('ລົບບໍ່ໄດ້: '+err.message); deleteBtn.disabled = false; }
+      });
+    }
+  }catch(err){
+    el.innerHTML = `<div class="empty">ຜິດພາດ: ${err.message}</div>`;
+  }
+}
+async function openGiveawayDetail(group){
+  if(!group) return;
+  const doc = giveawayDocFromGroup(group);
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal">
+    ${paperHtml(giveawayDocBody(doc.t, doc.items))}
+    <button class="btn secondary" id="gvPrintBtn" style="margin-top:16px;"><svg class="dv-icon"><use href="#i-printer"></use></svg>ພິມໃບເບີກ (A5)</button>
+    ${currentRole==='admin' ? `<button class="btn danger" id="gvDeleteBtn" style="margin-top:8px;"><svg class="dv-icon"><use href="#i-trash"></use></svg>ລົບລາຍການນີ້ (ຄືນສະຕັອກ)</button>` : ''}
+    <button class="btn secondary" id="gvDetailClose">ປິດ</button>
+  </div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', (e)=>{ if(e.target === bg) bg.remove(); });
+  bg.querySelector('#gvPrintBtn').addEventListener('click', ()=>{
+    const w = openPrintWindow();
+    if(w) printGiveawayDoc(doc.t, doc.items, { win: w });
+  });
+  bg.querySelector('#gvDetailClose').addEventListener('click', ()=> bg.remove());
+  if(currentRole==='admin'){
+    const delBtn = bg.querySelector('#gvDeleteBtn');
+    delBtn.addEventListener('click', async ()=>{
+      if(!await confirmDelete('ລົບການເບີກ/ແຖມນີ້?', 'ສິນຄ້າທີ່ມີເລກເຄື່ອງຈະຄືນເປັນສະຕັອກຄົງເຫຼືອ')) return;
+      if(delBtn.disabled) return;
+      delBtn.disabled = true;
+      try{
+        await voidGiveawayGroups([group]);
+        toast('ລົບສຳເລັດ ຄືນສະຕັອກແລ້ວ');
+        bg.remove();
+        renderTab();
+      }catch(err){ toast('ຜິດພາດ: '+err.message); delBtn.disabled = false; }
+    });
+  }
+}
+/* ລົບການເບີກ/ແຖມ: ເຄື່ອງທີ່ມີເລກເຄື່ອງກັບເປັນ in_stock ແລ້ວລົບ movement ອອກ (ສະຕັອກຈະຄືນເອງ) */
+async function voidGiveawayGroups(groupsArr){
+  const allItems = groupsArr.flatMap(g=> g.items);
+  const unitIds = [...new Set(allItems.filter(it=> it.unit_id).map(it=> it.unit_id))];
+  const movementIds = allItems.map(it=> it.id);
+  await Promise.all([
+    unitIds.length ? sb(`stock_product_units?id=in.(${unitIds.join(',')})`, { method:'PATCH', body:{ status:'in_stock', note: null } }) : Promise.resolve(),
+    movementIds.length ? sb(`stock_movements?id=in.(${movementIds.join(',')})`, { method:'DELETE' }) : Promise.resolve()
+  ]);
 }
 
 /* ============================================================
