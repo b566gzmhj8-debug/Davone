@@ -4096,15 +4096,36 @@
         loadInbox();
         return;
       }
+      var newVeh = 0;
       items.forEach(function(it){
         var code = (it.code || "").trim();
+        /* ເຄື່ອງທີ່ມີເລກເຄື່ອງ (ລົດ) = ແຍກເປັນແຖວລະຄັນ ບໍ່ລວມເປັນກ້ອນດຽວ
+           ເມື່ອກ່ອນລວມເປັນແຖວດຽວ ຈຳນວນ 5 ແຕ່ຈື່ເລກໄດ້ຄັນດຽວ ຈຶ່ງບອກບໍ່ໄດ້ວ່າຄັນໃດເລກຫຍັງ ແລະ ຂາຍບໍ່ໄດ້ */
+        if(it.serial_no){
+          var serial = String(it.serial_no).trim();
+          /* ຮັບມາແລ້ວ (ເລກຊ້ຳ) ບໍ່ຕ້ອງເພີ່ມອີກ */
+          if(DATA.stock.some(function(x){ return x.chassisNo === serial || x.engineNo === serial; })) return;
+          /* ຖ້າມີລົດລຸ່ນດຽວກັນຢູ່ແລ້ວ ໃຫ້ຢືມ ຫົວໜ່ວຍ / ສະກຸນ / ລາຄາ ມານຳ ຈະໄດ້ບໍ່ຕ້ອງພິມໃໝ່ທຸກຄັນ */
+          var sib = DATA.stock.find(function(x){ return x.name === it.name && isVehicleItem(x); });
+          DATA.stock.push({
+            id: uid(), name: it.name, code: code, category: "vehicle",
+            unit: (sib && sib.unit) || it.unit || "ຄັນ",
+            qty: Math.max(1, Number(it.quantity || 1)), min: null,
+            costPrice: sib && sib.costPrice != null ? sib.costPrice
+                     : (it.cost_price != null ? Number(it.cost_price) : null),
+            sellPrice: sib ? (sib.sellPrice != null ? sib.sellPrice : null) : null,
+            currency: (sib && sib.currency) || "LAK",
+            brand: (sib && sib.brand) || "", engineNo: "", chassisNo: serial
+          });
+          newVeh++;
+          return;
+        }
         var item = DATA.stock.find(function(x){
           return (code && x.code === code) || (!code && x.name === it.name);
         });
         if(!item){
           item = { id: uid(), name: it.name, code: code, category: "part", unit: it.unit || "ອັນ",
                    qty: 0, min: null, costPrice: null, sellPrice: null, currency: "LAK" };
-          if(it.serial_no){ item.category = "vehicle"; item.chassisNo = it.serial_no; }
           DATA.stock.push(item);
         }
         if(item.costPrice == null && it.cost_price != null){ item.costPrice = Number(it.cost_price); }
@@ -4115,7 +4136,8 @@
       renderSummary();
       inboxDocs = inboxDocs.filter(function(x){ return x.id !== t.id; });
       renderInbox();
-      alert("ຮັບເຂົ້າສະຕັອກແລ້ວ "+items.length+" ລາຍການ");
+      alert("ຮັບເຂົ້າສະຕັອກແລ້ວ "+items.length+" ລາຍການ"
+            + (newVeh ? "\n(ເຄື່ອງທີ່ມີເລກເຄື່ອງ "+newVeh+" ຄັນ ແຍກເປັນແຖວລະຄັນ — ໃສ່ລາຄາຂາຍໄດ້ເລີຍ)" : ""));
     }).catch(function(err){
       btn.disabled = false;
       btn.textContent = "ຢືນຢັນຮັບເຂົ້າສະຕັອກ";
