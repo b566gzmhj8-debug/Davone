@@ -329,11 +329,12 @@
   .modal { background:#16213e; border-radius:20px; padding:32px 24px; text-align:center; width:80%; max-width:320px; display:flex; flex-direction:column; align-items:center; gap:10px; color:#fff; }
   .modal-img-box { background:#fff; border-radius:16px; overflow:hidden; width:96vw; max-width:640px; max-height:94vh; display:flex; flex-direction:column; }
   .modal-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#1a1a1a; color:#fff; font-size:14px; font-weight:600; flex-shrink:0; }
-  .modal-img-viewport { flex:1 1 auto; min-height:0; overflow:auto; background:#0c0c0c; display:flex; align-items:flex-start; justify-content:center; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y pinch-zoom; }
-  .modal-img { width:100%; display:block; cursor:zoom-in; transition:transform 0.15s; }
-  .modal-img.zoomed { width:260%; max-width:none; cursor:zoom-out; }
-  .modal-img.rot-side { width:auto; height:94vh; max-width:none; }
-  .modal-img.rot-side.zoomed { height:260%; }
+  .modal-img-viewport { flex:1 1 auto; min-height:0; overflow:auto; background:#0c0c0c; display:flex; align-items:center; justify-content:center; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y pinch-zoom; }
+  /* ຮູບບິນຕ້ອງເຫັນເຕັມໃບກ່ອນສະເໝີ (ທັງຈໍຄອມ ແລະ ມືຖື) — ຂະໜາດຈິງຄຳນວນດ້ວຍ JS ໃຫ້ພໍດີກັບກອບ
+     ເມື່ອກ່ອນໃຊ້ width:100% ຮູບແນວຕັ້ງຈຶ່ງສູງລົ້ນກອບ ຕ້ອງເລື່ອນຫາ ເບິ່ງບໍ່ຄົບໃນເທື່ອດຽວ */
+  .modal-img { display:block; margin:auto; max-width:100%; max-height:100%; width:auto; height:auto;
+               object-fit:contain; cursor:zoom-in; transition:max-width .15s, max-height .15s; }
+  .modal-img.zoomed { cursor:zoom-out; }
   .modal-info { padding:14px 16px; font-size:13px; line-height:1.8; color:#ccc; text-align:left; width:100%; flex-shrink:0; }
   .modal-actions { display:flex; gap:12px; width:100%; }
   .btn-cancel { flex:1; padding:13px; border-radius:12px; border:1.5px solid #555; background:#1a1a2e; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; color:#ccc; }
@@ -545,8 +546,7 @@
     .theme-btn { bottom:22px; right:22px; }
 
     /* image viewer scaled for desktop */
-    .modal-img-box { max-width:720px; max-height:90vh; }
-    .modal-img.rot-side { height:auto; max-height:82vh; }
+    .modal-img-box { max-width:860px; max-height:92vh; }
   }
 
 /* ═══════════ ADMIN / OWNER REDESIGN — C1 LEDGER ═══════════ */
@@ -2894,7 +2894,8 @@ async function viewBill(id) {
     const viewport = document.getElementById("billImgViewport");
     if (!viewport) return; // modal already closed
     if (!image) { viewport.innerHTML = `<div style="color:#5b6472;font-size:13px;padding:40px 0">ບໍ່ມີຮູບບິນ</div>`; return; }
-    viewport.innerHTML = `<img src="${image}" class="modal-img" id="billImgEl" ondblclick="toggleZoomBillImg()">`;
+    viewport.innerHTML = `<img src="${image}" class="modal-img" id="billImgEl" ondblclick="toggleZoomBillImg()" onload="fitBillImg()">`;
+    fitBillImg();
     document.getElementById("billRotateBtn").style.display = "";
   } catch(e) {
     const viewport = document.getElementById("billImgViewport");
@@ -2903,16 +2904,32 @@ async function viewBill(id) {
 }
 
 let billRotation = 0;
+/* ວາງຂະໜາດຮູບໃຫ້ພໍດີກັບກອບ — ຕອນໝຸນ 90° ດ້ານກວ້າງ/ສູງຈະສະຫຼັບກັນ
+   ຊູມແລ້ວຂະຫຍາຍຂອບເຂດຈິງ (ບໍ່ແມ່ນ scale) ກອບຈຶ່ງເລື່ອນເບິ່ງສ່ວນທີ່ລົ້ນໄດ້ */
+function fitBillImg() {
+  const img = document.getElementById("billImgEl");
+  const vp  = document.getElementById("billImgViewport");
+  if (!img || !vp) return;
+  const side = billRotation === 90 || billRotation === 270;
+  const k = img.classList.contains("zoomed") ? 2.5 : 1;
+  const w = vp.clientWidth * k, h = vp.clientHeight * k;
+  img.style.maxWidth  = (side ? h : w) + "px";
+  img.style.maxHeight = (side ? w : h) + "px";
+}
 function toggleZoomBillImg() {
   const img = document.getElementById("billImgEl");
-  if (img) img.classList.toggle("zoomed");
+  if (!img) return;
+  img.classList.toggle("zoomed");
+  fitBillImg();
 }
 function rotateBillImg() {
   const img = document.getElementById("billImgEl"); if (!img) return;
   billRotation = (billRotation + 90) % 360;
   img.style.transform = `rotate(${billRotation}deg)`;
-  img.classList.toggle("rot-side", billRotation===90 || billRotation===270);
+  fitBillImg();
 }
+/* ປັບຂະໜາດໜ້າຈໍ / ໝຸນຈໍ ແລ້ວໃຫ້ຮູບພໍດີຄືເກົ່າ */
+window.addEventListener("resize", () => { if (document.getElementById("billImgEl")) fitBillImg(); });
 
 async function doBackup() {
   const all = await dbGet();
@@ -3980,8 +3997,8 @@ function lockOverlay(overlay) {
 function showImgFull(src) {
   const overlay = document.createElement("div");
   overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow:hidden";
-  overlay.innerHTML = '<div class="zoom-wrap" style="width:100%;height:85vh;overflow:auto;display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch">'
-    + '<img src="'+src+'" class="zoom-img" style="max-width:100%;border-radius:12px;transition:transform .15s;transform-origin:top center;cursor:zoom-in">'
+  overlay.innerHTML = '<div class="zoom-wrap" style="width:100%;height:85vh;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch">'
+    + '<img src="'+src+'" class="zoom-img" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:12px;transition:transform .15s;transform-origin:top center;cursor:zoom-in">'
     + '</div>'
     + '<div style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:8px"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/></svg> ແຕະຮູບເພື່ອຂະຫຍາຍ · ລູບເພື່ອເລື່ອນ</div>'
     + '<button onclick="this.parentNode.remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;width:44px;height:44px;border-radius:50%;cursor:pointer">✕</button>';
